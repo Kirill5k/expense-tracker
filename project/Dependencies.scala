@@ -2,74 +2,78 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    lazy val mongo4cats = "0.2.8"
-    lazy val pureConfig = "0.15.0"
-    lazy val circe      = "0.14.1"
-    lazy val sttp       = "3.3.6"
-    lazy val http4s     = "1.0.0-M23"
-    lazy val logback    = "1.2.3"
-    lazy val log4cats   = "2.1.1"
+    val mongo4cats = "0.2.8"
+    val pureConfig = "0.15.0"
+    val circe      = "0.14.1"
+    val sttp       = "3.3.6"
+    val http4s     = "1.0.0-M23"
+    val logback    = "1.2.3"
+    val log4cats   = "2.1.1"
+    val squants    = "1.8.0"
 
-    lazy val scalaTest     = "3.2.9"
-    lazy val mockito       = "1.16.37"
-    lazy val embeddedMongo = "3.0.0"
+    val scalaTest     = "3.2.9"
+    val mockito       = "1.16.37"
+    val embeddedMongo = "3.0.0"
   }
 
   object Libraries {
+    val squants = "org.typelevel" %% "squants" % Versions.squants
+
     object mongo4cats {
-      lazy val core  = "io.github.kirill5k" %% "mongo4cats-core"  % Versions.mongo4cats
-      lazy val circe = "io.github.kirill5k" %% "mongo4cats-circe" % Versions.mongo4cats
+      val core  = "io.github.kirill5k" %% "mongo4cats-core"  % Versions.mongo4cats
+      val circe = "io.github.kirill5k" %% "mongo4cats-circe" % Versions.mongo4cats
     }
 
     object pureconfig {
-      lazy val core       = "com.github.pureconfig" %% "pureconfig"             % Versions.pureConfig
+      val core = "com.github.pureconfig" %% "pureconfig" % Versions.pureConfig
     }
 
     object logging {
-      lazy val logback  = "ch.qos.logback" % "logback-classic" % Versions.logback
-      lazy val log4cats = "org.typelevel" %% "log4cats-slf4j"  % Versions.log4cats
+      val logback  = "ch.qos.logback" % "logback-classic" % Versions.logback
+      val log4cats = "org.typelevel" %% "log4cats-slf4j"  % Versions.log4cats
 
-      lazy val all = Seq(log4cats, logback)
+      val all = Seq(log4cats, logback)
     }
 
     object circe {
-      lazy val core          = "io.circe" %% "circe-core"           % Versions.circe
-      lazy val literal       = "io.circe" %% "circe-literal"        % Versions.circe
-      lazy val generic       = "io.circe" %% "circe-generic"        % Versions.circe
-      lazy val genericExtras = "io.circe" %% "circe-generic-extras" % Versions.circe
-      lazy val parser        = "io.circe" %% "circe-parser"         % Versions.circe
+      val core          = "io.circe" %% "circe-core"           % Versions.circe
+      val literal       = "io.circe" %% "circe-literal"        % Versions.circe
+      val generic       = "io.circe" %% "circe-generic"        % Versions.circe
+      val genericExtras = "io.circe" %% "circe-generic-extras" % Versions.circe
+      val parser        = "io.circe" %% "circe-parser"         % Versions.circe
 
-      lazy val all = Seq(core, literal, generic, genericExtras, parser)
+      val all = Seq(core, literal, generic, genericExtras, parser)
     }
 
     object sttp {
-      lazy val core        = "com.softwaremill.sttp.client3" %% "core"                           % Versions.sttp
-      lazy val circe       = "com.softwaremill.sttp.client3" %% "circe"                          % Versions.sttp
-      lazy val catsBackend = "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % Versions.sttp
+      val core        = "com.softwaremill.sttp.client3" %% "core"                           % Versions.sttp
+      val circe       = "com.softwaremill.sttp.client3" %% "circe"                          % Versions.sttp
+      val catsBackend = "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % Versions.sttp
 
-      lazy val all = Seq(core, circe, catsBackend)
+      val all = Seq(core, circe, catsBackend)
     }
 
     object http4s {
-      lazy val core   = "org.http4s" %% "http4s-core"         % Versions.http4s
-      lazy val dsl    = "org.http4s" %% "http4s-dsl"          % Versions.http4s
-      lazy val server = "org.http4s" %% "http4s-server"       % Versions.http4s
-      lazy val blaze  = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
-      lazy val circe  = "org.http4s" %% "http4s-circe"        % Versions.http4s
+      val core   = "org.http4s" %% "http4s-core"         % Versions.http4s
+      val dsl    = "org.http4s" %% "http4s-dsl"          % Versions.http4s
+      val server = "org.http4s" %% "http4s-server"       % Versions.http4s
+      val blaze  = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
+      val circe  = "org.http4s" %% "http4s-circe"        % Versions.http4s
 
-      lazy val all = Seq(core, dsl, server, blaze, circe)
+      val all = Seq(core, dsl, server, blaze, circe)
     }
 
-    lazy val scalaTest        = "org.scalatest"      %% "scalatest"                 % Versions.scalaTest
-    lazy val mockitoCore      = "org.mockito"        %% "mockito-scala"             % Versions.mockito
-    lazy val mockitoScalatest = "org.mockito"        %% "mockito-scala-scalatest"   % Versions.mockito
-    lazy val embeddedMongo    = "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % Versions.embeddedMongo
+    val scalaTest        = "org.scalatest"      %% "scalatest"                 % Versions.scalaTest
+    val mockitoCore      = "org.mockito"        %% "mockito-scala"             % Versions.mockito
+    val mockitoScalatest = "org.mockito"        %% "mockito-scala-scalatest"   % Versions.mockito
+    val embeddedMongo    = "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % Versions.embeddedMongo
   }
 
   lazy val core = Seq(
     Libraries.mongo4cats.core,
     Libraries.mongo4cats.circe,
-    Libraries.pureconfig.core
+    Libraries.pureconfig.core,
+    Libraries.squants
   ) ++
     Libraries.circe.all ++
     Libraries.http4s.all ++
