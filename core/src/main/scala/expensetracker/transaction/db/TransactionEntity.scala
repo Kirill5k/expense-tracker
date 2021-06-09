@@ -1,5 +1,6 @@
 package expensetracker.transaction.db
 
+import cats.implicits._
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind, TransactionNote}
 import expensetracker.user.UserId
@@ -15,15 +16,10 @@ final case class TransactionCategory(
     userId: Option[ObjectId]
 )
 
-final case class TransactionAmount(
-    amount: BigDecimal,
-    currency: String
-)
-
 sealed trait TransactionEntity {
   def id: ObjectId
   def kind: TransactionKind
-  def amount: TransactionAmount
+  def amount: Money
   def date: Instant
   def note: Option[String]
 
@@ -35,7 +31,7 @@ final case class SimpleTransactionEntity(
     userId: ObjectId,
     categoryId: ObjectId,
     kind: TransactionKind,
-    amount: TransactionAmount,
+    amount: Money,
     date: Instant,
     note: Option[String]
 ) extends TransactionEntity {
@@ -47,7 +43,7 @@ final case class JoinedTransactionEntity(
     userId: ObjectId,
     category: TransactionCategory,
     kind: TransactionKind,
-    amount: TransactionAmount,
+    amount: Money,
     date: Instant,
     note: Option[String]
 ) extends TransactionEntity {
@@ -62,10 +58,10 @@ final case class JoinedTransactionEntity(
         CategoryIcon(category.icon),
         category.userId.map(id => UserId(id.toHexString))
       ),
-      amount = Money(amount.amount, amount.currency)(defaultMoneyContext),
+      amount = amount,
       date = date,
       note = note.map(n => TransactionNote(n))
-    )
+    ).some
 }
 
 object TransactionEntity {
@@ -76,7 +72,7 @@ object TransactionEntity {
       new ObjectId(tx.userId.value),
       new ObjectId(tx.categoryId.value),
       tx.kind,
-      TransactionAmount(tx.amount.amount, tx.amount.currency.code),
+      tx.amount,
       tx.date,
       tx.note.map(_.value)
     )
