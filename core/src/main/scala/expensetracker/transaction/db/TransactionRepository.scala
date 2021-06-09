@@ -31,6 +31,8 @@ final private class LiveTransactionRepository[F[_]: Async](
         Aggregates.unwind("category"),
         Aggregates.project(Projections.exclude("categoryId"))
       ))
+      .all[F]
+      .map(_.flatMap(_.toDomain))
 }
 
 object TransactionRepository {
