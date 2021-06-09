@@ -1,4 +1,4 @@
-package io.github.kirill5k.template
+package expensetracker
 
 import de.flapdoodle.embed.mongo.MongodStarter
 import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}

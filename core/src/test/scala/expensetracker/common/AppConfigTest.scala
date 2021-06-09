@@ -1,6 +1,6 @@
-package io.github.kirill5k.template.common
+package expensetracker.common
 
-import io.github.kirill5k.template.common.config.AppConfig
+import config.AppConfig
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

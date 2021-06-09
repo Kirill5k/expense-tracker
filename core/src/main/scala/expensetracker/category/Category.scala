@@ -1,8 +1,8 @@
-package io.github.kirill5k.template.category
+package expensetracker.category
 
-import io.github.kirill5k.template.user.UserId
+import expensetracker.user.UserId
 
-final case class CategoryId(value: String)     extends AnyVal
+final case class CategoryId(value: String)   extends AnyVal
 final case class CategoryName(value: String) extends AnyVal
 final case class CategoryIcon(value: String) extends AnyVal
 

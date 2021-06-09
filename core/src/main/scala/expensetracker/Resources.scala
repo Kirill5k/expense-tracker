@@ -1,7 +1,7 @@
-package io.github.kirill5k.template
+package expensetracker
 
 import cats.effect.{Async, Resource}
-import io.github.kirill5k.template.common.config.{AppConfig, MongoConfig}
+import expensetracker.common.config.{AppConfig, MongoConfig}
 import mongo4cats.client.MongoClientF
 
 trait Resources[F[_]] {

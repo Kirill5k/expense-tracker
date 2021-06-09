@@ -1,7 +1,7 @@
-package io.github.kirill5k.template
+package expensetracker
 
 import cats.effect.{IO, IOApp}
-import io.github.kirill5k.template.common.config.AppConfig
+import expensetracker.common.config.AppConfig
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.Router

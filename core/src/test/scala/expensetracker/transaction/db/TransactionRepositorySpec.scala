@@ -1,11 +1,13 @@
-package io.github.kirill5k.template.transaction.db
+package expensetracker.transaction.db
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import io.github.kirill5k.template.EmbeddedMongo
-import io.github.kirill5k.template.category.CategoryId
-import io.github.kirill5k.template.transaction.{CreateTransaction, TransactionKind}
-import io.github.kirill5k.template.user.UserId
+import expensetracker.EmbeddedMongo
+import expensetracker.category.CategoryId
+import expensetracker.transaction.{CreateTransaction, TransactionKind}
+import expensetracker.transaction.TransactionKind.Expense
+import expensetracker.user.UserId
+import io.github.kirill5k.template.transaction.CreateTransaction
 import mongo4cats.client.MongoClientF
 import org.bson.Document
 import org.bson.types.ObjectId
@@ -30,7 +32,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         val result = for {
           repo <- TransactionRepository.make(client)
           res <- repo.create(
-            CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None)
+            CreateTransaction(user1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None)
           )
         } yield res
 

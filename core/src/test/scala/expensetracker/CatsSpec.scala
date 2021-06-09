@@ -1,4 +1,4 @@
-package io.github.kirill5k.template
+package expensetracker
 
 import cats.effect.IO
 import org.mockito.ArgumentMatchersSugar

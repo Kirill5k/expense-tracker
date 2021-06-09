@@ -1,4 +1,4 @@
-package io.github.kirill5k.template.user
+package expensetracker.user
 
 final case class UserId(value: String)         extends AnyVal
 final case class UserName(value: String)     extends AnyVal

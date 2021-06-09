@@ -1,4 +1,4 @@
-package io.github.kirill5k.template.common
+package expensetracker.common
 
 object errors {
 
