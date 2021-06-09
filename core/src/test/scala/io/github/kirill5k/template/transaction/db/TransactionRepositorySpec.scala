@@ -1,28 +1,57 @@
-package io.github.kirill5k.template.transaction
+package io.github.kirill5k.template.transaction.db
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import io.github.kirill5k.template.EmbeddedMongo
 import io.github.kirill5k.template.category.CategoryId
+import io.github.kirill5k.template.transaction.{CreateTransaction, TransactionKind}
 import io.github.kirill5k.template.user.UserId
 import mongo4cats.client.MongoClientF
 import org.bson.Document
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import squants.market.GBP
 
+import java.time.Instant
 import scala.jdk.CollectionConverters._
 
 class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matchers {
 
-  val userId = UserId(new ObjectId().toHexString)
-  val cat1Id = CategoryId(new ObjectId().toHexString)
-  val cat2Id = CategoryId(new ObjectId().toHexString)
+  val user1Id = UserId(new ObjectId().toHexString)
+  val user2Id = UserId(new ObjectId().toHexString)
+  val cat1Id  = CategoryId(new ObjectId().toHexString)
+  val cat2Id  = CategoryId(new ObjectId().toHexString)
 
   "A TransactionRepository" should {
 
-    ""
+    "create new transactions" in {
+      withEmbeddedMongoClient { client =>
+        val result = for {
+          repo <- TransactionRepository.make(client)
+          res <- repo.create(
+            CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None)
+          )
+        } yield res
 
+        result.attempt.map(_ mustBe Right(()))
+      }
+    }
+
+    "return existing transactions from db" in {
+      withEmbeddedMongoClient { client =>
+        val result = for {
+          repo <- TransactionRepository.make(client)
+          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat2Id, GBP(45.0), Instant.now(), None))
+          txs <- repo.getAll(user1Id)
+        } yield txs
+
+        result.map { txs =>
+          txs must have size 2
+        }
+      }
+    }
   }
 
   def withEmbeddedMongoClient[A](test: MongoClientF[IO] => IO[A]): A =
@@ -35,7 +64,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             categories <- db.getCollection("categories")
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "category-1"), categoryDoc(cat2Id, "category-2")))
             users <- db.getCollection("users")
-            _     <- users.insertOne[IO](userDoc(userId, "user-1"))
+            _     <- users.insertMany[IO](List(userDoc(user1Id, "user-1"), userDoc(user2Id, "user-2")))
             res   <- test(client)
           } yield res
         }

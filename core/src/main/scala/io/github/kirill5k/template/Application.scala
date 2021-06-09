@@ -1,12 +1,12 @@
 package io.github.kirill5k.template
 
-import cats.effect.{ExitCode, IO, IOApp}
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
+import cats.effect.{IO, IOApp}
 import io.github.kirill5k.template.common.config.AppConfig
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.Router
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.concurrent.ExecutionContext
 
@@ -24,5 +24,5 @@ object Application extends IOApp.Simple {
         .serve
         .compile
         .drain
-    } yield ExitCode.Success
+    } yield ()
 }
