@@ -3,11 +3,10 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.CategoryId
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.user.UserId
-import io.github.kirill5k.template.transaction.CreateTransaction
 import mongo4cats.client.MongoClientF
 import org.bson.Document
 import org.bson.types.ObjectId
@@ -31,9 +30,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          res <- repo.create(
-            CreateTransaction(user1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None)
-          )
+          res  <- repo.create(CreateTransaction(user1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
         } yield res
 
         result.attempt.map(_ mustBe Right(()))
@@ -45,21 +42,42 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         val result = for {
           repo <- TransactionRepository.make(client)
           _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
-          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat2Id, GBP(45.0), Instant.now(), None))
+          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Income, cat2Id, GBP(45.0), Instant.now(), None))
           txs <- repo.getAll(user1Id)
         } yield txs
 
         result.map { txs =>
           txs must have size 2
+          txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
+          txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
+          txs.map(_.category) mustBe List(
+            Category(cat1Id, CategoryName("category-1"), CategoryIcon("icon"), None),
+            Category(cat2Id, CategoryName("category-2"), CategoryIcon("icon"), None)
+          )
+        }
+      }
+    }
+
+    "not return transactions that belong to other users" in {
+      withEmbeddedMongoClient { client =>
+        val result = for {
+          repo <- TransactionRepository.make(client)
+          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat2Id, GBP(45.0), Instant.now(), None))
+          txs <- repo.getAll(user2Id)
+        } yield txs
+
+        result.map { txs =>
+          txs must have size 0
         }
       }
     }
   }
 
   def withEmbeddedMongoClient[A](test: MongoClientF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo() {
+    withRunningEmbeddedMongo(port = 12346) {
       MongoClientF
-        .fromConnectionString[IO]("mongodb://localhost:12345")
+        .fromConnectionString[IO]("mongodb://localhost:12346")
         .use { client =>
           for {
             db         <- client.getDatabase("expense-tracker")
@@ -74,7 +92,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
     }
 
   def categoryDoc(id: CategoryId, name: String): Document =
-    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "icon" -> "icon1").asJava)
+    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "icon" -> "icon").asJava)
 
   def userDoc(id: UserId, name: String): Document =
     new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "password" -> "password").asJava)

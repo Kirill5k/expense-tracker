@@ -42,8 +42,8 @@ final case class Transaction(
 object Transaction {
   implicit val decodeMoney: Decoder[Money] = Decoder[JsonObject].emap { json =>
     for {
-      rawValue    <- json("value").map(_.toString()).toLeft("missing the actual amount")
-      rawCurrency <- json("currency").map(_.toString()).toLeft("missing currency")
+      rawValue    <- json("value").flatMap(_.asNumber).toRight("missing the actual amount")
+      rawCurrency <- json("currency").flatMap(_.asString).toRight("missing currency")
       currency    <- Currency(rawCurrency)(defaultMoneyContext).toEither.leftMap(_.getMessage)
       value       <- Try(rawValue.toDouble).toEither.leftMap(_.getMessage)
     } yield Money(value, currency)

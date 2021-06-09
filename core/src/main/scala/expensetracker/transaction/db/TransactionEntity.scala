@@ -1,7 +1,7 @@
 package expensetracker.transaction.db
 
-import cats.implicits._
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
+import expensetracker.common.errors.AppError
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind, TransactionNote}
 import expensetracker.user.UserId
 import org.bson.types.ObjectId
@@ -14,63 +14,51 @@ final case class TransactionCategory(
     name: String,
     icon: String,
     userId: Option[ObjectId]
-)
-
-sealed trait TransactionEntity {
-  def id: ObjectId
-  def kind: TransactionKind
-  def amount: Money
-  def date: Instant
-  def note: Option[String]
-
-  def toDomain: Option[Transaction]
+) {
+  def toDomain: Category =
+    Category(
+      CategoryId(id.toHexString),
+      CategoryName(name),
+      CategoryIcon(icon),
+      userId.map(uid => UserId(uid.toHexString))
+    )
 }
 
-final case class SimpleTransactionEntity(
+final case class TransactionEntity(
     id: ObjectId,
     userId: ObjectId,
     categoryId: ObjectId,
+    category: Option[TransactionCategory],
     kind: TransactionKind,
     amount: Money,
     date: Instant,
     note: Option[String]
-) extends TransactionEntity {
-  override def toDomain: Option[Transaction] = None
-}
-
-final case class JoinedTransactionEntity(
-    id: ObjectId,
-    userId: ObjectId,
-    category: TransactionCategory,
-    kind: TransactionKind,
-    amount: Money,
-    date: Instant,
-    note: Option[String]
-) extends TransactionEntity {
-  override def toDomain: Option[Transaction] =
-    Transaction(
-      id = TransactionId(id.toHexString),
-      userId = UserId(userId.toHexString),
-      kind = kind,
-      category = Category(
-        CategoryId(category.id.toHexString),
-        CategoryName(category.name),
-        CategoryIcon(category.icon),
-        category.userId.map(id => UserId(id.toHexString))
-      ),
-      amount = amount,
-      date = date,
-      note = note.map(n => TransactionNote(n))
-    ).some
+) {
+  def toDomain: Either[AppError, Transaction] =
+    category
+      .map(_.toDomain)
+      .toRight(AppError.Mongo(s"unable to find category with id ${categoryId.toHexString}"))
+      .map { cat =>
+        Transaction(
+          id = TransactionId(id.toHexString),
+          userId = UserId(userId.toHexString),
+          kind = kind,
+          category = cat,
+          amount = amount,
+          date = date,
+          note = note.map(n => TransactionNote(n))
+        )
+      }
 }
 
 object TransactionEntity {
 
   def create(tx: CreateTransaction): TransactionEntity =
-    SimpleTransactionEntity(
+    TransactionEntity(
       new ObjectId(),
       new ObjectId(tx.userId.value),
       new ObjectId(tx.categoryId.value),
+      None,
       tx.kind,
       tx.amount,
       tx.date,

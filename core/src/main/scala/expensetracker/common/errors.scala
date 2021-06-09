@@ -6,4 +6,8 @@ object errors {
     def message: String
     override def getMessage: String = message
   }
+
+  object AppError {
+    final case class Mongo(message: String) extends AppError
+  }
 }

@@ -1,9 +1,10 @@
 package expensetracker.transaction.db
 
-import cats.effect.Async
+import cats.effect.{Async, Sync}
 import cats.implicits._
-import com.mongodb.client.model.{Aggregates, Filters, Projections}
+import com.mongodb.client.model.{Aggregates, Filters}
 import expensetracker.transaction.{CreateTransaction, Transaction}
+import expensetracker.transaction.Transaction._
 import expensetracker.user.UserId
 import io.circe.generic.auto._
 import mongo4cats.client.MongoClientF
@@ -25,14 +26,17 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(userId: UserId): F[List[Transaction]] =
     collection
-      .aggregate(List(
-        Aggregates.`match`(Filters.eq("userId", new ObjectId(userId.value))),
-        Aggregates.lookup("categories", "categoryId", "id", "category"),
-        Aggregates.unwind("category"),
-        Aggregates.project(Projections.exclude("categoryId"))
-      ))
+      .aggregate(
+        List(
+          Aggregates.`match`(Filters.eq("userId", new ObjectId(userId.value))),
+          Aggregates.lookup("categories", "categoryId", "id", "category"),
+          Aggregates.unwind("$category")
+        )
+      )
       .all[F]
-      .map(_.flatMap(_.toDomain))
+      .flatMap { tx =>
+        tx.toList.traverse(te => Sync[F].fromEither(te.toDomain))
+      }
 }
 
 object TransactionRepository {
