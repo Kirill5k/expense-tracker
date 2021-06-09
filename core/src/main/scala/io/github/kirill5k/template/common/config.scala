@@ -1,11 +1,13 @@
 package io.github.kirill5k.template.common
 
-import cats.effect.{Blocker, ContextShift, Sync}
+import pureconfig._
 import pureconfig.generic.auto._
-import pureconfig.module.catseffect.syntax._
-import pureconfig.ConfigSource
 
 object config {
+
+  final case class MongoConfig(
+      connectionUri: String
+  )
 
   final case class ServerConfig(
       host: String,
@@ -13,11 +15,11 @@ object config {
   )
 
   final case class AppConfig(
-      server: ServerConfig
+      server: ServerConfig,
+      mongo: MongoConfig
   )
 
   object AppConfig {
-    def load[F[_]: Sync: ContextShift](blocker: Blocker): F[AppConfig] =
-      ConfigSource.default.loadF[F, AppConfig](blocker)
+    def load: AppConfig = ConfigSource.default.loadOrThrow[AppConfig]
   }
 }

@@ -5,9 +5,8 @@ import io.github.kirill5k.template.user.UserId
 import squants.Money
 
 import java.time.Instant
-import java.util.UUID
 
-final case class TransactionId(value: UUID) extends AnyVal
+final case class TransactionId(value: String) extends AnyVal
 
 sealed trait TransactionKind
 object TransactionKind {
