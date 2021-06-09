@@ -1,6 +1,6 @@
 package io.github.kirill5k.template.category
 
-import io.github.kirill5k.template.user.User
+import io.github.kirill5k.template.user.UserId
 
 import java.util.UUID
 
@@ -12,5 +12,5 @@ final case class Category(
     id: CategoryId,
     name: CategoryName,
     icon: CategoryIcon,
-    user: Option[User]
+    userId: Option[UserId]
 )
