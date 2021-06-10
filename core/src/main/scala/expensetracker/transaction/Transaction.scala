@@ -9,8 +9,7 @@ import squants.market.{Currency, Money, defaultMoneyContext}
 import java.time.Instant
 import scala.util.Try
 
-final case class TransactionId(value: String)   extends AnyVal
-final case class TransactionNote(value: String) extends AnyVal
+final case class TransactionId(value: String) extends AnyVal
 
 sealed trait TransactionKind
 object TransactionKind {
@@ -36,7 +35,7 @@ final case class Transaction(
     category: Category,
     amount: Money,
     date: Instant,
-    note: Option[TransactionNote]
+    note: Option[String]
 )
 
 object Transaction {
@@ -60,5 +59,5 @@ final case class CreateTransaction(
     categoryId: CategoryId,
     amount: Money,
     date: Instant,
-    note: Option[TransactionNote]
+    note: Option[String]
 )

@@ -2,7 +2,7 @@ package expensetracker.transaction.db
 
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.common.errors.AppError
-import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind, TransactionNote}
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import expensetracker.user.UserId
 import org.bson.types.ObjectId
 import squants.market._
@@ -46,7 +46,7 @@ final case class TransactionEntity(
           category = cat,
           amount = amount,
           date = date,
-          note = note.map(n => TransactionNote(n))
+          note = note
         )
       }
 }
@@ -62,6 +62,6 @@ object TransactionEntity {
       tx.kind,
       tx.amount,
       tx.date,
-      tx.note.map(_.value)
+      tx.note
     )
 }
