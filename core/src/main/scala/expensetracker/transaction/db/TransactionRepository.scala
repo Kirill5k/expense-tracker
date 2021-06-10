@@ -30,7 +30,8 @@ final private class LiveTransactionRepository[F[_]: Async](
         List(
           Aggregates.`match`(Filters.eq("userId", new ObjectId(userId.value))),
           Aggregates.lookup("categories", "categoryId", "id", "category"),
-          Aggregates.unwind("$category")
+          Aggregates.unwind("$category"),
+          Aggregates.`match`(Filters.not(Filters.eq("category", null)))
         )
       )
       .all[F]

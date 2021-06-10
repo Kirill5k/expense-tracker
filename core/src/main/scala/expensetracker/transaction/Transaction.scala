@@ -48,8 +48,8 @@ object Transaction {
     } yield Money(value, currency)
   }
 
-  implicit val encodeMoney: Encoder[Money] = Encoder[JsonObject].contramap { amount =>
-    JsonObject("value" -> Json.fromBigDecimal(amount.amount), "currency" -> Json.fromString(amount.currency.code))
+  implicit val encodeMoney: Encoder[Money] = Encoder[JsonObject].contramap { m =>
+    JsonObject("value" -> Json.fromBigDecimal(m.amount), "currency" -> Json.fromString(m.currency.code))
   }
 }
 
