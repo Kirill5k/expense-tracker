@@ -8,14 +8,12 @@ import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.user.UserId
 import mongo4cats.client.MongoClientF
-import org.bson.Document
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import squants.market.GBP
 
 import java.time.Instant
-import scala.jdk.CollectionConverters._
 
 class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matchers {
 
@@ -90,10 +88,4 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         }
         .unsafeRunSync()
     }
-
-  def categoryDoc(id: CategoryId, name: String): Document =
-    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "icon" -> "icon").asJava)
-
-  def userDoc(id: UserId, name: String): Document =
-    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "password" -> "password").asJava)
 }
