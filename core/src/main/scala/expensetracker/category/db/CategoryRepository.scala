@@ -2,22 +2,38 @@ package expensetracker.category.db
 
 import cats.effect.Async
 import cats.implicits._
-import expensetracker.category.Category
-import expensetracker.transaction.db.{LiveTransactionRepository, TransactionEntity, TransactionRepository}
+import com.mongodb.client.model.Filters
+import expensetracker.category.{Category, CategoryId}
 import expensetracker.user.UserId
 import io.circe.generic.auto._
 import mongo4cats.client.MongoClientF
 import mongo4cats.circe._
 import mongo4cats.database.MongoCollectionF
+import org.bson.conversions.Bson
+import org.bson.types.ObjectId
 
 trait CategoryRepository[F[_]] {
   def getAll(uid: UserId): F[List[Category]]
+  def remove(uid: UserId, cid: CategoryId): F[Unit]
 }
 
 final private class LiveCategoryRepository[F[_]: Async](
     private val collection: MongoCollectionF[CategoryEntity]
 ) extends CategoryRepository[F] {
-  override def getAll(uid: UserId): F[List[Category]] = ???
+
+  override def getAll(uid: UserId): F[List[Category]] =
+    collection
+      .find(idEq("userId", uid.value))
+      .all[F]
+      .map(_.toList.map(_.toDomain))
+
+  override def remove(uid: UserId, cid: CategoryId): F[Unit] =
+    collection
+      .deleteOne(Filters.and(idEq("userId", uid.value), idEq("id", cid.value)))
+      .void
+
+  private def idEq(name: String, id: String): Bson =
+    Filters.eq(name, new ObjectId(id))
 }
 
 object CategoryRepository {
