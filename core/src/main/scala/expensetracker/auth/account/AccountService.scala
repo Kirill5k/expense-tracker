@@ -5,28 +5,39 @@ import cats.implicits._
 import expensetracker.auth.account.db.AccountRepository
 import expensetracker.common.errors.AppError.InvalidEmailOrPassword
 
+sealed trait LoginResult
+object LoginResult {
+  case object Fail                           extends LoginResult
+  final case class Success(account: Account) extends LoginResult
+}
+
 trait AccountService[F[_]] {
   def create(email: AccountEmail, password: Password): F[AccountId]
-  def login(email: AccountEmail, password: Password): F[Unit]
+  def login(email: AccountEmail, password: Password): F[AccountId]
 }
 
 final private class LiveAccountService[F[_]](
     private val repository: AccountRepository[F],
-    private val passwordEncryptor: PasswordEncryptor[F]
+    private val encryptor: PasswordEncryptor[F]
 )(implicit
     F: MonadError[F, Throwable]
 ) extends AccountService[F] {
 
-  override def create(email: AccountEmail, password: Password): F[AccountId] =
-    passwordEncryptor.hash(password).flatMap(h => repository.create(email, h))
+  import LoginResult._
 
-  override def login(email: AccountEmail, password: Password): F[Unit] =
+  override def create(email: AccountEmail, password: Password): F[AccountId] =
+    encryptor.hash(password).flatMap(h => repository.create(email, h))
+
+  override def login(email: AccountEmail, password: Password): F[AccountId] =
     repository
       .find(email)
-      .flatMap(_.fold(false.pure[F])(a => passwordEncryptor.isValid(password, a.password)))
       .flatMap {
-        case true  => ().pure[F]
-        case false => InvalidEmailOrPassword.raiseError[F, Unit]
+        case Some(acc) => encryptor.isValid(password, acc.password).map[LoginResult](if (_) Success(acc) else Fail)
+        case None      => F.pure[LoginResult](Fail)
+      }
+      .flatMap {
+        case Fail       => InvalidEmailOrPassword.raiseError[F, AccountId]
+        case Success(a) => F.pure(a.id)
       }
 }
 
