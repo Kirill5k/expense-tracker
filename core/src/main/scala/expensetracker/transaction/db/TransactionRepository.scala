@@ -7,9 +7,8 @@ import expensetracker.transaction.{CreateTransaction, Transaction}
 import expensetracker.transaction.Transaction._
 import expensetracker.auth.account.AccountId
 import io.circe.generic.auto._
-import mongo4cats.client.MongoClientF
 import mongo4cats.circe._
-import mongo4cats.database.MongoCollectionF
+import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import org.bson.types.ObjectId
 
 trait TransactionRepository[F[_]] {
@@ -42,9 +41,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
 object TransactionRepository {
 
-  def make[F[_]: Async](client: MongoClientF[F]): F[TransactionRepository[F]] =
-    client
-      .getDatabase("expense-tracker")
-      .flatMap(_.getCollectionWithCirceCodecs[TransactionEntity]("transactions"))
+  def make[F[_]: Async](db: MongoDatabaseF[F]): F[TransactionRepository[F]] =
+    db.getCollectionWithCirceCodecs[TransactionEntity]("transactions")
       .map(coll => new LiveTransactionRepository[F](coll))
 }

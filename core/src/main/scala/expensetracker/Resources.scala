@@ -3,20 +3,23 @@ package expensetracker
 import cats.effect.{Async, Resource}
 import expensetracker.common.config.{AppConfig, MongoConfig}
 import mongo4cats.client.MongoClientF
+import mongo4cats.database.MongoDatabaseF
 
 trait Resources[F[_]] {
-  def mongoClient: MongoClientF[F]
+  def mongo: MongoDatabaseF[F]
 }
 
 object Resources {
 
-  private def mongoClient[F[_]: Async](config: MongoConfig): Resource[F, MongoClientF[F]] =
-    MongoClientF.fromConnectionString[F](config.connectionUri)
+  private def mongoDb[F[_]: Async](config: MongoConfig): Resource[F, MongoDatabaseF[F]] =
+    MongoClientF
+      .fromConnectionString[F](config.connectionUri)
+      .evalMap(_.getDatabase("expense-tracker"))
 
   def make[F[_]: Async](config: AppConfig): Resource[F, Resources[F]] =
-    mongoClient[F](config.mongo).map { mongo =>
+    mongoDb[F](config.mongo).map { db =>
       new Resources[F] {
-        def mongoClient: MongoClientF[F] = mongo
+        def mongo: MongoDatabaseF[F] = db
       }
     }
 }

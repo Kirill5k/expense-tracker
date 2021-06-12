@@ -7,8 +7,7 @@ import expensetracker.auth.account.{Account, AccountEmail, AccountId, PasswordHa
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountNotFound}
 import io.circe.generic.auto._
 import mongo4cats.circe._
-import mongo4cats.client.MongoClientF
-import mongo4cats.database.MongoCollectionF
+import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 
 trait AccountRepository[F[_]] {
   def find(email: AccountEmail): F[Account]
@@ -42,9 +41,7 @@ final private class LiveAccountRepository[F[_]: Async](
 }
 
 object AccountRepository {
-  def make[F[_]: Async](client: MongoClientF[F]): F[AccountRepository[F]] =
-    client
-      .getDatabase("expense-tracker")
-      .flatMap(_.getCollectionWithCirceCodecs[AccountEntity]("accounts"))
+  def make[F[_]: Async](db: MongoDatabaseF[F]): F[AccountRepository[F]] =
+    db.getCollectionWithCirceCodecs[AccountEntity]("accounts")
       .map(coll => new LiveAccountRepository[F](coll))
 }

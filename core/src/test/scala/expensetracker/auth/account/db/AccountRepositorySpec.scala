@@ -6,6 +6,7 @@ import expensetracker.EmbeddedMongo
 import expensetracker.auth.account.{AccountEmail, AccountId, PasswordHash}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountNotFound}
 import mongo4cats.client.MongoClientF
+import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -18,7 +19,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
     "find" should {
       "return account by email" in {
-        withEmbeddedMongoClient { client =>
+        withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
             acc  <- repo.find(AccountEmail("acc1@et.com"))
@@ -32,7 +33,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
       }
 
       "return error when account does not exist" in {
-        withEmbeddedMongoClient { client =>
+        withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
             acc  <- repo.find(AccountEmail("acc2@et.com"))
@@ -47,7 +48,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
     "create" should {
       "create new account" in {
-        withEmbeddedMongoClient { client =>
+        withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
             _    <- repo.create(AccountEmail("acc2@et.com"), PasswordHash("123456"))
@@ -61,7 +62,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
       }
 
       "return error when accout already exists" in {
-        withEmbeddedMongoClient { client =>
+        withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
             _    <- repo.create(AccountEmail("acc1@et.com"), PasswordHash("123456"))
@@ -75,7 +76,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
     }
   }
 
-  def withEmbeddedMongoClient[A](test: MongoClientF[IO] => IO[A]): A =
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
     withRunningEmbeddedMongo(port = 12348) {
       MongoClientF
         .fromConnectionString[IO]("mongodb://localhost:12348")
@@ -84,7 +85,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
             db   <- client.getDatabase("expense-tracker")
             accs <- db.getCollection("accounts")
             _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc1@et.com")))
-            res  <- test(client)
+            res  <- test(db)
           } yield res
         }
         .unsafeRunSync()

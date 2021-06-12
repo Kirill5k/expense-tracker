@@ -6,6 +6,7 @@ import expensetracker.EmbeddedMongo
 import expensetracker.category.{CategoryId, CategoryName}
 import expensetracker.auth.account.AccountId
 import mongo4cats.client.MongoClientF
+import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -19,7 +20,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
 
   "A CategoryRepository" should {
     "return all account's categories" in {
-      withEmbeddedMongoClient { client =>
+      withEmbeddedMongoDb { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
           cats <- repo.getAll(acc2Id)
@@ -35,7 +36,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     }
 
     "remove account's category" in {
-      withEmbeddedMongoClient { client =>
+      withEmbeddedMongoDb { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
           _    <- repo.remove(acc2Id, cat2Id)
@@ -49,7 +50,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     }
 
     "keep category if accountId doesn't match" in {
-      withEmbeddedMongoClient { client =>
+      withEmbeddedMongoDb { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
           _    <- repo.remove(acc1Id, cat2Id)
@@ -63,7 +64,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     }
   }
 
-  def withEmbeddedMongoClient[A](test: MongoClientF[IO] => IO[A]): A =
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
     withRunningEmbeddedMongo(port = 12347) {
       MongoClientF
         .fromConnectionString[IO]("mongodb://localhost:12347")
@@ -74,7 +75,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "c1"), categoryDoc(cat2Id, "c2", Some(acc2Id))))
             accounts <- db.getCollection("accounts")
             _        <- accounts.insertMany[IO](List(accDoc(acc1Id, "acc1"), accDoc(acc2Id, "acc2")))
-            res      <- test(client)
+            res      <- test(db)
           } yield res
         }
         .unsafeRunSync()

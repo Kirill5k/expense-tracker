@@ -8,6 +8,7 @@ import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
 import mongo4cats.client.MongoClientF
+import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -25,7 +26,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
   "A TransactionRepository" should {
 
     "create new transactions" in {
-      withEmbeddedMongoClient { client =>
+      withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
           res  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
@@ -36,7 +37,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
     }
 
     "return existing transactions from db" in {
-      withEmbeddedMongoClient { client =>
+      withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
           _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
@@ -57,7 +58,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
     }
 
     "not return transactions that belong to other accounts" in {
-      withEmbeddedMongoClient { client =>
+      withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
           _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
@@ -72,7 +73,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
     }
   }
 
-  def withEmbeddedMongoClient[A](test: MongoClientF[IO] => IO[A]): A =
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
     withRunningEmbeddedMongo(port = 12346) {
       MongoClientF
         .fromConnectionString[IO]("mongodb://localhost:12346")
@@ -83,7 +84,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "category-1"), categoryDoc(cat2Id, "category-2")))
             accs <- db.getCollection("accounts")
             _     <- accs.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
-            res   <- test(client)
+            res   <- test(db)
           } yield res
         }
         .unsafeRunSync()
