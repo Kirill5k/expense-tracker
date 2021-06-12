@@ -2,6 +2,7 @@ package expensetracker.auth.session
 
 import cats.MonadError
 import cats.data.{Kleisli, OptionT}
+import cats.effect.Temporal
 import cats.implicits._
 import org.http4s.{AuthedRoutes, Request}
 import org.http4s.dsl.Http4sDsl
@@ -12,7 +13,7 @@ object SessionAuthMiddleware {
   def apply[F[_]](
       obtainSession: SessionId => F[Option[Session]]
   )(implicit
-      F: MonadError[F, Throwable]
+      F: Temporal[F]
   ): AuthMiddleware[F, Session] = {
     val dsl = new Http4sDsl[F] {}; import dsl._
 
@@ -25,10 +26,12 @@ object SessionAuthMiddleware {
           .find(_.name == "session-id")
           .map(c => SessionId(c.content))
           .fold("missing session-id cookie".asLeft[Session].pure[F]) { sid =>
-            obtainSession(sid).map {
-              case None                    => "invalid session-id".asLeft[Session]
-              case Some(s) if s.hasExpired => "session has expired".asLeft[Session]
-              case Some(s)                 => s.asRight[String]
+            F.realTime.flatMap { time =>
+              obtainSession(sid).map {
+                case None                                                => "invalid session-id".asLeft[Session]
+                case Some(s) if time.toMillis > s.expiresAt.toEpochMilli => "session has expired".asLeft[Session]
+                case Some(s)                                             => s.asRight[String]
+              }
             }
           }
       }

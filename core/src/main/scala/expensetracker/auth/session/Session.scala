@@ -11,6 +11,4 @@ final case class Session(
     accountId: AccountId,
     createdAt: Instant,
     expiresAt: Instant
-) {
-  def hasExpired: Boolean = Instant.now().isAfter(expiresAt)
-}
+)
