@@ -10,6 +10,7 @@ object Dependencies {
     val logback    = "1.2.3"
     val log4cats   = "2.1.1"
     val squants    = "1.8.0"
+    val bcrypt     = "4.3.0"
 
     val scalaTest     = "3.2.9"
     val mockito       = "1.16.37"
@@ -17,7 +18,8 @@ object Dependencies {
   }
 
   object Libraries {
-    val squants = "org.typelevel" %% "squants" % Versions.squants
+    val squants = "org.typelevel"     %% "squants"      % Versions.squants
+    val bcrypt  = "com.github.t3hnar" %% "scala-bcrypt" % Versions.bcrypt
 
     object mongo4cats {
       val core  = "io.github.kirill5k" %% "mongo4cats-core"  % Versions.mongo4cats
@@ -73,7 +75,8 @@ object Dependencies {
     Libraries.mongo4cats.core,
     Libraries.mongo4cats.circe,
     Libraries.pureconfig.core,
-    Libraries.squants
+    Libraries.squants,
+    Libraries.bcrypt
   ) ++
     Libraries.circe.all ++
     Libraries.http4s.all ++
