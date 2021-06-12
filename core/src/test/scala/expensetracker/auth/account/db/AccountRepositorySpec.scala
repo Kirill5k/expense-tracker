@@ -3,8 +3,8 @@ package expensetracker.auth.account.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.account.{Account, AccountEmail, AccountId, PasswordHash}
-import expensetracker.common.errors.AppError.{AccountAlreadyExists}
+import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountName, PasswordHash}
+import expensetracker.common.errors.AppError.AccountAlreadyExists
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
@@ -14,6 +14,8 @@ import org.scalatest.wordspec.AnyWordSpec
 class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
   val acc1Id = AccountId(new ObjectId().toHexString)
+  val hash = PasswordHash("hash")
+  val accDetails = AccountDetails(AccountEmail("acc1@et.com"), AccountName("John", "Bloggs"))
 
   "An AccountRepository" when {
 
@@ -22,11 +24,11 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
-            acc  <- repo.find(AccountEmail("acc1@et.com"))
+            acc  <- repo.find(accDetails.email)
           } yield acc
 
           result.map { acc =>
-            acc mustBe Some(Account(acc1Id, AccountEmail("acc1@et.com"), PasswordHash("password")))
+            acc mustBe Some(Account(acc1Id, accDetails.email, accDetails.name, hash))
           }
         }
       }
@@ -48,14 +50,16 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
     "create" should {
       "create new account" in {
         withEmbeddedMongoDb { client =>
+          val email = AccountEmail("acc2@et.com")
+
           val result = for {
             repo <- AccountRepository.make(client)
-            _    <- repo.create(AccountEmail("acc2@et.com"), PasswordHash("123456"))
-            acc  <- repo.find(AccountEmail("acc2@et.com"))
-          } yield acc
+            aid    <- repo.create(accDetails.copy(email = email), hash)
+            acc  <- repo.find(email)
+          } yield (aid, acc)
 
-          result.map { acc =>
-            acc.map(_.email) mustBe Some(AccountEmail("acc2@et.com"))
+          result.map { case (aid, acc) =>
+            acc mustBe Some(Account(aid, email, accDetails.name, hash))
           }
         }
       }
@@ -64,11 +68,11 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
-            _    <- repo.create(AccountEmail("acc1@et.com"), PasswordHash("123456"))
+            _    <- repo.create(accDetails, hash)
           } yield ()
 
           result.attempt.map { err =>
-            err mustBe Left(AccountAlreadyExists(AccountEmail("acc1@et.com")))
+            err mustBe Left(AccountAlreadyExists(accDetails.email))
           }
         }
       }
@@ -83,7 +87,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           for {
             db   <- client.getDatabase("expense-tracker")
             accs <- db.getCollection("accounts")
-            _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc1@et.com")))
+            _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc1@et.com", password = hash.value)))
             res  <- test(db)
           } yield res
         }

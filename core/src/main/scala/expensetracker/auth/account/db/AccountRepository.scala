@@ -3,7 +3,7 @@ package expensetracker.auth.account.db
 import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Filters
-import expensetracker.auth.account.{Account, AccountEmail, AccountId, PasswordHash}
+import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, PasswordHash}
 import expensetracker.common.errors.AppError.AccountAlreadyExists
 import io.circe.generic.auto._
 import mongo4cats.circe._
@@ -11,7 +11,7 @@ import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 
 trait AccountRepository[F[_]] {
   def find(email: AccountEmail): F[Option[Account]]
-  def create(email: AccountEmail, password: PasswordHash): F[AccountId]
+  def create(details: AccountDetails, password: PasswordHash): F[AccountId]
 }
 
 final private class LiveAccountRepository[F[_]: Async](
@@ -24,15 +24,15 @@ final private class LiveAccountRepository[F[_]: Async](
       .first[F]
       .map(ue => Option(ue).map(_.toDomain))
 
-  override def create(email: AccountEmail, password: PasswordHash): F[AccountId] =
+  override def create(details: AccountDetails, password: PasswordHash): F[AccountId] =
     collection
-      .count[F](Filters.eq("email", email.value))
+      .count[F](Filters.eq("email", details.email.value))
       .flatMap {
         case 0 =>
-          val createAcc = AccountEntity.create(email, password)
+          val createAcc = AccountEntity.create(details, password)
           collection.insertOne[F](createAcc).as(AccountId(createAcc.id.toHexString))
         case _ =>
-          AccountAlreadyExists(email).raiseError[F, AccountId]
+          AccountAlreadyExists(details.email).raiseError[F, AccountId]
       }
 }
 

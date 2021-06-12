@@ -8,10 +8,10 @@ import expensetracker.common.errors.AppError.InvalidEmailOrPassword
 
 class AccountServiceSpec extends CatsSpec {
 
-  val aid   = AccountId("a1")
-  val pwd   = Password("pwd")
-  val hash  = PasswordHash("hash")
-  val email = AccountEmail("email")
+  val aid     = AccountId("a1")
+  val pwd     = Password("pwd")
+  val hash    = PasswordHash("hash")
+  val details = AccountDetails(AccountEmail("email"), AccountName("John", "Bloggs"))
 
   "An AccountService" when {
     "create" should {
@@ -19,16 +19,16 @@ class AccountServiceSpec extends CatsSpec {
       "return account id on success" in {
         val (repo, encr) = mocks
         when(encr.hash(any[Password])).thenReturn(IO.pure(hash))
-        when(repo.create(any[AccountEmail], any[PasswordHash])).thenReturn(IO.pure(aid))
+        when(repo.create(any[AccountDetails], any[PasswordHash])).thenReturn(IO.pure(aid))
 
         val result = for {
           service <- AccountService.make[IO](repo, encr)
-          res     <- service.create(email, pwd)
+          res     <- service.create(details, pwd)
         } yield res
 
         result.unsafeToFuture().map { res =>
           verify(encr).hash(pwd)
-          verify(repo).create(email, hash)
+          verify(repo).create(details, hash)
           res mustBe aid
         }
       }
@@ -38,16 +38,16 @@ class AccountServiceSpec extends CatsSpec {
 
       "return account id on success" in {
         val (repo, encr) = mocks
-        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, email, hash))))
+        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
 
         val result = for {
           service <- AccountService.make[IO](repo, encr)
-          res     <- service.login(email, pwd)
+          res     <- service.login(details.email, pwd)
         } yield res
 
         result.unsafeToFuture().map { res =>
-          verify(repo).find(email)
+          verify(repo).find(details.email)
           verify(encr).isValid(pwd, hash)
           res mustBe aid
         }
@@ -59,11 +59,11 @@ class AccountServiceSpec extends CatsSpec {
 
         val result = for {
           service <- AccountService.make[IO](repo, encr)
-          res     <- service.login(email, pwd)
+          res     <- service.login(details.email, pwd)
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
-          verify(repo).find(email)
+          verify(repo).find(details.email)
           verifyZeroInteractions(encr)
           res mustBe Left(InvalidEmailOrPassword)
         }
@@ -71,16 +71,16 @@ class AccountServiceSpec extends CatsSpec {
 
       "return error when password doesn't match" in {
         val (repo, encr) = mocks
-        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, email, hash))))
+        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
         val result = for {
           service <- AccountService.make[IO](repo, encr)
-          res     <- service.login(email, pwd)
+          res     <- service.login(details.email, pwd)
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
-          verify(repo).find(email)
+          verify(repo).find(details.email)
           verify(encr).isValid(pwd, hash)
           res mustBe Left(InvalidEmailOrPassword)
         }

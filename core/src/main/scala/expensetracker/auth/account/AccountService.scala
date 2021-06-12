@@ -12,7 +12,7 @@ object LoginResult {
 }
 
 trait AccountService[F[_]] {
-  def create(email: AccountEmail, password: Password): F[AccountId]
+  def create(details: AccountDetails, password: Password): F[AccountId]
   def login(email: AccountEmail, password: Password): F[AccountId]
 }
 
@@ -25,8 +25,8 @@ final private class LiveAccountService[F[_]](
 
   import LoginResult._
 
-  override def create(email: AccountEmail, password: Password): F[AccountId] =
-    encryptor.hash(password).flatMap(h => repository.create(email, h))
+  override def create(details: AccountDetails, password: Password): F[AccountId] =
+    encryptor.hash(password).flatMap(h => repository.create(details, h))
 
   override def login(email: AccountEmail, password: Password): F[AccountId] =
     repository

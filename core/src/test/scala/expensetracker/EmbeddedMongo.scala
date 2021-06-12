@@ -37,6 +37,11 @@ trait EmbeddedMongo {
       ).asJava
     )
 
-  def accDoc(id: AccountId, email: String): Document =
-    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "email" -> email, "password" -> "password").asJava)
+  def accDoc(id: AccountId, email: String, password: String = "password"): Document =
+    new Document(Map[String, Object](
+      "id" -> new ObjectId(id.value),
+      "email" -> email,
+      "password" -> password,
+      "name" -> Document.parse("""{"first":"John","last":"Bloggs"}""")
+    ).asJava)
 }
