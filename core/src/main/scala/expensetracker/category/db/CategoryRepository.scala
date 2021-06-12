@@ -21,15 +21,15 @@ final private class LiveCategoryRepository[F[_]: Async](
     private val collection: MongoCollectionF[CategoryEntity]
 ) extends CategoryRepository[F] {
 
-  override def getAll(uid: AccountId): F[List[Category]] =
+  override def getAll(aid: AccountId): F[List[Category]] =
     collection
-      .find(idEq("userId", uid.value))
+      .find(idEq("accountId", aid.value))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
-  override def remove(uid: AccountId, cid: CategoryId): F[Unit] =
+  override def remove(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
-      .deleteOne(Filters.and(idEq("userId", uid.value), idEq("id", cid.value)))
+      .deleteOne(Filters.and(idEq("accountId", aid.value), idEq("id", cid.value)))
       .void
 
   private def idEq(name: String, id: String): Bson =

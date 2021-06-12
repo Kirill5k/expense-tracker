@@ -14,7 +14,7 @@ import org.bson.types.ObjectId
 
 trait TransactionRepository[F[_]] {
   def create(tx: CreateTransaction): F[Unit]
-  def getAll(userId: AccountId): F[List[Transaction]]
+  def getAll(aid: AccountId): F[List[Transaction]]
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
@@ -24,11 +24,11 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def create(tx: CreateTransaction): F[Unit] =
     collection.insertOne[F](TransactionEntity.create(tx)).void
 
-  override def getAll(userId: AccountId): F[List[Transaction]] =
+  override def getAll(aid: AccountId): F[List[Transaction]] =
     collection
       .aggregate(
         List(
-          Aggregates.`match`(Filters.eq("userId", new ObjectId(userId.value))),
+          Aggregates.`match`(Filters.eq("accountId", new ObjectId(aid.value))),
           Aggregates.lookup("categories", "categoryId", "id", "category"),
           Aggregates.unwind("$category"),
           Aggregates.`match`(Filters.not(Filters.eq("category", null)))
