@@ -6,7 +6,7 @@ import expensetracker.EmbeddedMongo
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
-import expensetracker.auth.user.UserId
+import expensetracker.auth.account.AccountId
 import mongo4cats.client.MongoClientF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
@@ -17,10 +17,10 @@ import java.time.Instant
 
 class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matchers {
 
-  val user1Id = UserId(new ObjectId().toHexString)
-  val user2Id = UserId(new ObjectId().toHexString)
-  val cat1Id  = CategoryId(new ObjectId().toHexString)
-  val cat2Id  = CategoryId(new ObjectId().toHexString)
+  val acc1Id = AccountId(new ObjectId().toHexString)
+  val acc2Id = AccountId(new ObjectId().toHexString)
+  val cat1Id = CategoryId(new ObjectId().toHexString)
+  val cat2Id = CategoryId(new ObjectId().toHexString)
 
   "A TransactionRepository" should {
 
@@ -28,7 +28,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          res  <- repo.create(CreateTransaction(user1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          res  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
         } yield res
 
         result.attempt.map(_ mustBe Right(()))
@@ -39,9 +39,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
-          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Income, cat2Id, GBP(45.0), Instant.now(), None))
-          txs <- repo.getAll(user1Id)
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Income, cat2Id, GBP(45.0), Instant.now(), None))
+          txs <- repo.getAll(acc1Id)
         } yield txs
 
         result.map { txs =>
@@ -60,9 +60,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
-          _ <- repo.create(CreateTransaction(user1Id, TransactionKind.Expense, cat2Id, GBP(45.0), Instant.now(), None))
-          txs <- repo.getAll(user2Id)
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat2Id, GBP(45.0), Instant.now(), None))
+          txs <- repo.getAll(acc2Id)
         } yield txs
 
         result.map { txs =>
@@ -81,8 +81,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "category-1"), categoryDoc(cat2Id, "category-2")))
-            users <- db.getCollection("users")
-            _     <- users.insertMany[IO](List(userDoc(user1Id, "user-1"), userDoc(user2Id, "user-2")))
+            users <- db.getCollection("accounts")
+            _     <- users.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
             res   <- test(client)
           } yield res
         }

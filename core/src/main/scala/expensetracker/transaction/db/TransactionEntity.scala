@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.common.errors.AppError
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
-import expensetracker.auth.user.UserId
+import expensetracker.auth.account.AccountId
 import org.bson.types.ObjectId
 import squants.market._
 
@@ -13,20 +13,20 @@ final case class TransactionCategory(
     id: ObjectId,
     name: String,
     icon: String,
-    userId: Option[ObjectId]
+    accountId: Option[ObjectId]
 ) {
   def toDomain: Category =
     Category(
       CategoryId(id.toHexString),
       CategoryName(name),
       CategoryIcon(icon),
-      userId.map(uid => UserId(uid.toHexString))
+      accountId.map(uid => AccountId(uid.toHexString))
     )
 }
 
 final case class TransactionEntity(
     id: ObjectId,
-    userId: ObjectId,
+    accountId: ObjectId,
     categoryId: ObjectId,
     category: Option[TransactionCategory],
     kind: TransactionKind,
@@ -41,7 +41,7 @@ final case class TransactionEntity(
       .map { cat =>
         Transaction(
           id = TransactionId(id.toHexString),
-          userId = UserId(userId.toHexString),
+          accountId = AccountId(accountId.toHexString),
           kind = kind,
           category = cat,
           amount = amount,
@@ -56,7 +56,7 @@ object TransactionEntity {
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       new ObjectId(),
-      new ObjectId(tx.userId.value),
+      new ObjectId(tx.accountId.value),
       new ObjectId(tx.categoryId.value),
       None,
       tx.kind,

@@ -5,7 +5,7 @@ import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
 import expensetracker.category.CategoryId
-import expensetracker.auth.user.UserId
+import expensetracker.auth.account.AccountId
 import org.bson.Document
 import org.bson.types.ObjectId
 
@@ -27,16 +27,16 @@ trait EmbeddedMongo {
     } finally mongodExecutable.stop()
   }
 
-  def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
+  def categoryDoc(id: CategoryId, name: String, uid: Option[AccountId] = None): Document =
     new Document(
       Map[String, Object](
-        "id"     -> new ObjectId(id.value),
-        "name"   -> name,
-        "icon"   -> "icon",
-        "userId" -> uid.map(id => new ObjectId(id.value)).orNull
+        "id"        -> new ObjectId(id.value),
+        "name"      -> name,
+        "icon"      -> "icon",
+        "accountId" -> uid.map(id => new ObjectId(id.value)).orNull
       ).asJava
     )
 
-  def userDoc(id: UserId, name: String): Document =
+  def accDoc(id: AccountId, name: String): Document =
     new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "password" -> "password").asJava)
 }

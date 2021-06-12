@@ -1,21 +1,32 @@
-package expensetracker.auth.user.db
+package expensetracker.auth.account.db
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.user.UserId
+import expensetracker.auth.account.{AccountId, AccountEmail}
 import mongo4cats.client.MongoClientF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class UserRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
+class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
-  val user1Id = UserId(new ObjectId().toHexString)
+  val user1Id = AccountId(new ObjectId().toHexString)
 
   "A UserRepository" should {
 
-    "find user by name" in {}
+    "find user by name" in {
+      withEmbeddedMongoClient { client =>
+        val result = for {
+          repo <- AccountRepository.make(client)
+          user <- repo.find(AccountEmail("user-1@et.com"))
+        } yield user
+
+        result.map { u =>
+          u.map(_.id) mustBe Some(user1Id)
+        }
+      }
+    }
   }
 
   def withEmbeddedMongoClient[A](test: MongoClientF[IO] => IO[A]): A =
@@ -26,7 +37,7 @@ class UserRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
           for {
             db    <- client.getDatabase("expense-tracker")
             users <- db.getCollection("users")
-            _     <- users.insertMany[IO](List(userDoc(user1Id, "user-1")))
+            _     <- users.insertMany[IO](List(accDoc(user1Id, "user-1@et.com")))
             res   <- test(client)
           } yield res
         }

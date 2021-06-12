@@ -1,5 +1,7 @@
 package expensetracker.common
 
+import expensetracker.auth.account.AccountEmail
+
 object errors {
 
   sealed trait AppError extends Throwable {
@@ -9,5 +11,9 @@ object errors {
 
   object AppError {
     final case class Mongo(message: String) extends AppError
+
+    final case class AccountAlreadyExists(email: AccountEmail) extends AppError {
+      override def message: String = s"account with ${email.value} already exists"
+    }
   }
 }

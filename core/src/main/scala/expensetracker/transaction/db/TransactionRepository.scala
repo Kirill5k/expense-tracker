@@ -5,7 +5,7 @@ import cats.implicits._
 import com.mongodb.client.model.{Aggregates, Filters}
 import expensetracker.transaction.{CreateTransaction, Transaction}
 import expensetracker.transaction.Transaction._
-import expensetracker.auth.user.UserId
+import expensetracker.auth.account.AccountId
 import io.circe.generic.auto._
 import mongo4cats.client.MongoClientF
 import mongo4cats.circe._
@@ -14,7 +14,7 @@ import org.bson.types.ObjectId
 
 trait TransactionRepository[F[_]] {
   def create(tx: CreateTransaction): F[Unit]
-  def getAll(userId: UserId): F[List[Transaction]]
+  def getAll(userId: AccountId): F[List[Transaction]]
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
@@ -24,7 +24,7 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def create(tx: CreateTransaction): F[Unit] =
     collection.insertOne[F](TransactionEntity.create(tx)).void
 
-  override def getAll(userId: UserId): F[List[Transaction]] =
+  override def getAll(userId: AccountId): F[List[Transaction]] =
     collection
       .aggregate(
         List(
