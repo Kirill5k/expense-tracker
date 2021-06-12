@@ -46,6 +46,19 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         result.map(_ mustBe None)
       }
     }
+
+    "delete session from database" in {
+      withEmbeddedMongoDb { db =>
+        val result = for {
+          repo <- SessionRepository.make(db)
+          sid  <- repo.create(aid, 90.days)
+          _    <- repo.delete(sid)
+          res  <- repo.find(sid)
+        } yield res
+
+        result.map(_ mustBe None)
+      }
+    }
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =

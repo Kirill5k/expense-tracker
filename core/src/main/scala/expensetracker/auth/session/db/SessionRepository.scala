@@ -15,6 +15,7 @@ import scala.concurrent.duration.FiniteDuration
 trait SessionRepository[F[_]] {
   def create(aid: AccountId, duration: FiniteDuration): F[SessionId]
   def find(sid: SessionId): F[Option[Session]]
+  def delete(sid: SessionId): F[Unit]
 }
 
 final private class LiveSessionRepository[F[_]: Async](
@@ -31,6 +32,9 @@ final private class LiveSessionRepository[F[_]: Async](
       .find(Filters.eq("id", new ObjectId(sid.value)))
       .first[F]
       .map(res => Option(res).map(_.toDomain))
+
+  override def delete(sid: SessionId): F[Unit] =
+    collection.deleteOne[F](Filters.eq("id", new ObjectId(sid.value))).void
 }
 
 object SessionRepository {
