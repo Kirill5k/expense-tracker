@@ -5,6 +5,10 @@ import pureconfig.generic.auto._
 
 object config {
 
+  final case class AuthConfig(
+      passwordSalt: String
+  )
+
   final case class MongoConfig(
       connectionUri: String
   )
@@ -16,6 +20,7 @@ object config {
 
   final case class AppConfig(
       server: ServerConfig,
+      auth: AuthConfig,
       mongo: MongoConfig
   )
 
