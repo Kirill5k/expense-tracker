@@ -20,7 +20,7 @@ object SessionAuthMiddleware {
     val onFailure: AuthedRoutes[String, F] =
       Kleisli(req => OptionT.liftF(Forbidden(req.context)))
 
-    val getSession: Kleisli[F, Request[F], Either[String, Session]] =
+    val getValidSession: Kleisli[F, Request[F], Either[String, Session]] =
       Kleisli { req =>
         req.cookies
           .find(_.name == "session-id")
@@ -36,6 +36,6 @@ object SessionAuthMiddleware {
           }
       }
 
-    AuthMiddleware(getSession, onFailure)
+    AuthMiddleware(getValidSession, onFailure)
   }
 }
