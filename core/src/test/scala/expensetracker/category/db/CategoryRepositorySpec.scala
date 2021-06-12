@@ -3,17 +3,12 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
-import expensetracker.transaction.db.TransactionRepository
-import expensetracker.transaction.{CreateTransaction, TransactionKind}
+import expensetracker.category.{CategoryId, CategoryName}
 import expensetracker.user.UserId
 import mongo4cats.client.MongoClientF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import squants.market.GBP
-
-import java.time.Instant
 
 class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
@@ -32,8 +27,37 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
 
         result.map { cats =>
           cats must have size 1
-          cats.head.name mustBe CategoryName("c2")
-          cats.head.userId mustBe user2Id
+          cats.head.id mustBe cat2Id
+          cats.head.name mustBe CategoryName("c-2")
+          cats.head.userId mustBe Some(user2Id)
+        }
+      }
+    }
+
+    "remove user's category" in {
+      withEmbeddedMongoClient { client =>
+        val result = for {
+          repo <- CategoryRepository.make(client)
+          _    <- repo.remove(user2Id, cat2Id)
+          cats <- repo.getAll(user2Id)
+        } yield cats
+
+        result.map { cats =>
+          cats must have size 0
+        }
+      }
+    }
+
+    "keep category is userid doesn't match" in {
+      withEmbeddedMongoClient { client =>
+        val result = for {
+          repo <- CategoryRepository.make(client)
+          _    <- repo.remove(user1Id, cat2Id)
+          cats <- repo.getAll(user2Id)
+        } yield cats
+
+        result.map { cats =>
+          cats must have size 1
         }
       }
     }
