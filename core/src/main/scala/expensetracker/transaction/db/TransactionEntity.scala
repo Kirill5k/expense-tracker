@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.common.errors.AppError
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import org.bson.types.ObjectId
 import squants.market._
 

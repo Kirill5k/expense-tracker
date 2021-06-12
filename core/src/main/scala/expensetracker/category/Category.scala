@@ -1,6 +1,6 @@
 package expensetracker.category
 
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 
 final case class CategoryId(value: String)   extends AnyVal
 final case class CategoryName(value: String) extends AnyVal

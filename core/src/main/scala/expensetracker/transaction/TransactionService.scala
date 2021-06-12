@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import cats.Monad
 import expensetracker.transaction.db.TransactionRepository
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 
 trait TransactionService[F[_]] {
   def getAll(userId: UserId): F[List[Transaction]]

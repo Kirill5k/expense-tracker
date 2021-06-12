@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import cats.implicits._
 import expensetracker.category.{Category, CategoryId}
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import io.circe.{Decoder, Encoder, Json, JsonObject}
 import squants.market.{Currency, Money, defaultMoneyContext}
 

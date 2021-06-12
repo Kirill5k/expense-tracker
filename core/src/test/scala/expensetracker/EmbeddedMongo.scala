@@ -5,7 +5,7 @@ import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
 import expensetracker.category.CategoryId
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import org.bson.Document
 import org.bson.types.ObjectId
 

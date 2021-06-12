@@ -6,7 +6,7 @@ import expensetracker.EmbeddedMongo
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import mongo4cats.client.MongoClientF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers

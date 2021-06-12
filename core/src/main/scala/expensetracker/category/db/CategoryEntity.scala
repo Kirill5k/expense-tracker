@@ -1,7 +1,7 @@
 package expensetracker.category.db
 
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import org.bson.types.ObjectId
 
 final case class CategoryEntity(

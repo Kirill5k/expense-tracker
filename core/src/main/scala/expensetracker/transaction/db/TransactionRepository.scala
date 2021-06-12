@@ -5,7 +5,7 @@ import cats.implicits._
 import com.mongodb.client.model.{Aggregates, Filters}
 import expensetracker.transaction.{CreateTransaction, Transaction}
 import expensetracker.transaction.Transaction._
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import io.circe.generic.auto._
 import mongo4cats.client.MongoClientF
 import mongo4cats.circe._

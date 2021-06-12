@@ -4,7 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
 import expensetracker.category.{CategoryId, CategoryName}
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import mongo4cats.client.MongoClientF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers

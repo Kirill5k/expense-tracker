@@ -4,7 +4,7 @@ import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Filters
 import expensetracker.category.{Category, CategoryId}
-import expensetracker.user.UserId
+import expensetracker.auth.user.UserId
 import io.circe.generic.auto._
 import mongo4cats.client.MongoClientF
 import mongo4cats.circe._
