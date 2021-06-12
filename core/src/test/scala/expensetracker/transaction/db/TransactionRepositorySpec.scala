@@ -56,7 +56,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       }
     }
 
-    "not return transactions that belong to other users" in {
+    "not return transactions that belong to other accounts" in {
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
@@ -81,8 +81,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "category-1"), categoryDoc(cat2Id, "category-2")))
-            users <- db.getCollection("accounts")
-            _     <- users.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
+            accs <- db.getCollection("accounts")
+            _     <- accs.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
             res   <- test(client)
           } yield res
         }

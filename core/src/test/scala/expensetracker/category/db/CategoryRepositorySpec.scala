@@ -18,7 +18,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
   val cat2Id = CategoryId(new ObjectId().toHexString)
 
   "A CategoryRepository" should {
-    "return all user's categories" in {
+    "return all account's categories" in {
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
@@ -28,13 +28,13 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         result.map { cats =>
           cats must have size 1
           cats.head.id mustBe cat2Id
-          cats.head.name mustBe CategoryName("c-2")
+          cats.head.name mustBe CategoryName("c2")
           cats.head.accountId mustBe Some(acc2Id)
         }
       }
     }
 
-    "remove user's category" in {
+    "remove account's category" in {
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
@@ -48,7 +48,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
       }
     }
 
-    "keep category is userid doesn't match" in {
+    "keep category if accountId doesn't match" in {
       withEmbeddedMongoClient { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
@@ -71,10 +71,10 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
           for {
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
-            _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "c-1"), categoryDoc(cat2Id, "c-2", Some(acc2Id))))
-            users <- db.getCollection("accounts")
-            _     <- users.insertMany[IO](List(accDoc(acc1Id, "user-1"), accDoc(acc2Id, "user-2")))
-            res   <- test(client)
+            _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "c1"), categoryDoc(cat2Id, "c2", Some(acc2Id))))
+            accounts <- db.getCollection("accounts")
+            _        <- accounts.insertMany[IO](List(accDoc(acc1Id, "acc1"), accDoc(acc2Id, "acc2")))
+            res      <- test(client)
           } yield res
         }
         .unsafeRunSync()

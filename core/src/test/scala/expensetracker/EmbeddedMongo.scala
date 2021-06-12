@@ -37,6 +37,6 @@ trait EmbeddedMongo {
       ).asJava
     )
 
-  def accDoc(id: AccountId, name: String): Document =
-    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "name" -> name, "password" -> "password").asJava)
+  def accDoc(id: AccountId, email: String): Document =
+    new Document(Map[String, Object]("id" -> new ObjectId(id.value), "email" -> email, "password" -> "password").asJava)
 }

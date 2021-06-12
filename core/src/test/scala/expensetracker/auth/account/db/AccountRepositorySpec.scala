@@ -3,7 +3,8 @@ package expensetracker.auth.account.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.account.{AccountId, AccountEmail}
+import expensetracker.auth.account.{AccountEmail, AccountId, PasswordHash}
+import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountNotFound}
 import mongo4cats.client.MongoClientF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
@@ -11,19 +12,64 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
-  val user1Id = AccountId(new ObjectId().toHexString)
+  val acc1Id = AccountId(new ObjectId().toHexString)
 
-  "A UserRepository" should {
+  "An AccountRepository" when {
 
-    "find user by name" in {
-      withEmbeddedMongoClient { client =>
-        val result = for {
-          repo <- AccountRepository.make(client)
-          user <- repo.find(AccountEmail("user-1@et.com"))
-        } yield user
+    "find" should {
+      "return account by email" in {
+        withEmbeddedMongoClient { client =>
+          val result = for {
+            repo <- AccountRepository.make(client)
+            acc  <- repo.find(AccountEmail("acc1@et.com"))
+          } yield acc
 
-        result.map { u =>
-          u.map(_.id) mustBe Some(user1Id)
+          result.map { acc =>
+            acc.id mustBe acc1Id
+            acc.email mustBe AccountEmail("acc1@et.com")
+          }
+        }
+      }
+
+      "return error when account does not exist" in {
+        withEmbeddedMongoClient { client =>
+          val result = for {
+            repo <- AccountRepository.make(client)
+            acc  <- repo.find(AccountEmail("acc2@et.com"))
+          } yield acc
+
+          result.attempt.map { err =>
+            err mustBe Left(AccountNotFound(AccountEmail("acc2@et.com")))
+          }
+        }
+      }
+    }
+
+    "create" should {
+      "create new account" in {
+        withEmbeddedMongoClient { client =>
+          val result = for {
+            repo <- AccountRepository.make(client)
+            _    <- repo.create(AccountEmail("acc2@et.com"), PasswordHash("123456"))
+            acc  <- repo.find(AccountEmail("acc2@et.com"))
+          } yield acc
+
+          result.map { acc =>
+            acc.email mustBe AccountEmail("acc2@et.com")
+          }
+        }
+      }
+
+      "return error when accout already exists" in {
+        withEmbeddedMongoClient { client =>
+          val result = for {
+            repo <- AccountRepository.make(client)
+            _    <- repo.create(AccountEmail("acc1@et.com"), PasswordHash("123456"))
+          } yield ()
+
+          result.attempt.map { err =>
+            err mustBe Left(AccountAlreadyExists(AccountEmail("acc1@et.com")))
+          }
         }
       }
     }
@@ -35,10 +81,10 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         .fromConnectionString[IO]("mongodb://localhost:12348")
         .use { client =>
           for {
-            db    <- client.getDatabase("expense-tracker")
-            users <- db.getCollection("users")
-            _     <- users.insertMany[IO](List(accDoc(user1Id, "user-1@et.com")))
-            res   <- test(client)
+            db   <- client.getDatabase("expense-tracker")
+            accs <- db.getCollection("accounts")
+            _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc1@et.com")))
+            res  <- test(client)
           } yield res
         }
         .unsafeRunSync()
