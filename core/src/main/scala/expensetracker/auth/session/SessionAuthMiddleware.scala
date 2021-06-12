@@ -1,6 +1,5 @@
 package expensetracker.auth.session
 
-import cats.MonadError
 import cats.data.{Kleisli, OptionT}
 import cats.effect.Temporal
 import cats.implicits._
