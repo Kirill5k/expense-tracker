@@ -16,8 +16,8 @@ object errors {
       override def message: String = s"account with email ${email.value} already exists"
     }
 
-    final case class AccountNotFound(email: AccountEmail) extends AppError {
-      override def message: String = s"account with email ${email.value} does not exist"
+    case object InvalidEmailOrPassword extends AppError {
+      override def message: String = "invalid email or password"
     }
   }
 }
