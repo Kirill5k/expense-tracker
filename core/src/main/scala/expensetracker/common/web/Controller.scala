@@ -2,17 +2,16 @@ package expensetracker.common.web
 
 import cats.MonadError
 import cats.implicits._
-import expensetracker.auth.session.SessionId
-import io.circe.generic.auto._
 import expensetracker.common.errors.{AuthError, BadRequestError}
-import org.http4s.{Request, Response}
-import org.http4s.dsl.Http4sDsl
-import org.typelevel.log4cats.Logger
+import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec._
+import org.http4s.dsl.Http4sDsl
+import org.http4s.{Request, RequestCookie, Response}
+import org.typelevel.log4cats.Logger
+
+final case class ErrorResponse(message: String)
 
 trait Controller[F[_]] extends Http4sDsl[F] {
-  final case class ErrorResponse(message: String)
-
   val SessionIdCookie = "session-id"
 
   protected def withErrorHandling(
@@ -33,6 +32,7 @@ trait Controller[F[_]] extends Http4sDsl[F] {
           InternalServerError(ErrorResponse(err.getMessage))
     }
 
-  def getSessionIdFromCookie(req: Request[F]): Option[SessionId] =
-    req.cookies.find(_.name == SessionIdCookie).map(c => SessionId(c.content))
+  def getSessionIdCookie(req: Request[F]): Option[RequestCookie] =
+    req.cookies
+      .find(_.name == SessionIdCookie)
 }
