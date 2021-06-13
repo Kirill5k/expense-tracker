@@ -5,12 +5,12 @@ object Dependencies {
     val mongo4cats = "0.2.9"
     val pureConfig = "0.15.0"
     val circe      = "0.14.1"
-    val sttp       = "3.3.6"
     val http4s     = "1.0.0-M23"
     val logback    = "1.2.3"
     val log4cats   = "2.1.1"
     val squants    = "1.8.0"
     val bcrypt     = "4.3.0"
+    val refined    = "0.9.26"
 
     val scalaTest     = "3.2.9"
     val mockito       = "1.16.37"
@@ -38,21 +38,19 @@ object Dependencies {
     }
 
     object circe {
-      val core          = "io.circe" %% "circe-core"           % Versions.circe
-      val literal       = "io.circe" %% "circe-literal"        % Versions.circe
-      val generic       = "io.circe" %% "circe-generic"        % Versions.circe
-      val genericExtras = "io.circe" %% "circe-generic-extras" % Versions.circe
-      val parser        = "io.circe" %% "circe-parser"         % Versions.circe
+      val core    = "io.circe" %% "circe-core"    % Versions.circe
+      val generic = "io.circe" %% "circe-generic" % Versions.circe
+      val refined = "io.circe" %% "circe-refined" % Versions.circe
+      val parser  = "io.circe" %% "circe-parser"  % Versions.circe
 
-      val all = Seq(core, literal, generic, genericExtras, parser)
+      val all = Seq(core, generic, refined, parser)
     }
 
-    object sttp {
-      val core        = "com.softwaremill.sttp.client3" %% "core"                           % Versions.sttp
-      val circe       = "com.softwaremill.sttp.client3" %% "circe"                          % Versions.sttp
-      val catsBackend = "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % Versions.sttp
+    object refined {
+      val core = "eu.timepit" %% "refined"      % Versions.refined
+      val cats = "eu.timepit" %% "refined-cats" % Versions.refined
 
-      val all = Seq(core, circe, catsBackend)
+      val all = Seq(core, cats)
     }
 
     object http4s {
@@ -81,7 +79,7 @@ object Dependencies {
     Libraries.circe.all ++
     Libraries.http4s.all ++
     Libraries.logging.all ++
-    Libraries.sttp.all
+    Libraries.refined.all
 
   lazy val test = Seq(
     Libraries.scalaTest        % Test,

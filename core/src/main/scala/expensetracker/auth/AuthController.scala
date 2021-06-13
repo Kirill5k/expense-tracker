@@ -3,6 +3,10 @@ package expensetracker.auth
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
+import eu.timepit.refined._
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.string.MatchesRegex
+import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountName, Password}
 import expensetracker.auth.session.Session
 import expensetracker.common.web.Controller
@@ -34,7 +38,7 @@ final class AuthController[F[_]: Logger: Concurrent](
       withErrorHandling {
         for {
           login <- req.as[LoginRequest]
-          sid   <- service.login(AccountEmail(login.email), Password(login.password), login.duration)
+          sid   <- service.login(login.accountEmail, login.accountPassword, login.duration)
           res   <- NoContent()
         } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value, httpOnly = true))
       }
@@ -55,27 +59,33 @@ final class AuthController[F[_]: Logger: Concurrent](
 
 object AuthController {
 
+  type EmailPred = MatchesRegex[W.`"""(?=[^\\s]+)(?=(\\w+)@([\\w\\.]+))"""`.T]
+  type Email     = String Refined EmailPred
+
   final case class CreateAccountRequest(
-      email: String,
-      firstName: String,
-      lastName: String,
-      password: String
+      email: Email,
+      firstName: NonEmptyString,
+      lastName: NonEmptyString,
+      password: NonEmptyString
   ) {
     def accountDetails: AccountDetails =
-      AccountDetails(AccountEmail(email), AccountName(firstName, lastName))
+      AccountDetails(AccountEmail(email.value), AccountName(firstName.value, lastName.value))
 
-    def accountPassword: Password = Password(password)
+    def accountPassword: Password = Password(password.value)
   }
 
   final case class CreateAccountResponse(accountId: String)
 
   final case class LoginRequest(
-      email: String,
-      password: String,
+      email: Email,
+      password: NonEmptyString,
       isExtended: Boolean
   ) {
     def duration: FiniteDuration =
       if (isExtended) 1.day else 90.days
+
+    def accountEmail    = AccountEmail(email.value)
+    def accountPassword = Password(password.value)
   }
 
   def make[F[_]: Concurrent: Logger](service: AuthService[F]): F[AuthController[F]] =
