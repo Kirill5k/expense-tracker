@@ -24,7 +24,7 @@ object Auth {
   def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F]): F[Auth[F]] =
     for {
       sessRepo <- SessionRepository.make[F](resources.mongo)
-      sessSvc <- SessionService.make[F](sessRepo)
+      sessSvc  <- SessionService.make[F](sessRepo)
       accRepo  <- AccountRepository.make[F](resources.mongo)
       encr     <- PasswordEncryptor.make[F](config)
       accSvc   <- AccountService.make[F](accRepo, encr)
