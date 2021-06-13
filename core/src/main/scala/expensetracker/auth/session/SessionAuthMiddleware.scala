@@ -3,8 +3,10 @@ package expensetracker.auth.session
 import cats.data.{Kleisli, OptionT}
 import cats.effect.Temporal
 import cats.implicits._
+import io.circe.generic.auto._
+import expensetracker.common.web.Controller
 import org.http4s.{AuthedRoutes, Request}
-import org.http4s.dsl.Http4sDsl
+import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.AuthMiddleware
 
 object SessionAuthMiddleware {
@@ -14,16 +16,14 @@ object SessionAuthMiddleware {
   )(implicit
       F: Temporal[F]
   ): AuthMiddleware[F, Session] = {
-    val dsl = new Http4sDsl[F] {}; import dsl._
+    val dsl = new Controller[F] {}; import dsl._
 
     val onFailure: AuthedRoutes[String, F] =
-      Kleisli(req => OptionT.liftF(Forbidden(req.context)))
+      Kleisli(req => OptionT.liftF(Forbidden(ErrorResponse(req.context))))
 
     val getValidSession: Kleisli[F, Request[F], Either[String, Session]] =
       Kleisli { req =>
-        req.cookies
-          .find(_.name == "session-id")
-          .map(c => SessionId(c.content))
+        getSessionIdFromCookie(req)
           .fold("missing session-id cookie".asLeft[Session].pure[F]) { sid =>
             F.realTime.flatMap { time =>
               obtainSession(sid).map {
