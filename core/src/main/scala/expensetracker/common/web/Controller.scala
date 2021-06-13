@@ -6,7 +6,7 @@ import expensetracker.common.errors.{AuthError, BadRequestError}
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{Request, RequestCookie, Response}
+import org.http4s.{InvalidMessageBodyFailure, Request, RequestCookie, Response}
 import org.typelevel.log4cats.Logger
 
 final case class ErrorResponse(message: String)
@@ -27,6 +27,9 @@ trait Controller[F[_]] extends Http4sDsl[F] {
       case err: AuthError =>
         logger.error(err)(err.getMessage) *>
           Forbidden(ErrorResponse(err.getMessage))
+      case err: InvalidMessageBodyFailure =>
+        logger.error(err.getCause())(err.getMessage()) *>
+          BadRequest(ErrorResponse(err.getCause().getMessage.replaceAll("Predicate", "Validation").replaceAll("DownField", "Field")))
       case err =>
         logger.error(err)(s"unexpected error: ${err.getMessage}") *>
           InternalServerError(ErrorResponse(err.getMessage))

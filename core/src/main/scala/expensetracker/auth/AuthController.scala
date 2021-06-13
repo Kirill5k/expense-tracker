@@ -3,7 +3,6 @@ package expensetracker.auth
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
-import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
@@ -11,6 +10,7 @@ import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountName, P
 import expensetracker.auth.session.Session
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
+import io.circe.refined._
 import org.http4s.{AuthedRoutes, HttpRoutes, ResponseCookie}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.{AuthMiddleware, Router}
@@ -40,7 +40,7 @@ final class AuthController[F[_]: Logger: Concurrent](
           login <- req.as[LoginRequest]
           sid   <- service.login(login.accountEmail, login.accountPassword, login.duration)
           res   <- NoContent()
-        } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value, httpOnly = true))
+        } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value))
       }
   }
 
@@ -59,8 +59,7 @@ final class AuthController[F[_]: Logger: Concurrent](
 
 object AuthController {
 
-  type EmailPred = MatchesRegex[W.`"""(?=[^\\s]+)(?=(\\w+)@([\\w\\.]+))"""`.T]
-  type Email     = String Refined EmailPred
+  type Email = String Refined MatchesRegex["^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+$"]
 
   final case class CreateAccountRequest(
       email: Email,
@@ -82,7 +81,7 @@ object AuthController {
       isExtended: Boolean
   ) {
     def duration: FiniteDuration =
-      if (isExtended) 1.day else 90.days
+      if (isExtended) 90.days else 1.day
 
     def accountEmail    = AccountEmail(email.value)
     def accountPassword = Password(password.value)
