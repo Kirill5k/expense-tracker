@@ -73,7 +73,7 @@ object AuthController {
     def accountPassword: Password = Password(password.value)
   }
 
-  final case class CreateAccountResponse(accountId: String)
+  final case class CreateAccountResponse(id: String)
 
   final case class LoginRequest(
       email: Email,

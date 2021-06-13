@@ -55,4 +55,7 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with ArgumentMatchers
 
   def readFileFromResources(path: String): String =
     Source.fromResource(path).getLines().toList.mkString
+
+  def parseJson(jsonString: String): Json =
+    parse(jsonString).getOrElse(throw new RuntimeException)
 }

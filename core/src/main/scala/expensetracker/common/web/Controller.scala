@@ -2,7 +2,7 @@ package expensetracker.common.web
 
 import cats.MonadError
 import cats.implicits._
-import expensetracker.common.errors.{AuthError, BadRequestError}
+import expensetracker.common.errors.{AuthError, ConflictError}
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.dsl.Http4sDsl
@@ -21,9 +21,9 @@ trait Controller[F[_]] extends Http4sDsl[F] {
       logger: Logger[F]
   ): F[Response[F]] =
     response.handleErrorWith {
-      case err: BadRequestError =>
+      case err: ConflictError =>
         logger.error(err)(err.getMessage) *>
-          BadRequest(ErrorResponse(err.getMessage))
+          Conflict(ErrorResponse(err.getMessage))
       case err: AuthError =>
         logger.error(err)(err.getMessage) *>
           Forbidden(ErrorResponse(err.getMessage))

@@ -9,13 +9,13 @@ object errors {
     override def getMessage: String = message
   }
 
-  sealed trait BadRequestError extends AppError
+  sealed trait ConflictError extends AppError
   sealed trait AuthError       extends AppError
 
   object AppError {
     final case class Mongo(message: String) extends AppError
 
-    final case class AccountAlreadyExists(email: AccountEmail) extends BadRequestError {
+    final case class AccountAlreadyExists(email: AccountEmail) extends ConflictError {
       override def message: String = s"account with email ${email.value} already exists"
     }
 
