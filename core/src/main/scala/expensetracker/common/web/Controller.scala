@@ -5,7 +5,7 @@ import cats.implicits._
 import expensetracker.auth.session.SessionId
 import io.circe.generic.auto._
 import expensetracker.common.errors.{AuthError, BadRequestError}
-import org.http4s.{Request, RequestCookie, Response}
+import org.http4s.{Request, Response}
 import org.http4s.dsl.Http4sDsl
 import org.typelevel.log4cats.Logger
 import org.http4s.circe.CirceEntityCodec._
