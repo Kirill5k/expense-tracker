@@ -44,11 +44,12 @@ final class AuthController[F[_]: Logger: Concurrent](
       }
   }
 
-  private val authedRoutes: AuthedRoutes[Session, F] = AuthedRoutes.of { case POST -> Root / "logout" as session =>
-    withErrorHandling {
-      service.logout(session.id) *> NoContent()
+  private val authedRoutes: AuthedRoutes[Session, F] =
+    AuthedRoutes.of { case POST -> Root / "logout" as session =>
+      withErrorHandling {
+        service.logout(session.id) *> NoContent()
+      }
     }
-  }
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
     Router(
