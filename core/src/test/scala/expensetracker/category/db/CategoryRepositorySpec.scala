@@ -39,7 +39,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
-          _    <- repo.remove(acc2Id, cat2Id)
+          _    <- repo.delete(acc2Id, cat2Id)
           cats <- repo.getAll(acc2Id)
         } yield cats
 
@@ -53,7 +53,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- CategoryRepository.make(client)
-          _    <- repo.remove(acc1Id, cat2Id)
+          _    <- repo.delete(acc1Id, cat2Id)
           cats <- repo.getAll(acc2Id)
         } yield cats
 

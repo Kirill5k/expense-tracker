@@ -13,7 +13,7 @@ import org.bson.types.ObjectId
 
 trait CategoryRepository[F[_]] {
   def getAll(uid: AccountId): F[List[Category]]
-  def remove(uid: AccountId, cid: CategoryId): F[Unit]
+  def delete(uid: AccountId, cid: CategoryId): F[Unit]
 }
 
 final private class LiveCategoryRepository[F[_]: Async](
@@ -26,7 +26,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       .all[F]
       .map(_.toList.map(_.toDomain))
 
-  override def remove(aid: AccountId, cid: CategoryId): F[Unit] =
+  override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
       .deleteOne(Filters.and(idEq("accountId", aid.value), idEq("id", cid.value)))
       .void
