@@ -12,8 +12,8 @@ import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
 trait CategoryRepository[F[_]] {
-  def getAll(uid: AccountId): F[List[Category]]
-  def delete(uid: AccountId, cid: CategoryId): F[Unit]
+  def getAll(aid: AccountId): F[List[Category]]
+  def delete(aid: AccountId, cid: CategoryId): F[Unit]
 }
 
 final private class LiveCategoryRepository[F[_]: Async](

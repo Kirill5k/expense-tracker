@@ -2,14 +2,12 @@ package expensetracker
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.auth.account.AccountId
-import expensetracker.auth.session.{Session, SessionAuthMiddleware, SessionId}
-import io.circe.{Json, JsonObject}
+import expensetracker.auth.session.{Session, SessionAuthMiddleware}
 import io.circe.parser._
-import org.bson.types.ObjectId
+import io.circe.{Json, JsonObject}
 import org.http4s.circe._
 import org.http4s.server.AuthMiddleware
-import org.http4s.{RequestCookie, Response, ResponseCookie, Status}
+import org.http4s.{Response, ResponseCookie, Status}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.Assertion
 import org.scalatest.matchers.must.Matchers
@@ -17,19 +15,13 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-import java.time.Instant
 import scala.io.Source
 
-trait ControllerSpec extends AnyWordSpec with MockitoSugar with ArgumentMatchersSugar with Matchers {
+trait ControllerSpec extends AnyWordSpec with MockitoSugar with ArgumentMatchersSugar with Matchers with TestData {
 
   implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   val emptyJson: Json = Json.fromJsonObject(JsonObject.empty)
-
-  val aid             = AccountId(new ObjectId().toHexString)
-  val sid             = SessionId(new ObjectId().toHexString)
-  val sess            = Session(sid, aid, Instant.now(), Instant.now().plusSeconds(100000L))
-  val sessionIdCookie = RequestCookie("session-id", sid.value)
 
   def sessionMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
     SessionAuthMiddleware(_ => IO.pure(sess))
@@ -47,7 +39,7 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with ArgumentMatchers
     expectedBody match {
       case Some(expected) =>
         val actual = actualResp.asJson.unsafeRunSync()
-        actual must be(parse(expected).getOrElse(throw new RuntimeException))
+        actual mustBe parse(expected).getOrElse(throw new RuntimeException)
       case None =>
         actualResp.body.compile.toVector.unsafeRunSync() mustBe empty
     }

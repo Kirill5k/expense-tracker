@@ -6,14 +6,9 @@ import expensetracker.CatsSpec
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.db.SessionRepository
 
-import java.time.Instant
 import scala.concurrent.duration._
 
 class SessionServiceSpec extends CatsSpec {
-
-  val sid     = SessionId("s-1")
-  val aid     = AccountId("a-1")
-  val session = Session(sid, aid, Instant.now(), Instant.now().plusSeconds(1000L))
 
   "A SessionService" should {
 
@@ -34,7 +29,7 @@ class SessionServiceSpec extends CatsSpec {
 
     "return existing session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(session)))
+      when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(sess)))
 
       val result = for {
         svc  <- SessionService.make(repo)
@@ -43,7 +38,7 @@ class SessionServiceSpec extends CatsSpec {
 
       result.unsafeToFuture().map { res =>
         verify(repo).find(sid)
-        res mustBe Some(session)
+        res mustBe Some(sess)
       }
     }
 

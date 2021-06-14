@@ -8,11 +8,6 @@ import expensetracker.common.errors.AppError.InvalidEmailOrPassword
 
 class AccountServiceSpec extends CatsSpec {
 
-  val aid     = AccountId("a1")
-  val pwd     = Password("pwd")
-  val hash    = PasswordHash("hash")
-  val details = AccountDetails(AccountEmail("email"), AccountName("John", "Bloggs"))
-
   "An AccountService" when {
     "create" should {
 

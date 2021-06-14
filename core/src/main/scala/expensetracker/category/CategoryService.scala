@@ -5,19 +5,19 @@ import expensetracker.auth.account.AccountId
 import expensetracker.category.db.CategoryRepository
 
 trait CategoryService[F[_]] {
-  def getAll(uid: AccountId): F[List[Category]]
-  def delete(uid: AccountId, cid: CategoryId): F[Unit]
+  def getAll(aid: AccountId): F[List[Category]]
+  def delete(aid: AccountId, cid: CategoryId): F[Unit]
 }
 
 final private class LiveCategoryService[F[_]](
     private val repository: CategoryRepository[F]
 ) extends CategoryService[F] {
 
-  override def getAll(uid: AccountId): F[List[Category]] =
-    repository.getAll(uid)
+  override def getAll(aid: AccountId): F[List[Category]] =
+    repository.getAll(aid)
 
-  override def delete(uid: AccountId, cid: CategoryId): F[Unit] =
-    repository.delete(uid, cid)
+  override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
+    repository.delete(aid, cid)
 }
 
 object CategoryService {
