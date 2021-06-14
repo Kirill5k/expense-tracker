@@ -13,7 +13,8 @@ trait TestData {
   val aid     = AccountId(new ObjectId().toHexString)
   val pwd     = Password("pwd")
   val hash    = PasswordHash("hash")
-  val details = AccountDetails(AccountEmail("email"), AccountName("John", "Bloggs"))
+  val email   = AccountEmail("email")
+  val details = AccountDetails(email, AccountName("John", "Bloggs"))
 
   val cid   = CategoryId(new ObjectId().toHexString)
   val cname = CategoryName("cat-1")
