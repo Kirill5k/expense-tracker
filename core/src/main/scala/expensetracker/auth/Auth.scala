@@ -1,6 +1,6 @@
 package expensetracker.auth
 
-import cats.effect.kernel.{Async, Temporal}
+import cats.effect.{Async, Temporal}
 import cats.implicits._
 import expensetracker.Resources
 import expensetracker.auth.account.{AccountService, PasswordEncryptor}
