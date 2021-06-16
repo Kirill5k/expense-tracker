@@ -3,12 +3,14 @@ package expensetracker.category
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
+import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
-import expensetracker.category.CategoryController.CategoryView
+import expensetracker.category.CategoryController.{CategoryView, UpdateCategoryRequest}
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
+import io.circe.refined._
 import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.http4s.circe.CirceEntityCodec._
@@ -38,7 +40,7 @@ final class CategoryController[F[_]: Logger](
     case authReq @ PUT -> Root / CategoryIdPath(cid) as session =>
       withErrorHandling {
         for {
-          catView <- F.ensure(authReq.req.as[CategoryView])(IdMismatch)(_.id == cid.value)
+          catView <- F.ensure(authReq.req.as[UpdateCategoryRequest])(IdMismatch)(_.id.value == cid.value)
           _       <- service.update(catView.toDomain(session.accountId))
           res     <- NoContent()
         } yield res
@@ -55,19 +57,25 @@ final class CategoryController[F[_]: Logger](
 
 object CategoryController {
 
+  final case class UpdateCategoryRequest(
+      id: NonEmptyString,
+      name: NonEmptyString,
+      icon: NonEmptyString
+  ) {
+    def toDomain(aid: AccountId): Category =
+      Category(
+        id = CategoryId(id.value),
+        name = CategoryName(name.value),
+        icon = CategoryIcon(icon.value),
+        accountId = Some(aid)
+      )
+  }
+
   final case class CategoryView(
       id: String,
       name: String,
       icon: String
-  ) {
-    def toDomain(aid: AccountId): Category =
-      Category(
-        id = CategoryId(id),
-        name = CategoryName(name),
-        icon = CategoryIcon(icon),
-        accountId = Some(aid)
-      )
-  }
+  )
 
   object CategoryView {
     def from(cat: Category): CategoryView =

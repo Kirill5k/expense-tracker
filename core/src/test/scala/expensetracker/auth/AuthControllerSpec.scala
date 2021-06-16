@@ -42,7 +42,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         verifyJsonResponse(
           res,
-          Status.BadRequest,
+          Status.UnprocessableEntity,
           Some("""{"message":"Validation isEmpty() did not fail.: Field(password)"}""")
         )
         verifyZeroInteractions(svc)
@@ -73,7 +73,7 @@ class AuthControllerSpec extends ControllerSpec {
         val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         val responseBody = """{"message":"Attempt to decode value on failed cursor: Field(email)"}"""
-        verifyJsonResponse(res, Status.BadRequest, Some(responseBody))
+        verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
         verifyZeroInteractions(svc)
       }
 
@@ -86,7 +86,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val resBody =
           """{"message":"Validation failed: \"foo\".matches(\"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+$\").: Field(email)"}"""
-        verifyJsonResponse(response, Status.BadRequest, Some(resBody))
+        verifyJsonResponse(response, Status.UnprocessableEntity, Some(resBody))
         verifyZeroInteractions(svc)
       }
 

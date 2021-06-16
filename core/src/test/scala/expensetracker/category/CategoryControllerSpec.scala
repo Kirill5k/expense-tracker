@@ -50,6 +50,10 @@ class CategoryControllerSpec extends ControllerSpec {
         verifyJsonResponse(res, Status.BadRequest, Some("""{"message":"the id supplied in the path does not match with the id in the request body"}"""))
         verifyZeroInteractions(svc)
       }
+
+      "return 422 when request has validation errors" in {
+        ???
+      }
     }
 
     "DELETE /categories/:id" should {

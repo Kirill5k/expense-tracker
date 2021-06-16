@@ -32,7 +32,15 @@ trait Controller[F[_]] extends Http4sDsl[F] {
           Forbidden(ErrorResponse(err.getMessage))
       case err: InvalidMessageBodyFailure =>
         logger.error(err.getCause())(err.getMessage()) *>
-          BadRequest(ErrorResponse(err.getCause().getMessage.replaceAll("Predicate", "Validation").replaceAll("DownField", "Field")))
+          UnprocessableEntity(
+            ErrorResponse(
+              err
+                .getCause()
+                .getMessage
+                .replaceAll("Predicate", "Validation")
+                .replaceAll("DownField", "Field")
+            )
+          )
       case err =>
         logger.error(err)(s"unexpected error: ${err.getMessage}") *>
           InternalServerError(ErrorResponse(err.getMessage))
