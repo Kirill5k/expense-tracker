@@ -1,6 +1,7 @@
 package expensetracker.common
 
 import expensetracker.auth.account.AccountEmail
+import expensetracker.category.{CategoryId, CategoryName}
 
 object errors {
 
@@ -10,6 +11,7 @@ object errors {
     override def getMessage: String = message
   }
 
+  sealed trait NotFoundError   extends AppError
   sealed trait ConflictError   extends AppError
   sealed trait BadRequestError extends AppError
   sealed trait AuthError       extends AppError
@@ -27,6 +29,14 @@ object errors {
 
     case object IdMismatch extends BadRequestError {
       override def message: String = "the id supplied in the path does not match with the id in the request body"
+    }
+
+    final case class CategoryDoesNotExist(id: CategoryId) extends NotFoundError {
+      override def message: String = s"category with id ${id.value} does not exist"
+    }
+
+    final case class CategoryAlreadyExists(name: CategoryName) extends ConflictError {
+      override def message: String = s"category with name ${name.value} already exists"
     }
   }
 }

@@ -12,3 +12,9 @@ final case class Category(
     icon: CategoryIcon,
     accountId: Option[AccountId]
 )
+
+final case class CreateCategory(
+    name: CategoryName,
+    icon: CategoryIcon,
+    accountId: AccountId
+)

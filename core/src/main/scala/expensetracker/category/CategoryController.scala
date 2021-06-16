@@ -6,7 +6,7 @@ import cats.implicits._
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
-import expensetracker.category.CategoryController.{CategoryView, UpdateCategoryRequest}
+import expensetracker.category.CategoryController.{CategoryView, CreateCategoryRequest, CreateCategoryResponse, UpdateCategoryRequest}
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
@@ -37,6 +37,14 @@ final class CategoryController[F[_]: Logger](
           .map(_.map(CategoryView.from))
           .flatMap(Ok(_))
       }
+    case authReq @ POST -> Root as session =>
+      withErrorHandling {
+        for {
+          req <- authReq.req.as[CreateCategoryRequest]
+          cid <- service.create(req.toDomain(session.accountId))
+          res <- Created(CreateCategoryResponse(cid.value))
+        } yield res
+      }
     case authReq @ PUT -> Root / CategoryIdPath(cid) as session =>
       withErrorHandling {
         for {
@@ -56,6 +64,20 @@ final class CategoryController[F[_]: Logger](
 }
 
 object CategoryController {
+
+  final case class CreateCategoryRequest(
+      name: NonEmptyString,
+      icon: NonEmptyString
+  ) {
+    def toDomain(aid: AccountId): CreateCategory =
+      CreateCategory(
+        name = CategoryName(name.value),
+        icon = CategoryIcon(icon.value),
+        accountId = aid
+      )
+  }
+
+  final case class CreateCategoryResponse(id: String)
 
   final case class UpdateCategoryRequest(
       id: NonEmptyString,
