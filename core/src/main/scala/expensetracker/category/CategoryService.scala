@@ -21,9 +21,11 @@ final private class LiveCategoryService[F[_]](
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     repository.delete(aid, cid)
 
-  override def update(cat: Category): F[Unit] = ???
+  override def update(cat: Category): F[Unit] =
+    repository.update(cat)
 
-  override def create(cat: CreateCategory): F[CategoryId] = ???
+  override def create(cat: CreateCategory): F[CategoryId] =
+    repository.create(cat)
 }
 
 object CategoryService {

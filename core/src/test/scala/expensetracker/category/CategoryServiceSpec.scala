@@ -38,5 +38,36 @@ class CategoryServiceSpec extends CatsSpec {
         res mustBe List(cat)
       }
     }
+
+    "create new category in db" in {
+      val repo = mock[CategoryRepository[IO]]
+      when(repo.create(any[CreateCategory])).thenReturn(IO.pure(cid))
+
+      val create = CreateCategory(cname, CategoryIcon("icon"), aid)
+      val result = for {
+        svc <- CategoryService.make[IO](repo)
+        res <- svc.create(create)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).create(create)
+        res mustBe cid
+      }
+    }
+
+    "update category in db" in {
+      val repo = mock[CategoryRepository[IO]]
+      when(repo.update(any[Category])).thenReturn(IO.unit)
+
+      val result = for {
+        svc <- CategoryService.make[IO](repo)
+        res <- svc.update(cat)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).update(cat)
+        res mustBe ()
+      }
+    }
   }
 }

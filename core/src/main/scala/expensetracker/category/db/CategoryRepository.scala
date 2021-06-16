@@ -3,7 +3,7 @@ package expensetracker.category.db
 import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Filters
-import expensetracker.category.{Category, CategoryId}
+import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.account.AccountId
 import io.circe.generic.auto._
 import mongo4cats.circe._
@@ -12,6 +12,8 @@ import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
 trait CategoryRepository[F[_]] {
+  def create(cat: CreateCategory): F[CategoryId]
+  def update(cat: Category): F[Unit]
   def getAll(aid: AccountId): F[List[Category]]
   def delete(aid: AccountId, cid: CategoryId): F[Unit]
 }
@@ -33,6 +35,10 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   private def idEq(name: String, id: String): Bson =
     Filters.eq(name, new ObjectId(id))
+
+  override def create(cat: CreateCategory): F[CategoryId] = ???
+
+  override def update(cat: Category): F[Unit] = ???
 }
 
 object CategoryRepository {
