@@ -3,7 +3,7 @@ package expensetracker.category
 import cats.effect.IO
 import expensetracker.ControllerSpec
 import expensetracker.auth.account.AccountId
-import expensetracker.common.errors.AppError.CategoryDoesNotExist
+import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import org.http4s.{Method, Request, Status}
 import org.http4s.implicits._
 import org.http4s.circe.CirceEntityCodec._
@@ -21,6 +21,18 @@ class CategoryControllerSpec extends ControllerSpec {
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${cid.value}"}"""))
+        verify(svc).create(CreateCategory(CategoryName("cat-1"), CategoryIcon("icon"), aid))
+      }
+
+      "return 409 when cat name is taken" in {
+        val svc = mock[CategoryService[IO]]
+        when(svc.create(any[CreateCategory])).thenReturn(IO.raiseError(CategoryAlreadyExists(cname)))
+
+        val reqBody = parseJson("""{"name":"cat-1","icon":"icon"}""")
+        val req = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessionIdCookie).withEntity(reqBody)
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Conflict, Some(s"""{"message":"category with name cat-1 already exists"}"""))
         verify(svc).create(CreateCategory(CategoryName("cat-1"), CategoryIcon("icon"), aid))
       }
     }
