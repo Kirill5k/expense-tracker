@@ -3,8 +3,10 @@ package expensetracker.category
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
+import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryController.CategoryView
+import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
 import org.bson.types.ObjectId
@@ -13,8 +15,10 @@ import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
 
-final class CategoryController[F[_]: Logger: Concurrent](
+final class CategoryController[F[_]: Logger](
     private val service: CategoryService[F]
+)(implicit
+    F: Concurrent[F]
 ) extends Controller[F] {
   private val prefixPath = "/categories"
 
@@ -30,6 +34,14 @@ final class CategoryController[F[_]: Logger: Concurrent](
           .getAll(session.accountId)
           .map(_.map(CategoryView.from))
           .flatMap(Ok(_))
+      }
+    case authReq @ PUT -> Root / CategoryIdPath(cid) as session =>
+      withErrorHandling {
+        for {
+          catView <- F.ensure(authReq.req.as[CategoryView])(IdMismatch)(_.id == cid.value)
+          _       <- service.update(catView.toDomain(session.accountId))
+          res     <- NoContent()
+        } yield res
       }
     case DELETE -> Root / CategoryIdPath(cid) as session =>
       withErrorHandling {
@@ -47,7 +59,15 @@ object CategoryController {
       id: String,
       name: String,
       icon: String
-  )
+  ) {
+    def toDomain(aid: AccountId): Category =
+      Category(
+        id = CategoryId(id),
+        name = CategoryName(name),
+        icon = CategoryIcon(icon),
+        accountId = Some(aid)
+      )
+  }
 
   object CategoryView {
     def from(cat: Category): CategoryView =

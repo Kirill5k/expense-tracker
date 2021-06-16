@@ -6,10 +6,12 @@ object errors {
 
   sealed trait AppError extends Throwable {
     def message: String
+
     override def getMessage: String = message
   }
 
-  sealed trait ConflictError extends AppError
+  sealed trait ConflictError   extends AppError
+  sealed trait BadRequestError extends AppError
   sealed trait AuthError       extends AppError
 
   object AppError {
@@ -21,6 +23,10 @@ object errors {
 
     case object InvalidEmailOrPassword extends AuthError {
       override def message: String = "invalid email or password"
+    }
+
+    case object IdMismatch extends BadRequestError {
+      override def message: String = "the id supplied in the path does not match with the id in the request body"
     }
   }
 }

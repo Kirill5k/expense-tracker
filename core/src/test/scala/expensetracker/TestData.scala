@@ -16,7 +16,7 @@ trait TestData {
   val email   = AccountEmail("email")
   val details = AccountDetails(email, AccountName("John", "Bloggs"))
 
-  val cid   = CategoryId(new ObjectId().toHexString)
+  val cid   = CategoryId("AB0C5342AB0C5342AB0C5342")
   val cname = CategoryName("cat-1")
   val cat   = Category(cid, cname, CategoryIcon("icon"), Some(aid))
 

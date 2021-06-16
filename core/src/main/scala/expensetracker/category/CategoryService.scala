@@ -7,6 +7,7 @@ import expensetracker.category.db.CategoryRepository
 trait CategoryService[F[_]] {
   def getAll(aid: AccountId): F[List[Category]]
   def delete(aid: AccountId, cid: CategoryId): F[Unit]
+  def update(cat: Category): F[Unit]
 }
 
 final private class LiveCategoryService[F[_]](
@@ -18,6 +19,8 @@ final private class LiveCategoryService[F[_]](
 
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     repository.delete(aid, cid)
+
+  override def update(cat: Category): F[Unit] = ???
 }
 
 object CategoryService {
