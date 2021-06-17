@@ -18,3 +18,13 @@ final case class CategoryEntity(
       accountId = accountId.map(uid => AccountId(uid.toHexString))
     )
 }
+
+object CategoryEntity {
+  def from(cat: Category): CategoryEntity =
+    CategoryEntity(
+      id = new ObjectId(cat.id.value),
+      name = cat.name.value,
+      icon = cat.icon.value,
+      accountId = cat.accountId.map(aid => new ObjectId(aid.value))
+    )
+}

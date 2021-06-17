@@ -5,6 +5,7 @@ import cats.implicits._
 import com.mongodb.client.model.Filters
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.account.AccountId
+import expensetracker.common.errors.AppError.CategoryDoesNotExist
 import io.circe.generic.auto._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
@@ -38,7 +39,14 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def create(cat: CreateCategory): F[CategoryId] = ???
 
-  override def update(cat: Category): F[Unit] = ???
+  override def update(cat: Category): F[Unit] =
+    collection
+      .count[F](idEq("id", cat.id.value))
+      .map(_ >= 1)
+      .flatMap {
+        case true  => collection.insertOne(CategoryEntity.from(cat)).void
+        case false => CategoryDoesNotExist(cat.id).raiseError[F, Unit]
+      }
 }
 
 object CategoryRepository {
