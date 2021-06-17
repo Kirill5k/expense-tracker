@@ -1,33 +1,35 @@
 package expensetracker.auth.session.db
 
 import expensetracker.auth.account.AccountId
-import expensetracker.auth.session.{Session, SessionId}
+import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
 import org.bson.types.ObjectId
 
 import java.time.Instant
-import scala.concurrent.duration.FiniteDuration
 
 final case class SessionEntity(
-    id: ObjectId,
+    _id: ObjectId,
     accountId: ObjectId,
     createdAt: Instant,
-    expiresAt: Instant
+    expiresAt: Instant,
+    lastRecordedActivity: Option[SessionActivity]
 ) {
   def toDomain: Session =
     Session(
-      id = SessionId(id.toHexString),
+      id = SessionId(_id.toHexString),
       accountId = AccountId(accountId.toHexString),
       createdAt = createdAt,
-      expiresAt = expiresAt
+      expiresAt = expiresAt,
+      lastRecordedActivity = lastRecordedActivity
     )
 }
 
 object SessionEntity {
-  def create(aid: AccountId, duration: FiniteDuration): SessionEntity =
+  def create(aid: AccountId, cs: CreateSession): SessionEntity =
     SessionEntity(
       new ObjectId(),
       new ObjectId(aid.value),
-      Instant.now(),
-      Instant.now().plusMillis(duration.toMillis)
+      cs.time,
+      cs.time.plusMillis(cs.duration.toMillis),
+      cs.ipAddress.map(ip => SessionActivity(ip, cs.time))
     )
 }

@@ -3,14 +3,13 @@ package expensetracker.auth
 import cats.effect.IO
 import expensetracker.ControllerSpec
 import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountName, Password}
-import expensetracker.auth.session.SessionId
+import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
 import org.http4s.{Method, Request, ResponseCookie, Status}
 
 import java.time.Instant
-import scala.concurrent.duration._
 
 class AuthControllerSpec extends ControllerSpec {
 
@@ -92,26 +91,26 @@ class AuthControllerSpec extends ControllerSpec {
 
       "return forbidden when invalid password or email" in {
         val svc = mock[AuthService[IO]]
-        when(svc.login(any[AccountEmail], any[Password], any[FiniteDuration])).thenReturn(IO.raiseError(InvalidEmailOrPassword))
+        when(svc.login(any[AccountEmail], any[Password], any[CreateSession])).thenReturn(IO.raiseError(InvalidEmailOrPassword))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar","isExtended":true}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid email or password"}"""))
-        verify(svc).login(AccountEmail("foo@bar.com"), Password("bar"), 90.days)
+        verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")), any[CreateSession])
       }
 
       "return no content on success and create session id cookie" in {
         val svc = mock[AuthService[IO]]
-        when(svc.login(any[AccountEmail], any[Password], any[FiniteDuration])).thenReturn(IO.pure(sid))
+        when(svc.login(any[AccountEmail], any[Password], any[CreateSession])).thenReturn(IO.pure(sid))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar","isExtended":true}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None, List(ResponseCookie("session-id", sid.value)))
-        verify(svc).login(AccountEmail("foo@bar.com"), Password("bar"), 90.days)
+        verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")), any[CreateSession])
       }
     }
 

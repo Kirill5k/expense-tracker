@@ -2,16 +2,14 @@ package expensetracker.auth
 
 import cats.Monad
 import cats.implicits._
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountService, Password}
-import expensetracker.auth.session.{Session, SessionId, SessionService}
-
-import scala.concurrent.duration.FiniteDuration
+import expensetracker.auth.account._
+import expensetracker.auth.session._
 
 trait AuthService[F[_]] {
   def createAccount(details: AccountDetails, password: Password): F[AccountId]
-  def login(email: AccountEmail, password: Password, sessionDuration: FiniteDuration): F[SessionId]
+  def login(email: AccountEmail, password: Password, cs: CreateSession): F[SessionId]
   def logout(sid: SessionId): F[Unit]
-  def findSession(sid: SessionId): F[Option[Session]]
+  def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
 }
 
 final private class LiveAuthService[F[_]: Monad](
@@ -22,14 +20,14 @@ final private class LiveAuthService[F[_]: Monad](
   override def createAccount(details: AccountDetails, password: Password): F[AccountId] =
     accountService.create(details, password)
 
-  override def login(email: AccountEmail, password: Password, sessionDuration: FiniteDuration): F[SessionId] =
-    accountService.login(email, password).flatMap(aid => sessionService.create(aid, sessionDuration))
+  override def login(email: AccountEmail, password: Password, cs: CreateSession): F[SessionId] =
+    accountService.login(email, password).flatMap(aid => sessionService.create(aid, cs))
 
   override def logout(sid: SessionId): F[Unit] =
     sessionService.delete(sid)
 
-  override def findSession(sid: SessionId): F[Option[Session]] =
-    sessionService.find(sid)
+  override def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
+    sessionService.find(sid, activity)
 }
 
 object AuthService {

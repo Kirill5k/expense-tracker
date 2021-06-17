@@ -1,13 +1,13 @@
 package expensetracker.auth
 
 import cats.Monad
-import cats.effect.Concurrent
+import cats.effect.Temporal
 import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountName, Password}
-import expensetracker.auth.session.Session
+import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
 import io.circe.refined._
@@ -16,9 +16,10 @@ import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
 
+import java.time.Instant
 import scala.concurrent.duration._
 
-final class AuthController[F[_]: Logger: Concurrent](
+final class AuthController[F[_]: Logger: Temporal](
     private val service: AuthService[F]
 ) extends Controller[F] {
   import AuthController._
@@ -38,7 +39,9 @@ final class AuthController[F[_]: Logger: Concurrent](
       withErrorHandling {
         for {
           login <- req.as[LoginRequest]
-          sid   <- service.login(login.accountEmail, login.accountPassword, login.duration)
+          time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
+          cs = CreateSession(req.from, time, login.duration)
+          sid   <- service.login(login.accountEmail, login.accountPassword, cs)
           res   <- NoContent()
         } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value))
       }
@@ -88,6 +91,6 @@ object AuthController {
     def accountPassword = Password(password.value)
   }
 
-  def make[F[_]: Concurrent: Logger](service: AuthService[F]): F[AuthController[F]] =
+  def make[F[_]: Temporal: Logger](service: AuthService[F]): F[AuthController[F]] =
     Monad[F].pure(new AuthController[F](service))
 }

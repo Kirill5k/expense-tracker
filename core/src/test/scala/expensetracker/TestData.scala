@@ -1,7 +1,8 @@
 package expensetracker
 
+import com.comcast.ip4s.IpAddress
 import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, Password, PasswordHash}
-import expensetracker.auth.session.{Session, SessionId}
+import expensetracker.auth.session.{Session, SessionActivity, SessionId}
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import org.bson.types.ObjectId
 import org.http4s.RequestCookie
@@ -21,6 +22,7 @@ trait TestData {
   val cat   = Category(cid, cname, CategoryIcon("icon"), Some(aid))
 
   val sid             = SessionId(new ObjectId().toHexString)
-  val sess            = Session(sid, aid, Instant.now(), Instant.now().plusSeconds(100000L))
+  val sa              = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))
+  val sess            = Session(sid, aid, Instant.now(), Instant.now().plusSeconds(100000L), sa)
   val sessionIdCookie = RequestCookie("session-id", sid.value)
 }

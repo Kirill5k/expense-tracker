@@ -10,10 +10,12 @@ import org.http4s.{AuthedRoutes, Request}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.AuthMiddleware
 
+import java.time.Instant
+
 object SessionAuthMiddleware {
 
   def apply[F[_]](
-      obtainSession: SessionId => F[Option[Session]]
+      obtainSession: (SessionId, Option[SessionActivity]) => F[Option[Session]]
   )(implicit
       F: Temporal[F]
   ): AuthMiddleware[F, Session] = {
@@ -32,10 +34,12 @@ object SessionAuthMiddleware {
             _.asLeft[Session].pure[F],
             sid =>
               F.realTime.flatMap { time =>
-                obtainSession(sid).map {
-                  case None                                                => "invalid session-id".asLeft[Session]
-                  case Some(s) if time.toMillis > s.expiresAt.toEpochMilli => "session has expired".asLeft[Session]
-                  case Some(s)                                             => s.asRight[String]
+                val currentTime = Instant.ofEpochMilli(time.toMillis)
+                val activity    = req.from.map(ip => SessionActivity(ip, currentTime))
+                obtainSession(sid, activity).map {
+                  case None                                        => "invalid session-id".asLeft[Session]
+                  case Some(s) if currentTime.isAfter(s.expiresAt) => "session has expired".asLeft[Session]
+                  case Some(s)                                     => s.asRight[String]
                 }
               }
           )

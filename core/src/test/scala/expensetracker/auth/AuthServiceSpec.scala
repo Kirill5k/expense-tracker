@@ -4,8 +4,9 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountService, Password}
-import expensetracker.auth.session.{SessionId, SessionService}
+import expensetracker.auth.session.{CreateSession, SessionActivity, SessionId, SessionService}
 
+import java.time.Instant
 import scala.concurrent.duration._
 
 class AuthServiceSpec extends CatsSpec {
@@ -30,16 +31,16 @@ class AuthServiceSpec extends CatsSpec {
 
     "find session by session id" in {
       val (accSvc, sessSvc) = mocks
-      when(sessSvc.find(any[SessionId])).thenReturn(IO.pure(Some(sess)))
+      when(sessSvc.find(any[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(sess)))
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.findSession(sid)
+        res     <- authSvc.findSession(sid, sa)
       } yield res
 
       result.unsafeToFuture().map { res =>
         verifyZeroInteractions(accSvc)
-        verify(sessSvc).find(sid)
+        verify(sessSvc).find(sid, sa)
         res mustBe Some(sess)
       }
     }
@@ -47,16 +48,17 @@ class AuthServiceSpec extends CatsSpec {
     "create new session on login" in {
       val (accSvc, sessSvc) = mocks
       when(accSvc.login(any[AccountEmail], any[Password])).thenReturn(IO.pure(aid))
-      when(sessSvc.create(any[AccountId], any[FiniteDuration])).thenReturn(IO.pure(sid))
+      when(sessSvc.create(any[AccountId], any[CreateSession])).thenReturn(IO.pure(sid))
 
+      val create = CreateSession(None, Instant.now(), 90.days)
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.login(email, pwd, 90.days)
+        res     <- authSvc.login(email, pwd, create)
       } yield res
 
       result.unsafeToFuture().map { res =>
         verify(accSvc).login(email, pwd)
-        verify(sessSvc).create(aid, 90.days)
+        verify(sessSvc).create(aid, create)
         res mustBe sid
       }
     }
