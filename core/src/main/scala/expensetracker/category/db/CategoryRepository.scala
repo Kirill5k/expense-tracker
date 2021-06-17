@@ -31,21 +31,21 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
-      .deleteOne(Filters.and(idEq("accountId", aid.value), idEq("_id", cid.value)))
-      .void
+      .findOneAndDelete[F](Filters.and(idEq("accountId", aid.value), idEq("_id", cid.value)))
+      .flatMap(errorIfNull(cid))
 
   override def create(cat: CreateCategory): F[CategoryId] = ???
 
-  override def update(cat: Category): F[Unit] = {
+  override def update(cat: Category): F[Unit] =
     collection
       .findOneAndReplace[F](
         Filters.and(idEq("accountId", cat.accountId.map(_.value).orNull), idEq("_id", cat.id.value)),
         CategoryEntity.from(cat)
       )
-      .flatMap { res =>
-        Option(res).as(().pure[F]).getOrElse(CategoryDoesNotExist(cat.id).raiseError[F, Unit])
-      }
-  }
+      .flatMap(errorIfNull(cat.id))
+
+  private def errorIfNull[A](cid: CategoryId)(res: A): F[Unit] =
+    Option(res).as(().pure[F]).getOrElse(CategoryDoesNotExist(cid).raiseError[F, Unit])
 
   private def idEq(name: String, id: String): Bson =
     Filters.eq(name, new ObjectId(id))

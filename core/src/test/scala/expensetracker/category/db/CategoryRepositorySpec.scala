@@ -54,16 +54,15 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         }
       }
 
-      "keep category if accountId doesn't match" in {
+      "return error if accountId doesn't match" in {
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            _    <- repo.delete(acc1Id, cat2Id)
-            cats <- repo.getAll(acc2Id)
-          } yield cats
+            res    <- repo.delete(acc1Id, cat2Id)
+          } yield res
 
-          result.map { cats =>
-            cats must have size 1
+          result.attempt.map { res =>
+            res mustBe Left(CategoryDoesNotExist(cat2Id))
           }
         }
       }

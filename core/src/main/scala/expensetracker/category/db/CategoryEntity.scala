@@ -14,7 +14,7 @@ final case class CategoryEntity(
     Category(
       id = CategoryId(_id.toHexString),
       name = CategoryName(name),
-      icon = CategoryIcon(name),
+      icon = CategoryIcon(icon),
       accountId = accountId.map(uid => AccountId(uid.toHexString))
     )
 }
