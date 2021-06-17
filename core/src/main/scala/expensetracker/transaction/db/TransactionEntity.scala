@@ -10,14 +10,14 @@ import squants.market._
 import java.time.Instant
 
 final case class TransactionCategory(
-    id: ObjectId,
+    _id: ObjectId,
     name: String,
     icon: String,
     accountId: Option[ObjectId]
 ) {
   def toDomain: Category =
     Category(
-      CategoryId(id.toHexString),
+      CategoryId(_id.toHexString),
       CategoryName(name),
       CategoryIcon(icon),
       accountId.map(uid => AccountId(uid.toHexString))

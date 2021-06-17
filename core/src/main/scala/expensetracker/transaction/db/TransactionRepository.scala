@@ -28,7 +28,7 @@ final private class LiveTransactionRepository[F[_]: Async](
       .aggregate(
         List(
           Aggregates.`match`(Filters.eq("accountId", new ObjectId(aid.value))),
-          Aggregates.lookup("categories", "categoryId", "id", "category"),
+          Aggregates.lookup("categories", "categoryId", "_id", "category"),
           Aggregates.unwind("$category"),
           Aggregates.`match`(Filters.not(Filters.eq("category", null)))
         )

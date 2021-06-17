@@ -30,7 +30,7 @@ trait EmbeddedMongo {
   def categoryDoc(id: CategoryId, name: String, uid: Option[AccountId] = None): Document =
     new Document(
       Map[String, Object](
-        "id"        -> new ObjectId(id.value),
+        "_id"        -> new ObjectId(id.value),
         "name"      -> name,
         "icon"      -> "icon",
         "accountId" -> uid.map(id => new ObjectId(id.value)).orNull
@@ -39,7 +39,7 @@ trait EmbeddedMongo {
 
   def accDoc(id: AccountId, email: String, password: String = "password"): Document =
     new Document(Map[String, Object](
-      "id" -> new ObjectId(id.value),
+      "_id" -> new ObjectId(id.value),
       "email" -> email,
       "password" -> password,
       "name" -> Document.parse("""{"first":"John","last":"Bloggs"}""")
