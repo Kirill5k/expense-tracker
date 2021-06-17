@@ -34,19 +34,19 @@ final private class LiveCategoryRepository[F[_]: Async](
       .deleteOne(Filters.and(idEq("accountId", aid.value), idEq("id", cid.value)))
       .void
 
-  private def idEq(name: String, id: String): Bson =
-    Filters.eq(name, new ObjectId(id))
-
   override def create(cat: CreateCategory): F[CategoryId] = ???
 
   override def update(cat: Category): F[Unit] =
     collection
-      .count[F](idEq("id", cat.id.value))
+      .count[F](Filters.and(idEq("accountId", cat.accountId.map(_.value).orNull), idEq("id", cat.id.value)))
       .map(_ >= 1)
       .flatMap {
         case true  => collection.insertOne(CategoryEntity.from(cat)).void
         case false => CategoryDoesNotExist(cat.id).raiseError[F, Unit]
       }
+
+  private def idEq(name: String, id: String): Bson =
+    Filters.eq(name, new ObjectId(id))
 }
 
 object CategoryRepository {

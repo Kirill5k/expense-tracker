@@ -3,7 +3,7 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{CategoryId, CategoryName}
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import expensetracker.auth.account.AccountId
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
@@ -18,47 +18,68 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
   val cat1Id = CategoryId(new ObjectId().toHexString)
   val cat2Id = CategoryId(new ObjectId().toHexString)
 
-  "A CategoryRepository" should {
-    "return all account's categories" in {
-      withEmbeddedMongoDb { client =>
-        val result = for {
-          repo <- CategoryRepository.make(client)
-          cats <- repo.getAll(acc2Id)
-        } yield cats
+  "A CategoryRepository" when {
 
-        result.map { cats =>
-          cats must have size 1
-          cats.head.id mustBe cat2Id
-          cats.head.name mustBe CategoryName("c2")
-          cats.head.accountId mustBe Some(acc2Id)
+    "getAll" should {
+      "return all account's categories" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            cats <- repo.getAll(acc2Id)
+          } yield cats
+
+          result.map { cats =>
+            cats must have size 1
+            cats.head.id mustBe cat2Id
+            cats.head.name mustBe CategoryName("c2")
+            cats.head.accountId mustBe Some(acc2Id)
+          }
         }
       }
     }
 
-    "remove account's category" in {
-      withEmbeddedMongoDb { client =>
-        val result = for {
-          repo <- CategoryRepository.make(client)
-          _    <- repo.delete(acc2Id, cat2Id)
-          cats <- repo.getAll(acc2Id)
-        } yield cats
+    "delete" should {
+      "remove account's category" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            _    <- repo.delete(acc2Id, cat2Id)
+            cats <- repo.getAll(acc2Id)
+          } yield cats
 
-        result.map { cats =>
-          cats must have size 0
+          result.map { cats =>
+            cats must have size 0
+          }
+        }
+      }
+
+      "keep category if accountId doesn't match" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            _    <- repo.delete(acc1Id, cat2Id)
+            cats <- repo.getAll(acc2Id)
+          } yield cats
+
+          result.map { cats =>
+            cats must have size 1
+          }
         }
       }
     }
 
-    "keep category if accountId doesn't match" in {
-      withEmbeddedMongoDb { client =>
-        val result = for {
-          repo <- CategoryRepository.make(client)
-          _    <- repo.delete(acc1Id, cat2Id)
-          cats <- repo.getAll(acc2Id)
-        } yield cats
+    "update" should {
+      "update existing category" in {
+        withEmbeddedMongoDb { db =>
+          val result = for {
+            repo <- CategoryRepository.make(db)
+            _    <- repo.update(Category(cat2Id, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id)))
+            cats <- repo.getAll(acc2Id)
+          } yield cats
 
-        result.map { cats =>
-          cats must have size 1
+          result.map { cats =>
+            cats must have size 1
+          }
         }
       }
     }
