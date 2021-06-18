@@ -17,7 +17,8 @@ final class Auth[F[_]: Temporal] private (
     private val authController: AuthController[F]
 ) {
   val sessionAuthMiddleware: AuthMiddleware[F, Session] = SessionAuthMiddleware[F](authService.findSession)
-  val routes: HttpRoutes[F]                             = authController.routes(sessionAuthMiddleware)
+
+  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = authController.routes(authMiddleware)
 }
 
 object Auth {
