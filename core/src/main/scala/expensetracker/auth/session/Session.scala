@@ -19,6 +19,11 @@ object SessionActivity {
   implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 }
 
+/**
+ * Fields to add:
+ * active: Boolean - if false, user needs to confirm his activity
+ * status: String
+ */
 final case class Session(
     id: SessionId,
     accountId: AccountId,
