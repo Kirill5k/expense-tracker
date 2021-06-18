@@ -30,7 +30,7 @@ final private class LiveAccountRepository[F[_]: Async](
       .flatMap {
         case 0 =>
           val createAcc = AccountEntity.create(details, password)
-          collection.insertOne[F](createAcc).as(AccountId(createAcc.id.toHexString))
+          collection.insertOne[F](createAcc).as(AccountId(createAcc._id.toHexString))
         case _ =>
           AccountAlreadyExists(details.email).raiseError[F, AccountId]
       }

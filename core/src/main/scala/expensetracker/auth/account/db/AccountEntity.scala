@@ -4,14 +4,14 @@ import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, Accou
 import org.bson.types.ObjectId
 
 final case class AccountEntity(
-    id: ObjectId,
+    _id: ObjectId,
     email: String,
     name: AccountName,
-    password: String,
+    password: String
 ) {
   def toDomain: Account =
     Account(
-      id = AccountId(id.toHexString),
+      id = AccountId(_id.toHexString),
       email = AccountEmail(email),
       name = name,
       password = PasswordHash(password)
