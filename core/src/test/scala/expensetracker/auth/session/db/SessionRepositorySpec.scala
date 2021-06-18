@@ -88,9 +88,9 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo(port = 12347) {
+    withRunningEmbeddedMongo(port = 12345) {
       MongoClientF
-        .fromConnectionString[IO]("mongodb://localhost:12347")
+        .fromConnectionString[IO]("mongodb://localhost:12345")
         .use { client =>
           for {
             db  <- client.getDatabase("expense-tracker")

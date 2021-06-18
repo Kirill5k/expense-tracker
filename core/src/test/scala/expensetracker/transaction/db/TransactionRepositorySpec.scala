@@ -74,9 +74,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo(port = 12346) {
+    withRunningEmbeddedMongo(port = 12349) {
       MongoClientF
-        .fromConnectionString[IO]("mongodb://localhost:12346")
+        .fromConnectionString[IO]("mongodb://localhost:12349")
         .use { client =>
           for {
             db         <- client.getDatabase("expense-tracker")
