@@ -1,13 +1,14 @@
 <template>
-  <hello-world />
+  <v-container fluid>
+    <hello-world />
+  </v-container>
 </template>
 
 <script>
-import HelloWorld from '../components/HelloWorld'
+import HelloWorld from '@/components/HelloWorld'
 
 export default {
   name: 'Home',
-
   components: {
     HelloWorld
   }

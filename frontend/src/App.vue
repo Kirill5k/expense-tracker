@@ -16,20 +16,26 @@
     </v-app-bar>
 
     <v-main class="grey lighten-3">
-      <v-container fluid>
-        <router-view/>
-      </v-container>
+
+      <router-view
+        v-if="isAuthenticated"
+      />
+      <auth
+        v-else
+      />
     </v-main>
   </v-app>
 </template>
 
 <script>
+import Auth from '@/views/Auth'
 
 export default {
   name: 'App',
   created () {
     this.$store.dispatch('getAccount')
   },
+  components: { Auth },
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
