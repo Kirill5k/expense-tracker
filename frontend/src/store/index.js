@@ -26,7 +26,7 @@ export default new Vuex.Store({
     },
     setAccount (state, account) {
       state.account = account
-    },
+    }
   },
   actions: {
     getAccount ({ commit }) {
@@ -55,7 +55,7 @@ export default new Vuex.Store({
           commit('authenticate')
         })
         .catch(() => {})
-    },
+    }
   },
   modules: {
   }

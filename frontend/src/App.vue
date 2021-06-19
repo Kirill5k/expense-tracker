@@ -4,9 +4,12 @@
       app
       color="white"
     >
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-      <v-toolbar-title>Expense Tracker</v-toolbar-title>
+      <v-avatar
+        v-if="isAuthenticated"
+        color="primary"
+      >
+        <span class="white--text text-h5">{{initials}}</span>
+      </v-avatar>
 
       <v-spacer></v-spacer>
 
@@ -24,12 +27,21 @@
 
 export default {
   name: 'App',
-  data: () => ({
-    //
-  }),
+  created () {
+    this.$store.dispatch('getAccount')
+  },
   computed: {
-    isAuthenticated() {
-      return $store.state.isAuthenticated
+    isAuthenticated () {
+      return this.$store.state.isAuthenticated
+    },
+    initials () {
+      if (this.isAuthenticated) {
+        const acc = this.$store.account
+        const initials = acc.firstName.charAt(0) + acc.lastName.charAt(0)
+        return initials.toUpperCase()
+      } else {
+        return ''
+      }
     }
   }
 }
