@@ -1,0 +1,23 @@
+version: '3'
+services:
+
+  redis:
+    image: bitnami/redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  mongodb:
+    image: bitnami/mongodb:latest
+    environment:
+      MONGODB_USERNAME: dbuser
+      MONGODB_PASSWORD: dbpassword
+      MONGODB_DATABASE: expense-tracker
+
+  expense-tracker-core:
+    image: expense-tracker-core:latest
+    depends_on:
+      - mongo-warehouse
+    environment:
+      MONGO_HOST: mongodb
+      MONGO_USER: dbuser
+      MONGO_PASSWORD: dbpassword
