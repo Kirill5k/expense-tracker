@@ -24,10 +24,10 @@ final case class SessionEntity(
 }
 
 object SessionEntity {
-  def create(aid: AccountId, cs: CreateSession): SessionEntity =
+  def create(cs: CreateSession): SessionEntity =
     SessionEntity(
       new ObjectId(),
-      new ObjectId(aid.value),
+      new ObjectId(cs.accountId.value),
       cs.time,
       cs.time.plusMillis(cs.duration.toMillis),
       cs.ipAddress.map(ip => SessionActivity(ip, cs.time))

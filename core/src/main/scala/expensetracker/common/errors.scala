@@ -1,6 +1,6 @@
 package expensetracker.common
 
-import expensetracker.auth.account.AccountEmail
+import expensetracker.auth.account.{AccountEmail, AccountId}
 import expensetracker.category.{CategoryId, CategoryName}
 
 object errors {
@@ -21,6 +21,10 @@ object errors {
 
     final case class AccountAlreadyExists(email: AccountEmail) extends ConflictError {
       override def message: String = s"account with email ${email.value} already exists"
+    }
+
+    final case class AccountDoesNotExist(id: AccountId) extends NotFoundError {
+      override def message: String = s"account with id ${id.value} does not exist"
     }
 
     case object InvalidEmailOrPassword extends AuthError {

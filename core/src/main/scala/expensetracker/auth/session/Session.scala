@@ -19,11 +19,8 @@ object SessionActivity {
   implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 }
 
-/**
- * Fields to add:
- * active: Boolean - if false, user needs to confirm his activity
- * status: String
- */
+/** Fields to add: active: Boolean - if false, user needs to confirm his activity status: String
+  */
 final case class Session(
     id: SessionId,
     accountId: AccountId,
@@ -33,6 +30,7 @@ final case class Session(
 )
 
 final case class CreateSession(
+    accountId: AccountId,
     ipAddress: Option[IpAddress],
     time: Instant,
     duration: FiniteDuration

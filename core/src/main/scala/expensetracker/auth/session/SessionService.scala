@@ -5,7 +5,7 @@ import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.db.SessionRepository
 
 trait SessionService[F[_]] {
-  def create(aid: AccountId, cs: CreateSession): F[SessionId]
+  def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def delete(sid: SessionId): F[Unit]
 }
@@ -14,8 +14,8 @@ final private class LiveSessionService[F[_]](
     private val repository: SessionRepository[F]
 ) extends SessionService[F] {
 
-  override def create(aid: AccountId, cs: CreateSession): F[SessionId] =
-    repository.create(aid, cs)
+  override def create(cs: CreateSession): F[SessionId] =
+    repository.create(cs)
 
   override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
     repository.find(sid, activity)

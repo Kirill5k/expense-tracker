@@ -33,7 +33,7 @@ class AccountServiceSpec extends CatsSpec {
 
       "return account id on success" in {
         val (repo, encr) = mocks
-        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
+        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
 
         val result = for {
@@ -42,7 +42,7 @@ class AccountServiceSpec extends CatsSpec {
         } yield res
 
         result.unsafeToFuture().map { res =>
-          verify(repo).find(details.email)
+          verify(repo).findBy(details.email)
           verify(encr).isValid(pwd, hash)
           res mustBe aid
         }
@@ -50,7 +50,7 @@ class AccountServiceSpec extends CatsSpec {
 
       "return error when account does not exist" in {
         val (repo, encr) = mocks
-        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(None))
+        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(None))
 
         val result = for {
           service <- AccountService.make[IO](repo, encr)
@@ -58,7 +58,7 @@ class AccountServiceSpec extends CatsSpec {
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
-          verify(repo).find(details.email)
+          verify(repo).findBy(details.email)
           verifyZeroInteractions(encr)
           res mustBe Left(InvalidEmailOrPassword)
         }
@@ -66,7 +66,7 @@ class AccountServiceSpec extends CatsSpec {
 
       "return error when password doesn't match" in {
         val (repo, encr) = mocks
-        when(repo.find(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
+        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
         val result = for {
@@ -75,7 +75,7 @@ class AccountServiceSpec extends CatsSpec {
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
-          verify(repo).find(details.email)
+          verify(repo).findBy(details.email)
           verify(encr).isValid(pwd, hash)
           res mustBe Left(InvalidEmailOrPassword)
         }

@@ -7,9 +7,11 @@ import expensetracker.auth.session._
 
 trait AuthService[F[_]] {
   def createAccount(details: AccountDetails, password: Password): F[AccountId]
-  def login(email: AccountEmail, password: Password, cs: CreateSession): F[SessionId]
+  def createSession(cs: CreateSession): F[SessionId]
+  def login(email: AccountEmail, password: Password): F[Account]
   def logout(sid: SessionId): F[Unit]
   def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
+  def findAccount(aic: AccountId): F[Account]
 }
 
 final private class LiveAuthService[F[_]: Monad](
@@ -20,14 +22,20 @@ final private class LiveAuthService[F[_]: Monad](
   override def createAccount(details: AccountDetails, password: Password): F[AccountId] =
     accountService.create(details, password)
 
-  override def login(email: AccountEmail, password: Password, cs: CreateSession): F[SessionId] =
-    accountService.login(email, password).flatMap(aid => sessionService.create(aid, cs))
+  override def def createSession(cs: CreateSession): F[SessionId] =
+    sessionService.create(cs)
+
+  override def login(email: AccountEmail, password: Password): F[Account] =
+    accountService.login(email, password)
 
   override def logout(sid: SessionId): F[Unit] =
     sessionService.delete(sid)
 
   override def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
     sessionService.find(sid, activity)
+
+  override def findAccount(aid: AccountId): F[Account] =
+    accountService.find(aid)
 }
 
 object AuthService {

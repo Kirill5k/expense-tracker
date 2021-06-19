@@ -15,7 +15,7 @@ import org.bson.types.ObjectId
 import scala.jdk.CollectionConverters._
 
 trait SessionRepository[F[_]] {
-  def create(aid: AccountId, cs: CreateSession): F[SessionId]
+  def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def delete(sid: SessionId): F[Unit]
 }
@@ -24,8 +24,8 @@ final private class LiveSessionRepository[F[_]: Async](
     private val collection: MongoCollectionF[SessionEntity]
 ) extends SessionRepository[F] {
 
-  override def create(aid: AccountId, cs: CreateSession): F[SessionId] = {
-    val createSession = SessionEntity.create(aid, cs)
+  override def create(cs: CreateSession): F[SessionId] = {
+    val createSession = SessionEntity.create(cs)
     collection.insertOne[F](createSession).as(SessionId(createSession._id.toHexString))
   }
 

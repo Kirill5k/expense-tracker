@@ -24,7 +24,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
-            acc  <- repo.find(accDetails.email)
+            acc  <- repo.findBy(accDetails.email)
           } yield acc
 
           result.map { acc =>
@@ -37,7 +37,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
-            acc  <- repo.find(AccountEmail("acc2@et.com"))
+            acc  <- repo.findBy(AccountEmail("acc2@et.com"))
           } yield acc
 
           result.map { res =>
@@ -55,7 +55,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           val result = for {
             repo <- AccountRepository.make(client)
             aid    <- repo.create(accDetails.copy(email = email), hash)
-            acc  <- repo.find(email)
+            acc  <- repo.findBy(email)
           } yield (aid, acc)
 
           result.map { case (aid, acc) =>

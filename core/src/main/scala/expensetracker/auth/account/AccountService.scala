@@ -13,7 +13,8 @@ object LoginResult {
 
 trait AccountService[F[_]] {
   def create(details: AccountDetails, password: Password): F[AccountId]
-  def login(email: AccountEmail, password: Password): F[AccountId]
+  def login(email: AccountEmail, password: Password): F[Account]
+  def find(aid: AccountId): F[Account]
 }
 
 final private class LiveAccountService[F[_]](
@@ -28,17 +29,20 @@ final private class LiveAccountService[F[_]](
   override def create(details: AccountDetails, password: Password): F[AccountId] =
     encryptor.hash(password).flatMap(h => repository.create(details, h))
 
-  override def login(email: AccountEmail, password: Password): F[AccountId] =
+  override def login(email: AccountEmail, password: Password): F[Account] =
     repository
-      .find(email)
+      .findBy(email)
       .flatMap {
         case Some(acc) => encryptor.isValid(password, acc.password).map[LoginResult](if (_) Success(acc) else Fail)
         case None      => F.pure[LoginResult](Fail)
       }
       .flatMap {
-        case Fail       => InvalidEmailOrPassword.raiseError[F, AccountId]
-        case Success(a) => F.pure(a.id)
+        case Fail       => InvalidEmailOrPassword.raiseError[F, Account]
+        case Success(a) => F.pure(a)
       }
+
+  override def find(aid: AccountId): F[Account] =
+    repository.find(aid)
 }
 
 object AccountService {

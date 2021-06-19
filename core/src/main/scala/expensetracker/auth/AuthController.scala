@@ -6,7 +6,7 @@ import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountName, Password}
+import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountName, Password}
 import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
@@ -27,7 +27,7 @@ final class AuthController[F[_]: Logger: Temporal](
   private val prefixPath = "/auth"
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
-    case req @ POST -> Root / "accounts" =>
+    case req @ POST -> Root / "account" =>
       withErrorHandling {
         for {
           create <- req.as[CreateAccountRequest]
@@ -40,18 +40,24 @@ final class AuthController[F[_]: Logger: Temporal](
         for {
           login <- req.as[LoginRequest]
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
-          cs = CreateSession(req.from, time, login.duration)
-          sid   <- service.login(login.accountEmail, login.accountPassword, cs)
-          res   <- NoContent()
+          acc   <- service.login(login.accountEmail, login.accountPassword)
+          cs = CreateSession(acc.id, req.from, time, login.duration)
+          sid <- service.createSession(cs)
+          res <- Ok(AccountView.from(acc))
         } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value))
       }
   }
 
   private val authedRoutes: AuthedRoutes[Session, F] =
-    AuthedRoutes.of { case POST -> Root / "logout" as session =>
-      withErrorHandling {
-        service.logout(session.id) *> NoContent()
-      }
+    AuthedRoutes.of {
+      case GET -> Root / "account" as session =>
+        withErrorHandling {
+          service.findAccount(session.accountId).map(AccountView.from).flatMap(Ok(_))
+        }
+      case POST -> Root / "logout" as session =>
+        withErrorHandling {
+          service.logout(session.id) *> NoContent()
+        }
     }
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
@@ -89,6 +95,21 @@ object AuthController {
 
     def accountEmail    = AccountEmail(email.value)
     def accountPassword = Password(password.value)
+  }
+
+  final case class AccountView(
+      firstName: String,
+      lastName: String,
+      email: String
+  )
+
+  object AccountView {
+    def from(acc: Account): AccountView =
+      AccountView(
+        acc.name.first,
+        acc.name.last,
+        acc.email.value
+      )
   }
 
   def make[F[_]: Temporal: Logger](service: AuthService[F]): F[AuthController[F]] =
