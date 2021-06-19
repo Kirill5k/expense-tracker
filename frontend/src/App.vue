@@ -24,9 +24,13 @@
 
 export default {
   name: 'App',
-
   data: () => ({
     //
-  })
+  }),
+  computed: {
+    isAuthenticated() {
+      return $store.state.isAuthenticated
+    }
+  }
 }
 </script>

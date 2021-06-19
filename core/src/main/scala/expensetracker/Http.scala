@@ -7,6 +7,7 @@ import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import org.http4s._
 import org.http4s.implicits._
+import org.http4s.server.Router
 import org.http4s.server.middleware._
 
 import scala.concurrent.duration._
@@ -16,9 +17,13 @@ final class Http[F[_]: Async] private (
     private val categories: Categories[F]
 ) {
 
-  private val routes: HttpRoutes[F] =
-    auth.routes(auth.sessionAuthMiddleware) <+>
-      categories.routes(auth.sessionAuthMiddleware)
+  private val routes: HttpRoutes[F] = {
+    val api = auth.routes(auth.sessionAuthMiddleware) <+> categories.routes(auth.sessionAuthMiddleware)
+
+    Router(
+      "/api" -> api
+    )
+  }
 
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { http: HttpRoutes[F] =>
     AutoSlash(http)
