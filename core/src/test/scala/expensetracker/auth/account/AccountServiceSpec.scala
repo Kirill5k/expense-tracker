@@ -10,7 +10,6 @@ class AccountServiceSpec extends CatsSpec {
 
   "An AccountService" when {
     "create" should {
-
       "return account id on success" in {
         val (repo, encr) = mocks
         when(encr.hash(any[Password])).thenReturn(IO.pure(hash))
@@ -29,11 +28,29 @@ class AccountServiceSpec extends CatsSpec {
       }
     }
 
+    "find" should {
+      "return account on success" in {
+        val (repo, encr) = mocks
+        when(repo.find(any[AccountId])).thenReturn(IO.pure(acc))
+
+        val result = for {
+          service <- AccountService.make[IO](repo, encr)
+          res     <- service.find(aid)
+        } yield res
+
+        result.unsafeToFuture().map { res =>
+          verifyZeroInteractions(encr)
+          verify(repo).find(aid)
+          res mustBe acc
+        }
+      }
+    }
+
     "login" should {
 
-      "return account id on success" in {
+      "return account on success" in {
         val (repo, encr) = mocks
-        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
+        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(Some(acc)))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
 
         val result = for {
@@ -44,7 +61,7 @@ class AccountServiceSpec extends CatsSpec {
         result.unsafeToFuture().map { res =>
           verify(repo).findBy(details.email)
           verify(encr).isValid(pwd, hash)
-          res mustBe aid
+          res mustBe acc
         }
       }
 

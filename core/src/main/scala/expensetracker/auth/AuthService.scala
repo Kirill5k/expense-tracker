@@ -1,7 +1,6 @@
 package expensetracker.auth
 
 import cats.Monad
-import cats.implicits._
 import expensetracker.auth.account._
 import expensetracker.auth.session._
 
@@ -14,7 +13,7 @@ trait AuthService[F[_]] {
   def findAccount(aic: AccountId): F[Account]
 }
 
-final private class LiveAuthService[F[_]: Monad](
+final private class LiveAuthService[F[_]](
     private val accountService: AccountService[F],
     private val sessionService: SessionService[F]
 ) extends AuthService[F] {
@@ -22,7 +21,7 @@ final private class LiveAuthService[F[_]: Monad](
   override def createAccount(details: AccountDetails, password: Password): F[AccountId] =
     accountService.create(details, password)
 
-  override def def createSession(cs: CreateSession): F[SessionId] =
+  override def createSession(cs: CreateSession): F[SessionId] =
     sessionService.create(cs)
 
   override def login(email: AccountEmail, password: Password): F[Account] =

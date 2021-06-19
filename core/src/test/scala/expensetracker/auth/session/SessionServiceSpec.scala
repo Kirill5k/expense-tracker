@@ -3,7 +3,6 @@ package expensetracker.auth.session
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.db.SessionRepository
 
 import java.time.Instant
@@ -15,16 +14,16 @@ class SessionServiceSpec extends CatsSpec {
 
     "create new session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.create(any[AccountId], any[CreateSession])).thenReturn(IO.pure(sid))
+      when(repo.create(any[CreateSession])).thenReturn(IO.pure(sid))
 
-      val create = CreateSession(None, Instant.now(), 90.days)
+      val create = CreateSession(aid, None, Instant.now(), 90.days)
       val result = for {
         svc <- SessionService.make(repo)
-        sid <- svc.create(aid, create)
+        sid <- svc.create(create)
       } yield sid
 
       result.unsafeToFuture().map { res =>
-        verify(repo).create(aid, create)
+        verify(repo).create(create)
         res mustBe sid
       }
     }

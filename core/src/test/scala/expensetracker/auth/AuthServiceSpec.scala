@@ -4,10 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountService, Password}
-import expensetracker.auth.session.{CreateSession, SessionActivity, SessionId, SessionService}
-
-import java.time.Instant
-import scala.concurrent.duration._
+import expensetracker.auth.session.{SessionActivity, SessionId, SessionService}
 
 class AuthServiceSpec extends CatsSpec {
 
@@ -45,21 +42,35 @@ class AuthServiceSpec extends CatsSpec {
       }
     }
 
-    "create new session on login" in {
+    "find account by account id" in {
       val (accSvc, sessSvc) = mocks
-      when(accSvc.login(any[AccountEmail], any[Password])).thenReturn(IO.pure(aid))
-      when(sessSvc.create(any[AccountId], any[CreateSession])).thenReturn(IO.pure(sid))
+      when(accSvc.find(any[AccountId])).thenReturn(IO.pure(acc))
 
-      val create = CreateSession(None, Instant.now(), 90.days)
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.login(email, pwd, create)
+        res     <- authSvc.findAccount(aid)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verifyZeroInteractions(sessSvc)
+        verify(accSvc).find(aid)
+        res mustBe acc
+      }
+    }
+
+    "return account on login" in {
+      val (accSvc, sessSvc) = mocks
+      when(accSvc.login(any[AccountEmail], any[Password])).thenReturn(IO.pure(acc))
+
+      val result = for {
+        authSvc <- AuthService.make[IO](accSvc, sessSvc)
+        res     <- authSvc.login(email, pwd)
       } yield res
 
       result.unsafeToFuture().map { res =>
         verify(accSvc).login(email, pwd)
-        verify(sessSvc).create(aid, create)
-        res mustBe sid
+        verifyZeroInteractions(sessSvc)
+        res mustBe acc
       }
     }
 

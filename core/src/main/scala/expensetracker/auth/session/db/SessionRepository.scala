@@ -4,7 +4,6 @@ import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.{Filters, Updates}
 import io.circe.generic.auto._
-import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
 import expensetracker.auth.session.SessionActivity._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}

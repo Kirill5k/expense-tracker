@@ -1,7 +1,6 @@
 package expensetracker.auth.session
 
 import cats.Monad
-import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.db.SessionRepository
 
 trait SessionService[F[_]] {

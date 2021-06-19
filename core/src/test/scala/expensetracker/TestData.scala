@@ -1,7 +1,7 @@
 package expensetracker
 
 import com.comcast.ip4s.IpAddress
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, Password, PasswordHash}
+import expensetracker.auth.account._
 import expensetracker.auth.session.{Session, SessionActivity, SessionId}
 import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
 import org.bson.types.ObjectId
@@ -16,6 +16,7 @@ trait TestData {
   val hash    = PasswordHash("hash")
   val email   = AccountEmail("email")
   val details = AccountDetails(email, AccountName("John", "Bloggs"))
+  val acc     = Account(aid, details.email, details.name, hash)
 
   val cid   = CategoryId("AB0C5342AB0C5342AB0C5342")
   val cname = CategoryName("cat-1")

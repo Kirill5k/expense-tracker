@@ -2,7 +2,7 @@ package expensetracker.auth
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountName, Password}
+import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, Password}
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
 import org.http4s.circe.CirceEntityCodec._
@@ -14,15 +14,28 @@ import java.time.Instant
 class AuthControllerSpec extends ControllerSpec {
 
   "An AuthController" when {
-    "POST /auth/accounts" should {
+    "GET /auth/account" should {
+      "return current account" in {
+        val svc = mock[AuthService[IO]]
+        when(svc.findAccount(any[AccountId])).thenReturn(IO.pure(acc))
 
+        val req     = Request[IO](uri = uri"/auth/account", method = Method.GET).addCookie(sessionIdCookie)
+        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+
+        val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
+        verifyJsonResponse(res, Status.Ok, Some(resBody))
+        verify(svc).findAccount(sess.accountId)
+      }
+    }
+
+    "POST /auth/account" should {
       "return bad request if email is already taken" in {
         val svc = mock[AuthService[IO]]
         when(svc.createAccount(any[AccountDetails], any[Password]))
           .thenReturn(IO.raiseError(AccountAlreadyExists(AccountEmail("foo@bar.com"))))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
-        val req     = Request[IO](uri = uri"/auth/accounts", method = Method.POST).withEntity(reqBody)
+        val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Conflict, Some("""{"message":"account with email foo@bar.com already exists"}"""))
@@ -36,7 +49,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"","firstName":"John","lastName":"Bloggs"}""")
-        val req     = Request[IO](uri = uri"/auth/accounts", method = Method.POST).withEntity(reqBody)
+        val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(
@@ -52,7 +65,7 @@ class AuthControllerSpec extends ControllerSpec {
         when(svc.createAccount(any[AccountDetails], any[Password])).thenReturn(IO.pure(aid))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
-        val req     = Request[IO](uri = uri"/auth/accounts", method = Method.POST).withEntity(reqBody)
+        val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${aid.value}"}"""))
@@ -91,26 +104,29 @@ class AuthControllerSpec extends ControllerSpec {
 
       "return forbidden when invalid password or email" in {
         val svc = mock[AuthService[IO]]
-        when(svc.login(any[AccountEmail], any[Password], any[CreateSession])).thenReturn(IO.raiseError(InvalidEmailOrPassword))
+        when(svc.login(any[AccountEmail], any[Password])).thenReturn(IO.raiseError(InvalidEmailOrPassword))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar","isExtended":true}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid email or password"}"""))
-        verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")), any[CreateSession])
+        verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")))
       }
 
-      "return no content on success and create session id cookie" in {
+      "return account on success and create session id cookie" in {
         val svc = mock[AuthService[IO]]
-        when(svc.login(any[AccountEmail], any[Password], any[CreateSession])).thenReturn(IO.pure(sid))
+        when(svc.login(any[AccountEmail], any[Password])).thenReturn(IO.pure(acc))
+        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(sid))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar","isExtended":true}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None, List(ResponseCookie("session-id", sid.value)))
-        verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")), any[CreateSession])
+        val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
+        verifyJsonResponse(res, Status.Ok, Some(resBody), List(ResponseCookie("session-id", sid.value)))
+        verify(svc).login(AccountEmail("foo@bar.com"), Password("bar"))
+        verify(svc).createSession(any[CreateSession])
       }
     }
 
