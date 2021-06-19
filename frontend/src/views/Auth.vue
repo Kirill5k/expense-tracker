@@ -14,13 +14,13 @@
 
         <v-tab-item>
           <v-card-text>
-            Login
+            <sign-in />
           </v-card-text>
         </v-tab-item>
 
         <v-tab-item>
           <v-card-text>
-            Register
+            <sign-up />
           </v-card-text>
         </v-tab-item>
       </v-tabs>
@@ -29,10 +29,11 @@
 </template>
 
 <script>
-// import SignUp from '@/components/auth/SignUp'
-// import SignIn from '@/components/auth/SignIn'
+import SignUp from '@/components/auth/SignUp'
+import SignIn from '@/components/auth/SignIn'
 
 export default {
-  name: 'Auth'
+  name: 'Auth',
+  components: { SignUp, SignIn }
 }
 </script>
