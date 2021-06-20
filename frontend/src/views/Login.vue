@@ -5,8 +5,10 @@
     >
       <v-col
         cols="12"
-        md="8"
-        lg="4"
+        xs="9"
+        sm="7"
+        md="5"
+        lg="3"
       >
         <v-alert
           v-if="alert.message"
