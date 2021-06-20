@@ -6,26 +6,26 @@
       max-width="374"
     >
       <v-card-title>
-        Sign in into your account
+        Create new account
       </v-card-title>
 
       <v-card-text>
-        <sign-in />
+        <sign-up />
       </v-card-text>
 
       <v-divider></v-divider>
 
       <v-card-subtitle>
-        New?
+        Already have an account?
         <v-btn
           class="pl-0 pr-0"
           :style="{textTransform: 'unset'}"
           small
           color="primary"
           text
-          @click="createAccount"
+          @click="login"
         >
-          Create an account.
+          Sign in.
         </v-btn>
       </v-card-subtitle>
     </v-card>
@@ -33,11 +33,11 @@
 </template>
 
 <script>
-import SignIn from '@/components/auth/SignIn'
+import SignUp from '@/components/auth/SignUp'
 
 export default {
-  name: 'Login',
-  components: { SignIn },
+  name: 'Register',
+  components: { SignUp },
   created () {
     if (this.isAuthenticated) {
       this.$router.push('home')
@@ -49,8 +49,8 @@ export default {
     }
   },
   methods: {
-    createAccount () {
-      this.$router.push('register')
+    login () {
+      this.$router.push('login')
     }
   }
 }
