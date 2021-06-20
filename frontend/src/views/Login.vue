@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid>
+  <v-container
+    class="login"
+    fluid
+  >
     <v-row
       justify="center"
     >
@@ -7,20 +10,22 @@
         cols="12"
         xs="9"
         sm="7"
-        md="5"
+        md="4"
         lg="3"
       >
-        <v-alert
-          v-if="alert.message"
-          dense
-          outlined
-          :type="alert.type"
-          close-text="Hide"
-          dismissible
-          @click="alert = {}"
-        >
-          {{ alert.message }}
-        </v-alert>
+        <div class="login__alert">
+          <v-alert
+            v-if="error"
+            dense
+            outlined
+            type="error"
+            close-text="Hide"
+            dismissible
+            @click="error = ''"
+          >
+            {{ error }}
+          </v-alert>
+        </div>
         <v-card
           :loading="loading"
           class="mx-auto"
@@ -65,10 +70,7 @@ export default {
   components: { SignIn },
   data: () => ({
     loading: false,
-    alert: {
-      type: 'error',
-      message: 'Uh oh! This is an error!'
-    }
+    error: 'Uh oh! This is an error!'
   }),
   created () {
     if (this.isAuthenticated) {
@@ -94,3 +96,15 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.login {
+
+  &__alert {
+    display: flex;
+    max-width: 400px;
+    flex-direction: column-reverse;
+    height: 100px;
+  }
+}
+</style>

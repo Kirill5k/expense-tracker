@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid>
+  <v-container
+    class="register"
+    fluid
+  >
     <v-row
       justify="center"
     >
@@ -7,9 +10,12 @@
         cols="12"
         xs="9"
         sm="7"
-        md="5"
+        md="4"
         lg="3"
       >
+        <div class="register__alert">
+
+        </div>
         <v-card
           :loading="loading"
           class="mx-auto"
@@ -74,3 +80,14 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.register {
+
+  &__alert {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 50px;
+  }
+}
+</style>
