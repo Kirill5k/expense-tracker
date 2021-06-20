@@ -38,15 +38,24 @@ export default new Vuex.Store({
         })
         .catch(() => commit('unAuthenticate'))
     },
+    createAccount ({ commit }, requestBody) {
+      return fetch('/api/account', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      })
+        .then(res => res.status === 200 ? res.json() : reject(res))
+    },
     login ({ commit, dispatch }, requestBody) {
       return fetch('/api/auth/login', {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
         credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
       })
         .then(res => res.status === 200 ? res.json() : reject(res))
@@ -54,7 +63,6 @@ export default new Vuex.Store({
           commit('setAccount', acc)
           commit('authenticate')
         })
-        .catch(() => {})
     }
   },
   modules: {

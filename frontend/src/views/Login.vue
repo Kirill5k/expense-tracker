@@ -12,6 +12,7 @@
       <v-card-text>
         <sign-in
           @sign-in="login"
+          @reset-password="reset"
         />
       </v-card-text>
 
@@ -58,7 +59,11 @@ export default {
       this.$router.push('register')
     },
     login (credentials) {
+      this.loading = true
       console.log(credentials)
+    },
+    reset () {
+      console.log('reset password')
     }
   }
 }
