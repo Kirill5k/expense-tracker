@@ -36,6 +36,16 @@ import SignIn from '@/components/auth/SignIn'
 
 export default {
   name: 'Login',
-  components: { SignIn }
+  components: { SignIn },
+  created () {
+    if (this.isAuthenticated) {
+      this.$router.push('home')
+    }
+  },
+  computed: {
+    isAuthenticated () {
+      return this.$store.state.isAuthenticated
+    }
+  }
 }
 </script>

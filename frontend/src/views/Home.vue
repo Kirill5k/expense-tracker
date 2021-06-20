@@ -11,6 +11,16 @@ export default {
   name: 'Home',
   components: {
     HelloWorld
+  },
+  created () {
+    if (!this.isAuthenticated) {
+      this.$router.push('login')
+    }
+  },
+  computed: {
+    isAuthenticated () {
+      return this.$store.state.isAuthenticated
+    }
   }
 }
 </script>
