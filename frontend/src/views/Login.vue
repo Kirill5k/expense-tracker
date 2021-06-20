@@ -70,13 +70,8 @@ export default {
   components: { SignIn },
   data: () => ({
     loading: false,
-    error: 'Uh oh! This is an error!'
+    error: ''
   }),
-  created () {
-    if (this.isAuthenticated) {
-      this.$router.push('home')
-    }
-  },
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
@@ -84,10 +79,11 @@ export default {
   },
   methods: {
     createAccount () {
-      this.$router.push('register')
+      this.$router.push('/register')
     },
     login (credentials) {
       this.loading = true
+      this.error = ''
       this.$store
         .dispatch('login', credentials)
         .then(() => this.$router.push('home'))

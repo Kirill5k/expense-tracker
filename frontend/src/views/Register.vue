@@ -14,7 +14,17 @@
         lg="3"
       >
         <div class="register__alert">
-
+          <v-alert
+            v-if="alert.message"
+            dense
+            outlined
+            :type="alert.type"
+            close-text="Hide"
+            dismissible
+            @click="alert = {}"
+          >
+            {{ alert.message }}
+          </v-alert>
         </div>
         <v-card
           :loading="loading"
@@ -57,13 +67,9 @@ import SignUp from '@/components/auth/SignUp'
 export default {
   name: 'Register',
   components: { SignUp },
-  created () {
-    if (this.isAuthenticated) {
-      this.$router.push('home')
-    }
-  },
   data: () => ({
-    loading: false
+    loading: false,
+    alert: {}
   }),
   computed: {
     isAuthenticated () {
@@ -72,10 +78,27 @@ export default {
   },
   methods: {
     login () {
-      this.$router.push('login')
+      this.$router.push('/login')
     },
     register (account) {
-      console.log(account)
+      this.loading = true
+      this.alert = {}
+      this.$store
+        .dispatch('createAccount', account)
+        .then(() => {
+          this.loading = false
+          this.alert = {
+            type: 'success',
+            message: 'Account has been successfully created!'
+          }
+        })
+        .catch(err => {
+          this.loading = false
+          this.alert = {
+            message: err.toString(),
+            type: 'error'
+          }
+        })
     }
   }
 }
@@ -87,7 +110,7 @@ export default {
   &__alert {
     display: flex;
     flex-direction: column-reverse;
-    height: 50px;
+    height: 100px;
   }
 }
 </style>

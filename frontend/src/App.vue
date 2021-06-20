@@ -26,7 +26,10 @@
 export default {
   name: 'App',
   created () {
-    this.$store.dispatch('getAccount')
+    this.$store
+      .dispatch('getAccount')
+      .then(() => this.$router.push('/'))
+      .catch(() => this.$router.push('/login'))
   },
   computed: {
     isAuthenticated () {
@@ -34,7 +37,7 @@ export default {
     },
     initials () {
       if (this.isAuthenticated) {
-        const acc = this.$store.account
+        const acc = this.$store.state.account
         const initials = acc.firstName.charAt(0) + acc.lastName.charAt(0)
         return initials.toUpperCase()
       } else {

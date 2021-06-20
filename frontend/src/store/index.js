@@ -33,13 +33,13 @@ export default new Vuex.Store({
       return fetch('/api/auth/account')
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => {
-          commit('setAccount', acc)
           commit('authenticate')
+          commit('setAccount', acc)
         })
         .catch(() => commit('unAuthenticate'))
     },
     createAccount ({ commit }, requestBody) {
-      return fetch('/api/account', {
+      return fetch('/api/auth/account', {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',
@@ -47,7 +47,7 @@ export default new Vuex.Store({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
       })
-        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(res => res.status === 201 ? res.json() : reject(res))
     },
     login ({ commit, dispatch }, requestBody) {
       return fetch('/api/auth/login', {
@@ -60,6 +60,7 @@ export default new Vuex.Store({
       })
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => {
+          console.log(acc)
           commit('setAccount', acc)
           commit('authenticate')
         })

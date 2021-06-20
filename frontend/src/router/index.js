@@ -8,17 +8,29 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
+    meta: {
+      authAccess: true,
+      unAuthAccess: false
+    }
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
+    meta: {
+      authAccess: false,
+      unAuthAccess: true
+    }
   },
   {
     path: '/register',
     name: 'register',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue'),
+    meta: {
+      authAccess: false,
+      unAuthAccess: true
+    }
   }
 ]
 
