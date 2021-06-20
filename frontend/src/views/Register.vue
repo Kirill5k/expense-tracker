@@ -1,36 +1,46 @@
 <template>
   <v-container fluid>
-    <v-card
-      :loading="loading"
-      class="mx-auto"
-      max-width="400"
+    <v-row
+      justify="center"
     >
-      <v-card-title>
-        Create new account
-      </v-card-title>
-
-      <v-card-text>
-        <sign-up
-          @sign-up="register"
-        />
-      </v-card-text>
-
-      <v-divider></v-divider>
-
-      <v-card-subtitle>
-        Already have an account?
-        <v-btn
-          class="pl-0 pr-0"
-          :style="{textTransform: 'unset'}"
-          small
-          color="primary"
-          text
-          @click="login"
+      <v-col
+        cols="12"
+        md="8"
+        lg="4"
+      >
+        <v-card
+          :loading="loading"
+          class="mx-auto"
+          max-width="400"
         >
-          Sign in.
-        </v-btn>
-      </v-card-subtitle>
-    </v-card>
+          <v-card-title>
+            Create new account
+          </v-card-title>
+
+          <v-card-text>
+            <sign-up
+              @sign-up="register"
+            />
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-subtitle>
+            Already have an account?
+            <v-btn
+              class="pl-0 pr-0"
+              :style="{textTransform: 'unset'}"
+              small
+              color="primary"
+              text
+              @click="login"
+            >
+              Sign in.
+            </v-btn>
+          </v-card-subtitle>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
