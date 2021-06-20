@@ -32,7 +32,7 @@
       color="success"
       @click="submit"
     >
-      Sign in
+      Log in
     </v-btn>
 
     <v-btn
@@ -63,7 +63,6 @@ export default {
     passwordRules: [
       v => !!v || 'Please enter your password'
     ],
-    rememberMe: false,
     showPassword: false
   }),
   methods: {

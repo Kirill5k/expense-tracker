@@ -3,7 +3,7 @@
     <v-card
       :loading="loading"
       class="mx-auto"
-      max-width="374"
+      max-width="450"
     >
       <v-card-title>
         Create new account
