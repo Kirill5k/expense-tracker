@@ -1,13 +1,13 @@
 <template>
   <v-form
-    ref="form"
+    ref="signInForm"
     v-model="valid"
     lazy-validation
   >
     <v-text-field
+      outlined
       v-model="email"
-      :error-messages="emailErrors"
-      label="E-mail"
+      label="Email"
       :rules="emailRules"
       required
       @input="$v.email.$touch()"
@@ -15,29 +15,36 @@
     />
 
     <v-text-field
+      outlined
       v-model="password"
-      :error-messages="emailErrors"
       :rules="passwordRules"
+      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+      :type="showPassword ? 'text' : 'password'"
       label="Password"
+      hint="At least 8 characters"
       required
       @input="$v.email.$touch()"
       @blur="$v.email.$touch()"
+      @click:append="showPassword = !showPassword"
     />
 
-    <v-checkbox
-      v-model="rememberMe"
-      :error-messages="checkboxErrors"
-      label="Remember me"
-      required
-      @change="$v.checkbox.$touch()"
-      @blur="$v.checkbox.$touch()"
-    ></v-checkbox>
-
     <v-btn
-      color="primary"
+      color="success"
       @click="submit"
     >
-      Login
+      Sign in
+    </v-btn>
+
+    <v-btn
+      class="mt-1 pl-0 pr-0"
+      :style="{textTransform: 'unset'}"
+      right
+      absolute
+      small
+      text
+      color="primary"
+    >
+      Forgot password?
     </v-btn>
   </v-form>
 </template>
@@ -49,18 +56,19 @@ export default {
     valid: true,
     email: '',
     emailRules: [
-      v => !!v || 'Please enter your e-mail',
-      v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+      v => !!v || 'Please enter your email',
+      v => /.+@.+\..+/.test(v) || 'Email must be valid'
     ],
     password: '',
     passwordRules: [
       v => !!v || 'Please enter your password'
     ],
-    rememberMe: false
+    rememberMe: false,
+    showPassword: false
   }),
   methods: {
     submit () {
-      this.$refs.form.validate()
+      this.$refs.signInForm.validate()
     }
   }
 }

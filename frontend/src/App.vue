@@ -20,7 +20,7 @@
       <router-view
         v-if="isAuthenticated"
       />
-      <auth
+      <login
         v-else
       />
     </v-main>
@@ -28,14 +28,14 @@
 </template>
 
 <script>
-import Auth from '@/views/Auth'
+import Login from '@/views/Login'
 
 export default {
   name: 'App',
   created () {
     this.$store.dispatch('getAccount')
   },
-  components: { Auth },
+  components: { Login },
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
