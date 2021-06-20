@@ -49,7 +49,6 @@
     <v-checkbox
       class="mb-1"
       dense
-      small
       v-model="accept"
       :rules="[v => !!v || 'You must agree to our terms and conditions to continue!']"
       label="I accept terms and condition"
@@ -58,7 +57,7 @@
 
     <v-btn
       color="success"
-      @click="submit"
+      @click="signUp"
     >
       Register
     </v-btn>
@@ -74,7 +73,9 @@ export default {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    showPassword: false,
+    accept: false
   }),
   computed: {
     rules () {
@@ -98,8 +99,16 @@ export default {
     }
   },
   methods: {
-    submit () {
-      this.$refs.signUpForm.validate()
+    signUp () {
+      if (this.$refs.signUpForm.validate()) {
+        const newAccount = {
+          firstName: this.firstName,
+          lastName: this.lastName,
+          email: this.email,
+          password: this.password
+        }
+        this.$emit('sign-up', newAccount)
+      }
     }
   }
 }

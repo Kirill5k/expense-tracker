@@ -10,8 +10,6 @@
       label="Email"
       :rules="emailRules"
       required
-      @input="$v.email.$touch()"
-      @blur="$v.email.$touch()"
     />
 
     <v-text-field
@@ -23,14 +21,12 @@
       label="Password"
       hint="At least 8 characters"
       required
-      @input="$v.email.$touch()"
-      @blur="$v.email.$touch()"
       @click:append="showPassword = !showPassword"
     />
 
     <v-btn
       color="success"
-      @click="submit"
+      @click="signIn"
     >
       Log in
     </v-btn>
@@ -43,6 +39,7 @@
       small
       text
       color="primary"
+      @click="resetPassword"
     >
       Forgot password?
     </v-btn>
@@ -66,8 +63,17 @@ export default {
     showPassword: false
   }),
   methods: {
-    submit () {
-      this.$refs.signInForm.validate()
+    signIn () {
+      if (this.$refs.signInForm.validate()) {
+        const credentials = {
+          email: this.email,
+          password: this.password
+        }
+        this.$emit('sign-in', credentials)
+      }
+    },
+    resetPassword () {
+      this.$emit('reset-password')
     }
   }
 }

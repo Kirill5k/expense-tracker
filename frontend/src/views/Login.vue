@@ -10,7 +10,9 @@
       </v-card-title>
 
       <v-card-text>
-        <sign-in />
+        <sign-in
+          @sign-in="login"
+        />
       </v-card-text>
 
       <v-divider></v-divider>
@@ -38,6 +40,9 @@ import SignIn from '@/components/auth/SignIn'
 export default {
   name: 'Login',
   components: { SignIn },
+  data: () => ({
+    loading: false
+  }),
   created () {
     if (this.isAuthenticated) {
       this.$router.push('home')
@@ -51,6 +56,9 @@ export default {
   methods: {
     createAccount () {
       this.$router.push('register')
+    },
+    login (credentials) {
+      console.log(credentials)
     }
   }
 }

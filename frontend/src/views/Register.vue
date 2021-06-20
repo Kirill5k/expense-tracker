@@ -10,7 +10,9 @@
       </v-card-title>
 
       <v-card-text>
-        <sign-up />
+        <sign-up
+          @sign-up="register"
+        />
       </v-card-text>
 
       <v-divider></v-divider>
@@ -43,6 +45,9 @@ export default {
       this.$router.push('home')
     }
   },
+  data: () => ({
+    loading: false
+  }),
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
@@ -51,6 +56,9 @@ export default {
   methods: {
     login () {
       this.$router.push('login')
+    },
+    register (account) {
+      console.log(account)
     }
   }
 }
