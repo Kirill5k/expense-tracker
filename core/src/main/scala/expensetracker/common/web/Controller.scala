@@ -31,7 +31,7 @@ trait Controller[F[_]] extends Http4sDsl[F] {
         logger.error(err)(err.getMessage) *>
           NotFound(ErrorResponse(err.getMessage))
       case err: AuthError =>
-        logger.error(err)(err.getMessage) *>
+        logger.error(err.getMessage) *>
           Forbidden(ErrorResponse(err.getMessage))
       case err: InvalidMessageBodyFailure =>
         logger.error(err.getCause())(err.getMessage()) *>

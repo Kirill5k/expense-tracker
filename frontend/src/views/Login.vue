@@ -86,7 +86,7 @@ export default {
       this.error = ''
       this.$store
         .dispatch('login', credentials)
-        .then(() => this.$router.push('home'))
+        .then(() => this.$router.push('/'))
         .catch(err => {
           this.loading = false
           this.error = err.toString()
