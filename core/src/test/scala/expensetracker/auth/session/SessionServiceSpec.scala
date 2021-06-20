@@ -6,7 +6,6 @@ import expensetracker.CatsSpec
 import expensetracker.auth.session.db.SessionRepository
 
 import java.time.Instant
-import scala.concurrent.duration._
 
 class SessionServiceSpec extends CatsSpec {
 
@@ -16,7 +15,7 @@ class SessionServiceSpec extends CatsSpec {
       val repo = mock[SessionRepository[IO]]
       when(repo.create(any[CreateSession])).thenReturn(IO.pure(sid))
 
-      val create = CreateSession(aid, None, Instant.now(), 90.days)
+      val create = CreateSession(aid, None, Instant.now())
       val result = for {
         svc <- SessionService.make(repo)
         sid <- svc.create(create)

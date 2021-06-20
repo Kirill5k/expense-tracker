@@ -92,7 +92,7 @@ class AuthControllerSpec extends ControllerSpec {
       "return bad req on parsing error" in {
         val svc = mock[AuthService[IO]]
 
-        val reqBody  = parseJson("""{"email":"foo","password":"","isExtended":true}""")
+        val reqBody  = parseJson("""{"email":"foo","password":""}""")
         val res      = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val response = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(res))
 
@@ -106,7 +106,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
         when(svc.login(any[AccountEmail], any[Password])).thenReturn(IO.raiseError(InvalidEmailOrPassword))
 
-        val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar","isExtended":true}""")
+        val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
@@ -119,7 +119,7 @@ class AuthControllerSpec extends ControllerSpec {
         when(svc.login(any[AccountEmail], any[Password])).thenReturn(IO.pure(acc))
         when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(sid))
 
-        val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar","isExtended":true}""")
+        val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 

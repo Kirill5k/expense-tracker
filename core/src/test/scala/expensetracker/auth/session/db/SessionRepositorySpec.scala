@@ -26,7 +26,7 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
     "create new sessions" in {
       withEmbeddedMongoDb { db =>
-        val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts, 90.days)
+        val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts)
         val result = for {
           repo <- SessionRepository.make(db)
           sid  <- repo.create(create)
@@ -38,7 +38,7 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
             sid,
             aid,
             create.time,
-            create.time.plusMillis(create.duration.toMillis),
+            create.time.plusMillis(90.days.toMillis),
             create.ipAddress.map(ip => SessionActivity(ip, create.time))
           ).some
         }
@@ -58,7 +58,7 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
     "delete session from database" in {
       withEmbeddedMongoDb { db =>
-        val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts, 90.days)
+        val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts)
         val result = for {
           repo <- SessionRepository.make(db)
           sid  <- repo.create(create)
@@ -75,7 +75,7 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         val activity = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, ts))
         val result = for {
           repo <- SessionRepository.make(db)
-          sid  <- repo.create(CreateSession(aid, None, ts, 90.days))
+          sid  <- repo.create(CreateSession(aid, None, ts))
           _    <- repo.find(sid, activity)
           res  <- repo.find(sid, None)
         } yield res

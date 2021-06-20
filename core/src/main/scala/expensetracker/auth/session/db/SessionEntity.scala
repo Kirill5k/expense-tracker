@@ -5,6 +5,7 @@ import expensetracker.auth.session.{CreateSession, Session, SessionActivity, Ses
 import org.bson.types.ObjectId
 
 import java.time.Instant
+import scala.concurrent.duration._
 
 final case class SessionEntity(
     _id: ObjectId,
@@ -29,7 +30,7 @@ object SessionEntity {
       new ObjectId(),
       new ObjectId(cs.accountId.value),
       cs.time,
-      cs.time.plusMillis(cs.duration.toMillis),
+      cs.time.plusMillis(90.days.toMillis),
       cs.ipAddress.map(ip => SessionActivity(ip, cs.time))
     )
 }

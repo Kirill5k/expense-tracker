@@ -88,7 +88,13 @@ export default {
     },
     login (credentials) {
       this.loading = true
-      console.log(credentials)
+      this.$store
+        .dispatch('login', credentials)
+        .then(() => this.$router.push('home'))
+        .catch(err => {
+          this.loading = false
+          this.error = err.toString()
+        })
     },
     reset () {
       console.log('reset password')
@@ -102,7 +108,6 @@ export default {
 
   &__alert {
     display: flex;
-    max-width: 400px;
     flex-direction: column-reverse;
     height: 100px;
   }

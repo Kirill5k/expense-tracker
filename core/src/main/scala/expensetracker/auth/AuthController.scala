@@ -17,7 +17,6 @@ import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
 
 import java.time.Instant
-import scala.concurrent.duration._
 
 final class AuthController[F[_]: Logger: Temporal](
     private val service: AuthService[F]
@@ -41,8 +40,7 @@ final class AuthController[F[_]: Logger: Temporal](
           login <- req.as[LoginRequest]
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
           acc   <- service.login(login.accountEmail, login.accountPassword)
-          cs = CreateSession(acc.id, req.from, time, login.duration)
-          sid <- service.createSession(cs)
+          sid <- service.createSession(CreateSession(acc.id, req.from, time))
           res <- Ok(AccountView.from(acc))
         } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value))
       }
@@ -87,12 +85,8 @@ object AuthController {
 
   final case class LoginRequest(
       email: Email,
-      password: NonEmptyString,
-      isExtended: Boolean
+      password: NonEmptyString
   ) {
-    def duration: FiniteDuration =
-      if (isExtended) 90.days else 1.day
-
     def accountEmail    = AccountEmail(email.value)
     def accountPassword = Password(password.value)
   }

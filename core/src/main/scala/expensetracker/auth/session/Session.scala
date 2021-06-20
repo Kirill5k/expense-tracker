@@ -5,7 +5,6 @@ import expensetracker.auth.account.AccountId
 import io.circe.{Decoder, Encoder}
 
 import java.time.Instant
-import scala.concurrent.duration.FiniteDuration
 
 final case class SessionId(value: String) extends AnyVal
 
@@ -32,6 +31,5 @@ final case class Session(
 final case class CreateSession(
     accountId: AccountId,
     ipAddress: Option[IpAddress],
-    time: Instant,
-    duration: FiniteDuration
+    time: Instant
 )
