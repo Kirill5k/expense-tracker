@@ -43,6 +43,17 @@
       :rules="rules.confirmPassword"
       type="password"
       label="Confirm password"
+      required
+    />
+
+    <v-checkbox
+      class="mb-1"
+      dense
+      small
+      v-model="accept"
+      :rules="[v => !!v || 'You must agree to our terms and conditions to continue!']"
+      label="I accept terms and condition"
+      required
     />
 
     <v-btn
@@ -79,7 +90,10 @@ export default {
           v => v.length >= 8 || 'Must be at least 8 characters in length',
           v => /[A-Z].*\d|\d.*[A-Z]/.test(v) || 'Must contain at least 1 digit and 1 uppercase letter'
         ],
-        confirmPassword: [v => v === this.password || 'Passwords do not match']
+        confirmPassword: [
+          v => !!v || 'Please enter your password',
+          v => v === this.password || 'Passwords do not match'
+        ]
       }
     }
   },
