@@ -38,7 +38,7 @@
           </v-card-actions>
         </v-card>
       </v-col>
-      <v-col cols="7">
+      <v-col cols="5">
         <categories
           :items="categories"
         />
