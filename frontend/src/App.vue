@@ -5,16 +5,21 @@
       app
       color="white"
     >
-      <v-avatar
-        color="primary"
-        size="48"
+      <v-chip
+        color="black"
+        text-color="white"
       >
-        <span
-          class="white--text text-h6"
+        <v-avatar
+          left
+          class="mr-2"
+          color="primary"
         >
-          {{initials}}
-        </span>
-      </v-avatar>
+          <v-icon dark large>
+            mdi-account-circle
+          </v-icon>
+        </v-avatar>
+        <strong>{{ name }}</strong>
+      </v-chip>
 
       <v-spacer></v-spacer>
 
@@ -45,10 +50,7 @@
 export default {
   name: 'App',
   created () {
-    this.$store
-      .dispatch('getAccount')
-      .then(() => this.$router.push('/'))
-      .catch(() => this.$router.push('/login'))
+    this.$store.dispatch('getAccount')
   },
   computed: {
     isAuthenticated () {
@@ -57,13 +59,17 @@ export default {
     isLoading () {
       return this.$store.state.isLoading
     },
-    initials () {
-      if (this.isAuthenticated) {
-        const acc = this.$store.state.account
-        const initials = acc.firstName.charAt(0) + acc.lastName.charAt(0)
-        return initials.toUpperCase()
-      } else {
-        return ''
+    name () {
+      return this.isAuthenticated ? this.$store.state.account.firstName : ''
+    }
+  },
+  watch: {
+    isAuthenticated (newVal) {
+      if (newVal === true) {
+        this.$router.push('/')
+      }
+      if (newVal === false) {
+        this.$router.push('/login')
       }
     }
   }
