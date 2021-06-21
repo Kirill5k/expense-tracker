@@ -9,7 +9,8 @@ export default new Vuex.Store({
   state: {
     isLoading: true,
     isAuthenticated: false,
-    account: null
+    account: null,
+    categories: []
   },
   mutations: {
     authenticate (state) {

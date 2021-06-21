@@ -39,19 +39,26 @@
         </v-card>
       </v-col>
       <v-col cols="7">
-        <v-sheet>
-          <p>Hello, world!</p>
-        </v-sheet>
+        <categories
+          :items="categories"
+        />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+import Categories from '@/components/categories/Categories'
 
 export default {
   name: 'Home',
   components: {
+    Categories
+  },
+  computed: {
+    categories () {
+      return this.$store.state.categories
+    }
   }
 }
 </script>
