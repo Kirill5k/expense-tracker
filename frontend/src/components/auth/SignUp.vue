@@ -5,6 +5,9 @@
     lazy-validation
   >
     <v-text-field
+      tabindex="1"
+      name="firstName"
+      autocomplete="given-name"
       v-model="firstName"
       :rules="rules.firstName"
       label="First name"
@@ -12,6 +15,9 @@
     />
 
     <v-text-field
+      tabindex="2"
+      name="lastName"
+      autocomplete="family-name"
       v-model="lastName"
       :rules="rules.lastName"
       label="Last name"
@@ -19,14 +25,18 @@
     />
 
     <v-text-field
+      tabindex="3"
+      name="email"
       v-model="email"
       :rules="rules.email"
       label="Email"
       required
-      autocomplete="new"
+      autocomplete="email"
     />
 
     <v-text-field
+      tabindex="4"
+      name="password"
       autocomplete="new-password"
       v-model="password"
       :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
@@ -38,7 +48,9 @@
     />
 
     <v-text-field
-      autocomplete="new"
+      tabindex="5"
+      name="confirmPassword"
+      autocomplete="new-password"
       v-model="confirmPassword"
       :rules="rules.confirmPassword"
       type="password"
@@ -47,6 +59,7 @@
     />
 
     <v-checkbox
+      tabindex="6"
       class="mb-1"
       dense
       v-model="accept"
@@ -56,6 +69,7 @@
     />
 
     <v-btn
+      tabindex="7"
       color="success"
       @click="signUp"
     >

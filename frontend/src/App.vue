@@ -1,11 +1,11 @@
 <template>
   <v-app>
     <v-app-bar
+      v-if="isAuthenticated"
       app
       color="white"
     >
       <v-avatar
-        v-if="isAuthenticated"
         color="primary"
       >
         <span class="white--text text-h5">{{initials}}</span>
@@ -16,7 +16,21 @@
     </v-app-bar>
 
     <v-main class="grey lighten-3">
-      <router-view/>
+      <div
+        v-if="loading"
+        class="d-flex justify-center align-center"
+        style="height: 50%"
+      >
+        <v-progress-circular
+          size="70"
+          width="7"
+          color="primary"
+          indeterminate
+        />
+      </div>
+      <router-view
+        v-else
+      />
     </v-main>
   </v-app>
 </template>
@@ -28,9 +42,18 @@ export default {
   created () {
     this.$store
       .dispatch('getAccount')
-      .then(() => this.$router.push('/'))
-      .catch(() => this.$router.push('/login'))
+      .then(() => {
+        this.$router.push('/')
+        this.loading = false
+      })
+      .catch(() => {
+        this.$router.push('/login')
+        this.loading = false
+      })
   },
+  data: () => ({
+    loading: true
+  }),
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated

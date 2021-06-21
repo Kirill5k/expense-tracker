@@ -5,6 +5,9 @@
     lazy-validation
   >
     <v-text-field
+      tabindex="1"
+      name="email"
+      autocomplete="email"
       outlined
       v-model="email"
       label="Email"
@@ -13,6 +16,9 @@
     />
 
     <v-text-field
+      tabindex="2"
+      name="password"
+      autocomplete="password"
       outlined
       v-model="password"
       :rules="passwordRules"
@@ -25,6 +31,7 @@
     />
 
     <v-btn
+      tabindex="3"
       color="success"
       @click="signIn"
     >
@@ -32,6 +39,7 @@
     </v-btn>
 
     <v-btn
+      tabindex="4"
       class="mt-1 pl-0 pr-0"
       :style="{textTransform: 'unset'}"
       right

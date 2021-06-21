@@ -86,11 +86,11 @@ export default {
       this.$store
         .dispatch('createAccount', account)
         .then(() => {
-          this.loading = false
           this.alert = {
             type: 'success',
-            message: 'Account has been successfully created!'
+            message: 'Account has been successfully created! Redirecting to the sign in page.'
           }
+          setTimeout(() => this.login(), 2500)
         })
         .catch(err => {
           this.loading = false
