@@ -7,8 +7,8 @@ const reject = (res) => res.json().then(e => Promise.reject(new Error(e.message)
 
 export default new Vuex.Store({
   state: {
+    isLoading: true,
     isAuthenticated: false,
-    isLoading: false,
     account: null
   },
   mutations: {
@@ -33,10 +33,14 @@ export default new Vuex.Store({
       return fetch('/api/auth/account')
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => {
+          commit('loaded')
           commit('authenticate')
           commit('setAccount', acc)
         })
-        .catch(() => commit('unAuthenticate'))
+        .catch(() => {
+          commit('loaded')
+          commit('unAuthenticate')
+        })
     },
     createAccount ({ commit }, requestBody) {
       return fetch('/api/auth/account', {

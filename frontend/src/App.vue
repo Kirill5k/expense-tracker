@@ -7,8 +7,13 @@
     >
       <v-avatar
         color="primary"
+        size="48"
       >
-        <span class="white--text text-h5">{{initials}}</span>
+        <span
+          class="white--text text-h6"
+        >
+          {{initials}}
+        </span>
       </v-avatar>
 
       <v-spacer></v-spacer>
@@ -17,9 +22,9 @@
 
     <v-main class="grey lighten-3">
       <div
-        v-if="loading"
+        v-if="isLoading"
         class="d-flex justify-center align-center"
-        style="height: 50%"
+        style="height: 70%"
       >
         <v-progress-circular
           size="70"
@@ -42,21 +47,15 @@ export default {
   created () {
     this.$store
       .dispatch('getAccount')
-      .then(() => {
-        this.$router.push('/')
-        this.loading = false
-      })
-      .catch(() => {
-        this.$router.push('/login')
-        this.loading = false
-      })
+      .then(() => this.$router.push('/'))
+      .catch(() => this.$router.push('/login'))
   },
-  data: () => ({
-    loading: true
-  }),
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
+    },
+    isLoading () {
+      return this.$store.state.isLoading
     },
     initials () {
       if (this.isAuthenticated) {
