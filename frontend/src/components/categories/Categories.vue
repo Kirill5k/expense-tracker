@@ -5,6 +5,7 @@
     class="mx-auto"
   >
     <v-btn
+      v-if="items.length"
       class="mt-5 mr-1"
       elevation="2"
       right
