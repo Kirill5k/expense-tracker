@@ -3,7 +3,7 @@ package expensetracker
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.account._
 import expensetracker.auth.session.{Session, SessionActivity, SessionId}
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
 import org.bson.types.ObjectId
 import org.http4s.RequestCookie
 
@@ -20,7 +20,7 @@ trait TestData {
 
   val cid   = CategoryId("AB0C5342AB0C5342AB0C5342")
   val cname = CategoryName("cat-1")
-  val cat   = Category(cid, cname, CategoryIcon("icon"), Some(aid))
+  val cat   = Category(cid, CategoryKind.Expense, cname, CategoryIcon("icon"), Some(aid))
 
   val sid             = SessionId(new ObjectId().toHexString)
   val sa              = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))

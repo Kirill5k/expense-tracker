@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
@@ -50,8 +50,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
           txs.map(_.category) mustBe List(
-            Category(cat1Id, CategoryName("category-1"), CategoryIcon("icon"), None),
-            Category(cat2Id, CategoryName("category-2"), CategoryIcon("icon"), None)
+            Category(cat1Id, CategoryKind.Expense, CategoryName("category-1"), CategoryIcon("icon"), None),
+            Category(cat2Id, CategoryKind.Expense, CategoryName("category-2"), CategoryIcon("icon"), None)
           )
         }
       }
@@ -83,8 +83,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             categories <- db.getCollection("categories")
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "category-1"), categoryDoc(cat2Id, "category-2")))
             accs <- db.getCollection("accounts")
-            _     <- accs.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
-            res   <- test(db)
+            _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
+            res  <- test(db)
           } yield res
         }
         .unsafeRunSync()

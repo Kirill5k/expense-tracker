@@ -3,7 +3,7 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.errors.AppError.CategoryDoesNotExist
 import mongo4cats.client.MongoClientF
@@ -58,7 +58,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            res    <- repo.delete(acc1Id, cat2Id)
+            res  <- repo.delete(acc1Id, cat2Id)
           } yield res
 
           result.attempt.map { res =>
@@ -71,24 +71,26 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     "update" should {
       "update existing category" in {
         withEmbeddedMongoDb { db =>
+          val update = Category(cat2Id, CategoryKind.Income, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id))
           val result = for {
             repo <- CategoryRepository.make(db)
-            _    <- repo.update(Category(cat2Id, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id)))
+            _    <- repo.update(update)
             cats <- repo.getAll(acc2Id)
           } yield cats
 
           result.map { cats =>
             cats must have size 1
-            cats.head mustBe Category(cat2Id, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id))
+            cats.head mustBe update
           }
         }
       }
 
       "return error when category does not exist" in {
         withEmbeddedMongoDb { db =>
+          val update = Category(cat1Id, CategoryKind.Expense, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id))
           val result = for {
             repo <- CategoryRepository.make(db)
-            res    <- repo.update(Category(cat1Id, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id)))
+            res  <- repo.update(update)
           } yield res
 
           result.attempt.map { res =>

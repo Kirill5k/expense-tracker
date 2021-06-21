@@ -16,24 +16,42 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.create(any[CreateCategory])).thenReturn(IO.pure(cid))
 
-        val reqBody = parseJson("""{"name":"cat-1","icon":"icon"}""")
-        val req = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessionIdCookie).withEntity(reqBody)
+        val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"expense"}""")
+        val req =
+          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessionIdCookie).withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${cid.value}"}"""))
-        verify(svc).create(CreateCategory(CategoryName("cat-1"), CategoryIcon("icon"), aid))
+        verify(svc).create(CreateCategory(CategoryKind.Expense, CategoryName("cat-1"), CategoryIcon("icon"), aid))
       }
 
       "return 409 when cat name is taken" in {
         val svc = mock[CategoryService[IO]]
         when(svc.create(any[CreateCategory])).thenReturn(IO.raiseError(CategoryAlreadyExists(cname)))
 
-        val reqBody = parseJson("""{"name":"cat-1","icon":"icon"}""")
-        val req = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessionIdCookie).withEntity(reqBody)
+        val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"expense"}""")
+        val req =
+          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessionIdCookie).withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Conflict, Some(s"""{"message":"category with name cat-1 already exists"}"""))
-        verify(svc).create(CreateCategory(CategoryName("cat-1"), CategoryIcon("icon"), aid))
+        verify(svc).create(CreateCategory(CategoryKind.Expense, CategoryName("cat-1"), CategoryIcon("icon"), aid))
+      }
+
+      "return 422 when invalid kind passed" in {
+        val svc = mock[CategoryService[IO]]
+
+        val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo"}""")
+        val req =
+          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessionIdCookie).withEntity(reqBody)
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(
+          res,
+          Status.UnprocessableEntity,
+          Some(s"""{"message":"invalid category kind foo: Field(kind)"}""")
+        )
+        verifyZeroInteractions(svc)
       }
     }
 
@@ -55,20 +73,20 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.update(any[Category])).thenReturn(IO.unit)
 
-        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon"}""")
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon","kind":"expense"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessionIdCookie)
           .withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        verify(svc).update(Category(cid, CategoryName("c2"), CategoryIcon("icon"), Some(aid)))
+        verify(svc).update(Category(cid, CategoryKind.Expense, CategoryName("c2"), CategoryIcon("icon"), Some(aid)))
       }
 
       "return 400 when provided ids do not match" in {
         val svc = mock[CategoryService[IO]]
 
-        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5341","name":"c2","icon":"icon"}""")
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5341","name":"c2","icon":"icon","kind":"expense"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessionIdCookie)
           .withEntity(reqBody)
@@ -82,7 +100,7 @@ class CategoryControllerSpec extends ControllerSpec {
       "return 422 when request has validation errors" in {
         val svc = mock[CategoryService[IO]]
 
-        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5341","name":"","icon":"icon"}""")
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5341","name":"","icon":"icon","kind":"expense"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessionIdCookie)
           .withEntity(reqBody)
@@ -97,7 +115,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.update(any[Category])).thenReturn(IO.raiseError(CategoryDoesNotExist(cid)))
 
-        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon"}""")
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon","kind":"expense"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessionIdCookie)
           .withEntity(reqBody)
@@ -105,7 +123,7 @@ class CategoryControllerSpec extends ControllerSpec {
 
         val resBody = """{"message":"category with id AB0C5342AB0C5342AB0C5342 does not exist"}"""
         verifyJsonResponse(res, Status.NotFound, Some(resBody))
-        verify(svc).update(Category(cid, CategoryName("c2"), CategoryIcon("icon"), Some(aid)))
+        verify(svc).update(Category(cid, CategoryKind.Expense, CategoryName("c2"), CategoryIcon("icon"), Some(aid)))
       }
     }
 

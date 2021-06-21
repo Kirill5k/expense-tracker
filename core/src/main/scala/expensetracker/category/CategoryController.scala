@@ -66,6 +66,7 @@ final class CategoryController[F[_]: Logger](
 object CategoryController {
 
   final case class CreateCategoryRequest(
+      kind: CategoryKind,
       name: NonEmptyString,
       icon: NonEmptyString
   ) {
@@ -73,6 +74,7 @@ object CategoryController {
       CreateCategory(
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
+        kind = kind,
         accountId = aid
       )
   }
@@ -81,12 +83,14 @@ object CategoryController {
 
   final case class UpdateCategoryRequest(
       id: NonEmptyString,
+      kind: CategoryKind,
       name: NonEmptyString,
       icon: NonEmptyString
   ) {
     def toDomain(aid: AccountId): Category =
       Category(
         id = CategoryId(id.value),
+        kind = kind,
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
         accountId = Some(aid)

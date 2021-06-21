@@ -1,6 +1,6 @@
 package expensetracker.transaction.db
 
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryName}
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
 import expensetracker.common.errors.AppError
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import expensetracker.auth.account.AccountId
@@ -11,6 +11,7 @@ import java.time.Instant
 
 final case class TransactionCategory(
     _id: ObjectId,
+    kind: CategoryKind,
     name: String,
     icon: String,
     accountId: Option[ObjectId]
@@ -18,6 +19,7 @@ final case class TransactionCategory(
   def toDomain: Category =
     Category(
       CategoryId(_id.toHexString),
+      kind,
       CategoryName(name),
       CategoryIcon(icon),
       accountId.map(uid => AccountId(uid.toHexString))
