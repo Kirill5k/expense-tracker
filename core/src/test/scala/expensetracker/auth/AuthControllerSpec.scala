@@ -9,8 +9,6 @@ import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
 import org.http4s.{Method, Request, ResponseCookie, Status}
 
-import java.time.Instant
-
 class AuthControllerSpec extends ControllerSpec {
 
   "An AuthController" when {
@@ -151,14 +149,14 @@ class AuthControllerSpec extends ControllerSpec {
         verifyZeroInteractions(svc)
       }
 
-      "return forbidden if session has expired" in {
+      "return forbidden if session is inactive" in {
         val svc = mock[AuthService[IO]]
 
-        val exp = sess.copy(expiresAt = Instant.now().minusSeconds(10L))
+        val exp = sess.copy(active = false)
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessionIdCookie)
         val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(exp))).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"session has expired"}"""))
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"session is inactive"}"""))
         verifyZeroInteractions(svc)
       }
 

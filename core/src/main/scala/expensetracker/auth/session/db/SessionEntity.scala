@@ -1,17 +1,17 @@
 package expensetracker.auth.session.db
 
 import expensetracker.auth.account.AccountId
-import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
+import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import org.bson.types.ObjectId
 
 import java.time.Instant
-import scala.concurrent.duration._
 
 final case class SessionEntity(
     _id: ObjectId,
     accountId: ObjectId,
     createdAt: Instant,
-    expiresAt: Instant,
+    active: Boolean,
+    status: SessionStatus,
     lastRecordedActivity: Option[SessionActivity]
 ) {
   def toDomain: Session =
@@ -19,7 +19,8 @@ final case class SessionEntity(
       id = SessionId(_id.toHexString),
       accountId = AccountId(accountId.toHexString),
       createdAt = createdAt,
-      expiresAt = expiresAt,
+      active = active,
+      status = status,
       lastRecordedActivity = lastRecordedActivity
     )
 }
@@ -30,7 +31,8 @@ object SessionEntity {
       new ObjectId(),
       new ObjectId(cs.accountId.value),
       cs.time,
-      cs.time.plusMillis(90.days.toMillis),
+      true,
+      SessionStatus.Authenticated,
       cs.ipAddress.map(ip => SessionActivity(ip, cs.time))
     )
 }

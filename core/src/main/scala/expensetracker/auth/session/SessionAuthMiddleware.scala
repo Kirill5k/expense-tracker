@@ -37,9 +37,9 @@ object SessionAuthMiddleware {
                 val currentTime = Instant.ofEpochMilli(time.toMillis)
                 val activity    = req.from.map(ip => SessionActivity(ip, currentTime))
                 obtainSession(sid, activity).map {
-                  case None                                        => "invalid session-id".asLeft[Session]
-                  case Some(s) if currentTime.isAfter(s.expiresAt) => "session has expired".asLeft[Session]
-                  case Some(s)                                     => s.asRight[String]
+                  case Some(s) if s.active => s.asRight[String]
+                  case Some(_)             => "session is inactive".asLeft[Session]
+                  case None                => "invalid session-id".asLeft[Session]
                 }
               }
           )

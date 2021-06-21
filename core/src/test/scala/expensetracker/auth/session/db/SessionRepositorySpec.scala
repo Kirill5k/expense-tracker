@@ -6,7 +6,7 @@ import cats.implicits._
 import com.comcast.ip4s.IpAddress
 import expensetracker.EmbeddedMongo
 import expensetracker.auth.account.AccountId
-import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
+import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
@@ -15,7 +15,6 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import java.time.Instant
 import java.time.temporal.ChronoField
-import scala.concurrent.duration._
 
 class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
@@ -38,7 +37,8 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
             sid,
             aid,
             create.time,
-            create.time.plusMillis(90.days.toMillis),
+            true,
+            SessionStatus.Authenticated,
             create.ipAddress.map(ip => SessionActivity(ip, create.time))
           ).some
         }

@@ -8,6 +8,23 @@ import java.time.Instant
 
 final case class SessionId(value: String) extends AnyVal
 
+sealed trait SessionStatus
+object SessionStatus {
+  case object Authenticated extends SessionStatus
+  case object LoggedOut     extends SessionStatus
+
+  implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap {
+    case "authenticated" => Right(Authenticated)
+    case "logged-out"    => Right(LoggedOut)
+    case other           => Left(s"invalid session status $other")
+  }
+
+  implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap {
+    case Authenticated => "authenticated"
+    case LoggedOut     => "logged-out"
+  }
+}
+
 final case class SessionActivity(ipAddress: IpAddress, time: Instant)
 
 object SessionActivity {
@@ -24,7 +41,8 @@ final case class Session(
     id: SessionId,
     accountId: AccountId,
     createdAt: Instant,
-    expiresAt: Instant,
+    active: Boolean,
+    status: SessionStatus,
     lastRecordedActivity: Option[SessionActivity]
 )
 
