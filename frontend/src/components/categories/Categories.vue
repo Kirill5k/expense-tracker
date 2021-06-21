@@ -4,12 +4,25 @@
     outlined
     class="mx-auto"
   >
+    <v-btn
+      class="mt-5 mr-1"
+      elevation="2"
+      right
+      x-small
+      text
+      absolute
+      rounded
+      plain
+      @click="editable = !editable"
+    >
+      {{ editable ? 'Done' : 'Edit' }}
+    </v-btn>
     <v-card-title>Categories</v-card-title>
-
     <v-card-text class="pb-0">
       <category-list
         name="EXPENSE"
         :items="expenseCats"
+        :editable="editable"
       />
     </v-card-text>
 
@@ -17,6 +30,7 @@
       <category-list
         name="INCOME"
         :items="incomeCats"
+        :editable="editable"
       />
     </v-card-text>
 
@@ -52,7 +66,7 @@ export default {
     CategoryList
   },
   data: () => ({
-    selectedItem: null
+    editable: false
   }),
   computed: {
     expenseCats () {
