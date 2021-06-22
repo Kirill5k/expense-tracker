@@ -37,23 +37,14 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-
-      <v-btn
-        color="primary"
-        small
-        absolute
-        bottom
-        right
-        fab
-      >
-        <v-icon dark>mdi-plus</v-icon>
-      </v-btn>
+      <new-category-dialog/>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
 import CategoryList from '@/components/categories/CategoryList'
+import NewCategoryDialog from '@/components/categories/NewCategoryDialog'
 
 export default {
   name: 'Categories',
@@ -64,7 +55,8 @@ export default {
     }
   },
   components: {
-    CategoryList
+    CategoryList,
+    NewCategoryDialog
   },
   data: () => ({
     editable: false
