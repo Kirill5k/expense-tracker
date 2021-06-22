@@ -18,7 +18,7 @@
       item-height="40"
     >
       <template v-slot:default="{ item }">
-        <v-list-item :key="item.id">
+        <v-list-item :key="item.id" class="pr-3">
           <v-list-item-icon>
             <v-icon v-text="item.icon"/>
           </v-list-item-icon>
@@ -27,32 +27,36 @@
           </v-list-item-content>
 
           <v-list-item-action class="mr-0 my-0">
-            <v-slide-x-reverse-transition>
-            <div v-if="editable" class="text-center">
-              <v-btn
-                icon
-                dark
-                color="blue"
-                x-small
-                @click="$emit('edit', item)"
+            <v-expand-transition>
+              <div
+                v-if="editable"
+                class="text-center"
               >
-                <v-icon dark>
-                  mdi-pencil
-                </v-icon>
-              </v-btn>
-              <v-btn
-                icon
-                dark
-                color="red"
-                x-small
-                @click="$emit('delete', item.id)"
-              >
-                <v-icon dark>
-                  mdi-trash-can-outline
-                </v-icon>
-              </v-btn>
-            </div>
-            </v-slide-x-reverse-transition>
+                <v-btn
+                  icon
+                  dark
+                  color="blue"
+                  x-small
+                  @click="$emit('edit', item)"
+                  class="mr-2"
+                >
+                  <v-icon dark>
+                    mdi-pencil
+                  </v-icon>
+                </v-btn>
+                <v-btn
+                  icon
+                  dark
+                  color="red"
+                  x-small
+                  @click="$emit('delete', item.id)"
+                >
+                  <v-icon dark>
+                    mdi-trash-can-outline
+                  </v-icon>
+                </v-btn>
+              </div>
+            </v-expand-transition>
           </v-list-item-action>
         </v-list-item>
 

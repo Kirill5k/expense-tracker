@@ -10,12 +10,7 @@ export default new Vuex.Store({
     isLoading: true,
     isAuthenticated: false,
     account: null,
-    categories: [
-      // { id: 'c1', kind: 'expense', name: 'Shopping', icon: 'mdi-cart-outline' },
-      // { id: 'c1-1', kind: 'expense', name: 'Shopping', icon: 'mdi-cart-outline' },
-      // { id: 'c1-2', kind: 'expense', name: 'Shopping', icon: 'mdi-cart-outline' },
-      // { id: 'c2', kind: 'income', name: 'Salary', icon: 'mdi-piggy-bank-outline' }
-    ]
+    categories: []
   },
   mutations: {
     authenticate (state) {
