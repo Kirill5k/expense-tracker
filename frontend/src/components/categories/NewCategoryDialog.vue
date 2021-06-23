@@ -32,7 +32,7 @@
           >
             <v-radio-group
               dense
-              v-model="kind"
+              v-model="newCategory.kind"
               row
             >
               <v-radio
@@ -46,13 +46,13 @@
             </v-radio-group>
             <v-text-field
               name="name"
-              v-model="name"
+              v-model="newCategory.name"
               label="Name"
               required
             />
             <v-select
               name="icon"
-              v-model="icon"
+              v-model="newCategory.icon"
               :items="icons"
               label="Icon"
             >
@@ -92,7 +92,7 @@
 </template>
 
 <script>
-const DEFAULT_SELECTION = {
+const DEFAULT_CATEGORY = {
   icon: '',
   name: '',
   kind: 'expense'
@@ -197,16 +197,16 @@ export default {
     dialog: false,
     valid: true,
     icons: ICONS,
-    ...DEFAULT_SELECTION
+    newCategory: {
+      ...DEFAULT_CATEGORY
+    }
   }),
   methods: {
     formatIconName (icon) {
       return icon.charAt(0).toUpperCase() + icon.slice(1).replace('-', ' ')
     },
     reset () {
-      this.icon = DEFAULT_SELECTION.icon
-      this.name = DEFAULT_SELECTION.name
-      this.kind = DEFAULT_SELECTION.kind
+      this.newCategory = DEFAULT_CATEGORY
     },
     close () {
       this.reset()
