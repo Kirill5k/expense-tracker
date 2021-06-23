@@ -4,6 +4,7 @@
       transition="dialog-top-transition"
       v-model="dialog"
       max-width="400px"
+      @click:outside="reset"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn
@@ -55,6 +56,11 @@
               :items="icons"
               label="Icon"
             >
+              <template slot="selection" slot-scope="data">
+                <span class="mt-1 mb-1">
+                  <v-icon class="mr-2">{{data.item.value}}</v-icon>{{formatIconName(data.item.text)}}
+                </span>
+              </template>
               <template slot="item" slot-scope="data">
                 <span>
                   <v-icon class="mr-2">{{data.item.value}}</v-icon>{{formatIconName(data.item.text)}}
@@ -68,7 +74,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="dialog = false"
+            @click="close"
           >
             Close
           </v-btn>
@@ -86,6 +92,12 @@
 </template>
 
 <script>
+const DEFAULT_SELECTION = {
+  icon: '',
+  name: '',
+  kind: 'expense'
+}
+
 const ICONS = [
   { header: 'Bills', divider: true },
   { value: 'mdi-antenna', text: 'antenna', disable: false },
@@ -184,14 +196,21 @@ export default {
   data: () => ({
     dialog: false,
     valid: true,
-    kind: 'expense',
-    name: '',
-    icon: '',
-    icons: ICONS
+    icons: ICONS,
+    ...DEFAULT_SELECTION
   }),
   methods: {
     formatIconName (icon) {
       return icon.charAt(0).toUpperCase() + icon.slice(1).replace('-', ' ')
+    },
+    reset () {
+      this.icon = DEFAULT_SELECTION.icon
+      this.name = DEFAULT_SELECTION.name
+      this.kind = DEFAULT_SELECTION.kind
+    },
+    close () {
+      this.reset()
+      this.dialog = false
     }
   }
 }
