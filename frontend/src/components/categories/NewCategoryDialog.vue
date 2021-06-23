@@ -54,7 +54,13 @@
               v-model="icon"
               :items="icons"
               label="Icon"
-            ></v-select>
+            >
+              <template slot="item" slot-scope="data">
+                <v-list-item>
+                  <v-icon x-small class="mr-2">{{data.item.value}}</v-icon>{{data.item.text}}
+                </v-list-item>
+              </template>
+            </v-select>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -82,15 +88,15 @@
 <script>
 const ICONS = [
   { header: 'Group 1', divider: true },
-  { text: 'Icon1', value: 'i1', disable: false },
-  { text: 'Icon2', value: 'i2', disable: false },
-  { text: 'Icon3', value: 'i3', disable: false },
-  { text: 'Icon4', value: 'i4', disable: false },
+  { text: 'Icon1', value: 'mdi-bank', disable: false },
+  { text: 'Icon2', value: 'mdi-bank', disable: false },
+  { text: 'Icon3', value: 'mdi-bank', disable: false },
+  { text: 'Icon4', value: 'mdi-bank', disable: false },
   { header: 'Group 2', divider: true },
-  { text: 'Icon5', value: 'i5', disable: false },
-  { text: 'Icon6', value: 'i6', disable: false },
-  { text: 'Icon7', value: 'i7', disable: false },
-  { text: 'Icon8', value: 'i8', disable: false }
+  { text: 'Icon5', value: 'mdi-bank', disable: false },
+  { text: 'Icon6', value: 'mdi-bank', disable: false },
+  { text: 'Icon7', value: 'mdi-bank', disable: false },
+  { text: 'Icon8', value: 'mdi-bank', disable: false }
 ]
 
 export default {
