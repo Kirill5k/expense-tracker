@@ -47,14 +47,17 @@
             <v-text-field
               name="name"
               v-model="newCategory.name"
+              :rules="rules.name"
               label="Name"
               required
             />
             <v-select
               name="icon"
               v-model="newCategory.icon"
+              :rules="rules.icon"
               :items="icons"
               label="Icon"
+              required
             >
               <template slot="selection" slot-scope="data">
                 <span class="mt-1 mb-1">
@@ -81,7 +84,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="dialog = false"
+            @click="save"
           >
             Save
           </v-btn>
@@ -197,6 +200,10 @@ export default {
     dialog: false,
     valid: true,
     icons: ICONS,
+    rules: {
+      name: [v => !!v || 'Please enter a name for the new category'],
+      icon: [v => !!v || 'Please select an icon']
+    },
     newCategory: {
       ...DEFAULT_CATEGORY
     }
@@ -207,10 +214,18 @@ export default {
     },
     reset () {
       this.newCategory = DEFAULT_CATEGORY
+      this.valid = true
+      this.$refs.newCategoryForm.resetValidation()
     },
     close () {
       this.reset()
       this.dialog = false
+    },
+    save () {
+      if (this.$refs.newCategoryForm.validate()) {
+        this.$emit('save', this.newCategory)
+        this.close()
+      }
     }
   }
 }

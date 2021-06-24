@@ -37,7 +37,9 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-      <new-category-dialog/>
+      <new-category-dialog
+        @save="create"
+      />
     </v-card-actions>
   </v-card>
 </template>
@@ -67,6 +69,11 @@ export default {
     },
     incomeCats () {
       return this.items.filter(c => c.kind === 'income')
+    }
+  },
+  methods: {
+    create (newCategory) {
+      this.$emit('create', newCategory)
     }
   }
 }

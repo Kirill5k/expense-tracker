@@ -41,6 +41,7 @@
       <v-col cols="5">
         <categories
           :items="categories"
+          @create="createCategory"
         />
       </v-col>
     </v-row>
@@ -58,6 +59,11 @@ export default {
   computed: {
     categories () {
       return this.$store.state.categories
+    }
+  },
+  methods: {
+    createCategory (newCategory) {
+      console.log(newCategory)
     }
   }
 }
