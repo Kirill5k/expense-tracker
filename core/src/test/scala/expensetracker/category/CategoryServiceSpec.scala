@@ -39,6 +39,21 @@ class CategoryServiceSpec extends CatsSpec {
       }
     }
 
+    "retrieve category from db" in {
+      val repo = mock[CategoryRepository[IO]]
+      when(repo.get(any[AccountId], any[CategoryId])).thenReturn(IO.pure(cat))
+
+      val result = for {
+        svc <- CategoryService.make[IO](repo)
+        res <- svc.get(aid, cid)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).get(aid, cid)
+        res mustBe cat
+      }
+    }
+
     "create new category in db" in {
       val repo = mock[CategoryRepository[IO]]
       when(repo.create(any[CreateCategory])).thenReturn(IO.pure(cid))

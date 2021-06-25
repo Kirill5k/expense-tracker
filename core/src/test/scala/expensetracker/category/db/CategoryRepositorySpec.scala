@@ -3,7 +3,7 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.errors.AppError.CategoryDoesNotExist
 import mongo4cats.client.MongoClientF
@@ -20,6 +20,40 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
   val cat2Id = CategoryId(new ObjectId().toHexString)
 
   "A CategoryRepository" when {
+
+    "create" should {
+      "create new category in db" in {
+        withEmbeddedMongoDb { client =>
+          val create = CreateCategory(CategoryKind.Income, CategoryName("test"), CategoryIcon("icon"), acc1Id)
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            id <- repo.create(create)
+            cat <- repo.get(acc1Id, id)
+          } yield cat
+
+          result.map { cat =>
+            cat.name mustBe create.name
+            cat.icon mustBe create.icon
+            cat.accountId mustBe Some(acc1Id)
+          }
+        }
+      }
+    }
+
+    "get" should {
+      "return error when cat id and acc id do not match" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            cat <- repo.get(acc1Id, cat2Id)
+          } yield cat
+
+          result.attempt.map { res =>
+            res mustBe Left(CategoryDoesNotExist(cat2Id))
+          }
+        }
+      }
+    }
 
     "getAll" should {
       "return all account's categories" in {

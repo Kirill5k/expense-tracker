@@ -32,7 +32,7 @@ export default new Vuex.Store({
       state.categories = categories
     },
     addCategory (state, category) {
-      state.categories = [category, ...state.categories]
+      state.categories = [...state.categories, category]
     }
   },
   actions: {
