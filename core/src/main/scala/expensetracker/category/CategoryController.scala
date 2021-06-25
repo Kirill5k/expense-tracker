@@ -67,7 +67,7 @@ final class CategoryController[F[_]: Logger](
   }
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
-    Router(prefixPath -> sessionIdCookieMiddleware(authMiddleware(authedRoutes)))
+    Router(prefixPath -> authMiddleware(authedRoutes))
 }
 
 object CategoryController {
@@ -107,12 +107,13 @@ object CategoryController {
   final case class CategoryView(
       id: String,
       name: String,
-      icon: String
+      icon: String,
+      kind: CategoryKind
   )
 
   object CategoryView {
     def from(cat: Category): CategoryView =
-      CategoryView(cat.id.value, cat.name.value, cat.icon.value)
+      CategoryView(cat.id.value, cat.name.value, cat.icon.value, cat.kind)
   }
 
   def make[F[_]: Concurrent: Logger](service: CategoryService[F]): F[CategoryController[F]] =

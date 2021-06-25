@@ -63,7 +63,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/categories", method = Method.GET).addCookie(sessionIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Ok, Some(s"""[{"id":"${cid.value}","name":"cat-1","icon":"icon"}]"""))
+        verifyJsonResponse(res, Status.Ok, Some(s"""[{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense"}]"""))
         verify(svc).getAll(aid)
       }
     }
@@ -76,7 +76,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessionIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Ok, Some(s"""{"id":"${cid.value}","name":"cat-1","icon":"icon"}"""))
+        verifyJsonResponse(res, Status.Ok, Some(s"""{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense"}"""))
         verify(svc).get(aid, cid)
       }
     }

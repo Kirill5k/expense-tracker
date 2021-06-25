@@ -126,8 +126,14 @@ class AuthControllerSpec extends ControllerSpec {
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
-        val sessCookie =
-          ResponseCookie("session-id", sid.value, maxAge = Some(Long.MaxValue), expires = Some(HttpDate.MaxValue))
+        val sessCookie = ResponseCookie(
+          "session-id",
+          sid.value,
+          httpOnly = true,
+          maxAge = Some(Long.MaxValue),
+          expires = Some(HttpDate.MaxValue),
+          path = Some("/")
+        )
         verifyJsonResponse(res, Status.Ok, Some(resBody), List(sessCookie))
         verify(svc).login(AccountEmail("foo@bar.com"), Password("bar"))
         verify(svc).createSession(any[CreateSession])

@@ -39,6 +39,7 @@ export default new Vuex.Store({
       state.categories = categories
     },
     addCategory (state, category) {
+      console.log('adding', category)
       state.categories = [...state.categories, category]
     }
   },

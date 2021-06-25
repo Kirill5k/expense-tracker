@@ -1,13 +1,12 @@
 package expensetracker.common.web
 
-import cats.{Functor, MonadError}
-import cats.data.Kleisli
+import cats.MonadError
 import cats.implicits._
 import expensetracker.common.errors.{AuthError, BadRequestError, ConflictError, NotFoundError}
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{HttpDate, HttpRoutes, InvalidMessageBodyFailure, Request, RequestCookie, Response, ResponseCookie}
+import org.http4s._
 import org.typelevel.log4cats.Logger
 
 final case class ErrorResponse(message: String)
@@ -54,16 +53,13 @@ trait Controller[F[_]] extends Http4sDsl[F] {
     req.cookies
       .find(_.name == SessionIdCookie)
 
-  protected def sessionIdCookieMiddleware(routes: HttpRoutes[F])(implicit F: Functor[F]): HttpRoutes[F] =
-    Kleisli { req: Request[F] =>
-      routes(req).map { res =>
-        getSessionIdCookie(req) match {
-          case Some(cookie) => res.addCookie(sessionIdResponseCookie(cookie.content))
-          case None => res
-        }
-    }
-  }
-
   protected def sessionIdResponseCookie(token: String): ResponseCookie =
-    ResponseCookie(SessionIdCookie, token, maxAge = Some(Long.MaxValue), expires = Some(HttpDate.MaxValue))
+    ResponseCookie(
+      SessionIdCookie,
+      token,
+      httpOnly = true,
+      maxAge = Some(Long.MaxValue),
+      expires = Some(HttpDate.MaxValue),
+      path = Some("/")
+    )
 }

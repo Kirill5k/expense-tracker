@@ -60,7 +60,7 @@ final class AuthController[F[_]: Logger: Temporal](
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
     Router(
-      prefixPath -> sessionIdCookieMiddleware(authMiddleware(authedRoutes)),
+      prefixPath -> authMiddleware(authedRoutes),
       prefixPath -> routes
     )
 }
