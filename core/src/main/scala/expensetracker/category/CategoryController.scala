@@ -67,7 +67,7 @@ final class CategoryController[F[_]: Logger](
   }
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
-    Router(prefixPath -> authMiddleware(authedRoutes))
+    Router(prefixPath -> sessionIdCookieMiddleware(authMiddleware(authedRoutes)))
 }
 
 object CategoryController {

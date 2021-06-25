@@ -7,7 +7,7 @@ import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
-import org.http4s.{Method, Request, ResponseCookie, Status}
+import org.http4s.{HttpDate, Method, Request, ResponseCookie, Status}
 
 class AuthControllerSpec extends ControllerSpec {
 
@@ -17,8 +17,8 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
         when(svc.findAccount(any[AccountId])).thenReturn(IO.pure(acc))
 
-        val req     = Request[IO](uri = uri"/auth/account", method = Method.GET).addCookie(sessionIdCookie)
-        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+        val req = Request[IO](uri = uri"/auth/account", method = Method.GET).addCookie(sessionIdCookie)
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
 
         val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
         verifyJsonResponse(res, Status.Ok, Some(resBody))
@@ -36,7 +36,11 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Conflict, Some("""{"message":"account with email foo@bar.com already exists"}"""))
+        verifyJsonResponse(
+          res,
+          Status.Conflict,
+          Some("""{"message":"account with email foo@bar.com already exists"}""")
+        )
         verify(svc).createAccount(
           AccountDetails(AccountEmail("foo@bar.com"), AccountName("John", "Bloggs")),
           Password("pwd")
@@ -122,7 +126,9 @@ class AuthControllerSpec extends ControllerSpec {
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
 
         val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
-        verifyJsonResponse(res, Status.Ok, Some(resBody), List(ResponseCookie("session-id", sid.value)))
+        val sessCookie =
+          ResponseCookie("session-id", sid.value, maxAge = Some(Long.MaxValue), expires = Some(HttpDate.MaxValue))
+        verifyJsonResponse(res, Status.Ok, Some(resBody), List(sessCookie))
         verify(svc).login(AccountEmail("foo@bar.com"), Password("bar"))
         verify(svc).createSession(any[CreateSession])
       }

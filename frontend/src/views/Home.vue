@@ -6,7 +6,6 @@
     <v-row justify="center">
       <v-col cols="2">
         <v-card
-          :loading="loading"
           class="mx-auto"
           outlined
         >
@@ -68,7 +67,11 @@ export default {
   methods: {
     createCategory (newCategory) {
       this.loading = true
-      console.log(newCategory)
+      this.$store
+        .dispatch('createCategory', newCategory)
+        .then(() => {
+          this.loading = false
+        })
     }
   }
 }

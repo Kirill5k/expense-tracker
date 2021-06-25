@@ -11,7 +11,7 @@ import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
 import io.circe.refined._
-import org.http4s.{AuthedRoutes, HttpRoutes, ResponseCookie}
+import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
@@ -42,7 +42,7 @@ final class AuthController[F[_]: Logger: Temporal](
           acc   <- service.login(login.accountEmail, login.accountPassword)
           sid <- service.createSession(CreateSession(acc.id, req.from, time))
           res <- Ok(AccountView.from(acc))
-        } yield res.addCookie(ResponseCookie(SessionIdCookie, sid.value))
+        } yield res.addCookie(sessionIdResponseCookie(sid.value))
       }
   }
 
@@ -60,7 +60,7 @@ final class AuthController[F[_]: Logger: Temporal](
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
     Router(
-      prefixPath -> authMiddleware(authedRoutes),
+      prefixPath -> sessionIdCookieMiddleware(authMiddleware(authedRoutes)),
       prefixPath -> routes
     )
 }

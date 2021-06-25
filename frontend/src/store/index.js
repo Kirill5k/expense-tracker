@@ -5,6 +5,13 @@ Vue.use(Vuex)
 
 const reject = (res) => res.json().then(e => Promise.reject(new Error(e.message)))
 
+const defaultRequestParams = {
+  mode: 'cors',
+  cache: 'no-cache',
+  credentials: 'include',
+  headers: { 'Content-Type': 'application/json' }
+}
+
 export default new Vuex.Store({
   state: {
     isLoading: true,
@@ -37,7 +44,7 @@ export default new Vuex.Store({
   },
   actions: {
     getAccount ({ commit }) {
-      return fetch('/api/auth/account')
+      return fetch('/api/auth/account', defaultRequestParams)
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => {
           commit('loaded')
@@ -52,22 +59,16 @@ export default new Vuex.Store({
     createAccount ({ commit }, requestBody) {
       return fetch('/api/auth/account', {
         method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
       })
         .then(res => res.status === 201 ? res.json() : reject(res))
     },
     login ({ commit }, requestBody) {
       return fetch('/api/auth/login', {
         method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
       })
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => {
@@ -79,11 +80,8 @@ export default new Vuex.Store({
     createCategory ({ commit, dispatch }, requestBody) {
       return fetch('/api/categories', {
         method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
       })
         .then(res => res.status === 201 ? res.json() : reject(res))
         .then(res => dispatch('getCategory', res.id))
@@ -94,7 +92,7 @@ export default new Vuex.Store({
         .then(cats => commit('setCategories', cats))
     },
     getCategory ({ commit }, id) {
-      return fetch(`/api/categories/${id}`)
+      return fetch(`/api/categories/${id}`, defaultRequestParams)
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(cat => commit('addCategory', cat))
     }
