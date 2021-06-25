@@ -1,6 +1,7 @@
 package expensetracker.category.db
 
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
+import cats.implicits._
+import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
 import expensetracker.auth.account.AccountId
 import org.bson.types.ObjectId
 
@@ -29,5 +30,14 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       accountId = cat.accountId.map(aid => new ObjectId(aid.value))
+    )
+
+  def from(cat: CreateCategory): CategoryEntity =
+    CategoryEntity(
+      _id = new ObjectId(),
+      kind = cat.kind,
+      name = cat.name.value,
+      icon = cat.icon.value,
+      accountId = new ObjectId(cat.accountId.value).some
     )
 }

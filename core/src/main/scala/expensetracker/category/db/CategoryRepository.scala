@@ -42,7 +42,10 @@ final private class LiveCategoryRepository[F[_]: Async](
       .findOneAndDelete[F](Filters.and(idEq("accountId", aid.value), idEq("_id", cid.value)))
       .flatMap(r => errorIfNull(cid)(r).void)
 
-  override def create(cat: CreateCategory): F[CategoryId] = ???
+  override def create(cat: CreateCategory): F[CategoryId] = {
+    val newCat = CategoryEntity.from(cat)
+    collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
+  }
 
   override def update(cat: Category): F[Unit] =
     collection
@@ -53,7 +56,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       .flatMap(r => errorIfNull(cat.id)(r).void)
 
   private def errorIfNull[A](cid: CategoryId)(res: A): F[A] =
-    Option(res).map(_.pure[F]).getOrElse(CategoryDoesNotExist(cid).raiseError[F, Unit])
+    Option(res).map(_.pure[F]).getOrElse(CategoryDoesNotExist(cid).raiseError[F, A])
 
   private def idEq(name: String, id: String): Bson =
     Filters.eq(name, new ObjectId(id))
