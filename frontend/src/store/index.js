@@ -27,6 +27,12 @@ export default new Vuex.Store({
     },
     setAccount (state, account) {
       state.account = account
+    },
+    setCategories (state, categories) {
+      state.categories = categories
+    },
+    addCategory (state, category) {
+      state.categories = [category, ...state.categories]
     }
   },
   actions: {
@@ -54,7 +60,7 @@ export default new Vuex.Store({
       })
         .then(res => res.status === 201 ? res.json() : reject(res))
     },
-    login ({ commit, dispatch }, requestBody) {
+    login ({ commit }, requestBody) {
       return fetch('/api/auth/login', {
         method: 'POST',
         mode: 'cors',
@@ -69,6 +75,28 @@ export default new Vuex.Store({
           commit('setAccount', acc)
           commit('authenticate')
         })
+    },
+    createCategory ({ commit, dispatch }, requestBody) {
+      return fetch('/api/categories', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      })
+        .then(res => res.status === 201 ? res.json() : reject(res))
+        .then(res => dispatch('getCategory', res.id))
+    },
+    getCategories ({ commit }) {
+      return fetch('/api/categories')
+        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(cats => commit('setCategories', cats))
+    },
+    getCategory ({ commit }, id) {
+      return fetch(`/api/categories/${id}`)
+        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(cat => commit('addCategory', cat))
     }
   },
   modules: {

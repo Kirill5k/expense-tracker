@@ -37,6 +37,13 @@ final class CategoryController[F[_]: Logger](
           .map(_.map(CategoryView.from))
           .flatMap(Ok(_))
       }
+    case GET -> Root / CategoryIdPath(cid) as session =>
+      withErrorHandling {
+        service
+          .get(session.accountId, cid)
+          .map(CategoryView.from)
+          .flatMap(Ok(_))
+      }
     case authReq @ POST -> Root as session =>
       withErrorHandling {
         for {

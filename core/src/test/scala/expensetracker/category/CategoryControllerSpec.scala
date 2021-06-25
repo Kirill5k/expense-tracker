@@ -68,6 +68,19 @@ class CategoryControllerSpec extends ControllerSpec {
       }
     }
 
+    "GET /categories/:id" should {
+      "return user's category by id" in {
+        val svc = mock[CategoryService[IO]]
+        when(svc.get(any[AccountId], any[CategoryId])).thenReturn(IO.pure(cat))
+
+        val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessionIdCookie)
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Ok, Some(s"""{"id":"${cid.value}","name":"cat-1","icon":"icon"}"""))
+        verify(svc).get(aid, cid)
+      }
+    }
+
     "PUT /categories/:id" should {
       "update user's category" in {
         val svc = mock[CategoryService[IO]]
