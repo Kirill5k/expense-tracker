@@ -18,7 +18,11 @@
       item-height="45"
     >
       <template v-slot:default="{ item }">
-        <v-list-item :key="item.id" class="pr-3">
+        <v-list-item
+          :key="item.id"
+          class="pr-3"
+          link
+        >
           <v-list-item-icon>
             <v-icon v-text="item.icon"/>
           </v-list-item-icon>
