@@ -39,24 +39,14 @@ export default new Vuex.Store({
       state.categories = categories
     },
     addCategory (state, category) {
-      console.log('adding', category)
       state.categories = [...state.categories, category]
+    },
+    removeCategory (state, id) {
+      console.log('removing')
+      state.categories = state.categories.filter(cat => cat.id !== id)
     }
   },
   actions: {
-    getAccount ({ commit }) {
-      return fetch('/api/auth/account', defaultRequestParams)
-        .then(res => res.status === 200 ? res.json() : reject(res))
-        .then(acc => {
-          commit('loaded')
-          commit('authenticate')
-          commit('setAccount', acc)
-        })
-        .catch(() => {
-          commit('loaded')
-          commit('unAuthenticate')
-        })
-    },
     createAccount ({ commit }, requestBody) {
       return fetch('/api/auth/account', {
         method: 'POST',
@@ -65,7 +55,20 @@ export default new Vuex.Store({
       })
         .then(res => res.status === 201 ? res.json() : reject(res))
     },
-    login ({ commit }, requestBody) {
+    getAccount ({ commit, dispatch }) {
+      return fetch('/api/auth/account', defaultRequestParams)
+        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(acc => {
+          commit('authenticate')
+          commit('setAccount', acc)
+        })
+        .then(() => dispatch('getCategories'))
+        .catch(() => {
+          commit('unAuthenticate')
+        })
+        .then(() => commit('loaded'))
+    },
+    login ({ commit, dispatch }, requestBody) {
       return fetch('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(requestBody),
@@ -73,10 +76,10 @@ export default new Vuex.Store({
       })
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => {
-          console.log(acc)
           commit('setAccount', acc)
           commit('authenticate')
         })
+        .then(() => dispatch('getCategories'))
     },
     createCategory ({ commit, dispatch }, requestBody) {
       return fetch('/api/categories', {
@@ -96,6 +99,10 @@ export default new Vuex.Store({
       return fetch(`/api/categories/${id}`, defaultRequestParams)
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(cat => commit('addCategory', cat))
+    },
+    deleteCategory ({ commit }, id) {
+      return fetch(`/api/categories/${id}`, { ...defaultRequestParams, method: 'DELETE' })
+        .then(res => res.status === 204 ? commit('removeCategory', id) : reject(res))
     }
   },
   modules: {

@@ -208,6 +208,19 @@ export default {
       ...DEFAULT_CATEGORY
     }
   }),
+  props: {
+    category: {
+      type: Object,
+      default: DEFAULT_CATEGORY
+    }
+  },
+  watch: {
+    category (newVal) {
+      if (newVal) {
+        this.newCategory = newVal
+      }
+    }
+  },
   methods: {
     formatIconName (icon) {
       return icon.charAt(0).toUpperCase() + icon.slice(1).replace('-', ' ')

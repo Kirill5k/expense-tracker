@@ -24,6 +24,8 @@
         name="EXPENSE"
         :items="expenseCats"
         :editable="editable"
+        @delete="remove"
+        @edit="edit"
       />
     </v-card-text>
 
@@ -32,12 +34,15 @@
         name="INCOME"
         :items="incomeCats"
         :editable="editable"
+        @delete="remove"
+        @edit="edit"
       />
     </v-card-text>
 
     <v-card-actions>
       <v-spacer></v-spacer>
       <new-category-dialog
+        :category="updatedCategory"
         @save="create"
       />
     </v-card-actions>
@@ -61,7 +66,8 @@ export default {
     NewCategoryDialog
   },
   data: () => ({
-    editable: false
+    editable: false,
+    updatedCategory: null
   }),
   computed: {
     expenseCats () {
@@ -74,6 +80,12 @@ export default {
   methods: {
     create (newCategory) {
       this.$emit('create', newCategory)
+    },
+    remove (id) {
+      this.$emit('delete', id)
+    },
+    edit (category) {
+      this.updatedCategory = category
     }
   }
 }
