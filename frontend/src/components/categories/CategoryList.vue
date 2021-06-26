@@ -14,8 +14,8 @@
     </v-list-item>
     <v-virtual-scroll
       :items="items"
-      max-height="120"
-      item-height="40"
+      max-height="135"
+      item-height="45"
     >
       <template v-slot:default="{ item }">
         <v-list-item :key="item.id" class="pr-3">

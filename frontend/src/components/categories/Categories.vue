@@ -42,7 +42,8 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <new-category-dialog
-        :category="updatedCategory"
+        ref="newCategoryDialog"
+        @update="update"
         @save="create"
       />
     </v-card-actions>
@@ -66,8 +67,7 @@ export default {
     NewCategoryDialog
   },
   data: () => ({
-    editable: false,
-    updatedCategory: null
+    editable: false
   }),
   computed: {
     expenseCats () {
@@ -84,8 +84,11 @@ export default {
     remove (id) {
       this.$emit('delete', id)
     },
+    update (updatedCategory) {
+      this.$emit('update', updatedCategory)
+    },
     edit (category) {
-      this.updatedCategory = category
+      this.$refs.newCategoryDialog.update(category)
     }
   }
 }

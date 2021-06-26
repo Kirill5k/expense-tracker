@@ -208,12 +208,6 @@ export default {
       ...DEFAULT_CATEGORY
     }
   }),
-  props: {
-    category: {
-      type: Object,
-      default: DEFAULT_CATEGORY
-    }
-  },
   watch: {
     category (newVal) {
       if (newVal) {
@@ -226,7 +220,7 @@ export default {
       return icon.charAt(0).toUpperCase() + icon.slice(1).replace('-', ' ')
     },
     reset () {
-      this.newCategory = { ...DEFAULT_CATEGORY }
+      this.newCategory = DEFAULT_CATEGORY
       this.valid = true
       this.$refs.newCategoryForm.resetValidation()
     },
@@ -236,9 +230,17 @@ export default {
     },
     save () {
       if (this.$refs.newCategoryForm.validate()) {
-        this.$emit('save', this.newCategory)
+        if (this.newCategory.id) {
+          this.$emit('update', this.newCategory)
+        } else {
+          this.$emit('save', this.newCategory)
+        }
         this.close()
       }
+    },
+    update (category) {
+      this.newCategory = { ...category }
+      this.dialog = true
     }
   }
 }

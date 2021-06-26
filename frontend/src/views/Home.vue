@@ -43,6 +43,7 @@
           :items="categories"
           @create="createCategory"
           @delete="deleteCategory"
+          @update="updateCategory"
         />
       </v-col>
     </v-row>
@@ -78,6 +79,14 @@ export default {
       this.loading = true
       this.$store
         .dispatch('deleteCategory', id)
+        .then(() => {
+          this.loading = false
+        })
+    },
+    updateCategory (updatedCategory) {
+      this.loading = true
+      this.$store
+        .dispatch('updateCategory', updatedCategory)
         .then(() => {
           this.loading = false
         })

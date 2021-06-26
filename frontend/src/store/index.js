@@ -41,8 +41,10 @@ export default new Vuex.Store({
     addCategory (state, category) {
       state.categories = [...state.categories, category]
     },
+    updateCategory (state, updatedCategory) {
+      state.categories = state.categories.map(c => c.id === updatedCategory.id ? updatedCategory : c)
+    },
     removeCategory (state, id) {
-      console.log('removing')
       state.categories = state.categories.filter(cat => cat.id !== id)
     }
   },
@@ -103,6 +105,14 @@ export default new Vuex.Store({
     deleteCategory ({ commit }, id) {
       return fetch(`/api/categories/${id}`, { ...defaultRequestParams, method: 'DELETE' })
         .then(res => res.status === 204 ? commit('removeCategory', id) : reject(res))
+    },
+    updateCategory ({ commit }, requestBody) {
+      return fetch(`/api/categories/${requestBody.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
+      })
+        .then(res => res.status === 204 ? commit('updateCategory', requestBody) : reject(res))
     }
   },
   modules: {
