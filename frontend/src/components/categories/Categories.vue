@@ -3,6 +3,7 @@
     elevation="2"
     outlined
     class="mx-auto"
+    :loading="loading"
   >
     <v-btn
       v-if="items.length"
@@ -60,6 +61,10 @@ export default {
     items: {
       type: Array,
       required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

@@ -40,6 +40,7 @@
       </v-col>
       <v-col cols="5">
         <categories
+          :loading="loading"
           :items="categories"
           @create="createCategory"
           @delete="deleteCategory"
@@ -67,29 +68,22 @@ export default {
     }
   },
   methods: {
-    createCategory (newCategory) {
+    dispatchAction (name, arg) {
       this.loading = true
-      this.$store
-        .dispatch('createCategory', newCategory)
+      return this.$store
+        .dispatch(name, arg)
         .then(() => {
           this.loading = false
         })
+    },
+    createCategory (newCategory) {
+      this.dispatchAction('createCategory', newCategory)
     },
     deleteCategory (id) {
-      this.loading = true
-      this.$store
-        .dispatch('deleteCategory', id)
-        .then(() => {
-          this.loading = false
-        })
+      this.dispatchAction('deleteCategory', id)
     },
     updateCategory (updatedCategory) {
-      this.loading = true
-      this.$store
-        .dispatch('updateCategory', updatedCategory)
-        .then(() => {
-          this.loading = false
-        })
+      this.dispatchAction('updateCategory', updatedCategory)
     }
   }
 }
