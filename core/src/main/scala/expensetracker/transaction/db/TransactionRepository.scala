@@ -4,7 +4,7 @@ import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Filters
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
-import expensetracker.transaction.Transaction._
+import expensetracker.common.json._
 import expensetracker.auth.account.AccountId
 import io.circe.generic.auto._
 import mongo4cats.circe._

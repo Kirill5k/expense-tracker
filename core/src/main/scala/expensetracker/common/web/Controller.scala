@@ -2,6 +2,7 @@ package expensetracker.common.web
 
 import cats.MonadError
 import cats.implicits._
+import expensetracker.common.JsonCodecs
 import expensetracker.common.errors.{AuthError, BadRequestError, ConflictError, NotFoundError}
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec._
@@ -11,7 +12,7 @@ import org.typelevel.log4cats.Logger
 
 final case class ErrorResponse(message: String)
 
-trait Controller[F[_]] extends Http4sDsl[F] {
+trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
   val SessionIdCookie = "session-id"
 
   protected def withErrorHandling(

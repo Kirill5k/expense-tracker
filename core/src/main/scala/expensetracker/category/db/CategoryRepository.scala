@@ -7,6 +7,7 @@ import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.errors.AppError.CategoryDoesNotExist
 import io.circe.generic.auto._
+import expensetracker.common.json._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import org.bson.conversions.Bson

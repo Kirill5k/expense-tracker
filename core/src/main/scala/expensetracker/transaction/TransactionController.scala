@@ -7,7 +7,6 @@ import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryId
-import expensetracker.transaction.Transaction._
 import expensetracker.common.web.Controller
 import org.bson.types.ObjectId
 import io.circe.generic.auto._

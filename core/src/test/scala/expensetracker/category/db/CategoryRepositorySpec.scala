@@ -35,6 +35,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
             cat.name mustBe create.name
             cat.icon mustBe create.icon
             cat.accountId mustBe Some(acc1Id)
+            cat.kind mustBe create.kind
           }
         }
       }
