@@ -17,6 +17,22 @@
           :loading="loading"
           class="mx-auto"
         >
+
+          <v-btn
+            v-if="transactions.length"
+            class="mt-5 mr-1"
+            elevation="2"
+            right
+            x-small
+            text
+            absolute
+            rounded
+            plain
+            @click="editable = !editable"
+          >
+            {{ editable ? 'Done' : 'Edit' }}
+          </v-btn>
+
           <v-card-title>
             Transactions
           </v-card-title>
@@ -27,6 +43,14 @@
               :items="transactions"
             />
           </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <new-transaction-dialog
+              ref="newTransactionDialog"
+            />
+          </v-card-actions>
+
         </v-card>
       </v-col>
     </v-row>
@@ -35,14 +59,17 @@
 
 <script>
 import TransactionList from '@/components/transactions/TransactionList'
+import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 
 export default {
   name: 'Transactions',
   components: {
-    TransactionList
+    TransactionList,
+    NewTransactionDialog
   },
   data: () => ({
-    loading: false
+    loading: false,
+    editable: false
   }),
   computed: {
     expenseCats () {

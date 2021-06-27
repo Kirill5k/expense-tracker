@@ -41,7 +41,11 @@ trait JsonCodecs {
   }
 
   implicit val encodeMoney: Encoder[Money] = Encoder[JsonObject].contramap { m =>
-    JsonObject("value" -> Json.fromBigDecimal(m.amount), "currency" -> Json.fromString(m.currency.code))
+    JsonObject(
+      "value" -> Json.fromBigDecimal(m.amount),
+      "currency" -> Json.fromString(m.currency.code),
+      "symbol" -> Json.fromString(m.currency.symbol)
+    )
   }
 
   implicit val decodeTransactionKind: Decoder[TransactionKind] = Decoder[String].emap {
