@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName}
+import expensetracker.category.{CategoryId}
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
@@ -49,10 +49,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           txs must have size 2
           txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
-          txs.map(_.category) mustBe List(
-            Category(cat1Id, CategoryKind.Expense, CategoryName("category-1"), CategoryIcon("icon"), None),
-            Category(cat2Id, CategoryKind.Expense, CategoryName("category-2"), CategoryIcon("icon"), None)
-          )
+          txs.map(_.categoryId) mustBe List(cat1Id, cat2Id)
         }
       }
     }

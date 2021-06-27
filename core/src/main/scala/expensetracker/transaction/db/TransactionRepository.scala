@@ -1,8 +1,8 @@
 package expensetracker.transaction.db
 
-import cats.effect.{Async, Sync}
+import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Aggregates, Filters}
+import com.mongodb.client.model.Filters
 import expensetracker.transaction.{CreateTransaction, Transaction}
 import expensetracker.transaction.Transaction._
 import expensetracker.auth.account.AccountId
@@ -25,18 +25,9 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
     collection
-      .aggregate(
-        List(
-          Aggregates.`match`(Filters.eq("accountId", new ObjectId(aid.value))),
-          Aggregates.lookup("categories", "categoryId", "_id", "category"),
-          Aggregates.unwind("$category"),
-          Aggregates.`match`(Filters.not(Filters.eq("category", null)))
-        )
-      )
+      .find(Filters.eq("accountId", new ObjectId(aid.value)))
       .all[F]
-      .flatMap { tx =>
-        tx.toList.traverse(te => Sync[F].fromEither(te.toDomain))
-      }
+      .map(_.map(_.toDomain).toList)
 }
 
 object TransactionRepository {

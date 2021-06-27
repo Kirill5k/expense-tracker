@@ -1,8 +1,8 @@
 package expensetracker.transaction
 
 import cats.implicits._
-import expensetracker.category.{Category, CategoryId}
 import expensetracker.auth.account.AccountId
+import expensetracker.category.CategoryId
 import io.circe.{Decoder, Encoder, Json, JsonObject}
 import squants.market.{Currency, Money, defaultMoneyContext}
 
@@ -32,7 +32,7 @@ final case class Transaction(
     id: TransactionId,
     accountId: AccountId,
     kind: TransactionKind,
-    category: Category,
+    categoryId: CategoryId,
     amount: Money,
     date: Instant,
     note: Option[String]
