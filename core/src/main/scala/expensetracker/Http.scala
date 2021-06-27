@@ -5,6 +5,7 @@ import cats.effect.Async
 import cats.implicits._
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
+import expensetracker.transaction.Transactions
 import org.http4s._
 import org.http4s.implicits._
 import org.http4s.server.Router
@@ -14,11 +15,14 @@ import scala.concurrent.duration._
 
 final class Http[F[_]: Async] private (
     private val auth: Auth[F],
-    private val categories: Categories[F]
+    private val categories: Categories[F],
+    private val transactions: Transactions[F]
 ) {
 
   private val routes: HttpRoutes[F] = {
-    val api = auth.routes(auth.sessionAuthMiddleware) <+> categories.routes(auth.sessionAuthMiddleware)
+    val api = auth.routes(auth.sessionAuthMiddleware) <+>
+      categories.routes(auth.sessionAuthMiddleware) <+>
+      transactions.routes(auth.sessionAuthMiddleware)
 
     Router(
       "/api" -> api
@@ -45,6 +49,7 @@ final class Http[F[_]: Async] private (
 object Http {
   def make[F[_]: Async](
       auth: Auth[F],
-      categories: Categories[F]
-  ): F[Http[F]] = Monad[F].pure(new Http(auth, categories))
+      cats: Categories[F],
+      txs: Transactions[F]
+  ): F[Http[F]] = Monad[F].pure(new Http(auth, cats, txs))
 }
