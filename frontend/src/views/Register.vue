@@ -91,7 +91,7 @@ export default {
             type: 'success',
             message: 'Account has been successfully created! Redirecting to the sign in page.'
           }
-          setTimeout(() => this.login(), 2500)
+          setTimeout(() => this.login(), 1750)
         })
         .catch(err => {
           this.loading = false
