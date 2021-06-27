@@ -17,6 +17,21 @@
           :loading="loading"
           class="mx-auto"
         >
+          <v-btn
+            v-if="items.length"
+            class="mt-5 mr-1"
+            elevation="2"
+            right
+            x-small
+            text
+            absolute
+            rounded
+            plain
+            @click="editable = !editable"
+          >
+            {{ editable ? 'Done' : 'Edit' }}
+          </v-btn>
+
           <v-card-title>
             Categories
           </v-card-title>
@@ -67,7 +82,8 @@ export default {
     NewCategoryDialog
   },
   data: () => ({
-    loading: false
+    loading: false,
+    editable: false
   }),
   computed: {
     categories () {
