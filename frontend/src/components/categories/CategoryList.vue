@@ -14,6 +14,7 @@
     </v-list-item>
     <v-virtual-scroll
       :items="items"
+      bench="3"
       max-height="135"
       item-height="45"
     >

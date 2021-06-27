@@ -21,6 +21,12 @@
             Transactions
           </v-card-title>
 
+          <v-card-text>
+            <transaction-list
+              :categories="catsByIds"
+              :items="transactions"
+            />
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -28,15 +34,28 @@
 </template>
 
 <script>
+import TransactionList from '@/components/transactions/TransactionList'
 
 export default {
   name: 'Transactions',
+  components: {
+    TransactionList
+  },
   data: () => ({
     loading: false
   }),
-  computed () {
-    categoriesById () {
-      return this.$store.state.categories
+  computed: {
+    expenseCats () {
+      return this.$store.getters.expenseCats
+    },
+    incomeCats () {
+      return this.$store.getters.incomeCats
+    },
+    catsByIds () {
+      return this.$store.getters.catsByIds
+    },
+    transactions () {
+      return this.$store.state.transactions
     }
   }
 }

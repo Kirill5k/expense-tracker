@@ -18,7 +18,20 @@ export default new Vuex.Store({
     isAuthenticated: false,
     account: null,
     categories: [],
-    transactions: []
+    transactions: [
+      { id: '1', kind: 'expense', categoryId: '60d83bad919b494d3b17a379', amount: { value: 5.99, currency: 'GBP' }, note: 'test transaction', date: '2021-06-30' },
+      { id: '2', kind: 'expense', categoryId: '60d83bad919b494d3b17a379', amount: { value: 0.99, currency: 'GBP' }, note: null, date: '2021-06-29' },
+      { id: '3', kind: 'expense', categoryId: '60d83bad919b494d3b17a379', amount: { value: 12.30, currency: 'GBP' }, note: null, date: '2021-06-28' },
+      { id: '4', kind: 'income', categoryId: '60d83c2f919b494d3b17a37b', amount: { value: 100.0, currency: 'GBP' }, note: null, date: '2021-06-27' }
+    ]
+  },
+  getters: {
+    incomeCats: state => state.categories.filter(c => c.kind === 'income'),
+    expenseCats: state => state.categories.filter(c => c.kind === 'expense'),
+    catsByIds: state => state.categories.reduce((acc, el) => {
+      acc[el.id] = el
+      return acc
+    }, {})
   },
   mutations: {
     authenticate (state) {

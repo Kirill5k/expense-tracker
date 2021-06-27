@@ -90,10 +90,10 @@ export default {
       return this.$store.state.categories
     },
     expenseCats () {
-      return this.categories.filter(c => c.kind === 'expense')
+      return this.$store.getters.expenseCats
     },
     incomeCats () {
-      return this.categories.filter(c => c.kind === 'income')
+      return this.$store.getters.incomeCats
     }
   },
   methods: {
