@@ -47,6 +47,23 @@ class TransactionControllerSpec extends ControllerSpec {
         )
         verifyZeroInteractions(svc)
       }
+
+      "return 422 when invalid category id passed" in {
+        val svc = mock[TransactionService[IO]]
+        when(svc.create(any[CreateTransaction])).thenReturn(IO.pure(txid))
+
+        val reqBody = parseJson("""{
+                                  |"categoryId":"FOO",
+                                  |"kind":"expense",
+                                  |"date": "2021-01-01",
+                                  |"amount": {"value":5.99,"currency":"GBP"}
+                                  |}""".stripMargin)
+        val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.UnprocessableEntity, Some(s"""{"message":"Validation failed: (FOO is valid id).: Field(categoryId)"}"""))
+        verifyZeroInteractions(svc)
+      }
     }
 
     "GET /transactions" should {

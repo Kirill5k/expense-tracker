@@ -3,11 +3,11 @@ package expensetracker.transaction
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
-import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryId
 import expensetracker.common.web.Controller
+import expensetracker.common.validations._
 import org.bson.types.ObjectId
 import io.circe.generic.auto._
 import io.circe.refined._
@@ -59,7 +59,7 @@ object TransactionController {
 
   final case class CreateTransactionRequest(
       kind: TransactionKind,
-      categoryId: NonEmptyString,
+      categoryId: ValidIdString,
       amount: Money,
       date: LocalDate,
       note: Option[String]
