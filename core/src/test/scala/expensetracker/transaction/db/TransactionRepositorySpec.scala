@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{CategoryId}
+import expensetracker.category.CategoryId
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
@@ -25,14 +25,19 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
 
   "A TransactionRepository" should {
 
-    "create new transactions" in {
+    "create new transaction and return id" in {
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          res  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
-        } yield res
+          txId  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          txs <- repo.getAll(acc1Id)
+        } yield (txId, txs)
 
-        result.attempt.map(_ mustBe Right(()))
+        result.map { case (txId, txs) =>
+          txs must have size 1
+          val tx = txs.head
+          tx.id mustBe txId
+        }
       }
     }
 

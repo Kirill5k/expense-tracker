@@ -9,7 +9,7 @@ import squants.market._
 import java.time.Instant
 
 final case class TransactionEntity(
-    id: ObjectId,
+    _id: ObjectId,
     accountId: ObjectId,
     categoryId: ObjectId,
     kind: TransactionKind,
@@ -19,7 +19,7 @@ final case class TransactionEntity(
 ) {
   def toDomain: Transaction =
     Transaction(
-      id = TransactionId(id.toHexString),
+      id = TransactionId(_id.toHexString),
       accountId = AccountId(accountId.toHexString),
       categoryId = CategoryId(categoryId.toHexString),
       kind = kind,

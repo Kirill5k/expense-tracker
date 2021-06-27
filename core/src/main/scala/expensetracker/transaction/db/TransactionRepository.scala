@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Filters
-import expensetracker.transaction.{CreateTransaction, Transaction}
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.transaction.Transaction._
 import expensetracker.auth.account.AccountId
 import io.circe.generic.auto._
@@ -12,7 +12,7 @@ import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import org.bson.types.ObjectId
 
 trait TransactionRepository[F[_]] {
-  def create(tx: CreateTransaction): F[Unit]
+  def create(tx: CreateTransaction): F[TransactionId]
   def getAll(aid: AccountId): F[List[Transaction]]
 }
 
@@ -20,8 +20,12 @@ final private class LiveTransactionRepository[F[_]: Async](
     private val collection: MongoCollectionF[TransactionEntity]
 ) extends TransactionRepository[F] {
 
-  override def create(tx: CreateTransaction): F[Unit] =
-    collection.insertOne[F](TransactionEntity.create(tx)).void
+  override def create(tx: CreateTransaction): F[TransactionId] = {
+    val create = TransactionEntity.create(tx)
+    collection
+      .insertOne[F](create)
+      .as(TransactionId(create._id.toHexString))
+  }
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
     collection

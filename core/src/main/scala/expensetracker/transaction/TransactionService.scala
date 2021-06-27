@@ -6,13 +6,13 @@ import expensetracker.auth.account.AccountId
 
 trait TransactionService[F[_]] {
   def getAll(aid: AccountId): F[List[Transaction]]
-  def create(tx: CreateTransaction): F[Unit]
+  def create(tx: CreateTransaction): F[TransactionId]
 }
 
 final private class LiveTransactionService[F[_]](
     private val repository: TransactionRepository[F]
 ) extends TransactionService[F] {
-  override def create(tx: CreateTransaction): F[Unit] =
+  override def create(tx: CreateTransaction): F[TransactionId] =
     repository.create(tx)
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
