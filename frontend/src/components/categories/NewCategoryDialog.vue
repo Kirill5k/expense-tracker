@@ -218,7 +218,7 @@ export default {
   },
   methods: {
     formatIconName (icon) {
-      return icon.charAt(0).toUpperCase() + icon.slice(1).replace('-', ' ')
+      return icon.charAt(0).toUpperCase() + icon.slice(1).replaceAll('-', ' ')
     },
     reset () {
       this.newCategory = { ...DEFAULT_CATEGORY }
