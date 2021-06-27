@@ -23,7 +23,7 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with ArgumentMatchers
 
   val emptyJson: Json = Json.fromJsonObject(JsonObject.empty)
 
-  def sessionMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
+  def sessMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
     SessionAuthMiddleware((_, _) => IO.pure(sess))
 
   def verifyJsonResponse(

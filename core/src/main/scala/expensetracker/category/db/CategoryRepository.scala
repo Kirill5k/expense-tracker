@@ -44,6 +44,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       .flatMap(r => errorIfNull(cid)(r).void)
 
   override def create(cat: CreateCategory): F[CategoryId] = {
+    // TODO: return CategoryAlreadyExists if already exists
     val newCat = CategoryEntity.from(cat)
     collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
   }

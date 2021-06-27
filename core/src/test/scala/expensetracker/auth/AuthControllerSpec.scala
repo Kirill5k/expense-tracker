@@ -17,8 +17,8 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
         when(svc.findAccount(any[AccountId])).thenReturn(IO.pure(acc))
 
-        val req = Request[IO](uri = uri"/auth/account", method = Method.GET).addCookie(sessionIdCookie)
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+        val req = Request[IO](uri = uri"/auth/account", method = Method.GET).addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
         verifyJsonResponse(res, Status.Ok, Some(resBody))
@@ -34,7 +34,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(
           res,
@@ -52,7 +52,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(
           res,
@@ -68,7 +68,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/account", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${aid.value}"}"""))
         verify(svc).createAccount(
@@ -84,7 +84,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
 
         val req = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity("""{foo}""")
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         val responseBody = """{"message":"Attempt to decode value on failed cursor: Field(email)"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
@@ -96,7 +96,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val reqBody  = parseJson("""{"email":"foo","password":""}""")
         val res      = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
-        val response = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(res))
+        val response = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(res))
 
         val resBody =
           """{"message":"Validation failed: \"foo\".matches(\"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+$\").: Field(email)"}"""
@@ -110,7 +110,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid email or password"}"""))
         verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")))
@@ -123,7 +123,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
         val sessCookie = ResponseCookie(
@@ -145,7 +145,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
 
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST)
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"missing session-id cookie"}"""))
         verifyZeroInteractions(svc)
@@ -154,8 +154,8 @@ class AuthControllerSpec extends ControllerSpec {
       "return forbidden if session does not exist" in {
         val svc = mock[AuthService[IO]]
 
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessionIdCookie)
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(None)).orNotFound.run(req))
+        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid session-id"}"""))
         verifyZeroInteractions(svc)
@@ -165,8 +165,8 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
 
         val exp = sess.copy(active = false)
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessionIdCookie)
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(exp))).orNotFound.run(req))
+        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(exp))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"session is inactive"}"""))
         verifyZeroInteractions(svc)
@@ -176,8 +176,8 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
 
         val req =
-          Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessionIdCookie.copy(content = "f"))
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+          Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie.copy(content = "f"))
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid session-id format"}"""))
         verifyZeroInteractions(svc)
@@ -187,8 +187,8 @@ class AuthControllerSpec extends ControllerSpec {
         val svc = mock[AuthService[IO]]
         when(svc.logout(any[SessionId])).thenReturn(IO.unit)
 
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessionIdCookie)
-        val res = AuthController.make[IO](svc).flatMap(_.routes(sessionMiddleware(Some(sess))).orNotFound.run(req))
+        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).logout(sid)
