@@ -83,6 +83,17 @@ export default new Vuex.Store({
         })
         .then(() => dispatch('getCategories'))
     },
+    logout ({ commit }) {
+      return fetch('/api/auth/logout', {
+        method: 'POST',
+        ...defaultRequestParams
+      })
+        .then(res => res.status === 204 ? {} : reject(res))
+        .then(acc => {
+          commit('setAccount', {})
+          commit('unAuthenticate')
+        })
+    },
     createCategory ({ commit, dispatch }, requestBody) {
       return fetch('/api/categories', {
         method: 'POST',

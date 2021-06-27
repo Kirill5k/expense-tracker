@@ -42,17 +42,17 @@ class SessionServiceSpec extends CatsSpec {
       }
     }
 
-    "delete session" in {
+    "unauth session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.delete(sid)).thenReturn(IO.unit)
+      when(repo.unauth(sid)).thenReturn(IO.unit)
 
       val result = for {
         svc <- SessionService.make(repo)
-        res <- svc.delete(sid)
+        res <- svc.unauth(sid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).delete(sid)
+        verify(repo).unauth(sid)
         res mustBe ()
       }
     }

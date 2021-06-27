@@ -4,6 +4,7 @@ import cats.effect.{IO, IOApp}
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import expensetracker.common.config.AppConfig
+import expensetracker.transaction.Transactions
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -19,7 +20,8 @@ object Application extends IOApp.Simple {
       for {
         auth <- Auth.make(config.auth, res)
         cats <- Categories.make(res)
-        http <- Http.make(auth, cats)
+        txs  <- Transactions.make(res)
+        http <- Http.make(auth, cats, txs)
         _ <- BlazeServerBuilder[IO](runtime.compute)
           .bindHttp(config.server.port, config.server.host)
           .withHttpApp(http.httpApp)

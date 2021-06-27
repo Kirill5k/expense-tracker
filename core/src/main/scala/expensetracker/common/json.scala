@@ -1,6 +1,9 @@
 package expensetracker.common
 
 import cats.implicits._
+import com.comcast.ip4s.IpAddress
+import expensetracker.auth.session.SessionStatus
+import expensetracker.auth.session.SessionStatus.{Authenticated, LoggedOut}
 import expensetracker.category.CategoryKind
 import expensetracker.transaction.TransactionKind
 import io.circe.{Decoder, Encoder, Json, JsonObject}
@@ -11,6 +14,23 @@ import scala.util.Try
 object json extends JsonCodecs
 
 trait JsonCodecs {
+  implicit val decodeIpAddress: Decoder[IpAddress] = Decoder[String].emap { ip =>
+    IpAddress.fromString(ip).toRight(s"invalid ip address $ip")
+  }
+
+  implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap {
+    case "authenticated" => Right(Authenticated)
+    case "logged-out"    => Right(LoggedOut)
+    case other           => Left(s"invalid session status $other")
+  }
+
+  implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap {
+    case Authenticated => "authenticated"
+    case LoggedOut     => "logged-out"
+  }
+
+  implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
+
   implicit val decodeMoney: Decoder[Money] = Decoder[JsonObject].emap { json =>
     for {
       rawValue    <- json("value").flatMap(_.asNumber).toRight("missing the actual amount")

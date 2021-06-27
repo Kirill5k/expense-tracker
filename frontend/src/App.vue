@@ -8,6 +8,7 @@
       <v-chip
         color="black"
         text-color="white"
+        class="mr-2"
       >
         <v-avatar
           left
@@ -21,11 +22,10 @@
         <strong>{{ name }}</strong>
       </v-chip>
 
-      <v-spacer></v-spacer>
-
       <v-btn
         to="/"
         icon
+        class="mr-2"
       >
         <v-icon>mdi-bank-transfer</v-icon>
       </v-btn>
@@ -33,8 +33,19 @@
       <v-btn
         to="/categories"
         icon
+        class="mr-2"
       >
         <v-icon>mdi-shape</v-icon>
+      </v-btn>
+
+      <v-spacer/>
+
+      <v-btn
+        icon
+        class="mr-2"
+        @click="logout"
+      >
+        <v-icon>mdi-logout</v-icon>
       </v-btn>
 
     </v-app-bar>
@@ -85,6 +96,11 @@ export default {
       if (newVal === false) {
         this.$router.push('/login')
       }
+    }
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('logout')
     }
   }
 }

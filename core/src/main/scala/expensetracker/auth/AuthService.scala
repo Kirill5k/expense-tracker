@@ -28,7 +28,7 @@ final private class LiveAuthService[F[_]](
     accountService.login(email, password)
 
   override def logout(sid: SessionId): F[Unit] =
-    sessionService.delete(sid)
+    sessionService.unauth(sid)
 
   override def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
     sessionService.find(sid, activity)

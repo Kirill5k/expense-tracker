@@ -5,7 +5,7 @@ import cats.implicits._
 import com.mongodb.client.model.{Filters, Updates}
 import io.circe.generic.auto._
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
-import expensetracker.auth.session.SessionActivity._
+import expensetracker.common.json._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import mongo4cats.circe._
 import org.bson.Document
@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters._
 trait SessionRepository[F[_]] {
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
-  def delete(sid: SessionId): F[Unit]
+  def unauth(sid: SessionId): F[Unit]
 }
 
 final private class LiveSessionRepository[F[_]: Async](
@@ -38,8 +38,13 @@ final private class LiveSessionRepository[F[_]: Async](
     sess.map(res => Option(res).map(_.toDomain))
   }
 
-  override def delete(sid: SessionId): F[Unit] =
-    collection.deleteOne[F](Filters.eq("_id", new ObjectId(sid.value))).void
+  override def unauth(sid: SessionId): F[Unit] = {
+    collection.updateOne(
+      Filters.eq("_id", new ObjectId(sid.value)),
+      Updates.combine(Updates.set("status", "logged-out"), Updates.set("active", false))
+    )
+      .void
+  }
 }
 
 object SessionRepository {

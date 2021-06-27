@@ -76,7 +76,7 @@ class AuthServiceSpec extends CatsSpec {
 
     "delete session on logout" in {
       val (accSvc, sessSvc) = mocks
-      when(sessSvc.delete(any[SessionId])).thenReturn(IO.unit)
+      when(sessSvc.unauth(any[SessionId])).thenReturn(IO.unit)
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
@@ -84,7 +84,7 @@ class AuthServiceSpec extends CatsSpec {
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(sessSvc).delete(sid)
+        verify(sessSvc).unauth(sid)
         verifyZeroInteractions(accSvc)
         res mustBe ()
       }

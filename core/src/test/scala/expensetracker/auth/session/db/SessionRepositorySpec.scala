@@ -56,17 +56,21 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
       }
     }
 
-    "delete session from database" in {
+    "unauth session" in {
       withEmbeddedMongoDb { db =>
         val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts)
         val result = for {
           repo <- SessionRepository.make(db)
           sid  <- repo.create(create)
-          _    <- repo.delete(sid)
+          _    <- repo.unauth(sid)
           res  <- repo.find(sid, None)
         } yield res
 
-        result.map(_ mustBe None)
+        result.map { s =>
+          val sess = s.get
+          sess.active mustBe false
+          sess.status mustBe SessionStatus.LoggedOut
+        }
       }
     }
 
