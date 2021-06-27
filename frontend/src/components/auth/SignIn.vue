@@ -34,6 +34,7 @@
       tabindex="3"
       color="success"
       @click="signIn"
+      :disabled="disabled"
     >
       Log in
     </v-btn>
@@ -57,6 +58,12 @@
 <script>
 export default {
   name: 'SignIn',
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
   data: () => ({
     valid: true,
     email: '',

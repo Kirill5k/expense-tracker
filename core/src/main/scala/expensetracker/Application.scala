@@ -8,8 +8,6 @@ import org.http4s.blaze.server.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-import scala.concurrent.ExecutionContext
-
 object Application extends IOApp.Simple {
 
   val config = AppConfig.load
@@ -22,7 +20,7 @@ object Application extends IOApp.Simple {
         auth <- Auth.make(config.auth, res)
         cats <- Categories.make(res)
         http <- Http.make(auth, cats)
-        _ <- BlazeServerBuilder[IO](ExecutionContext.global)
+        _ <- BlazeServerBuilder[IO](runtime.compute)
           .bindHttp(config.server.port, config.server.host)
           .withHttpApp(http.httpApp)
           .serve

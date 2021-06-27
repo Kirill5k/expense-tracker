@@ -36,6 +36,7 @@
 
           <v-card-text>
             <sign-in
+              :disabled="loading"
               @sign-in="login"
               @reset-password="reset"
             />

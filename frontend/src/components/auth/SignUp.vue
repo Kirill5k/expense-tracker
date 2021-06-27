@@ -72,6 +72,7 @@
       tabindex="7"
       color="success"
       @click="signUp"
+      :disabled="disabled"
     >
       Register
     </v-btn>
@@ -81,6 +82,12 @@
 <script>
 export default {
   name: 'SignUp',
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
   data: () => ({
     valid: true,
     firstName: '',

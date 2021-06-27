@@ -36,6 +36,7 @@
 
           <v-card-text>
             <sign-up
+              :disabled="loading"
               @sign-up="register"
             />
           </v-card-text>
