@@ -103,6 +103,8 @@ export default new Vuex.Store({
         .then(acc => {
           commit('setAccount', {})
           commit('unAuthenticate')
+          commit('setCategories', [])
+          commit('setTransactions', [])
         })
     },
     createCategory ({ commit, dispatch }, requestBody) {
