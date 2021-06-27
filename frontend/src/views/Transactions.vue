@@ -33,7 +33,12 @@ export default {
   name: 'Transactions',
   data: () => ({
     loading: false
-  })
+  }),
+  computed () {
+    categoriesById () {
+      return this.$store.state.categories
+    }
+  }
 }
 </script>
 
