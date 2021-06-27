@@ -13,14 +13,14 @@
     </v-list-item>
     <v-virtual-scroll
       :items="items"
-      max-height="900"
+      max-height="840"
       item-height="70"
       bench="3"
     >
       <template v-slot:default="{ item }">
         <v-list-item
           class="px-1"
-          :key="item.id"
+          :key="`${item.id}${categories[item.categoryId]}`"
           link
         >
           <v-list-item-avatar
