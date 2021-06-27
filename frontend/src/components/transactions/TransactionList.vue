@@ -1,6 +1,5 @@
 <template>
   <v-list dense>
-    <v-divider></v-divider>
     <v-list-item
       dense
       v-if="!items.length"
