@@ -23,6 +23,20 @@
 
       <v-spacer></v-spacer>
 
+      <v-btn
+        to="/"
+        icon
+      >
+        <v-icon>mdi-bank-transfer</v-icon>
+      </v-btn>
+
+      <v-btn
+        to="/categories"
+        icon
+      >
+        <v-icon>mdi-shape</v-icon>
+      </v-btn>
+
     </v-app-bar>
 
     <v-main class="grey lighten-3">

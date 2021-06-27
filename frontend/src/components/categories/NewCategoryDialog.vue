@@ -96,6 +96,7 @@
 
 <script>
 const DEFAULT_CATEGORY = {
+  id: undefined,
   icon: '',
   name: '',
   kind: 'expense'
@@ -220,7 +221,7 @@ export default {
       return icon.charAt(0).toUpperCase() + icon.slice(1).replace('-', ' ')
     },
     reset () {
-      this.newCategory = DEFAULT_CATEGORY
+      this.newCategory = { ...DEFAULT_CATEGORY }
       this.valid = true
       this.$refs.newCategoryForm.resetValidation()
     },
