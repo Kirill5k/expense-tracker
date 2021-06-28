@@ -24,7 +24,7 @@
         >
           <v-list-item-avatar
             size="28"
-            class="mt-0"
+            class="mt-0 mb-6"
           >
             <v-icon
               outline
@@ -43,7 +43,7 @@
           </v-list-item-content>
 
           <v-list-item-action
-            class="mt-0"
+            class="mt-0 mb-6"
           >
             <v-chip
               small
