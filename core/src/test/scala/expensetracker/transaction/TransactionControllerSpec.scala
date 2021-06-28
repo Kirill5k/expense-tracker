@@ -86,7 +86,8 @@ class TransactionControllerSpec extends ControllerSpec {
           |    "categoryId" : "AB0C5342AB0C5342AB0C5342",
           |    "amount" : {
           |      "value" : 10.99,
-          |      "currency" : "GBP"
+          |      "currency" : "GBP",
+          |      "symbol" : "£"
           |    },
           |    "date" : "2021-06-06T00:00:00Z",
           |    "note" : "test tx"
