@@ -142,18 +142,9 @@ export default new Vuex.Store({
         .then(res => res.status === 204 ? commit('updateCategory', requestBody) : reject(res))
     },
     getTransactions ({ commit }) {
-      //  return fetch('/api/categories', defaultRequestParams)
-      //    .then(res => res.status === 200 ? res.json() : reject(res))
-      //    .then(txs => commit('setTransaction', txs))
-      setTimeout(() => {
-        const txs = [
-          { id: '1', kind: 'expense', categoryId: '60d83bad919b494d3b17a379', amount: { value: 5.99, currency: 'GBP' }, note: 'test transaction', date: '2021-06-30' },
-          { id: '2', kind: 'expense', categoryId: '60d83bad919b494d3b17a379', amount: { value: 0.99, currency: 'GBP' }, note: null, date: '2021-06-29' },
-          { id: '3', kind: 'expense', categoryId: '60d83bad919b494d3b17a379', amount: { value: 12.30, currency: 'GBP' }, note: null, date: '2021-06-28' },
-          { id: '4', kind: 'income', categoryId: '60d83c2f919b494d3b17a37b', amount: { value: 100.0, currency: 'GBP' }, note: null, date: '2021-06-27' }
-        ]
-        commit('setTransactions', txs)
-      }, 0)
+      return fetch('/api/transactions', defaultRequestParams)
+        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(txs => commit('setTransactions', txs))
     },
     createTransaction ({ commit, dispatch }, requestBody) {
       return fetch('/api/transactions', {

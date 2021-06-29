@@ -94,11 +94,19 @@
 
             <v-text-field
               label="Amount"
-              :value="newTransaction.amount"
+              v-model="newTransaction.amount"
               type="number"
               :prefix="currencySymbol"
               :rules="rules.amount"
             />
+
+            <v-textarea
+              rows="2"
+              counter
+              label="Note"
+              v-model="newTransaction.note"
+              :rules="rules.note"
+            ></v-textarea>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -129,7 +137,8 @@ const DEFAULT_TRANSACTION = {
   categoryId: null,
   amount: null,
   date: new Date().toISOString().slice(0, 10),
-  kind: 'expense'
+  kind: 'expense',
+  note: null
 }
 
 export default {
@@ -160,7 +169,8 @@ export default {
     rules: {
       category: [v => !!v || 'Please select a category'],
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
-      amount: [v => !!v || 'Please specify the amount']
+      amount: [v => !!v || 'Please specify the amount'],
+      note: [v => v === null || v.length <= 140 || 'Max 140 characters']
     }
   }),
   computed: {
@@ -194,7 +204,7 @@ export default {
     },
     save () {
       if (this.$refs.newTransactionForm.validate()) {
-        const newTx = { ...this.newTransaction, amount: { value: this.newTransaction.amount, currency: this.currencyName } }
+        const newTx = { ...this.newTransaction, amount: { value: Number(this.newTransaction.amount), currency: this.currencyName } }
         if (newTx.id) {
           this.$emit('update', newTx)
         } else {
