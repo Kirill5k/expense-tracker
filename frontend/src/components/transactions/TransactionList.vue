@@ -10,6 +10,7 @@
     height="300"
     :headers-length="4"
     disable-pagination
+    mobile-breakpoint="100"
   >
     <template v-slot:item.icon="{ item }">
       <v-list-item-avatar
@@ -66,9 +67,9 @@ export default {
   data: () => ({
     selectedItem: null,
     headers: [
-      { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pr-0 pl-2' },
+      { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pr-0 pl-4', sortable: false },
       { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
-      { text: 'Amount', value: 'amount', align: 'end' }
+      { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pr-4' }
     ]
   }),
   computed: {
@@ -88,6 +89,12 @@ export default {
     formatTxDate (tx) {
       const date = new Date(tx.date)
       return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    },
+    editTx (tx) {
+      console.log('edit', tx.id)
+    },
+    deleteTx (tx) {
+      console.log('delete', tx.id)
     }
   }
 }
