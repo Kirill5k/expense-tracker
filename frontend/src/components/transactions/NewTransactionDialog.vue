@@ -170,7 +170,7 @@ export default {
       category: [v => !!v || 'Please select a category'],
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
       amount: [v => !!v || 'Please specify the amount'],
-      note: [v => v === null || v.length <= 140 || 'Max 140 characters']
+      note: [v => v === null || v.length <= 84 || 'Max 84 characters']
     }
   }),
   computed: {

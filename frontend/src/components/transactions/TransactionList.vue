@@ -8,7 +8,7 @@
     :items-per-page="-1"
     no-data-text="No transactions for this period"
     height="300"
-    :headers-length="4"
+    :headers-length="2"
     disable-pagination
     mobile-breakpoint="100"
   >
@@ -28,9 +28,9 @@
 
     <template v-slot:item.tx="{ item }">
       <v-list-item-content class="py-2">
-        <v-list-item-title v-text="item.tx.name" class="text-subtitle-2 mb-0" />
-        <v-list-item-subtitle class="text-caption mb-0 font-weight-medium" v-text="item.tx.note"/>
-        <v-list-item-subtitle v-text="item.tx.date" class="text-caption mb-0 font-weight-light"/>
+        <p class="text-subtitle-2 mb-0">{{ item.tx.name }}</p>
+        <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
+        <p class="text-caption mb-0 font-weight-light">{{ item.tx.date }}</p>
       </v-list-item-content>
     </template>
 
@@ -43,10 +43,50 @@
         {{ item.amount.value }}
       </v-chip>
     </template>
+
+    <template v-slot:item.edit="{ item }">
+      <v-expand-transition>
+        <div
+          v-if="editable"
+          class="d-flex"
+        >
+          <v-btn
+            icon
+            dark
+            color="blue"
+            x-small
+            @click="$emit('edit', item)"
+            class="mr-2"
+          >
+            <v-icon dark>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
+          <v-btn
+            icon
+            dark
+            color="red"
+            x-small
+            @click="$emit('delete', item.id)"
+          >
+            <v-icon dark>
+              mdi-trash-can-outline
+            </v-icon>
+          </v-btn>
+        </div>
+      </v-expand-transition>
+    </template>
   </v-data-table>
 </template>
 
 <script>
+const DEFAULT_HEADERS = [
+  { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
+  { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
+  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0' }
+]
+
+const EDIT_HEADER = { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 pr-1 pb-1' }
 
 export default {
   name: 'TransactionList',
@@ -65,20 +105,19 @@ export default {
     }
   },
   data: () => ({
-    selectedItem: null,
-    headers: [
-      { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pr-0 pl-4', sortable: false },
-      { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
-      { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pr-4' }
-    ]
+    selectedItem: null
   }),
   computed: {
     tableData () {
       return this.items.map(i => ({
+        id: i.id,
         icon: this.categories[i.categoryId].icon,
         tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
         amount: { value: this.formatTxAmount(i), kind: i.kind }
       }))
+    },
+    headers () {
+      return this.editable ? [...DEFAULT_HEADERS, EDIT_HEADER] : DEFAULT_HEADERS
     }
   },
   methods: {
