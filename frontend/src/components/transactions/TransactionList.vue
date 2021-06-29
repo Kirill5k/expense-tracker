@@ -1,72 +1,51 @@
 <template>
-  <v-list dense>
-    <v-list-item
-      dense
-      v-if="!items.length"
-    >
-      <v-list-item-subtitle
-        class="text-center"
+  <v-data-table
+    :headers="headers"
+    :items="tableData"
+    hide-default-header
+    hide-default-footer
+    dense
+    :items-per-page="-1"
+    no-data-text="No transactions for this period"
+    height="300"
+    :headers-length="4"
+    disable-pagination
+  >
+    <template v-slot:item.icon="{ item }">
+      <v-list-item-avatar
+        size="28"
       >
-        No transactions for this period
-      </v-list-item-subtitle>
-    </v-list-item>
-    <v-virtual-scroll
-      :items="items"
-      max-height="840"
-      item-height="70"
-      bench="3"
-    >
-      <template v-slot:default="{ item }">
-        <v-list-item
-          class="px-1"
-          :key="`${item.id}${categories[item.categoryId]}`"
-          link
+        <v-icon
+          outline
+          class="black lighten-10"
+          dark
         >
-          <v-list-item-avatar
-            size="28"
-            class="mt-0 mb-6"
-          >
-            <v-icon
-              outline
-              class="black lighten-10"
-              dark
-            >
-              {{ categories[item.categoryId].icon }}
-            </v-icon>
-          </v-list-item-avatar>
+          {{ item.icon }}
+        </v-icon>
+      </v-list-item-avatar>
+    </template>
 
-          <v-list-item-content>
-            <v-list-item-title v-text="categories[item.categoryId].name"/>
-            <v-list-item-subtitle class="text--secondary font-weight-medium" v-text="item.note"/>
-            <v-list-item-subtitle v-text="formatTxDate(item)" class="font-weight-light"/>
-            <p v-if="!item.note"></p>
-          </v-list-item-content>
+    <template v-slot:item.tx="{ item }">
+      <v-list-item-content class="py-2">
+        <v-list-item-title v-text="item.tx.name" class="text-subtitle-2 mb-0" />
+        <v-list-item-subtitle class="text-caption mb-0 font-weight-medium" v-text="item.tx.note"/>
+        <v-list-item-subtitle v-text="item.tx.date" class="text-caption mb-0 font-weight-light"/>
+      </v-list-item-content>
+    </template>
 
-          <v-list-item-action
-            class="mt-0 mb-6"
-          >
-            <v-chip
-              small
-              outlined
-              :color="item.kind === 'expense' ? 'pink' : 'success'"
-            >
-              {{ formatTxAmount(item) }}
-            </v-chip>
-          </v-list-item-action>
-        </v-list-item>
-
-        <v-divider></v-divider>
-      </template>
-    </v-virtual-scroll>
-  </v-list>
+    <template v-slot:item.amount="{ item }">
+      <v-chip
+        small
+        outlined
+        :color="item.amount.kind === 'expense' ? 'pink' : 'success'"
+      >
+        {{ item.amount.value }}
+      </v-chip>
+    </template>
+  </v-data-table>
 </template>
 
 <script>
-const CURRENCY_SYMBOLS = {
-  GBP: '£',
-  EUR: '€',
-  USD: '$'
-}
 
 export default {
   name: 'TransactionList',
@@ -85,13 +64,26 @@ export default {
     }
   },
   data: () => ({
-    selectedItem: null
+    selectedItem: null,
+    headers: [
+      { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pr-0 pl-2' },
+      { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
+      { text: 'Amount', value: 'amount', align: 'end' }
+    ]
   }),
+  computed: {
+    tableData () {
+      return this.items.map(i => ({
+        icon: this.categories[i.categoryId].icon,
+        tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
+        amount: { value: this.formatTxAmount(i), kind: i.kind }
+      }))
+    }
+  },
   methods: {
     formatTxAmount (tx) {
       const sign = tx.kind === 'expense' ? '-' : '+'
-      const symbol = CURRENCY_SYMBOLS[tx.amount.currency]
-      return `${sign} ${symbol}${tx.amount.value}`
+      return `${sign} ${tx.amount.symbol}${tx.amount.value}`
     },
     formatTxDate (tx) {
       const date = new Date(tx.date)

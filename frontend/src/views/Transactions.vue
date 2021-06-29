@@ -38,7 +38,7 @@
           </v-card-title>
 
           <v-card-text>
-            <new-transaction-list
+            <transaction-list
               :categories="catsByIds"
               :items="transactions"
               :editable="editable"
@@ -63,13 +63,13 @@
 </template>
 
 <script>
-import NewTransactionList from '@/components/transactions/NewTransactionList'
+import TransactionList from '@/components/transactions/TransactionList'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 
 export default {
   name: 'Transactions',
   components: {
-    NewTransactionList,
+    TransactionList,
     NewTransactionDialog
   },
   data: () => ({
