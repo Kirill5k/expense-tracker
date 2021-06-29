@@ -20,6 +20,21 @@ class TransactionServiceSpec extends CatsSpec {
       pending
     }
 
+    "retrieve tx by id from db" in {
+      val repo = mock[TransactionRepository[IO]]
+      when(repo.get(any[AccountId], any[TransactionId])).thenReturn(IO.pure(tx))
+
+      val result = for {
+        svc <- TransactionService.make[IO](repo)
+        res <- svc.get(aid, txid)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).get(aid, txid)
+        res mustBe tx
+      }
+    }
+
     "retrieve all txs from db" in {
       val repo = mock[TransactionRepository[IO]]
       when(repo.getAll(any[AccountId])).thenReturn(IO.pure(List(tx)))

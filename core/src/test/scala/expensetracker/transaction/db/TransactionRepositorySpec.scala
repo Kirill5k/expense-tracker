@@ -7,6 +7,7 @@ import expensetracker.category.CategoryId
 import expensetracker.transaction.{CreateTransaction, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
+import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
@@ -55,6 +56,34 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
           txs.map(_.categoryId) mustBe List(cat1Id, cat2Id)
+        }
+      }
+    }
+
+    "return tx by id from db" in {
+      withEmbeddedMongoDb { client =>
+        val result = for {
+          repo <- TransactionRepository.make(client)
+          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          tx <- repo.get(acc1Id, id)
+        } yield tx
+
+        result.map { tx =>
+          tx.accountId mustBe acc1Id
+        }
+      }
+    }
+
+    "return error when tx does not exist" in {
+      withEmbeddedMongoDb { client =>
+        val result = for {
+          repo <- TransactionRepository.make(client)
+          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          err <- repo.get(acc2Id, id).attempt
+        } yield (id, err)
+
+        result.map { case (id, err) =>
+          err mustBe Left(TransactionDoesNotExist(id))
         }
       }
     }

@@ -2,6 +2,7 @@ package expensetracker.common
 
 import expensetracker.auth.account.{AccountEmail, AccountId}
 import expensetracker.category.{CategoryId, CategoryName}
+import expensetracker.transaction.TransactionId
 
 object errors {
 
@@ -41,6 +42,10 @@ object errors {
 
     final case class CategoryAlreadyExists(name: CategoryName) extends ConflictError {
       override def message: String = s"category with name ${name.value} already exists"
+    }
+
+    final case class TransactionDoesNotExist(id: TransactionId) extends NotFoundError {
+      override def message: String = s"transaction with id ${id.value} does not exist"
     }
   }
 }

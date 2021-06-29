@@ -3,6 +3,7 @@ package expensetracker.transaction
 import cats.effect.IO
 import expensetracker.ControllerSpec
 import expensetracker.auth.account.AccountId
+import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
 import org.http4s.{Method, Request, Status}
@@ -101,7 +102,38 @@ class TransactionControllerSpec extends ControllerSpec {
 
     "GET /transactions/:id" should {
       "find user's tx by id" in {
-        pending
+        val svc = mock[TransactionService[IO]]
+        when(svc.get(any[AccountId], any[TransactionId])).thenReturn(IO.pure(tx))
+
+        val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        val resBody = """{
+                        |"id" : "BC0C5342AB0C5342AB0C5342",
+                        |"kind" : "expense",
+                        |"categoryId" : "AB0C5342AB0C5342AB0C5342",
+                        |"amount" : {
+                        |  "value" : 10.99,
+                        |  "currency" : "GBP",
+                        |  "symbol" : "£"
+                        |},
+                        |"date" : "2021-06-06T00:00:00Z",
+                        |"note" : "test tx"
+                        |}""".stripMargin
+
+        verifyJsonResponse(res, Status.Ok, Some(resBody))
+        verify(svc).get(aid,  txid)
+      }
+
+      "return 404 when tx does not exist" in {
+        val svc = mock[TransactionService[IO]]
+        when(svc.get(any[AccountId], any[TransactionId])).thenReturn(IO.raiseError(TransactionDoesNotExist(txid)))
+
+        val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.NotFound, Some("""{"message":"transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""))
+        verify(svc).get(aid,  txid)
       }
     }
 

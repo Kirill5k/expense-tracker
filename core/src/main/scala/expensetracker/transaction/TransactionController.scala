@@ -41,6 +41,13 @@ final class TransactionController[F[_]: Logger](
           .map(_.map(TransactionView.from))
           .flatMap(Ok(_))
       }
+    case GET -> Root / TransactionIdPath(txid) as session =>
+      withErrorHandling {
+        service
+          .get(session.accountId, txid)
+          .map(TransactionView.from)
+          .flatMap(Ok(_))
+      }
     case authReq @ POST -> Root as session =>
       withErrorHandling {
         for {

@@ -6,6 +6,7 @@ import com.mongodb.client.model.Filters
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.common.json._
 import expensetracker.auth.account.AccountId
+import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import io.circe.generic.auto._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
@@ -14,6 +15,7 @@ import org.bson.types.ObjectId
 trait TransactionRepository[F[_]] {
   def create(tx: CreateTransaction): F[TransactionId]
   def getAll(aid: AccountId): F[List[Transaction]]
+  def get(aid: AccountId, txid: TransactionId): F[Transaction]
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
@@ -32,6 +34,16 @@ final private class LiveTransactionRepository[F[_]: Async](
       .find(Filters.eq("accountId", new ObjectId(aid.value)))
       .all[F]
       .map(_.map(_.toDomain).toList)
+
+  override def get(aid: AccountId, txid: TransactionId): F[Transaction] =
+    collection
+      .find(Filters.and(Filters.eq("accountId", new ObjectId(aid.value)), Filters.eq("_id", new ObjectId(txid.value))))
+      .first[F]
+      .map(e => Option(e))
+      .flatMap {
+        case Some(e) => e.toDomain.pure[F]
+        case None => TransactionDoesNotExist(txid).raiseError[F, Transaction]
+      }
 }
 
 object TransactionRepository {
