@@ -48,6 +48,10 @@
             <v-spacer></v-spacer>
             <new-transaction-dialog
               ref="newTransactionDialog"
+              :expense-cats="expenseCats"
+              :income-cats="incomeCats"
+              @save="create"
+              @edit="edit"
             />
           </v-card-actions>
 
@@ -83,6 +87,28 @@ export default {
     },
     transactions () {
       return this.$store.state.transactions
+    }
+  },
+  methods: {
+    dispatchAction (name, arg) {
+      this.loading = true
+      return this.$store
+        .dispatch(name, arg)
+        .then(() => {
+          this.loading = false
+        })
+    },
+    create (newTransaction) {
+      this.dispatchAction('createTransaction', newTransaction)
+    },
+    remove (id) {
+      this.dispatchAction('deleteTransaction', id)
+    },
+    update (updatedTransaction) {
+      this.dispatchAction('updateTransaction', updatedTransaction)
+    },
+    edit (transaction) {
+      this.$refs.newTransactionDialog.update(transaction)
     }
   }
 }

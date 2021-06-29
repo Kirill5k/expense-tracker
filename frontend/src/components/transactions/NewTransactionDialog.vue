@@ -44,6 +44,61 @@
                 value="income"
               ></v-radio>
             </v-radio-group>
+
+            <v-menu
+              v-model="datePicker"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  name="date"
+                  v-model="formattedDate"
+                  :rules="rules.date"
+                  label="Date"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+              <v-date-picker
+                v-model="newTransaction.date"
+                @input="datePicker = false"
+                min="2000-01-01"
+              />
+            </v-menu>
+
+            <v-select
+              name="category"
+              v-model="newTransaction.categoryId"
+              :rules="rules.category"
+              :items="selectItems"
+              label="Category"
+              required
+            >
+              <template slot="selection" slot-scope="data">
+                <span class="mt-1 mb-1">
+                  <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
+                </span>
+              </template>
+              <template slot="item" slot-scope="data">
+                <span>
+                  <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
+                </span>
+              </template>
+            </v-select>
+
+            <v-text-field
+              label="Amount"
+              :value="newTransaction.amount"
+              type="number"
+              :prefix="currencySymbol"
+              :rules="rules.amount"
+            />
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -71,19 +126,62 @@
 <script>
 const DEFAULT_TRANSACTION = {
   id: undefined,
-  transactionId: null,
-  amount: {},
-  date: null,
+  categoryId: null,
+  amount: null,
+  date: new Date().toISOString().slice(0, 10),
   kind: 'expense'
 }
 
 export default {
   name: 'NewTransactionDialog',
+  props: {
+    expenseCats: {
+      type: Array,
+      default: () => []
+    },
+    incomeCats: {
+      type: Array,
+      default: () => []
+    },
+    currencySymbol: {
+      type: String,
+      default: '$'
+    },
+    currencyName: {
+      type: String,
+      default: 'USD'
+    }
+  },
   data: () => ({
     dialog: false,
+    datePicker: false,
     valid: true,
-    newTransaction: { ...DEFAULT_TRANSACTION }
+    newTransaction: { ...DEFAULT_TRANSACTION },
+    rules: {
+      category: [v => !!v || 'Please select a category'],
+      date: [v => !!v || 'Please select the date when this transaction has occurred'],
+      amount: [v => !!v || 'Please specify the amount']
+    }
   }),
+  computed: {
+    selectItems () {
+      const raw = this.newTransaction.kind === 'expense' ? this.expenseCats : this.incomeCats
+      return raw.map(c => ({ value: c.id, text: { ...c } }))
+    },
+    formattedDate () {
+      if (this.newTransaction.date) {
+        const [year, month, day] = this.newTransaction.date.split('-')
+        return `${month}/${day}/${year}`
+      } else {
+        return null
+      }
+    }
+  },
+  watch: {
+    'newTransaction.kind' () {
+      this.newTransaction.categoryId = null
+    }
+  },
   methods: {
     reset () {
       this.newTransaction = { ...DEFAULT_TRANSACTION }
@@ -95,7 +193,15 @@ export default {
       this.dialog = false
     },
     save () {
-      console.log('save')
+      if (this.$refs.newTransactionForm.validate()) {
+        const newTx = { ...this.newTransaction, amount: { value: this.newTransaction.amount, currency: this.currencyName } }
+        if (newTx.id) {
+          this.$emit('update', newTx)
+        } else {
+          this.$emit('save', newTx)
+        }
+        this.close()
+      }
     }
   }
 }

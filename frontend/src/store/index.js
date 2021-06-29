@@ -58,6 +58,9 @@ export default new Vuex.Store({
     },
     setTransactions (state, txs) {
       state.transactions = txs
+    },
+    addTransaction (state, tx) {
+      state.transactions = [...state.transactions, tx]
     }
   },
   actions: {
@@ -151,6 +154,20 @@ export default new Vuex.Store({
         ]
         commit('setTransactions', txs)
       }, 0)
+    },
+    createTransaction ({ commit, dispatch }, requestBody) {
+      return fetch('/api/transactions', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
+      })
+        .then(res => res.status === 201 ? res.json() : reject(res))
+        .then(res => dispatch('getTransaction', res.id))
+    },
+    getTransaction ({ commit }, id) {
+      return fetch(`/api/transactions/${id}`, defaultRequestParams)
+        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(tx => commit('addTransaction', tx))
     }
   },
   modules: {
