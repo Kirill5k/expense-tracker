@@ -39,13 +39,10 @@
 
           <v-card-text>
             <date-period-selector
-              current-date="July"
+              :current-date="new Date()"
               :current-range="currentRange"
               @reset="resetRange"
             />
-          </v-card-text>
-
-          <v-card-text>
             <transaction-list
               :categories="catsByIds"
               :items="transactions"

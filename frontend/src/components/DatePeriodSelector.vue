@@ -1,7 +1,12 @@
 <template>
-  <div class="d-flex">
-    <v-btn depressed>
-      Left
+  <div class="d-flex mb-1">
+    <v-btn
+      class="mx-3"
+      depressed
+      small
+      icon
+    >
+      <v-icon>mdi-arrow-left-thick</v-icon>
     </v-btn>
     <v-overflow-btn
       :value="currentRange"
@@ -17,17 +22,24 @@
     >
       <template v-slot:selection="{ }">
         <p class="ma-0 text-center text-subtitle-2" style="width: 100%">
-          {{ currentDate }}
+          {{ displayedDate }}
         </p>
       </template>
     </v-overflow-btn>
-    <v-btn depressed>
-      Right
+    <v-btn
+      class="mx-3"
+      depressed
+      small
+      icon
+    >
+      <v-icon>mdi-arrow-right-thick</v-icon>
     </v-btn>
   </div>
 </template>
 
 <script>
+import { format, startOfWeek, endOfWeek } from 'date-fns'
+
 const DATE_RANGE_OPTIONS = [
   { value: 'daily', text: 'Daily' },
   { value: 'weekly', text: 'Weekly' },
@@ -39,7 +51,7 @@ export default {
   name: 'DatePeriodSelector',
   props: {
     currentDate: {
-      type: String,
+      type: Date,
       required: true
     },
     currentRange: {
@@ -50,6 +62,21 @@ export default {
   data: () => ({
     dateRangeOptions: DATE_RANGE_OPTIONS
   }),
+  computed: {
+    displayedDate () {
+      if (this.currentRange === 'daily') {
+        return format(this.currentDate, 'do MMM')
+      } else if (this.currentRange === 'monthly') {
+        return format(this.currentDate, 'LLLL')
+      } else if (this.currentRange === 'yearly') {
+        return format(this.currentDate, 'yyyy')
+      } else {
+        const start = startOfWeek(this.currentDate)
+        const end = endOfWeek(this.currentDate)
+        return `${format(start, 'do MMM')} - ${format(end, 'do MMM')}`
+      }
+    }
+  },
   methods: {
     resetDate (newRange) {
       this.$emit('reset', newRange)
