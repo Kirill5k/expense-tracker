@@ -1,5 +1,8 @@
 <template>
-  <v-list dense>
+  <v-list
+    class="category-list"
+    dense
+  >
     <v-subheader>{{name}}</v-subheader>
     <v-divider></v-divider>
     <v-list-item
@@ -32,10 +35,10 @@
           </v-list-item-content>
 
           <v-list-item-action class="mr-0 my-0">
-            <v-expand-transition>
               <div
                 v-if="editable"
-                class="text-center"
+                class="text-center category-list__slider"
+                :class="editable ? 'category-list__slider--slide-in' : 'category-list__slider--slide-out'"
               >
                 <v-btn
                   icon
@@ -61,7 +64,6 @@
                   </v-icon>
                 </v-btn>
               </div>
-            </v-expand-transition>
           </v-list-item-action>
         </v-list-item>
 
@@ -93,3 +95,40 @@ export default {
   })
 }
 </script>
+
+<style lang="scss">
+.category-list {
+  &__slider {
+    transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+
+    &--slide-in {
+      animation: slide-in 0.5s forwards;
+      -webkit-animation: slide-in 0.5s forwards;
+    }
+
+    &--slide-out {
+      animation: slide-out 0.5s forwards;
+      -webkit-animation: slide-out 0.5s forwards;
+    }
+
+    @keyframes slide-in {
+      100% { transform: translateX(0%); }
+    }
+
+    @-webkit-keyframes slide-in {
+      100% { -webkit-transform: translateX(0%); }
+    }
+
+    @keyframes slide-out {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    @-webkit-keyframes slide-out {
+      0% { -webkit-transform: translateX(0%); }
+      100% { -webkit-transform: translateX(-100%); }
+    }
+  }
+}
+</style>

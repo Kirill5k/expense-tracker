@@ -1,5 +1,6 @@
 <template>
   <v-data-table
+    class="transaction-list"
     :headers="headers"
     :items="tableData"
     hide-default-header
@@ -45,36 +46,35 @@
     </template>
 
     <template v-slot:item.edit="{ item }">
-      <v-expand-transition>
-        <div
-          v-if="editable"
-          class="d-flex"
+      <div
+        v-if="editable"
+        class="d-flex transaction-list__slider"
+        :class="editable ? 'transaction-list__slider--slide-in' : 'transaction-list__slider--slide-out'"
+      >
+        <v-btn
+          icon
+          dark
+          color="blue"
+          x-small
+          @click="$emit('edit', item)"
+          class="mr-2"
         >
-          <v-btn
-            icon
-            dark
-            color="blue"
-            x-small
-            @click="$emit('edit', item)"
-            class="mr-2"
-          >
-            <v-icon dark>
-              mdi-pencil
-            </v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            dark
-            color="red"
-            x-small
-            @click="$emit('delete', item.id)"
-          >
-            <v-icon dark>
-              mdi-trash-can-outline
-            </v-icon>
-          </v-btn>
-        </div>
-      </v-expand-transition>
+          <v-icon dark>
+            mdi-pencil
+          </v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          dark
+          color="red"
+          x-small
+          @click="$emit('delete', item.id)"
+        >
+          <v-icon dark>
+            mdi-trash-can-outline
+          </v-icon>
+        </v-btn>
+      </div>
     </template>
   </v-data-table>
 </template>
@@ -138,3 +138,41 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.transaction-list {
+
+  &__slider {
+    transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+
+    &--slide-in {
+      animation: slide-in 0.5s forwards;
+      -webkit-animation: slide-in 0.5s forwards;
+    }
+
+    &--slide-out {
+      animation: slide-out 0.5s forwards;
+      -webkit-animation: slide-out 0.5s forwards;
+    }
+
+    @keyframes slide-in {
+      100% { transform: translateX(0%); }
+    }
+
+    @-webkit-keyframes slide-in {
+      100% { -webkit-transform: translateX(0%); }
+    }
+
+    @keyframes slide-out {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    @-webkit-keyframes slide-out {
+      0% { -webkit-transform: translateX(0%); }
+      100% { -webkit-transform: translateX(-100%); }
+    }
+  }
+}
+</style>
