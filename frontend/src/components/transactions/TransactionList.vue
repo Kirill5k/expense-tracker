@@ -8,16 +8,17 @@
     dense
     :items-per-page="-1"
     no-data-text="No transactions for this period"
-    height="300"
+    :height="height"
     :headers-length="2"
     disable-pagination
     mobile-breakpoint="100"
   >
     <template v-slot:item.icon="{ item }">
       <v-list-item-avatar
-        size="28"
+        size="26"
       >
         <v-icon
+          small
           outline
           class="black lighten-10"
           dark
@@ -28,7 +29,7 @@
     </template>
 
     <template v-slot:item.tx="{ item }">
-      <v-list-item-content class="py-2">
+      <v-list-item-content class="py-2 px-1">
         <p class="text-subtitle-2 mb-0">{{ item.tx.name }}</p>
         <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
         <p class="text-caption mb-0 font-weight-light">{{ item.tx.date }}</p>
@@ -118,6 +119,15 @@ export default {
     },
     headers () {
       return this.editable ? [...DEFAULT_HEADERS, EDIT_HEADER] : DEFAULT_HEADERS
+    },
+    height () {
+      if (this.items.length === 0) {
+        return 200
+      } else if (this.items.length > 6) {
+        return 500
+      } else {
+        return this.items.length * 80
+      }
     }
   },
   methods: {
