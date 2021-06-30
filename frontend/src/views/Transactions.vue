@@ -40,7 +40,8 @@
           <v-card-text>
             <date-period-selector
               current-date="July"
-              current-range="weekly"
+              :current-range="currentRange"
+              @reset="resetRange"
             />
           </v-card-text>
 
@@ -83,7 +84,8 @@ export default {
   },
   data: () => ({
     loading: false,
-    editable: false
+    editable: false,
+    currentRange: 'monthly'
   }),
   computed: {
     expenseCats () {
@@ -119,6 +121,9 @@ export default {
     },
     edit (transaction) {
       this.$refs.newTransactionDialog.update(transaction)
+    },
+    resetRange (newRange) {
+      this.currentRange = newRange
     }
   }
 }

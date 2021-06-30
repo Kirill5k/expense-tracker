@@ -52,7 +52,7 @@ export default {
   }),
   methods: {
     resetDate (newRange) {
-      console.log(newRange)
+      this.$emit('reset', newRange)
     }
   }
 }
