@@ -38,6 +38,13 @@
           </v-card-title>
 
           <v-card-text>
+            <date-period-selector
+              current-date="July"
+              current-range="weekly"
+            />
+          </v-card-text>
+
+          <v-card-text>
             <transaction-list
               :categories="catsByIds"
               :items="transactions"
@@ -65,12 +72,14 @@
 <script>
 import TransactionList from '@/components/transactions/TransactionList'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
+import DatePeriodSelector from '@/components/DatePeriodSelector'
 
 export default {
   name: 'Transactions',
   components: {
     TransactionList,
-    NewTransactionDialog
+    NewTransactionDialog,
+    DatePeriodSelector
   },
   data: () => ({
     loading: false,
