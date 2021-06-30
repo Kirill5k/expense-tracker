@@ -22,22 +22,6 @@
         <strong>{{ name }}</strong>
       </v-chip>
 
-      <v-btn
-        to="/"
-        icon
-        class="mr-2"
-      >
-        <v-icon>mdi-bank-transfer</v-icon>
-      </v-btn>
-
-      <v-btn
-        to="/categories"
-        icon
-        class="mr-2"
-      >
-        <v-icon>mdi-shape</v-icon>
-      </v-btn>
-
       <v-spacer/>
 
       <v-btn
@@ -67,6 +51,28 @@
         v-else
       />
     </v-main>
+
+    <v-bottom-navigation
+      v-if="isAuthenticated"
+      app
+      shift
+    >
+      <v-btn
+        to="/"
+        icon
+      >
+        <span>Transactions</span>
+        <v-icon class="mr-1">mdi-bank-transfer</v-icon>
+      </v-btn>
+
+      <v-btn
+        to="/categories"
+        icon
+      >
+        <span>Categories</span>
+        <v-icon class="mr-1">mdi-shape</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
   </v-app>
 </template>
 

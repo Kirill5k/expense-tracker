@@ -169,7 +169,10 @@ export default {
     rules: {
       category: [v => !!v || 'Please select a category'],
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
-      amount: [v => !!v || 'Please specify the amount'],
+      amount: [
+        v => !!v || 'Please specify the amount',
+        v => v > 0 || 'The amount must be greater than 0'
+      ],
       note: [v => v === null || v.length <= 84 || 'Max 84 characters']
     }
   }),
