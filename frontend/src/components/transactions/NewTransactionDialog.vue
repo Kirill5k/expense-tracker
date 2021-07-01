@@ -192,7 +192,10 @@ export default {
   },
   watch: {
     'newTransaction.kind' () {
-      this.newTransaction.categoryId = null
+      const catId = this.newTransaction.categoryId
+      if (catId !== null && this.selectItems.find(i => i.value === catId) === undefined) {
+        this.newTransaction.categoryId = null
+      }
     }
   },
   methods: {
