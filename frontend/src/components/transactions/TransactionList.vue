@@ -57,7 +57,7 @@
           dark
           color="blue"
           x-small
-          @click="$emit('edit', item)"
+          @click="$emit('edit', item.original)"
           class="mr-2"
         >
           <v-icon dark>
@@ -114,7 +114,8 @@ export default {
         id: i.id,
         icon: this.categories[i.categoryId].icon,
         tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
-        amount: { value: this.formatTxAmount(i), kind: i.kind }
+        amount: { value: this.formatTxAmount(i), kind: i.kind },
+        original: i
       }))
     },
     headers () {

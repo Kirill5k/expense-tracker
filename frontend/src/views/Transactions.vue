@@ -47,7 +47,7 @@
               :categories="catsByIds"
               :items="transactions"
               :editable="editable"
-              @edit="update"
+              @edit="edit"
               @delete="remove"
             />
           </v-card-text>
@@ -59,7 +59,7 @@
               :expense-cats="expenseCats"
               :income-cats="incomeCats"
               @save="create"
-              @edit="edit"
+              @update="update"
             />
           </v-card-actions>
 

@@ -173,7 +173,7 @@ export default {
         v => !!v || 'Please specify the amount',
         v => v > 0 || 'The amount must be greater than 0'
       ],
-      note: [v => v === null || v.length <= 84 || 'Max 84 characters']
+      note: [v => !v || v.length <= 84 || 'Max 84 characters']
     }
   }),
   computed: {
@@ -215,6 +215,10 @@ export default {
         }
         this.close()
       }
+    },
+    update (tx) {
+      this.newTransaction = { ...tx, amount: tx.amount.value, date: tx.date.slice(0, 10) }
+      this.dialog = true
     }
   }
 }
