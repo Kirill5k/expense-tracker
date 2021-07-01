@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { startOfMonth, endOfMonth } from 'date-fns'
 
 Vue.use(Vuex)
 
@@ -18,7 +19,12 @@ export default new Vuex.Store({
     isAuthenticated: false,
     account: null,
     categories: [],
-    transactions: []
+    transactions: [],
+    displayDate: {
+      start: startOfMonth(new Date()),
+      end: endOfMonth(new Date()),
+      range: 'monthly'
+    }
   },
   getters: {
     incomeCats: state => state.categories.filter(c => c.kind === 'income'),
@@ -61,6 +67,9 @@ export default new Vuex.Store({
     },
     addTransaction (state, tx) {
       state.transactions = [...state.transactions, tx]
+    },
+    setDisplayDate (state, newDate) {
+      state.displayDate = newDate
     }
   },
   actions: {

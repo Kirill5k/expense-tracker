@@ -39,9 +39,8 @@
 
           <v-card-text>
             <date-period-selector
-              :current-date="new Date()"
-              :current-range="currentRange"
-              @reset="resetRange"
+              :display-date="this.$store.state.displayDate"
+              @update="updateDisplayDate"
             />
             <transaction-list
               :categories="catsByIds"
@@ -81,8 +80,7 @@ export default {
   },
   data: () => ({
     loading: false,
-    editable: false,
-    currentRange: 'monthly'
+    editable: false
   }),
   computed: {
     expenseCats () {
@@ -119,8 +117,8 @@ export default {
     edit (transaction) {
       this.$refs.newTransactionDialog.update(transaction)
     },
-    resetRange (newRange) {
-      this.currentRange = newRange
+    updateDisplayDate (newRange) {
+      this.$store.commit('setDisplayDate', newRange)
     }
   }
 }
