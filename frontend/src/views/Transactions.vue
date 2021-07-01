@@ -42,6 +42,7 @@
               :display-date="this.$store.state.displayDate"
               @update="updateDisplayDate"
             />
+
             <transaction-list
               :categories="catsByIds"
               :items="transactions"

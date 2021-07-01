@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex mb-1">
+  <div class="d-flex mb-1" style="width: 100%">
     <v-btn
       class="mx-3"
       depressed
@@ -7,9 +7,9 @@
       icon
       @click="goBack"
     >
-      <v-icon>mdi-arrow-left-thick</v-icon>
+      <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
-    <v-overflow-btn
+    <v-select
       :value="displayDate.range"
       :items="dateRangeOptions"
       label="Show spending"
@@ -26,7 +26,7 @@
           {{ formattedDisplayedDate }}
         </p>
       </template>
-    </v-overflow-btn>
+    </v-select>
     <v-btn
       class="mx-3"
       depressed
@@ -34,7 +34,7 @@
       icon
       @click="goForward"
     >
-      <v-icon>mdi-arrow-right-thick</v-icon>
+      <v-icon>mdi-chevron-right</v-icon>
     </v-btn>
   </div>
 </template>
