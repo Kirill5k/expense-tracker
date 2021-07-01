@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex mb-1" style="width: 100%">
     <v-btn
-      class="mx-3"
+      class="ml-1 mr-1"
       depressed
       small
       icon
@@ -28,7 +28,7 @@
       </template>
     </v-select>
     <v-btn
-      class="mx-3"
+      class="mr-1 ml-1"
       depressed
       small
       icon
