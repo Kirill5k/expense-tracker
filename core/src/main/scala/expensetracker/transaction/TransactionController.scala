@@ -3,9 +3,11 @@ package expensetracker.transaction
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
+import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryId
+import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.Controller
 import expensetracker.common.validations._
 import org.bson.types.ObjectId
@@ -60,6 +62,14 @@ final class TransactionController[F[_]: Logger](
       withErrorHandling {
         service.delete(session.accountId, txid) *> NoContent()
       }
+    case authReq @ PUT -> Root / TransactionIdPath(cid) as session =>
+      withErrorHandling {
+        for {
+          txView <- F.ensure(authReq.req.as[UpdateTransactionRequest])(IdMismatch)(_.id.value == cid.value)
+          _      <- service.update(txView.toDomain(session.accountId))
+          res    <- NoContent()
+        } yield res
+      }
   }
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
@@ -106,6 +116,26 @@ object TransactionController {
         amount = tx.amount,
         date = tx.date,
         note = tx.note
+      )
+  }
+
+  final case class UpdateTransactionRequest(
+      id: NonEmptyString,
+      kind: TransactionKind,
+      categoryId: ValidIdString,
+      amount: Money,
+      date: LocalDate,
+      note: Option[String]
+  ) {
+    def toDomain(aid: AccountId): Transaction =
+      Transaction(
+        id = TransactionId(id.value),
+        kind = kind,
+        categoryId = CategoryId(categoryId.value),
+        accountId = aid,
+        amount = amount,
+        date = date.atStartOfDay().toInstant(ZoneOffset.UTC),
+        note = note
       )
   }
 

@@ -104,6 +104,7 @@ export default {
       this.loading = true
       return this.$store
         .dispatch(name, arg)
+        .catch(() => {})
         .then(() => {
           this.loading = false
         })
