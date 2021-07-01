@@ -93,7 +93,7 @@ export default {
       return this.$store.getters.catsByIds
     },
     transactions () {
-      return this.$store.state.transactions
+      return this.$store.getters.displayedTransactions
     }
   },
   methods: {

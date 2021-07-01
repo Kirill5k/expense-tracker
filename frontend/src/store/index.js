@@ -32,7 +32,11 @@ export default new Vuex.Store({
     catsByIds: state => state.categories.reduce((acc, el) => {
       acc[el.id] = el
       return acc
-    }, {})
+    }, {}),
+    displayedTransactions: state => state.transactions.filter(tx => {
+      const txdate = new Date(tx.date)
+      return state.displayDate.start <= txdate && txdate <= state.displayDate.end
+    })
   },
   mutations: {
     authenticate (state) {
@@ -63,10 +67,10 @@ export default new Vuex.Store({
       state.categories = state.categories.filter(cat => cat.id !== id)
     },
     setTransactions (state, txs) {
-      state.transactions = txs
+      state.transactions = txs.sort((a, b) => -a.date.localeCompare(b.date))
     },
     addTransaction (state, tx) {
-      state.transactions = [...state.transactions, tx]
+      state.transactions = [...state.transactions, tx].sort((a, b) => -a.date.localeCompare(b.date))
     },
     setDisplayDate (state, newDate) {
       state.displayDate = newDate

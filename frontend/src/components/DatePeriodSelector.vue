@@ -5,6 +5,7 @@
       depressed
       small
       icon
+      @click="goBack"
     >
       <v-icon>mdi-arrow-left-thick</v-icon>
     </v-btn>
@@ -31,6 +32,7 @@
       depressed
       small
       icon
+      @click="goForward"
     >
       <v-icon>mdi-arrow-right-thick</v-icon>
     </v-btn>
@@ -38,7 +40,7 @@
 </template>
 
 <script>
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay, addDays, addWeeks, addMonths, addYears } from 'date-fns'
 
 const DATE_RANGE_OPTIONS = [
   { value: 'daily', text: 'Daily' },
@@ -63,7 +65,7 @@ export default {
       if (this.displayDate.range === 'daily') {
         return format(this.displayDate.start, 'do MMM')
       } else if (this.displayDate.range === 'monthly') {
-        return format(this.displayDate.start, 'LLLL')
+        return format(this.displayDate.start, 'LLLL yyyy')
       } else if (this.displayDate.range === 'yearly') {
         return format(this.displayDate.start, 'yyyy')
       } else {
@@ -72,20 +74,44 @@ export default {
     }
   },
   methods: {
+    update (newDisplayDate) {
+      this.$emit('update', newDisplayDate)
+    },
     resetDate (newRange) {
+      this.update(this.applyNewRange(newRange))
+    },
+    goBack () {
+      this.update(this.incrementBy(-1))
+    },
+    goForward () {
+      this.update(this.incrementBy(1))
+    },
+    incrementBy (amount) {
+      const start = this.displayDate.start
+      const end = this.displayDate.end
+      const range = this.displayDate.range
+      switch (this.displayDate.range) {
+        case 'daily':
+          return { range, start: addDays(start, amount), end: addDays(end, amount) }
+        case 'monthly':
+          return { range, start: addMonths(start, amount), end: endOfMonth(addMonths(end, amount)) }
+        case 'weekly':
+          return { range, start: addWeeks(start, amount), end: addWeeks(end, amount) }
+        default:
+          return { range, start: addYears(start, amount), end: addYears(end, amount) }
+      }
+    },
+    applyNewRange (newRange) {
       const today = new Date()
       switch (newRange) {
         case 'daily':
-          this.$emit('update', { range: newRange, start: today, end: today })
-          break
+          return { range: newRange, start: startOfDay(today), end: endOfDay(today) }
         case 'weekly':
-          this.$emit('update', { range: newRange, start: startOfWeek(today), end: endOfWeek(today) })
-          break
+          return { range: newRange, start: startOfWeek(today), end: endOfWeek(today) }
         case 'monthly':
-          this.$emit('update', { range: newRange, start: startOfMonth(today), end: endOfMonth(today) })
-          break
+          return { range: newRange, start: startOfMonth(today), end: endOfMonth(today) }
         default:
-          this.$emit('update', { range: newRange, start: startOfYear(today), end: endOfYear(today) })
+          return { range: newRange, start: startOfYear(today), end: endOfYear(today) }
       }
     }
   }
