@@ -47,9 +47,14 @@
           indeterminate
         />
       </div>
-      <router-view
-        v-else
-      />
+      <template v-else>
+        <notification
+          :message="$store.state.alert.message"
+          :type="$store.state.alert.type"
+          @clear="$store.commit('clearAlert')"
+        />
+        <router-view/>
+      </template>
     </v-main>
 
     <v-bottom-navigation
@@ -77,9 +82,13 @@
 </template>
 
 <script>
+import Notification from '@/components/Notification'
 
 export default {
   name: 'App',
+  components: {
+    Notification
+  },
   created () {
     this.$store.dispatch('getAccount')
   },

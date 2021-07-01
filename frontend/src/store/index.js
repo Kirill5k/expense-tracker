@@ -4,7 +4,18 @@ import { startOfMonth, endOfMonth } from 'date-fns'
 
 Vue.use(Vuex)
 
-const reject = (res) => res.json().then(e => Promise.reject(new Error(e.message)))
+const reject = (res, commit) => res.json().then(e => {
+  if (commit) {
+    commit('setAlert', { type: 'error', message: e.message })
+  }
+  return Promise.reject(new Error(e.message))
+})
+
+const DEFAULT_DISPLAY_DATE = {
+  start: startOfMonth(new Date()),
+  end: endOfMonth(new Date()),
+  range: 'monthly'
+}
 
 const defaultRequestParams = {
   mode: 'cors',
@@ -20,10 +31,10 @@ export default new Vuex.Store({
     account: null,
     categories: [],
     transactions: [],
-    displayDate: {
-      start: startOfMonth(new Date()),
-      end: endOfMonth(new Date()),
-      range: 'monthly'
+    displayDate: DEFAULT_DISPLAY_DATE,
+    alert: {
+      type: 'error',
+      message: ''
     }
   },
   getters: {
@@ -39,6 +50,12 @@ export default new Vuex.Store({
     })
   },
   mutations: {
+    setAlert (state, alert) {
+      state.alert = { ...alert }
+    },
+    clearAlert (state) {
+      state.alert = { message: '', type: '' }
+    },
     authenticate (state) {
       state.isAuthenticated = true
     },
@@ -100,12 +117,13 @@ export default new Vuex.Store({
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
-        .then(res => res.status === 201 ? res.json() : reject(res))
+        .then(res => res.status === 201 ? res.json() : reject(res, commit))
     },
     getAccount ({ commit, dispatch }) {
       return fetch('/api/auth/account', defaultRequestParams)
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => dispatch('loadData', acc))
+        .catch(() => commit('loaded'))
     },
     login ({ commit, dispatch }, requestBody) {
       return fetch('/api/auth/login', {
@@ -113,7 +131,7 @@ export default new Vuex.Store({
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
-        .then(res => res.status === 200 ? res.json() : reject(res))
+        .then(res => res.status === 200 ? res.json() : reject(res, commit))
         .then(acc => dispatch('loadData', acc))
     },
     logout ({ commit }) {
@@ -122,11 +140,12 @@ export default new Vuex.Store({
         ...defaultRequestParams
       })
         .then(res => res.status === 204 ? {} : reject(res))
-        .then(acc => {
+        .then(() => {
           commit('setAccount', {})
           commit('unAuthenticate')
           commit('setCategories', [])
           commit('setTransactions', [])
+          commit('setDisplayDate', DEFAULT_DISPLAY_DATE)
         })
     },
     createCategory ({ commit, dispatch }, requestBody) {

@@ -13,19 +13,6 @@
         md="4"
         lg="3"
       >
-        <div class="login__alert">
-          <v-alert
-            v-if="error"
-            dense
-            outlined
-            type="error"
-            close-text="Hide"
-            dismissible
-            @click="error = ''"
-          >
-            {{ error }}
-          </v-alert>
-        </div>
         <v-card
           :loading="loading"
           class="mx-auto"
@@ -84,13 +71,12 @@ export default {
     },
     login (credentials) {
       this.loading = true
-      this.error = ''
+      this.$store.commit('clearAlert')
       this.$store
         .dispatch('login', credentials)
         .then(() => this.$router.push('/'))
-        .catch(err => {
+        .catch(() => {
           this.loading = false
-          this.error = err.toString()
         })
     },
     reset () {
@@ -103,10 +89,5 @@ export default {
 <style lang="scss">
 .login {
 
-  &__alert {
-    display: flex;
-    flex-direction: column-reverse;
-    height: 100px;
-  }
 }
 </style>

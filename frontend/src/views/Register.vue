@@ -13,19 +13,6 @@
         md="4"
         lg="3"
       >
-        <div class="register__alert">
-          <v-alert
-            v-if="alert.message"
-            dense
-            outlined
-            :type="alert.type"
-            close-text="Hide"
-            dismissible
-            @click="alert = {}"
-          >
-            {{ alert.message }}
-          </v-alert>
-        </div>
         <v-card
           :loading="loading"
           class="mx-auto"
@@ -69,8 +56,7 @@ export default {
   name: 'Register',
   components: { SignUp },
   data: () => ({
-    loading: false,
-    alert: {}
+    loading: false
   }),
   computed: {
     isAuthenticated () {
@@ -79,26 +65,24 @@ export default {
   },
   methods: {
     login () {
+      this.$store.commit('clearAlert')
       this.$router.push('/login')
     },
     register (account) {
       this.loading = true
-      this.alert = {}
+      this.$store.commit('clearAlert')
       this.$store
         .dispatch('createAccount', account)
         .then(() => {
-          this.alert = {
+          const alert = {
             type: 'success',
             message: 'Account has been successfully created! Redirecting to the sign in page.'
           }
+          this.$store.commit('setAlert', alert)
           setTimeout(() => this.login(), 1750)
         })
-        .catch(err => {
+        .catch(() => {
           this.loading = false
-          this.alert = {
-            message: err.toString(),
-            type: 'error'
-          }
         })
     }
   }
@@ -108,10 +92,5 @@ export default {
 <style lang="scss">
 .register {
 
-  &__alert {
-    display: flex;
-    flex-direction: column-reverse;
-    height: 100px;
-  }
 }
 </style>
