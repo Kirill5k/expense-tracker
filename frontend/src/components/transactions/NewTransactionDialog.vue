@@ -184,7 +184,7 @@ export default {
     formattedDate () {
       if (this.newTransaction.date) {
         const [year, month, day] = this.newTransaction.date.split('-')
-        return `${month}/${day}/${year}`
+        return `${day}/${month}/${year}`
       } else {
         return null
       }
@@ -207,7 +207,8 @@ export default {
     },
     save () {
       if (this.$refs.newTransactionForm.validate()) {
-        const newTx = { ...this.newTransaction, amount: { value: Number(this.newTransaction.amount), currency: this.currencyName } }
+        const amount = { value: Number(this.newTransaction.amount), currency: this.currencyName, symbol: this.currencySymbol }
+        const newTx = { ...this.newTransaction, amount }
         if (newTx.id) {
           this.$emit('update', newTx)
         } else {
