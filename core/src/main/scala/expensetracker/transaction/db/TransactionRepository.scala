@@ -6,16 +6,19 @@ import com.mongodb.client.model.Filters
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.common.json._
 import expensetracker.auth.account.AccountId
+import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import io.circe.generic.auto._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import org.bson.types.ObjectId
 
-trait TransactionRepository[F[_]] {
+trait TransactionRepository[F[_]] extends Repository[F] {
   def create(tx: CreateTransaction): F[TransactionId]
   def getAll(aid: AccountId): F[List[Transaction]]
   def get(aid: AccountId, txid: TransactionId): F[Transaction]
+  def delete(aid: AccountId, txid: TransactionId): F[Unit]
+  def update(tx: Transaction): F[Unit]
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
@@ -39,11 +42,21 @@ final private class LiveTransactionRepository[F[_]: Async](
     collection
       .find(Filters.and(Filters.eq("accountId", new ObjectId(aid.value)), Filters.eq("_id", new ObjectId(txid.value))))
       .first[F]
-      .map(e => Option(e))
-      .flatMap {
-        case Some(e) => e.toDomain.pure[F]
-        case None => TransactionDoesNotExist(txid).raiseError[F, Transaction]
-      }
+      .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
+      .map(_.toDomain)
+
+  override def update(tx: Transaction): F[Unit] =
+    collection
+      .findOneAndReplace[F](
+        Filters.and(idEq("accountId", tx.accountId.value), idEq("_id", tx.id.value)),
+        TransactionEntity.from(tx)
+      )
+      .flatMap(r => errorIfNull(TransactionDoesNotExist(tx.id))(r).void)
+
+  override def delete(aid: AccountId, txid: TransactionId): F[Unit] =
+    collection
+      .findOneAndDelete[F](Filters.and(idEq("accountId", aid.value), idEq("_id", txid.value)))
+      .flatMap(r => errorIfNull(TransactionDoesNotExist(txid))(r).void)
 }
 
 object TransactionRepository {

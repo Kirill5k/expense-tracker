@@ -31,6 +31,17 @@ final case class TransactionEntity(
 
 object TransactionEntity {
 
+  def from(tx: Transaction): TransactionEntity =
+    TransactionEntity(
+      new ObjectId(tx.id.value),
+      new ObjectId(tx.accountId.value),
+      new ObjectId(tx.categoryId.value),
+      tx.kind,
+      tx.amount,
+      tx.date,
+      tx.note
+    )
+
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       new ObjectId(),

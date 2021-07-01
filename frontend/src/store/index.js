@@ -74,6 +74,12 @@ export default new Vuex.Store({
     },
     setDisplayDate (state, newDate) {
       state.displayDate = newDate
+    },
+    removeTransaction (state, id) {
+      state.transactions = state.transactions.filter(tx => tx.id !== id)
+    },
+    updateTransaction (state, updatedTx) {
+      state.transactions = state.transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
     }
   },
   actions: {
@@ -172,6 +178,18 @@ export default new Vuex.Store({
       return fetch(`/api/transactions/${id}`, defaultRequestParams)
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(tx => commit('addTransaction', tx))
+    },
+    deleteTransaction ({ commit }, id) {
+      return fetch(`/api/transactions/${id}`, { ...defaultRequestParams, method: 'DELETE' })
+        .then(res => res.status === 204 ? commit('removeTransaction', id) : reject(res))
+    },
+    updateTransaction ({ commit }, requestBody) {
+      return fetch(`/api/transactions/${requestBody.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
+      })
+        .then(res => res.status === 204 ? commit('updateTransaction', requestBody) : reject(res))
     }
   },
   modules: {

@@ -5,15 +5,14 @@ import cats.implicits._
 import com.mongodb.client.model.Filters
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.account.AccountId
+import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.CategoryDoesNotExist
 import io.circe.generic.auto._
 import expensetracker.common.json._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
-import org.bson.conversions.Bson
-import org.bson.types.ObjectId
 
-trait CategoryRepository[F[_]] {
+trait CategoryRepository[F[_]] extends Repository[F] {
   def create(cat: CreateCategory): F[CategoryId]
   def update(cat: Category): F[Unit]
   def get(aid: AccountId, cid: CategoryId): F[Category]
@@ -35,13 +34,13 @@ final private class LiveCategoryRepository[F[_]: Async](
     collection
       .find(Filters.and(idEq("accountId", aid.value), idEq("_id", cid.value)))
       .first[F]
-      .flatMap(errorIfNull(cid))
+      .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .map(_.toDomain)
 
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
       .findOneAndDelete[F](Filters.and(idEq("accountId", aid.value), idEq("_id", cid.value)))
-      .flatMap(r => errorIfNull(cid)(r).void)
+      .flatMap(r => errorIfNull(CategoryDoesNotExist(cid))(r).void)
 
   override def create(cat: CreateCategory): F[CategoryId] = {
     // TODO: return CategoryAlreadyExists if already exists
@@ -55,13 +54,7 @@ final private class LiveCategoryRepository[F[_]: Async](
         Filters.and(idEq("accountId", cat.accountId.map(_.value).orNull), idEq("_id", cat.id.value)),
         CategoryEntity.from(cat)
       )
-      .flatMap(r => errorIfNull(cat.id)(r).void)
-
-  private def errorIfNull[A](cid: CategoryId)(res: A): F[A] =
-    Option(res).map(_.pure[F]).getOrElse(CategoryDoesNotExist(cid).raiseError[F, A])
-
-  private def idEq(name: String, id: String): Bson =
-    Filters.eq(name, new ObjectId(id))
+      .flatMap(r => errorIfNull(CategoryDoesNotExist(cat.id))(r).void)
 }
 
 object CategoryRepository {

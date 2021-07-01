@@ -13,11 +13,33 @@ class TransactionServiceSpec extends CatsSpec {
 
   "A TransactionService" should {
     "delete tx from db" in {
-      pending
+      val repo = mock[TransactionRepository[IO]]
+      when(repo.delete(any[AccountId], any[TransactionId])).thenReturn(IO.unit)
+
+      val result = for {
+        svc <- TransactionService.make[IO](repo)
+        res <- svc.delete(aid, txid)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).delete(aid, txid)
+        res mustBe ()
+      }
     }
 
     "update tx in db" in {
-      pending
+      val repo = mock[TransactionRepository[IO]]
+      when(repo.update(any[Transaction])).thenReturn(IO.unit)
+
+      val result = for {
+        svc <- TransactionService.make[IO](repo)
+        res <- svc.update(tx)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).update(tx)
+        res mustBe ()
+      }
     }
 
     "retrieve tx by id from db" in {

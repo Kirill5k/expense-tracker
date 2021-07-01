@@ -47,6 +47,8 @@
               :categories="catsByIds"
               :items="transactions"
               :editable="editable"
+              @edit="update"
+              @delete="remove"
             />
           </v-card-text>
 

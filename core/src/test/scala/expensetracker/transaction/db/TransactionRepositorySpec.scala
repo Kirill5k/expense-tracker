@@ -4,7 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
 import expensetracker.category.CategoryId
-import expensetracker.transaction.{CreateTransaction, TransactionKind}
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
@@ -99,6 +99,69 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
 
         result.map { txs =>
           txs must have size 0
+        }
+      }
+    }
+
+    "delete" should {
+      "remove account's transaction" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- TransactionRepository.make(client)
+            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            _    <- repo.delete(acc2Id, txid)
+            cats <- repo.getAll(acc2Id)
+          } yield cats
+
+          result.map { txs =>
+            txs must have size 0
+          }
+        }
+      }
+
+      "return error if accountId doesn't match" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- TransactionRepository.make(client)
+            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            res  <- repo.delete(acc1Id, txid).attempt
+          } yield (txid, res)
+
+          result.map { case (txid, res) =>
+            res mustBe Left(TransactionDoesNotExist(txid))
+          }
+        }
+      }
+    }
+
+    "update" should {
+      "update existing tx" in {
+        withEmbeddedMongoDb { db =>
+          val result = for {
+            repo <- TransactionRepository.make(db)
+            txid <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            tx   <- repo.get(acc2Id, txid)
+            _    <- repo.update(tx.copy(amount = GBP(25.0)))
+            txs <- repo.getAll(acc2Id)
+          } yield (tx, txs)
+
+          result.map { case (tx, txs) =>
+            txs mustBe List(tx.copy(amount = GBP(25.0)))
+          }
+        }
+      }
+
+      "return error when tx does not exist" in {
+        withEmbeddedMongoDb { db =>
+          val txid = TransactionId(new ObjectId().toHexString)
+          val result = for {
+            repo <- TransactionRepository.make(db)
+            res  <- repo.update(Transaction(txid, acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          } yield res
+
+          result.attempt.map { res =>
+            res mustBe Left(TransactionDoesNotExist(txid))
+          }
         }
       }
     }

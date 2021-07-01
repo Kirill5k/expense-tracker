@@ -138,12 +138,6 @@ export default {
     formatTxDate (tx) {
       const date = new Date(tx.date)
       return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-    },
-    editTx (tx) {
-      console.log('edit', tx.id)
-    },
-    deleteTx (tx) {
-      console.log('delete', tx.id)
     }
   }
 }

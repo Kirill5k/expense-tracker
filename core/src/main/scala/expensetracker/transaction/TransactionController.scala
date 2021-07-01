@@ -56,6 +56,10 @@ final class TransactionController[F[_]: Logger](
           res <- Created(CreateTransactionResponse(cid.value))
         } yield res
       }
+    case DELETE -> Root / TransactionIdPath(txid) as session =>
+      withErrorHandling {
+        service.delete(session.accountId, txid) *> NoContent()
+      }
   }
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =

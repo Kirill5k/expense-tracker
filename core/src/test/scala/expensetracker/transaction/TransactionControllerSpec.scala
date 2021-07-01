@@ -157,7 +157,15 @@ class TransactionControllerSpec extends ControllerSpec {
 
     "DELETE /transactions/:id" should {
       "delete tx by id" in {
-        pending
+        val svc = mock[TransactionService[IO]]
+        when(svc.delete(any[AccountId], any[TransactionId])).thenReturn(IO.unit)
+
+        val req = Request[IO](uri = uri"/transactions/AB0C5342AB0C5342AB0C5342", method = Method.DELETE)
+          .addCookie(sessIdCookie)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.NoContent, None)
+        verify(svc).delete(aid, TransactionId("AB0C5342AB0C5342AB0C5342"))
       }
     }
   }
