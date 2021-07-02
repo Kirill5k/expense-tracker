@@ -28,7 +28,7 @@
         />
 
         <transaction-list
-          :categories="catsByIds"
+          :categories="$store.getters.catsByIds"
           :items="transactions"
           :editable="editable"
           @edit="edit"
@@ -85,8 +85,8 @@
         <new-transaction-dialog
           ref="newTransactionDialog"
           :currency-name="currencyName"
-          :expense-cats="expenseCats"
-          :income-cats="incomeCats"
+          :expense-cats="$store.getters.expenseCats"
+          :income-cats="$store.getters.incomeCats"
           @save="create"
           @update="update"
         />
@@ -116,15 +116,6 @@ export default {
     currencyName: 'USD'
   }),
   computed: {
-    expenseCats () {
-      return this.$store.getters.expenseCats
-    },
-    incomeCats () {
-      return this.$store.getters.incomeCats
-    },
-    catsByIds () {
-      return this.$store.getters.catsByIds
-    },
     transactions () {
       return this.$store.getters.displayedTransactions
     },
