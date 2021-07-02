@@ -23,6 +23,7 @@
     >
       <template v-slot:default="{ item }">
         <v-list-item
+          @click="$emit('edit', item)"
           :key="item.id"
           class="pr-3"
           link
@@ -40,18 +41,6 @@
                 class="text-center category-list__slider"
                 :class="editable ? 'category-list__slider--slide-in' : 'category-list__slider--slide-out'"
               >
-                <v-btn
-                  icon
-                  dark
-                  color="blue"
-                  x-small
-                  @click="$emit('edit', item)"
-                  class="mr-2"
-                >
-                  <v-icon dark>
-                    mdi-pencil
-                  </v-icon>
-                </v-btn>
                 <v-btn
                   icon
                   dark

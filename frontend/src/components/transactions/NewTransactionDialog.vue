@@ -22,7 +22,7 @@
       </template>
       <v-card>
         <v-card-title>
-          New transaction
+          {{newTransaction.id ? 'Edit transaction' : 'New transaction'}}
         </v-card-title>
         <v-card-text>
           <v-form

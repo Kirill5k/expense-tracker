@@ -22,7 +22,7 @@
       </template>
       <v-card>
         <v-card-title>
-          New category
+          {{newCategory.id ? 'Edit category' : 'New category'}}
         </v-card-title>
         <v-card-text>
           <v-form
