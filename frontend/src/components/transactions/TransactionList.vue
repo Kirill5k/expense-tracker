@@ -12,6 +12,7 @@
     :headers-length="2"
     disable-pagination
     mobile-breakpoint="100"
+    @click:row="rowClick"
   >
     <template v-slot:item.icon="{ item }">
       <v-list-item-avatar
@@ -59,18 +60,6 @@
         <v-btn
           icon
           dark
-          color="blue"
-          x-small
-          @click="$emit('edit', item.original)"
-          class="mr-2"
-        >
-          <v-icon dark>
-            mdi-pencil
-          </v-icon>
-        </v-btn>
-        <v-btn
-          icon
-          dark
           color="red"
           x-small
           @click="$emit('delete', item.id)"
@@ -88,10 +77,9 @@
 const DEFAULT_HEADERS = [
   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
   { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
-  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0' }
+  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0' },
+  { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 pr-1' }
 ]
-
-const EDIT_HEADER = { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 pr-1 pb-1' }
 
 export default {
   name: 'TransactionList',
@@ -123,7 +111,7 @@ export default {
       }))
     },
     headers () {
-      return this.editable ? [...DEFAULT_HEADERS, EDIT_HEADER] : DEFAULT_HEADERS
+      return DEFAULT_HEADERS
     },
     height () {
       if (this.items.length === 0) {
@@ -139,6 +127,9 @@ export default {
     formatTxDate (tx) {
       const date = new Date(tx.date)
       return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    },
+    rowClick (clickedItem, rowData) {
+      this.$emit('edit', rowData.item.original)
     }
   }
 }
