@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex mb-1" style="width: 100%">
+  <div class="date-period-selector d-flex mb-1" style="width: 100%">
     <v-btn
       class="ml-0 mr-3"
       depressed
@@ -16,13 +16,13 @@
       hint="Show spending"
       hide-details
       single-line
-      class="pa-0 ma-0"
+      class="pa-0 ma-0 date-period-selector__select"
       @input="resetDate"
       dense
       :height="30"
     >
       <template v-slot:selection="{ }">
-        <p class="ma-0 text-center text-subtitle-2" style="width: 100%">
+        <p class="ma-0 mt-1 text-center text-subtitle-2" style="width: 100%">
           {{ formattedDisplayedDate }}
         </p>
       </template>
@@ -112,5 +112,11 @@ export default {
 </script>
 
 <style lang="scss">
-
+.date-period-selector {
+  &__select {
+    * {
+      align-self: flex-start
+    }
+  }
+}
 </style>

@@ -30,7 +30,7 @@
     <template v-slot:item.tx="{ item }">
       <v-list-item-content class="py-2 px-0">
         <p class="text-subtitle-2 mb-0">{{ categories[item.id].name }}</p>
-        <p class="text-caption mb-0 font-weight-light">{{ item.count }} Transactions</p>
+        <p class="text-caption mb-0 font-weight-light">{{ item.count === 1 ? '1 transaction' : `${item.count} transactions` }}</p>
       </v-list-item-content>
     </template>
 
