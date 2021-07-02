@@ -17,21 +17,6 @@
           :loading="loading"
           class="mx-auto"
         >
-          <v-btn
-            v-if="categories.length"
-            class="mt-5 mr-1"
-            elevation="2"
-            right
-            x-small
-            text
-            absolute
-            rounded
-            plain
-            @click="editable = !editable"
-          >
-            {{ editable ? 'Done' : 'Edit' }}
-          </v-btn>
-
           <v-card-title>
             Categories
           </v-card-title>
@@ -57,6 +42,19 @@
           </v-card-text>
 
           <v-card-actions>
+            <v-btn
+              v-if="categories.length"
+              color="primary"
+              x-small
+              absolute
+              bottom
+              left
+              fab
+              @click="editable = !editable"
+            >
+              <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
+            </v-btn>
+
             <v-spacer></v-spacer>
             <new-category-dialog
               ref="newCategoryDialog"

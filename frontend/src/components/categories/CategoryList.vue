@@ -22,38 +22,39 @@
       item-height="45"
     >
       <template v-slot:default="{ item }">
+
         <v-list-item
           @click="$emit('edit', item)"
           :key="item.id"
-          class="pr-3"
+          class="pr-3 pl-0"
           link
         >
+
           <v-list-item-icon>
-            <v-icon v-text="item.icon"/>
+            <v-slide-x-transition>
+              <v-btn
+                v-if="editable"
+                class="mr-2 pl-2 ml-2 mt-0"
+                icon
+                dark
+                color="red"
+                x-small
+                @click="$emit('delete', item.id)"
+              >
+                <v-icon dark>
+                  mdi-trash-can-outline
+                </v-icon>
+              </v-btn>
+            </v-slide-x-transition>
+            <v-icon
+              class="pl-3"
+              v-text="item.icon"
+            />
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title v-text="item.name"/>
           </v-list-item-content>
 
-          <v-list-item-action class="mr-0 my-0">
-              <div
-                v-if="editable"
-                class="text-center category-list__slider"
-                :class="editable ? 'category-list__slider--slide-in' : 'category-list__slider--slide-out'"
-              >
-                <v-btn
-                  icon
-                  dark
-                  color="red"
-                  x-small
-                  @click="$emit('delete', item.id)"
-                >
-                  <v-icon dark>
-                    mdi-trash-can-outline
-                  </v-icon>
-                </v-btn>
-              </div>
-          </v-list-item-action>
         </v-list-item>
 
         <v-divider></v-divider>
@@ -88,8 +89,8 @@ export default {
 <style lang="scss">
 .category-list {
   &__slider {
-    transform: translateX(100%);
-    -webkit-transform: translateX(100%);
+    transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
 
     &--slide-in {
       animation: slide-in 0.5s forwards;

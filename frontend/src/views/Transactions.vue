@@ -17,22 +17,6 @@
           :loading="loading"
           class="mx-auto"
         >
-
-          <v-btn
-            v-if="transactions.length"
-            class="mt-5 mr-1"
-            elevation="2"
-            right
-            x-small
-            text
-            absolute
-            rounded
-            plain
-            @click="editable = !editable"
-          >
-            {{ editable ? 'Done' : 'Edit' }}
-          </v-btn>
-
           <v-card-title>
             Transactions
           </v-card-title>
@@ -54,6 +38,20 @@
 
           <v-divider></v-divider>
           <v-card-actions class="py-0">
+
+            <v-btn
+              v-if="transactions.length"
+              color="primary"
+              x-small
+              absolute
+              bottom
+              left
+              fab
+              @click="editable = !editable"
+            >
+              <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
+            </v-btn>
+
             <div
               v-if="transactions.length"
               class="transactions__summary"

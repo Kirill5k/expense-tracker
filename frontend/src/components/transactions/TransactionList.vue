@@ -52,12 +52,9 @@
     </template>
 
     <template v-slot:item.edit="{ item }">
-      <div
-        v-if="editable"
-        class="d-flex transaction-list__slider"
-        :class="editable ? 'transaction-list__slider--slide-in' : 'transaction-list__slider--slide-out'"
-      >
+      <v-slide-x-transition>
         <v-btn
+          v-if="editable"
           icon
           dark
           color="red"
@@ -68,17 +65,17 @@
             mdi-trash-can-outline
           </v-icon>
         </v-btn>
-      </div>
+      </v-slide-x-transition>
     </template>
   </v-data-table>
 </template>
 
 <script>
 const DEFAULT_HEADERS = [
+  { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 px-1' },
   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
   { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
-  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0' },
-  { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 pr-1' }
+  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0' }
 ]
 
 export default {
@@ -98,7 +95,8 @@ export default {
     }
   },
   data: () => ({
-    selectedItem: null
+    selectedItem: null,
+    headers: DEFAULT_HEADERS
   }),
   computed: {
     tableData () {
@@ -109,9 +107,6 @@ export default {
         amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency },
         original: i
       }))
-    },
-    headers () {
-      return DEFAULT_HEADERS
     },
     height () {
       if (this.items.length === 0) {

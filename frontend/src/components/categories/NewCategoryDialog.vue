@@ -9,7 +9,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           color="primary"
-          small
+          x-small
           absolute
           bottom
           right
