@@ -50,6 +50,7 @@
               :rules="rules.name"
               label="Name"
               required
+              counter
             />
             <v-select
               name="icon"
@@ -202,7 +203,10 @@ export default {
     valid: true,
     icons: ICONS,
     rules: {
-      name: [v => !!v || 'Please enter a name for the new category'],
+      name: [
+        v => !!v || 'Please enter a name for the new category',
+        v => v.length <= 25 || 'Max 25 characters'
+      ],
       icon: [v => !!v || 'Please select an icon']
     },
     newCategory: {

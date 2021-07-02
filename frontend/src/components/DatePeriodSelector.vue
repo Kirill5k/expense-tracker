@@ -40,10 +40,9 @@
 </template>
 
 <script>
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay, addDays, addWeeks, addMonths, addYears } from 'date-fns'
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, addWeeks, addMonths, addYears } from 'date-fns'
 
 const DATE_RANGE_OPTIONS = [
-  { value: 'daily', text: 'Daily' },
   { value: 'weekly', text: 'Weekly' },
   { value: 'monthly', text: 'Monthly' },
   { value: 'yearly', text: 'Yearly' }
@@ -62,9 +61,7 @@ export default {
   }),
   computed: {
     formattedDisplayedDate () {
-      if (this.displayDate.range === 'daily') {
-        return format(this.displayDate.start, 'do MMM')
-      } else if (this.displayDate.range === 'monthly') {
+      if (this.displayDate.range === 'monthly') {
         return format(this.displayDate.start, 'LLLL yyyy')
       } else if (this.displayDate.range === 'yearly') {
         return format(this.displayDate.start, 'yyyy')
@@ -91,8 +88,6 @@ export default {
       const end = this.displayDate.end
       const range = this.displayDate.range
       switch (this.displayDate.range) {
-        case 'daily':
-          return { range, start: addDays(start, amount), end: addDays(end, amount) }
         case 'monthly':
           return { range, start: addMonths(start, amount), end: endOfMonth(addMonths(end, amount)) }
         case 'weekly':
@@ -104,8 +99,6 @@ export default {
     applyNewRange (newRange) {
       const today = new Date()
       switch (newRange) {
-        case 'daily':
-          return { range: newRange, start: startOfDay(today), end: endOfDay(today) }
         case 'weekly':
           return { range: newRange, start: startOfWeek(today), end: endOfWeek(today) }
         case 'monthly':
