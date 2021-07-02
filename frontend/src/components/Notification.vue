@@ -1,10 +1,9 @@
 <template>
   <v-container
-    class="transactions mb-0 pb-0"
+    class="notification mb-0 pb-0"
     fluid
   >
     <v-row
-      class="notification"
       justify="center"
     >
       <v-col

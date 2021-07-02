@@ -1,81 +1,68 @@
 <template>
-  <v-container
-    class="categories"
-    fluid
-  >
-    <v-row
-      justify="center"
+  <page>
+    <v-card
+      :loading="loading"
+      class="categories mx-auto"
     >
-      <v-col
-        cols="12"
-        xs="9"
-        sm="6"
-        md="5"
-        lg="4"
-      >
-        <v-card
-          :loading="loading"
-          class="mx-auto"
+      <v-card-title>
+        Categories
+      </v-card-title>
+
+      <v-card-text class="pb-0">
+        <category-list
+          name="EXPENSE"
+          :items="expenseCats"
+          :editable="editable"
+          @delete="remove"
+          @edit="edit"
+        />
+      </v-card-text>
+
+      <v-card-text class="pt-0">
+        <category-list
+          name="INCOME"
+          :items="incomeCats"
+          :editable="editable"
+          @delete="remove"
+          @edit="edit"
+        />
+      </v-card-text>
+
+      <v-card-actions>
+        <v-btn
+          v-if="categories.length"
+          color="primary"
+          x-small
+          absolute
+          bottom
+          left
+          fab
+          @click="editable = !editable"
         >
-          <v-card-title>
-            Categories
-          </v-card-title>
+          <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
+        </v-btn>
 
-          <v-card-text class="pb-0">
-            <category-list
-              name="EXPENSE"
-              :items="expenseCats"
-              :editable="editable"
-              @delete="remove"
-              @edit="edit"
-            />
-          </v-card-text>
+        <v-spacer></v-spacer>
+        <new-category-dialog
+          ref="newCategoryDialog"
+          @update="update"
+          @save="create"
+        />
+      </v-card-actions>
 
-          <v-card-text class="pt-0">
-            <category-list
-              name="INCOME"
-              :items="incomeCats"
-              :editable="editable"
-              @delete="remove"
-              @edit="edit"
-            />
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn
-              v-if="categories.length"
-              color="primary"
-              x-small
-              absolute
-              bottom
-              left
-              fab
-              @click="editable = !editable"
-            >
-              <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
-            </v-btn>
-
-            <v-spacer></v-spacer>
-            <new-category-dialog
-              ref="newCategoryDialog"
-              @update="update"
-              @save="create"
-            />
-          </v-card-actions>
-
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+    </v-card>
+  </page>
 </template>
 
 <script>
+import Page from '@/components/Page'
 import CategoryList from '@/components/categories/CategoryList'
 import NewCategoryDialog from '@/components/categories/NewCategoryDialog'
 
 export default {
   name: 'Categories',
   components: {
+    Page,
     CategoryList,
     NewCategoryDialog
   },
