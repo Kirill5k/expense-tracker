@@ -96,7 +96,7 @@
               label="Amount"
               v-model="newTransaction.amount"
               type="number"
-              :prefix="currencySymbol"
+              :prepend-icon="'mdi-currency-' + currencyName.toLowerCase()"
               :rules="rules.amount"
             />
 
@@ -152,13 +152,9 @@ export default {
       type: Array,
       default: () => []
     },
-    currencySymbol: {
-      type: String,
-      default: '$'
-    },
     currencyName: {
       type: String,
-      default: 'USD'
+      required: true
     }
   },
   data: () => ({
@@ -210,7 +206,7 @@ export default {
     },
     save () {
       if (this.$refs.newTransactionForm.validate()) {
-        const amount = { value: Number(this.newTransaction.amount), currency: this.currencyName, symbol: this.currencySymbol }
+        const amount = { value: Number(this.newTransaction.amount), currency: this.currencyName }
         const newTx = { ...this.newTransaction, amount }
         if (newTx.id) {
           this.$emit('update', newTx)

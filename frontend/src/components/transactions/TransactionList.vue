@@ -42,7 +42,11 @@
         outlined
         :color="item.amount.kind === 'expense' ? 'pink' : 'success'"
       >
-        {{ item.amount.value }}
+        {{ item.amount.kind === 'expense' ? '-' : '+' }}
+        <v-icon>
+          mdi-currency-{{item.amount.currency.toLowerCase()}}
+        </v-icon>
+        {{item.amount.value}}
       </v-chip>
     </template>
 
@@ -114,7 +118,7 @@ export default {
         id: i.id,
         icon: this.categories[i.categoryId].icon,
         tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
-        amount: { value: this.formatTxAmount(i), kind: i.kind },
+        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency },
         original: i
       }))
     },
@@ -132,10 +136,6 @@ export default {
     }
   },
   methods: {
-    formatTxAmount (tx) {
-      const sign = tx.kind === 'expense' ? '-' : '+'
-      return `${sign} ${tx.amount.symbol}${tx.amount.value}`
-    },
     formatTxDate (tx) {
       const date = new Date(tx.date)
       return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })

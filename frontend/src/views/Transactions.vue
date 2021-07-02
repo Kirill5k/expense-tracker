@@ -37,7 +37,7 @@
             Transactions
           </v-card-title>
 
-          <v-card-text>
+          <v-card-text class="pb-0">
             <date-period-selector
               :display-date="this.$store.state.displayDate"
               @update="updateDisplayDate"
@@ -52,10 +52,41 @@
             />
           </v-card-text>
 
-          <v-card-actions>
+          <v-divider></v-divider>
+          <v-card-actions class="py-0">
+            <div
+              v-if="transactions.length"
+              class="transactions__summary"
+            >
+              <v-chip
+                small
+                class="ma-2 px-4"
+                color="success"
+                outlined
+              >
+                <v-icon>
+                  mdi-currency-{{currencyName.toLowerCase()}}
+                </v-icon>
+                <span>{{ totalEarned }}</span>
+              </v-chip>
+
+              <v-chip
+                small
+                class="ma-2 px-4"
+                color="pink"
+                outlined
+              >
+                <v-icon>
+                  mdi-currency-{{currencyName.toLowerCase()}}
+                </v-icon>
+                <span>{{ totalSpent }}</span>
+              </v-chip>
+
+            </div>
             <v-spacer></v-spacer>
             <new-transaction-dialog
               ref="newTransactionDialog"
+              :currency-name="currencyName"
               :expense-cats="expenseCats"
               :income-cats="incomeCats"
               @save="create"
@@ -83,7 +114,8 @@ export default {
   },
   data: () => ({
     loading: false,
-    editable: false
+    editable: false,
+    currencyName: 'USD'
   }),
   computed: {
     expenseCats () {
@@ -97,6 +129,12 @@ export default {
     },
     transactions () {
       return this.$store.getters.displayedTransactions
+    },
+    totalSpent () {
+      return this.getTotalAmount(this.transactions.filter(t => t.kind === 'expense'))
+    },
+    totalEarned () {
+      return this.getTotalAmount(this.transactions.filter(t => t.kind === 'income'))
     }
   },
   methods: {
@@ -122,7 +160,11 @@ export default {
       this.$refs.newTransactionDialog.update(transaction)
     },
     updateDisplayDate (newRange) {
+      this.editable = false
       this.$store.commit('setDisplayDate', newRange)
+    },
+    getTotalAmount (txs) {
+      return txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0)
     }
   }
 }
@@ -131,5 +173,11 @@ export default {
 <style lang="scss">
 .transactions {
 
+  &__summary {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
 }
 </style>
