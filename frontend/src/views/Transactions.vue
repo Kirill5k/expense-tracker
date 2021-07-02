@@ -17,23 +17,22 @@
           :loading="loading"
           class="mx-auto"
         >
-          <v-btn
-            class="mt-5 mr-1"
-            elevation="2"
-            right
-            x-small
-            text
-            absolute
-            rounded
-            plain
-          >
-            <v-icon>
-              mdi-sort
-            </v-icon>
-          </v-btn>
 
           <v-card-title>
             Transactions
+            <v-spacer></v-spacer>
+            <v-btn
+              class="mr-1"
+              elevation="2"
+              x-small
+              text
+              rounded
+              plain
+            >
+              <v-icon>
+                mdi-sort
+              </v-icon>
+            </v-btn>
           </v-card-title>
 
           <v-card-text class="pb-0">
