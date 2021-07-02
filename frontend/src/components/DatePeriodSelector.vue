@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex mb-1" style="width: 100%">
     <v-btn
-      class="ml-4 mr-2"
+      class="ml-0 mr-3"
       depressed
       small
       icon
@@ -9,7 +9,7 @@
     >
       <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
-    <v-select
+    <v-overflow-btn
       :value="displayDate.range"
       :items="dateRangeOptions"
       label="Show spending"
@@ -26,9 +26,9 @@
           {{ formattedDisplayedDate }}
         </p>
       </template>
-    </v-select>
+    </v-overflow-btn>
     <v-btn
-      class="ml-2 mr-4"
+      class="ml-3 mr-0"
       depressed
       small
       icon
