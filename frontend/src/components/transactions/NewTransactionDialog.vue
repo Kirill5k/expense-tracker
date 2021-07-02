@@ -167,7 +167,8 @@ export default {
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
       amount: [
         v => !!v || 'Please specify the amount',
-        v => v > 0 || 'The amount must be greater than 0'
+        v => v > 0 || 'The amount must be greater than 0',
+        v => v < 100000000 || 'The amount must be less than 100000000'
       ],
       note: [v => !v || v.length <= 84 || 'Max 84 characters']
     }

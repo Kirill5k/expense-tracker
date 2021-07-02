@@ -10,6 +10,13 @@
           :display-date="this.$store.state.displayDate"
           @update="updateDisplayDate"
         />
+        <transactions-breakdown
+          :currency-name="currencyName"
+          :categories="$store.getters.catsByIds"
+          :items="transactions.filter(t => t.kind === 'expense')"
+        >
+
+        </transactions-breakdown>
       </v-card-text>
     </v-card>
   </page>
@@ -18,12 +25,22 @@
 <script>
 import Page from '@/components/Page'
 import DatePeriodSelector from '@/components/DatePeriodSelector'
+import TransactionsBreakdown from '@/components/analytics/TransactionsBreakdown'
 
 export default {
   name: 'Analytics',
   components: {
     Page,
-    DatePeriodSelector
+    DatePeriodSelector,
+    TransactionsBreakdown
+  },
+  data: () => ({
+    currencyName: 'USD'
+  }),
+  computed: {
+    transactions () {
+      return this.$store.getters.displayedTransactions
+    }
   },
   methods: {
     updateDisplayDate (newRange) {
