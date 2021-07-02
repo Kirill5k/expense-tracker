@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Transactions from '@/views/Transactions'
+import Analytics from '@/views/Analytics'
 
 Vue.use(VueRouter)
 
@@ -8,7 +8,16 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Transactions,
+    component: Analytics,
+    meta: {
+      authAccess: true,
+      unAuthAccess: false
+    }
+  },
+  {
+    path: '/transactions',
+    name: 'transactions',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Transactions.vue'),
     meta: {
       authAccess: true,
       unAuthAccess: false

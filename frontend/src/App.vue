@@ -66,6 +66,14 @@
         to="/"
         icon
       >
+        <span>Analytics</span>
+        <v-icon class="mr-1">mdi-chart-bar</v-icon>
+      </v-btn>
+
+      <v-btn
+        to="/transactions"
+        icon
+      >
         <span>Transactions</span>
         <v-icon class="mr-1">mdi-bank-transfer</v-icon>
       </v-btn>
