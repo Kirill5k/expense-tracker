@@ -10,10 +10,16 @@
           :display-date="this.$store.state.displayDate"
           @update="updateDisplayDate"
         />
+        <transactions-chart
+          :currency-name="currencyName"
+          :categories="$store.getters.catsByIds"
+          :items="$store.getters.expenseTransactions"
+        />
         <transactions-breakdown
           :currency-name="currencyName"
           :categories="$store.getters.catsByIds"
-          :items="transactions.filter(t => t.kind === 'expense')"
+          :items="$store.getters.expenseTransactions"
+          :total-amount="$store.getters.totalSpent"
         >
 
         </transactions-breakdown>
@@ -25,6 +31,7 @@
 <script>
 import Page from '@/components/Page'
 import DatePeriodSelector from '@/components/DatePeriodSelector'
+import TransactionsChart from '@/components/analytics/TransactionsChart'
 import TransactionsBreakdown from '@/components/analytics/TransactionsBreakdown'
 
 export default {
@@ -32,7 +39,8 @@ export default {
   components: {
     Page,
     DatePeriodSelector,
-    TransactionsBreakdown
+    TransactionsBreakdown,
+    TransactionsChart
   },
   data: () => ({
     currencyName: 'USD'

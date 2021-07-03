@@ -12,26 +12,23 @@
     disable-pagination
     mobile-breakpoint="100"
   >
-    <template v-slot:item.icon="{ item }">
-      <v-list-item-avatar
-        size="26"
-      >
-        <v-icon
-          small
-          outline
-          class="black lighten-10"
-          dark
-        >
-          {{ categories[item.id].icon }}
-        </v-icon>
-      </v-list-item-avatar>
-    </template>
-
     <template v-slot:item.tx="{ item }">
-      <v-list-item-content class="py-2 px-0">
-        <p class="text-subtitle-2 mb-0">{{ categories[item.id].name }}</p>
-        <p class="text-caption mb-0 font-weight-light">{{ item.count === 1 ? '1 transaction' : `${item.count} transactions` }}</p>
-      </v-list-item-content>
+      <v-list-item>
+        <v-list-item-avatar size="26">
+          <v-icon
+            small
+            outline
+            class="black lighten-10"
+            dark
+          >
+            {{ categories[item.id].icon }}
+          </v-icon>
+        </v-list-item-avatar>
+        <v-list-item-content class="py-2 px-0">
+          <p class="text-subtitle-2 mb-0">{{ categories[item.id].name }}</p>
+          <p class="text-caption mb-0 font-weight-light">{{ item.count === 1 ? '1 transaction' : `${item.count} transactions` }}</p>
+        </v-list-item-content>
+      </v-list-item>
     </template>
 
     <template v-slot:item.amount="{ item }">
@@ -53,9 +50,8 @@
 
 <script>
 const DEFAULT_HEADERS = [
-  { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-3', sortable: false, width: '10%' },
-  { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sortable: false, width: '80%' },
-  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sortable: false, width: '10%' }
+  { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sortable: false },
+  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0 mr-5', sortable: false }
 ]
 
 export default {
@@ -63,6 +59,10 @@ export default {
   props: {
     items: {
       type: Array,
+      required: true
+    },
+    totalAmount: {
+      type: Number,
       required: true
     },
     categories: {
@@ -78,9 +78,6 @@ export default {
     headers: DEFAULT_HEADERS
   }),
   computed: {
-    totalAmount () {
-      return this.items.map(t => t.amount.value).reduce((acc, i) => acc + i, 0)
-    },
     tableData () {
       return this.items.map(i => ({
         id: i.id,
@@ -113,9 +110,6 @@ export default {
 </script>
 
 <style lang="scss">
-.test {
-  max-width: 100px;
-}
 .transactions-breakdown {
 
   &__amount {

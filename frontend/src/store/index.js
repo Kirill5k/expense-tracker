@@ -47,7 +47,11 @@ export default new Vuex.Store({
     displayedTransactions: state => state.transactions.filter(tx => {
       const txdate = new Date(tx.date)
       return state.displayDate.start <= txdate && txdate <= state.displayDate.end
-    })
+    }),
+    expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'expense'),
+    incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'income'),
+    totalSpent: (state, getters) => getters.expenseTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0),
+    totalEarned: (state, getters) => getters.incomeTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0)
   },
   mutations: {
     setAlert (state, alert) {

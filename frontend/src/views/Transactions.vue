@@ -65,7 +65,7 @@
             <v-icon>
               mdi-currency-{{currencyName.toLowerCase()}}
             </v-icon>
-            <span>{{ totalEarned }}</span>
+            <span>{{ $store.getters.totalEarned }}</span>
           </v-chip>
 
           <v-chip
@@ -77,7 +77,7 @@
             <v-icon>
               mdi-currency-{{currencyName.toLowerCase()}}
             </v-icon>
-            <span>{{ totalSpent }}</span>
+            <span>{{ $store.getters.totalSpent }}</span>
           </v-chip>
 
         </div>
@@ -118,12 +118,6 @@ export default {
   computed: {
     transactions () {
       return this.$store.getters.displayedTransactions
-    },
-    totalSpent () {
-      return this.getTotalAmount(this.transactions.filter(t => t.kind === 'expense'))
-    },
-    totalEarned () {
-      return this.getTotalAmount(this.transactions.filter(t => t.kind === 'income'))
     }
   },
   methods: {
@@ -151,9 +145,6 @@ export default {
     updateDisplayDate (newRange) {
       this.editable = false
       this.$store.commit('setDisplayDate', newRange)
-    },
-    getTotalAmount (txs) {
-      return txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0)
     }
   }
 }
