@@ -11,6 +11,7 @@
           @update="updateDisplayDate"
         />
         <transactions-chart
+          :display-date="this.$store.state.displayDate"
           :currency-name="currencyName"
           :categories="$store.getters.catsByIds"
           :items="$store.getters.expenseTransactions"
