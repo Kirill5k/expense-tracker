@@ -55,7 +55,7 @@ export default {
     }
   },
   data: () => ({
-    priceUp: true,
+    priceUp: false,
     initOptions: {
       renderer: 'canvas'
     }
@@ -90,13 +90,13 @@ export default {
           itemGap: 5,
           padding: [15, 0, 5, 10],
           text: `${this.currency}${this.totalAmount}`,
-          subtext: `Total spend {${this.priceUp ? 'up' : 'down'}|${this.priceUp ? 'V' : '^'}}{${this.priceUp ? 'a' : 'b'}|${this.currency}40}`,
+          subtext: `Total spend {${this.priceUp ? 'up' : 'down'}|${this.priceUp ? 'Ý' : 'ß'}}{${this.priceUp ? 'a' : 'b'}|${this.currency}40}`,
           subtextStyle: {
             rich: {
               a: { fontSize: 12, fontWeight: 'bold', color: 'green' },
               b: { fontSize: 12, fontWeight: 'bold', color: 'red' },
-              down: { color: 'red', fontWeight: '1000', fontSize: 20, padding: [0, 0, -8, 0], width: 14 },
-              up: { color: 'green', fontWeight: '1000', fontSize: 14, padding: [0, 2, 0, 4] }
+              down: { fontFamily: 'symbol', color: 'red', fontWeight: '1000', fontSize: 14, padding: [2, 1, 0, 1] },
+              up: { fontFamily: 'symbol', color: 'green', fontWeight: '1000', fontSize: 14, padding: [2, 1, 0, 1] }
             }
           }
         },
