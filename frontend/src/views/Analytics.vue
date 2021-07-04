@@ -12,9 +12,10 @@
         />
         <transactions-chart
           :display-date="this.$store.state.displayDate"
-          :currency-name="currencyName"
+          :currency="currency"
           :categories="$store.getters.catsByIds"
           :items="$store.getters.expenseTransactions"
+          :total-amount="$store.getters.totalSpent"
         />
         <transactions-breakdown
           :currency-name="currencyName"
@@ -44,7 +45,8 @@ export default {
     TransactionsChart
   },
   data: () => ({
-    currencyName: 'USD'
+    currencyName: 'USD',
+    currency: '$'
   }),
   computed: {
     transactions () {

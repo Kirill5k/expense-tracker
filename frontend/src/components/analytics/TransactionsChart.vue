@@ -41,21 +41,35 @@ export default {
       type: Object,
       required: true
     },
-    currencyName: {
+    currency: {
       type: String,
       required: true
     },
     displayDate: {
       type: Object,
       required: true
+    },
+    totalAmount: {
+      type: Number,
+      required: true
     }
   },
   data: () => ({
+    priceUp: true,
     initOptions: {
       renderer: 'canvas'
     }
   }),
   computed: {
+    period () {
+      if (this.displayDate.range === 'weekly') {
+        return 'week'
+      } else if (this.displayDate.range === 'monthly') {
+        return 'month'
+      } else {
+        return 'year'
+      }
+    },
     xAxisData () {
       if (this.displayDate.range === 'weekly') {
         return WEEKLY_LABELS
@@ -69,11 +83,22 @@ export default {
       return {
         grid: {
           left: '5%',
-          bottom: '10%'
+          bottom: '10%',
+          top: '25%'
         },
         title: {
-          text: 'Chart title',
-          subtext: 'Small subtitle'
+          itemGap: 5,
+          padding: [15, 0, 5, 10],
+          text: `${this.currency}${this.totalAmount}`,
+          subtext: `Total spend {${this.priceUp ? 'up' : 'down'}|${this.priceUp ? 'V' : '^'}}{${this.priceUp ? 'a' : 'b'}|${this.currency}40}`,
+          subtextStyle: {
+            rich: {
+              a: { fontSize: 12, fontWeight: 'bold', color: 'green' },
+              b: { fontSize: 12, fontWeight: 'bold', color: 'red' },
+              down: { color: 'red', fontWeight: '1000', fontSize: 20, padding: [0, 0, -8, 0], width: 14 },
+              up: { color: 'green', fontWeight: '1000', fontSize: 14, padding: [0, 2, 0, 4] }
+            }
+          }
         },
         tooltip: {
           trigger: 'axis',
@@ -83,7 +108,9 @@ export default {
           show: true,
           feature: {
             magicType: { show: true, type: ['line', 'bar'] }
-          }
+          },
+          right: '2%',
+          top: '5%'
         },
         xAxis: [{
           type: 'category',
@@ -96,12 +123,17 @@ export default {
           splitNumber: 2,
           position: 'right',
           axisLine: { show: false },
-          axisLabel: { show: true, margin: 3, formatter: '£{value}', showMaxLabel: true },
+          axisLabel: {
+            show: true,
+            margin: 3,
+            formatter: `${this.currency}{value}`,
+            showMaxLabel: true
+          },
           splitLine: { show: true }
         }],
         series: [
           {
-            name: 'Current period',
+            name: 'Current ' + this.period,
             type: 'bar',
             showBackground: true,
             barGap: -0.1,
@@ -116,10 +148,13 @@ export default {
               shadowBlur: 10,
               shadowOffsetX: 5,
               shadowOffsetY: 5
+            },
+            markLine: {
+              data: [{ type: 'average', name: 'Average' }]
             }
           },
           {
-            name: 'Previous period',
+            name: 'Previous ' + this.period,
             type: 'bar',
             showBackground: true,
             label: { show: false },
@@ -131,6 +166,9 @@ export default {
               shadowBlur: 10,
               shadowOffsetX: 5,
               shadowOffsetY: 5
+            },
+            markLine: {
+              data: [{ type: 'average', name: 'Average' }]
             }
           }
         ]
