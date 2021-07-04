@@ -12,13 +12,13 @@
         />
         <transactions-chart
           :display-date="this.$store.state.displayDate"
-          :currency="currency"
+          :currency="$store.state.account.settings.currency"
           :categories="$store.getters.catsByIds"
           :items="$store.getters.expenseTransactions"
           :total-amount="$store.getters.totalSpent"
         />
         <transactions-breakdown
-          :currency-name="currencyName"
+          :currency="$store.state.account.settings.currency"
           :categories="$store.getters.catsByIds"
           :items="$store.getters.expenseTransactions"
           :total-amount="$store.getters.totalSpent"

@@ -38,7 +38,7 @@
           outlined
         >
           <v-icon>
-            mdi-currency-{{currencyName.toLowerCase()}}
+            mdi-currency-{{currency.code.toLowerCase()}}
           </v-icon>
           {{item.total}}
         </v-chip>
@@ -69,8 +69,8 @@ export default {
       type: Object,
       required: true
     },
-    currencyName: {
-      type: String,
+    currency: {
+      type: Object,
       required: true
     }
   },

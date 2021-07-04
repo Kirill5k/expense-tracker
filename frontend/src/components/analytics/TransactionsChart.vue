@@ -42,7 +42,7 @@ export default {
       required: true
     },
     currency: {
-      type: String,
+      type: Object,
       required: true
     },
     displayDate: {
@@ -89,8 +89,8 @@ export default {
         title: {
           itemGap: 5,
           padding: [15, 0, 5, 10],
-          text: `${this.currency}${this.totalAmount}`,
-          subtext: `Total spend {${this.priceUp ? 'up' : 'down'}|${this.priceUp ? 'Ý' : 'ß'}}{${this.priceUp ? 'a' : 'b'}|${this.currency}40}`,
+          text: `${this.currency.symbol}${this.totalAmount}`,
+          subtext: `Total spend {${this.priceUp ? 'up' : 'down'}|${this.priceUp ? 'Ý' : 'ß'}}{${this.priceUp ? 'a' : 'b'}|${this.currency.symbol}40}`,
           subtextStyle: {
             rich: {
               a: { fontSize: 12, fontWeight: 'bold', color: 'green' },
@@ -126,7 +126,7 @@ export default {
           axisLabel: {
             show: true,
             margin: 3,
-            formatter: `${this.currency}{value}`,
+            formatter: `${this.currency.symbol}{value}`,
             showMaxLabel: true
           },
           splitLine: { show: true }

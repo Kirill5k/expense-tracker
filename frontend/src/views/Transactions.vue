@@ -63,7 +63,7 @@
             outlined
           >
             <v-icon>
-              mdi-currency-{{currencyName.toLowerCase()}}
+              mdi-currency-{{currency.code.toLowerCase()}}
             </v-icon>
             <span>{{ $store.getters.totalEarned }}</span>
           </v-chip>
@@ -75,7 +75,7 @@
             outlined
           >
             <v-icon>
-              mdi-currency-{{currencyName.toLowerCase()}}
+              mdi-currency-{{currency.code.toLowerCase()}}
             </v-icon>
             <span>{{ $store.getters.totalSpent }}</span>
           </v-chip>
@@ -84,7 +84,7 @@
         <v-spacer></v-spacer>
         <new-transaction-dialog
           ref="newTransactionDialog"
-          :currency-name="currencyName"
+          :currency="$store.state.account.settings.currency"
           :expense-cats="$store.getters.expenseCats"
           :income-cats="$store.getters.incomeCats"
           @save="create"
@@ -112,12 +112,14 @@ export default {
   },
   data: () => ({
     loading: false,
-    editable: false,
-    currencyName: 'USD'
+    editable: false
   }),
   computed: {
     transactions () {
       return this.$store.getters.displayedTransactions
+    },
+    currency () {
+      return this.$store.state.account.settings.currency
     }
   },
   methods: {
