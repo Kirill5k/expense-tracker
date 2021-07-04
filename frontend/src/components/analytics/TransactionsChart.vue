@@ -5,10 +5,19 @@
 </template>
 
 <script>
-import { THEME_KEY } from 'vue-echarts'
+import VChart, { THEME_KEY } from 'vue-echarts'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { BarChart, PieChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent, TitleComponent, LegendComponent } from 'echarts/components'
+
+use([CanvasRenderer, BarChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
 
 export default {
   name: 'TransactionsChart',
+  components: {
+    VChart
+  },
   provide: {
     [THEME_KEY]: 'dark'
   },
