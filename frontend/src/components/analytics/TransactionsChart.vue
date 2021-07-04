@@ -1,6 +1,13 @@
 <template>
   <div class="transactions-chart">
-    <v-chart class="chart" :option="option" />
+    <figure>
+      <v-chart
+        class="chart"
+        :init-options="initOptions"
+        :option="option"
+        autoresize
+      />
+    </figure>
   </div>
 </template>
 
@@ -13,13 +20,25 @@ import { GridComponent, TooltipComponent, TitleComponent, LegendComponent } from
 
 use([CanvasRenderer, BarChart, PieChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent])
 
+const labelOption = {
+  show: true,
+  position: 'insideBottom',
+  distance: '5',
+  align: 'left',
+  verticalAlign: 'middle',
+  rotate: 90,
+  formatter: '{c}  {name|{a}}',
+  fontSize: 16,
+  rich: { name: {} }
+}
+
 export default {
   name: 'TransactionsChart',
   components: {
     VChart
   },
   provide: {
-    [THEME_KEY]: 'dark'
+    [THEME_KEY]: 'light'
   },
   props: {
     items: {
@@ -36,56 +55,59 @@ export default {
     }
   },
   data: () => ({
+    initOptions: {
+      renderer: 'canvas'
+    },
     option: {
       title: {
-        text: 'Traffic Sources',
-        left: 'center'
+        text: 'Chart title',
+        subtext: 'Small subtitle'
       },
       tooltip: {
-        trigger: 'item',
-        formatter: '\'{a} <br/>{b} : {c} ({d}%)\''
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
       },
       legend: {
-        orient: 'vertical',
-        left: 'left',
-        data: [
-          'Direct',
-          'Email',
-          'Ad Networks',
-          'Video Ads',
-          'Search Engines'
-        ]
+        data: ['current', 'previous']
       },
+      xAxis: [
+        {
+          type: 'category',
+          axisTick: { show: false },
+          data: ['2012', '2013', '2014', '2015', '2016']
+        }
+      ],
+      yAxis: [{ type: 'value' }],
       series: [
         {
-          name: 'Traffic Sources',
-          type: 'pie',
-          radius: '55%',
-          center: ['50%', '60%'],
-          data: [
-            { value: 335, name: 'Direct' },
-            { value: 310, name: 'Email' },
-            { value: 234, name: 'Ad Networks' },
-            { value: 135, name: 'Video Ads' },
-            { value: 1548, name: 'Search Engines' }
-          ],
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
-          }
+          name: 'current',
+          type: 'bar',
+          barGap: 0,
+          label: labelOption,
+          emphasis: { focus: 'series' },
+          data: [320, 332, 301, 334, 390]
+        },
+        {
+          name: 'previous',
+          type: 'bar',
+          label: labelOption,
+          emphasis: { focus: 'series' },
+          data: [220, 182, 191, 234, 290]
         }
       ]
     }
-  })
+  }),
+  methods: {
+
+  }
 }
 </script>
 
 <style lang="scss">
 .chart {
-  height: 400px;
+  height: 300px;
 }
 .transactions-chart {
 
