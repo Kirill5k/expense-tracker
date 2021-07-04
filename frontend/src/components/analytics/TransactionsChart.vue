@@ -67,6 +67,10 @@ export default {
     },
     option () {
       return {
+        grid: {
+          left: '5%',
+          bottom: '10%'
+        },
         title: {
           text: 'Chart title',
           subtext: 'Small subtitle'
@@ -100,7 +104,9 @@ export default {
             name: 'Current period',
             type: 'bar',
             showBackground: true,
-            barGap: 0,
+            barGap: -0.1,
+            barCategoryGap: '25%',
+            zlevel: 1,
             label: { show: false },
             emphasis: { focus: 'series' },
             data: [320, 332, 301, 334, 390],
@@ -139,7 +145,7 @@ export default {
 
 <style lang="scss">
 .chart {
-  height: 300px;
+  height: 250px;
 }
 .transactions-chart {
 
