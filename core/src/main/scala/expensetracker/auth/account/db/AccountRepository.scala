@@ -5,6 +5,7 @@ import cats.implicits._
 import com.mongodb.client.model.Filters
 import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, PasswordHash}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
+import expensetracker.common.json._
 import io.circe.generic.auto._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}

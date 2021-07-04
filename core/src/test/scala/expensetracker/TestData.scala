@@ -18,7 +18,7 @@ trait TestData {
   val hash    = PasswordHash("hash")
   val email   = AccountEmail("email")
   val details = AccountDetails(email, AccountName("John", "Bloggs"))
-  val acc     = Account(aid, details.email, details.name, hash)
+  val acc     = Account(aid, details.email, details.name, hash, AccountSettings(GBP))
 
   val cid   = CategoryId("AB0C5342AB0C5342AB0C5342")
   val cname = CategoryName("cat-1")

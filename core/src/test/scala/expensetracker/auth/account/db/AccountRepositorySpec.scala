@@ -3,7 +3,7 @@ package expensetracker.auth.account.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountName, PasswordHash}
+import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountName, AccountSettings, PasswordHash}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
@@ -29,7 +29,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           } yield acc
 
           result.map { acc =>
-            acc mustBe Account(acc1Id, accDetails.email, accDetails.name, hash)
+            acc mustBe Account(acc1Id, accDetails.email, accDetails.name, hash, AccountSettings.Default)
           }
         }
       }
@@ -57,7 +57,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           } yield acc
 
           result.map { acc =>
-            acc mustBe Some(Account(acc1Id, accDetails.email, accDetails.name, hash))
+            acc mustBe Some(Account(acc1Id, accDetails.email, accDetails.name, hash, AccountSettings.Default))
           }
         }
       }
@@ -88,7 +88,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           } yield (aid, acc)
 
           result.map { case (aid, acc) =>
-            acc mustBe Some(Account(aid, email, accDetails.name, hash))
+            acc mustBe Some(Account(aid, email, accDetails.name, hash, AccountSettings.Default))
           }
         }
       }

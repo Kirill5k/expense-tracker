@@ -6,7 +6,7 @@ import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountName, Password}
+import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountName, AccountSettings, Password}
 import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
@@ -94,7 +94,8 @@ object AuthController {
   final case class AccountView(
       firstName: String,
       lastName: String,
-      email: String
+      email: String,
+      settings: AccountSettings
   )
 
   object AccountView {
@@ -102,7 +103,8 @@ object AuthController {
       AccountView(
         acc.name.first,
         acc.name.last,
-        acc.email.value
+        acc.email.value,
+        acc.settings
       )
   }
 

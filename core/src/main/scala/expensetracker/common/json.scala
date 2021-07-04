@@ -31,6 +31,20 @@ trait JsonCodecs {
 
   implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 
+  implicit val decodeCurrency: Decoder[Currency] = Decoder[JsonObject].emap { json =>
+    for {
+      code     <- json("code").flatMap(_.asString).toRight("missing currency code")
+      currency <- Currency(code)(defaultMoneyContext).toEither.leftMap(_.getMessage)
+    } yield currency
+  }
+
+  implicit val encodeCurrency: Encoder[Currency] = Encoder[JsonObject].contramap { c =>
+    JsonObject(
+      "code"   -> Json.fromString(c.code),
+      "symbol" -> Json.fromString(c.symbol)
+    )
+  }
+
   implicit val decodeMoney: Decoder[Money] = Decoder[JsonObject].emap { json =>
     for {
       rawValue    <- json("value").flatMap(_.asNumber).toRight("missing the actual amount")
@@ -42,9 +56,9 @@ trait JsonCodecs {
 
   implicit val encodeMoney: Encoder[Money] = Encoder[JsonObject].contramap { m =>
     JsonObject(
-      "value" -> Json.fromBigDecimal(m.amount),
+      "value"    -> Json.fromBigDecimal(m.amount),
       "currency" -> Json.fromString(m.currency.code),
-      "symbol" -> Json.fromString(m.currency.symbol)
+      "symbol"   -> Json.fromString(m.currency.symbol)
     )
   }
 

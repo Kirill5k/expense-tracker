@@ -83,7 +83,7 @@ class AccountServiceSpec extends CatsSpec {
 
       "return error when password doesn't match" in {
         val (repo, encr) = mocks
-        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(Some(Account(aid, details.email, details.name, hash))))
+        when(repo.findBy(any[AccountEmail])).thenReturn(IO.pure(Some(acc)))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
         val result = for {

@@ -1,20 +1,22 @@
 package expensetracker.auth.account.db
 
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountName, PasswordHash}
+import expensetracker.auth.account._
 import org.bson.types.ObjectId
 
 final case class AccountEntity(
     _id: ObjectId,
     email: String,
     name: AccountName,
-    password: String
+    password: String,
+    settings: Option[AccountSettings]
 ) {
   def toDomain: Account =
     Account(
       id = AccountId(_id.toHexString),
       email = AccountEmail(email),
       name = name,
-      password = PasswordHash(password)
+      password = PasswordHash(password),
+      settings.getOrElse(AccountSettings.Default)
     )
 }
 
@@ -24,6 +26,7 @@ object AccountEntity {
       new ObjectId(),
       details.email.value,
       details.name,
-      password.value
+      password.value,
+      Some(AccountSettings.Default)
     )
 }

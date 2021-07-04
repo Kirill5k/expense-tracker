@@ -20,7 +20,13 @@ class AuthControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/auth/account", method = Method.GET).addCookie(sessIdCookie)
         val res = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
+        val resBody =
+          """{
+            |"email":"email",
+            |"firstName":"John",
+            |"lastName":"Bloggs",
+            |"settings":{"currency":{"code":"GBP","symbol":"£"}}
+            |}""".stripMargin
         verifyJsonResponse(res, Status.Ok, Some(resBody))
         verify(svc).findAccount(sess.accountId)
       }
@@ -125,7 +131,13 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        val resBody = """{"email":"email","firstName":"John","lastName":"Bloggs"}"""
+        val resBody =
+          """{
+            |"email":"email",
+            |"firstName":"John",
+            |"lastName":"Bloggs",
+            |"settings":{"currency":{"code":"GBP","symbol":"£"}}
+            |}""".stripMargin
         val sessCookie = ResponseCookie(
           "session-id",
           sid.value,
