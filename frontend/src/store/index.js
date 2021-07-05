@@ -48,9 +48,15 @@ export default new Vuex.Store({
       current: withinDates(state.transactions, state.displayDate),
       previous: withinDates(state.transactions, state.displayDate.previous || {})
     }),
-    expenseTransactions: (state, getters) => getters.displayedTransactions.current.filter(t => t.kind === 'expense'),
+    expenseTransactions: (state, getters) => ({
+      current: getters.displayedTransactions.current.filter(t => t.kind === 'expense'),
+      previous: getters.displayedTransactions.previous.filter(t => t.kind === 'expense')
+    }),
     incomeTransactions: (state, getters) => getters.displayedTransactions.current.filter(t => t.kind === 'income'),
-    totalSpent: (state, getters) => totalAmount(getters.expenseTransactions),
+    totalSpent: (state, getters) => ({
+      current: totalAmount(getters.expenseTransactions.current),
+      previous: totalAmount(getters.expenseTransactions.previous)
+    }),
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {

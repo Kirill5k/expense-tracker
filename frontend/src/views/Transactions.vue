@@ -23,7 +23,7 @@
 
       <v-card-text class="pb-0">
         <date-period-selector
-          :display-date="this.$store.state.displayDate"
+          :display-date="$store.state.displayDate"
           @update="updateDisplayDate"
         />
 
@@ -77,14 +77,14 @@
             <v-icon>
               mdi-currency-{{currency.code.toLowerCase()}}
             </v-icon>
-            <span>{{ $store.getters.totalSpent }}</span>
+            <span>{{ $store.getters.totalSpent.current }}</span>
           </v-chip>
 
         </div>
         <v-spacer></v-spacer>
         <new-transaction-dialog
           ref="newTransactionDialog"
-          :currency="$store.state.account.settings.currency"
+          :currency="currency"
           :expense-cats="$store.getters.expenseCats"
           :income-cats="$store.getters.incomeCats"
           @save="create"

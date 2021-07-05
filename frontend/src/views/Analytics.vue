@@ -10,22 +10,22 @@
 
       <v-card-text>
         <date-period-selector
-          :display-date="this.$store.state.displayDate"
+          :display-date="$store.state.displayDate"
           @update="updateDisplayDate"
         />
         <transactions-chart
-          :display-date="this.$store.state.displayDate"
+          :display-date="$store.state.displayDate"
           :currency="$store.state.account.settings.currency"
           :categories="$store.getters.catsByIds"
-          :items="$store.getters.expenseTransactions"
-          :total-amount="$store.getters.totalSpent"
+          :items="$store.getters.expenseTransactions.current"
+          :total-amount="$store.getters.totalSpent.current"
         />
         <p class="text-subtitle-2 ml-2 mb-0 mt-1">Spending breakdown</p>
         <transactions-breakdown
           :currency="$store.state.account.settings.currency"
           :categories="$store.getters.catsByIds"
-          :items="$store.getters.expenseTransactions"
-          :total-amount="$store.getters.totalSpent"
+          :items="$store.getters.expenseTransactions.current"
+          :total-amount="$store.getters.totalSpent.current"
         />
       </v-card-text>
 
