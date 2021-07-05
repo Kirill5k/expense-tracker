@@ -3,6 +3,13 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+const withinDates = (txs, { start, end }) => txs.filter(tx => {
+  const txdate = new Date(tx.date)
+  return start <= txdate && txdate <= end
+})
+
+const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
+
 const reject = (res, commit) => res.json().then(e => {
   if (commit) {
     commit('setAlert', { type: 'error', message: e.message })
@@ -37,14 +44,11 @@ export default new Vuex.Store({
       acc[el.id] = el
       return acc
     }, {}),
-    displayedTransactions: state => state.transactions.filter(tx => {
-      const txdate = new Date(tx.date)
-      return state.displayDate.start <= txdate && txdate <= state.displayDate.end
-    }),
+    displayedTransactions: state => withinDates(state.transactions, state.displayDate),
     expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'expense'),
     incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'income'),
-    totalSpent: (state, getters) => getters.expenseTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2),
-    totalEarned: (state, getters) => getters.incomeTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
+    totalSpent: (state, getters) => totalAmount(getters.expenseTransactions),
+    totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {
     setAlert (state, alert) {
