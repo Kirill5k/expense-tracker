@@ -163,7 +163,7 @@ export default {
             showBackground: true,
             barGap: -0.1,
             barCategoryGap: '25%',
-            zlevel: 1,
+            zlevel: 10,
             label: { show: false },
             emphasis: { focus: 'series' },
             data: this.yAxisCurrentData,
@@ -181,12 +181,13 @@ export default {
           {
             name: this.displayDate.previous.text,
             type: 'bar',
+            zlevel: 1,
             showBackground: true,
             label: { show: false },
             emphasis: { focus: 'series' },
             data: this.yAxisPreviousData,
             itemStyle: {
-              color: '#03DAC6',
+              color: 'rgba(3, 218, 198, 0.6)',
               shadowColor: 'rgba(0, 0, 0, 0.5)',
               shadowBlur: 10,
               shadowOffsetX: 5,
