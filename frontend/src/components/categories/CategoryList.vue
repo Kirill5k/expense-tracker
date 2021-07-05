@@ -47,6 +47,7 @@
               </v-btn>
             </v-slide-x-transition>
             <v-icon
+              :color="item.color"
               class="pl-3"
               v-text="item.icon"
             />

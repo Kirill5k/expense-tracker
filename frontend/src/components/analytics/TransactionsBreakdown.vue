@@ -18,7 +18,8 @@
           <v-icon
             small
             outline
-            class="black lighten-10"
+            :color="categories[item.id].color"
+            class="lighten-10"
             dark
           >
             {{ categories[item.id].icon }}
@@ -78,15 +79,6 @@ export default {
     headers: DEFAULT_HEADERS
   }),
   computed: {
-    tableData () {
-      return this.items.map(i => ({
-        id: i.id,
-        icon: this.categories[i.categoryId].icon,
-        tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
-        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency },
-        original: i
-      }))
-    },
     breakdown () {
       const grouped = this.items.reduce((acc, tx) => {
         const catId = tx.categoryId
