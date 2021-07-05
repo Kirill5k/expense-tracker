@@ -7,18 +7,9 @@
       <v-card-title>
         Transactions
         <v-spacer></v-spacer>
-        <v-btn
-          class="mr-1"
-          elevation="2"
-          x-small
-          text
-          rounded
-          plain
-        >
-          <v-icon>
-            mdi-sort
-          </v-icon>
-        </v-btn>
+        <transactions-sorter
+          @sort="sort"
+        />
       </v-card-title>
 
       <v-card-text class="pb-0">
@@ -99,6 +90,7 @@
 <script>
 import Page from '@/components/Page'
 import TransactionList from '@/components/transactions/TransactionList'
+import TransactionsSorter from '@/components/transactions/TransactionsSorter'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import DatePeriodSelector from '@/components/DatePeriodSelector'
 
@@ -107,6 +99,7 @@ export default {
   components: {
     Page,
     TransactionList,
+    TransactionsSorter,
     NewTransactionDialog,
     DatePeriodSelector
   },
@@ -147,6 +140,9 @@ export default {
     updateDisplayDate (newRange) {
       this.editable = false
       this.$store.commit('setDisplayDate', newRange)
+    },
+    sort (opt) {
+      console.log(opt)
     }
   }
 }

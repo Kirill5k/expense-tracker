@@ -4,6 +4,7 @@
       v-if="isAuthenticated"
       app
       color="white"
+      dense
     >
       <v-chip
         color="black"

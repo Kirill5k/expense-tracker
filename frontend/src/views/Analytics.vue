@@ -15,6 +15,7 @@
         />
         <transactions-chart
           v-if="$store.state.displayDate.previous"
+          :key="$store.state.displayDate.text"
           :display-date="$store.state.displayDate"
           :currency="$store.state.account.settings.currency"
           :categories="$store.getters.catsByIds"
