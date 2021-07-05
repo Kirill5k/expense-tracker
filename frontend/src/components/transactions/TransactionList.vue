@@ -17,11 +17,11 @@
     <template v-slot:item.icon="{ item }">
       <v-list-item-avatar
         size="26"
+        :color="item.color"
       >
         <v-icon
           small
           outline
-          :color="item.color"
           class="lighten-10"
           dark
         >

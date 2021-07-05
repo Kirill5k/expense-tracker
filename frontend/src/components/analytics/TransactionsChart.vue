@@ -50,7 +50,7 @@ export default {
       required: true
     },
     totalAmount: {
-      type: Number,
+      type: [String, Number],
       required: true
     }
   },
@@ -147,7 +147,7 @@ export default {
               shadowColor: 'rgba(0, 0, 0, 0.5)',
               shadowBlur: 10,
               shadowOffsetX: 5,
-              shadowOffsetY: 5
+              shadowOffsetY: 2
             },
             markLine: {
               data: [{ type: 'average', name: 'Average' }]
@@ -165,7 +165,7 @@ export default {
               shadowColor: 'rgba(0, 0, 0, 0.5)',
               shadowBlur: 10,
               shadowOffsetX: 5,
-              shadowOffsetY: 5
+              shadowOffsetY: 2
             },
             markLine: {
               data: [{ type: 'average', name: 'Average' }]
@@ -183,7 +183,7 @@ export default {
 
 <style lang="scss">
 .chart {
-  height: 250px;
+  height: 220px;
 }
 .transactions-chart {
 

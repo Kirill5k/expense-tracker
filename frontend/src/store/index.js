@@ -50,8 +50,8 @@ export default new Vuex.Store({
     }),
     expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'expense'),
     incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'income'),
-    totalSpent: (state, getters) => getters.expenseTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0),
-    totalEarned: (state, getters) => getters.incomeTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0)
+    totalSpent: (state, getters) => getters.expenseTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2),
+    totalEarned: (state, getters) => getters.incomeTransactions.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
   },
   mutations: {
     setAlert (state, alert) {

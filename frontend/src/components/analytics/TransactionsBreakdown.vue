@@ -9,16 +9,19 @@
     :items-per-page="-1"
     :headers-length="2"
     no-data-text="No transactions for this period"
+    :height="height"
     disable-pagination
     mobile-breakpoint="100"
   >
     <template v-slot:item.tx="{ item }">
       <v-list-item>
-        <v-list-item-avatar size="26">
+        <v-list-item-avatar
+          :color="categories[item.id].color"
+          size="26"
+        >
           <v-icon
             small
             outline
-            :color="categories[item.id].color"
             class="lighten-10"
             dark
           >
@@ -63,7 +66,7 @@ export default {
       required: true
     },
     totalAmount: {
-      type: Number,
+      type: [String, Number],
       required: true
     },
     categories: {
@@ -90,6 +93,15 @@ export default {
       }, {})
 
       return Object.values(grouped).sort((a, b) => b.total - a.total)
+    },
+    height () {
+      if (this.items.length === 0) {
+        return 100
+      } else if (this.items.length > 4) {
+        return 250
+      } else {
+        return this.items.length * 80
+      }
     }
   },
   methods: {
