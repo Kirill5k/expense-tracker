@@ -33,7 +33,11 @@ export default {
     [THEME_KEY]: 'light'
   },
   props: {
-    items: {
+    currentItems: {
+      type: Array,
+      required: true
+    },
+    previousItems: {
       type: Array,
       required: true
     },
@@ -64,11 +68,23 @@ export default {
     }
   }),
   computed: {
-    spendingDown () {
-      return Number(this.totalAmount) < Number(this.previousTotalAmount)
+    xAxisData () {
+      if (this.displayDate.range === 'weekly') {
+        return WEEKLY_LABELS
+      } else if (this.displayDate.range === 'monthly') {
+        return MONTHLY_LABELS
+      } else {
+        return YEARLY_LABELS
+      }
+    },
+    yAxisCurrentData () {
+      return this.groupItemsByDate(this.currentItems)
+    },
+    yAxisPreviousData () {
+      return this.groupItemsByDate(this.previousItems)
     },
     spendingDifference () {
-      return Math.abs(Number(this.totalAmount) - Number(this.previousTotalAmount))
+      return Math.abs(Number(this.totalAmount) - Number(this.previousTotalAmount)).toFixed(2)
     },
     subtext () {
       if (this.totalAmount === this.previousTotalAmount) {
@@ -86,15 +102,6 @@ export default {
         return 'month'
       } else {
         return 'year'
-      }
-    },
-    xAxisData () {
-      if (this.displayDate.range === 'weekly') {
-        return WEEKLY_LABELS
-      } else if (this.displayDate.range === 'monthly') {
-        return MONTHLY_LABELS
-      } else {
-        return YEARLY_LABELS
       }
     },
     option () {
@@ -159,7 +166,7 @@ export default {
             zlevel: 1,
             label: { show: false },
             emphasis: { focus: 'series' },
-            data: [320, 332, 301, 334, 390],
+            data: this.yAxisCurrentData,
             itemStyle: {
               color: '#6200EE',
               shadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -177,7 +184,7 @@ export default {
             showBackground: true,
             label: { show: false },
             emphasis: { focus: 'series' },
-            data: [220, 182, 191, 234, 290],
+            data: this.yAxisPreviousData,
             itemStyle: {
               color: '#03DAC6',
               shadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -194,7 +201,26 @@ export default {
     }
   },
   methods: {
-
+    getItemGroup (item) {
+      switch (this.displayDate.range) {
+        case 'yearly':
+          return new Date(item.date).getMonth()
+        case 'weekly':
+          return new Date(item.date).getDay()
+        default:
+          return Math.floor((new Date(item.date).getDate() - 1) / 7)
+      }
+    },
+    groupItemsByDate (items) {
+      const data = new Array(this.xAxisData.length).fill(0)
+      return items
+        .reduce((acc, i) => {
+          const group = this.getItemGroup(i)
+          acc[group] = acc[group] + i.amount.value
+          return acc
+        }, data)
+        .map(i => i.toFixed(2))
+    }
   }
 }
 </script>

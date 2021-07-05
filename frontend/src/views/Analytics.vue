@@ -17,7 +17,8 @@
           :display-date="$store.state.displayDate"
           :currency="$store.state.account.settings.currency"
           :categories="$store.getters.catsByIds"
-          :items="$store.getters.expenseTransactions.current"
+          :current-items="$store.getters.expenseTransactions.current"
+          :previous-items="$store.getters.expenseTransactions.previous"
           :total-amount="$store.getters.totalSpent.current"
           :previous-total-amount="$store.getters.totalSpent.previous"
         />
