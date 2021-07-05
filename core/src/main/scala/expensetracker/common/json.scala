@@ -45,20 +45,19 @@ trait JsonCodecs {
     )
   }
 
-  implicit val decodeMoney: Decoder[Money] = Decoder[JsonObject].emap { json =>
+  implicit def decodeMoney(implicit d: Decoder[Currency]): Decoder[Money] = Decoder[JsonObject].emap { json =>
     for {
       rawValue    <- json("value").flatMap(_.asNumber).toRight("missing the actual amount")
-      rawCurrency <- json("currency").flatMap(_.asString).toRight("missing currency")
-      currency    <- Currency(rawCurrency)(defaultMoneyContext).toEither.leftMap(_.getMessage)
+      rawCurrency <- json("currency").toRight("missing currency")
+      currency    <- d.decodeJson(rawCurrency).leftMap(_.message)
       value       <- Try(rawValue.toDouble).toEither.leftMap(_.getMessage)
     } yield Money(value, currency)
   }
 
-  implicit val encodeMoney: Encoder[Money] = Encoder[JsonObject].contramap { m =>
+  implicit def encodeMoney(implicit e: Encoder[Currency]): Encoder[Money] = Encoder[JsonObject].contramap { m =>
     JsonObject(
       "value"    -> Json.fromBigDecimal(m.amount),
-      "currency" -> Json.fromString(m.currency.code),
-      "symbol"   -> Json.fromString(m.currency.symbol)
+      "currency" -> e(m.currency)
     )
   }
 

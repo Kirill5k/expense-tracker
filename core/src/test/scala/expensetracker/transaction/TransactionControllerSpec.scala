@@ -23,7 +23,7 @@ class TransactionControllerSpec extends ControllerSpec {
             |"categoryId":"AB0C5342AB0C5342AB0C5342",
             |"kind":"expense",
             |"date": "2021-01-01",
-            |"amount": {"value":5.99,"currency":"GBP"}
+            |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}}
             |}""".stripMargin)
         val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -58,7 +58,7 @@ class TransactionControllerSpec extends ControllerSpec {
                                   |"categoryId":"FOO",
                                   |"kind":"expense",
                                   |"date": "2021-01-01",
-                                  |"amount": {"value":5.99,"currency":"GBP"}
+                                  |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}}
                                   |}""".stripMargin)
         val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -87,8 +87,7 @@ class TransactionControllerSpec extends ControllerSpec {
           |    "categoryId" : "AB0C5342AB0C5342AB0C5342",
           |    "amount" : {
           |      "value" : 10.99,
-          |      "currency" : "GBP",
-          |      "symbol" : "£"
+          |      "currency":{"code":"GBP","symbol":"£"}
           |    },
           |    "date" : "2021-06-06T00:00:00Z",
           |    "note" : "test tx"
@@ -114,8 +113,7 @@ class TransactionControllerSpec extends ControllerSpec {
                         |"categoryId" : "AB0C5342AB0C5342AB0C5342",
                         |"amount" : {
                         |  "value" : 10.99,
-                        |  "currency" : "GBP",
-                        |  "symbol" : "£"
+                        |  "currency":{"code":"GBP","symbol":"£"}
                         |},
                         |"date" : "2021-06-06T00:00:00Z",
                         |"note" : "test tx"
@@ -145,8 +143,7 @@ class TransactionControllerSpec extends ControllerSpec {
                       |"categoryId" : "AB0C5342AB0C5342AB0C5342",
                       |"amount" : {
                       |  "value" : 10.99,
-                      |  "currency" : "GBP",
-                      |  "symbol" : "£"
+                      |  "currency":{"code":"GBP","symbol":"£"}
                       |},
                       |"date" : "2021-06-06",
                       |"note" : "test tx"

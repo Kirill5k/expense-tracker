@@ -106,7 +106,7 @@ export default {
         color: this.categories[i.categoryId].color,
         icon: this.categories[i.categoryId].icon,
         tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
-        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency },
+        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency.code },
         original: i
       }))
     },
