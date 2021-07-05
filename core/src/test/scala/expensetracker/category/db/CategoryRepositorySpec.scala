@@ -3,7 +3,15 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
+import expensetracker.category.{
+  Category,
+  CategoryColor,
+  CategoryIcon,
+  CategoryId,
+  CategoryKind,
+  CategoryName,
+  CreateCategory
+}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.errors.AppError.CategoryDoesNotExist
 import mongo4cats.client.MongoClientF
@@ -24,11 +32,17 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     "create" should {
       "create new category in db" in {
         withEmbeddedMongoDb { client =>
-          val create = CreateCategory(CategoryKind.Income, CategoryName("test"), CategoryIcon("icon"), acc1Id)
+          val create = CreateCategory(
+            CategoryKind.Income,
+            CategoryName("test"),
+            CategoryIcon("icon"),
+            CategoryColor.Blue,
+            acc1Id
+          )
           val result = for {
             repo <- CategoryRepository.make(client)
-            id <- repo.create(create)
-            cat <- repo.get(acc1Id, id)
+            id   <- repo.create(create)
+            cat  <- repo.get(acc1Id, id)
           } yield cat
 
           result.map { cat =>
@@ -46,7 +60,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            cat <- repo.get(acc1Id, cat2Id)
+            cat  <- repo.get(acc1Id, cat2Id)
           } yield cat
 
           result.attempt.map { res =>
@@ -106,7 +120,14 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     "update" should {
       "update existing category" in {
         withEmbeddedMongoDb { db =>
-          val update = Category(cat2Id, CategoryKind.Income, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id))
+          val update = Category(
+            cat2Id,
+            CategoryKind.Income,
+            CategoryName("c2-upd"),
+            CategoryIcon("icon-upd"),
+            CategoryColor.Blue,
+            Some(acc2Id)
+          )
           val result = for {
             repo <- CategoryRepository.make(db)
             _    <- repo.update(update)
@@ -122,7 +143,14 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
 
       "return error when category does not exist" in {
         withEmbeddedMongoDb { db =>
-          val update = Category(cat1Id, CategoryKind.Expense, CategoryName("c2-upd"), CategoryIcon("icon-upd"), Some(acc2Id))
+          val update = Category(
+            cat1Id,
+            CategoryKind.Expense,
+            CategoryName("c2-upd"),
+            CategoryIcon("icon-upd"),
+            CategoryColor.Blue,
+            Some(acc2Id)
+          )
           val result = for {
             repo <- CategoryRepository.make(db)
             res  <- repo.update(update)

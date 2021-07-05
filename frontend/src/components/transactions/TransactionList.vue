@@ -17,11 +17,12 @@
     <template v-slot:item.icon="{ item }">
       <v-list-item-avatar
         size="26"
+        :color="item.color"
       >
         <v-icon
           small
           outline
-          class="black lighten-10"
+          class="lighten-10"
           dark
         >
           {{ item.icon }}
@@ -102,9 +103,10 @@ export default {
     tableData () {
       return this.items.map(i => ({
         id: i.id,
+        color: this.categories[i.categoryId].color,
         icon: this.categories[i.categoryId].icon,
         tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
-        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency },
+        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency.code },
         original: i
       }))
     },

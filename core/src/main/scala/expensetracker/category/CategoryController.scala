@@ -3,6 +3,8 @@ package expensetracker.category
 import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
@@ -72,16 +74,20 @@ final class CategoryController[F[_]: Logger](
 
 object CategoryController {
 
+  type Color = String Refined MatchesRegex["^#[A-Za-z0-9]{3,6}$"]
+
   final case class CreateCategoryRequest(
       kind: CategoryKind,
       name: NonEmptyString,
-      icon: NonEmptyString
+      icon: NonEmptyString,
+      color: Color
   ) {
     def toDomain(aid: AccountId): CreateCategory =
       CreateCategory(
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
         kind = kind,
+        color = CategoryColor(color.value),
         accountId = aid
       )
   }
@@ -92,7 +98,8 @@ object CategoryController {
       id: NonEmptyString,
       kind: CategoryKind,
       name: NonEmptyString,
-      icon: NonEmptyString
+      icon: NonEmptyString,
+      color: Color
   ) {
     def toDomain(aid: AccountId): Category =
       Category(
@@ -100,6 +107,7 @@ object CategoryController {
         kind = kind,
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
+        color = CategoryColor(color.value),
         accountId = Some(aid)
       )
   }
@@ -108,12 +116,13 @@ object CategoryController {
       id: String,
       name: String,
       icon: String,
-      kind: CategoryKind
+      kind: CategoryKind,
+      color: String
   )
 
   object CategoryView {
     def from(cat: Category): CategoryView =
-      CategoryView(cat.id.value, cat.name.value, cat.icon.value, cat.kind)
+      CategoryView(cat.id.value, cat.name.value, cat.icon.value, cat.kind, cat.color.value)
   }
 
   def make[F[_]: Concurrent: Logger](service: CategoryService[F]): F[CategoryController[F]] =

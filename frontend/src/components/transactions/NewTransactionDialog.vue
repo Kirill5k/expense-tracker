@@ -207,7 +207,7 @@ export default {
     },
     save () {
       if (this.$refs.newTransactionForm.validate()) {
-        const amount = { value: Number(this.newTransaction.amount), currency: this.currency.code }
+        const amount = { value: Number(this.newTransaction.amount), currency: this.currency }
         const newTx = { ...this.newTransaction, amount }
         if (newTx.id) {
           this.$emit('update', newTx)
