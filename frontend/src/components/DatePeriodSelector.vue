@@ -23,7 +23,7 @@
     >
       <template v-slot:selection="{ }">
         <p class="ma-0 mt-1 text-center text-subtitle-2" style="width: 100%">
-          {{ formattedDisplayedDate }}
+          {{ displayDate.text }}
         </p>
       </template>
     </v-overflow-btn>
@@ -59,20 +59,9 @@ export default {
   data: () => ({
     dateRangeOptions: DATE_RANGE_OPTIONS
   }),
-  computed: {
-    formattedDisplayedDate () {
-      if (this.displayDate.range === 'monthly') {
-        return format(this.displayDate.start, 'LLLL yyyy')
-      } else if (this.displayDate.range === 'yearly') {
-        return format(this.displayDate.start, 'yyyy')
-      } else {
-        return `${format(this.displayDate.start, 'do MMM')} - ${format(this.displayDate.end, 'do MMM')}`
-      }
-    }
-  },
   methods: {
     update (newDisplayDate) {
-      this.$emit('update', newDisplayDate)
+      this.$emit('update', { ...newDisplayDate, text: this.getDisplayedDateText(newDisplayDate) })
     },
     resetDate (newRange) {
       this.update(this.applyNewRange(newRange))
@@ -105,6 +94,15 @@ export default {
           return { range: newRange, start: startOfMonth(today), end: endOfMonth(today) }
         default:
           return { range: newRange, start: startOfYear(today), end: endOfYear(today) }
+      }
+    },
+    getDisplayedDateText (newDisplayDate) {
+      if (newDisplayDate.range === 'monthly') {
+        return format(newDisplayDate.start, 'LLLL yyyy')
+      } else if (newDisplayDate.range === 'yearly') {
+        return format(newDisplayDate.start, 'yyyy')
+      } else {
+        return `${format(newDisplayDate.start, 'do MMM')} - ${format(newDisplayDate.end, 'do MMM')}`
       }
     }
   }
