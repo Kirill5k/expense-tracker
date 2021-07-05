@@ -158,7 +158,7 @@ export default {
         }],
         series: [
           {
-            name: 'Current ' + this.period,
+            name: this.displayDate.text,
             type: 'bar',
             showBackground: true,
             barGap: -0.1,
@@ -179,7 +179,7 @@ export default {
             }
           },
           {
-            name: 'Previous ' + this.period,
+            name: this.displayDate.previous.text,
             type: 'bar',
             showBackground: true,
             label: { show: false },
