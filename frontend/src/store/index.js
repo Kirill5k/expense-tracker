@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { startOfMonth, endOfMonth, format } from 'date-fns'
 
 Vue.use(Vuex)
 
@@ -9,13 +8,6 @@ const reject = (res, commit) => res.json().then(e => {
     commit('setAlert', { type: 'error', message: e.message })
   }
   return Promise.reject(new Error(e.message))
-})
-
-const DEFAULT_DISPLAY_DATE = date => ({
-  start: startOfMonth(date),
-  end: endOfMonth(date),
-  range: 'monthly',
-  text: format(date, 'LLLL yyyy')
 })
 
 const defaultRequestParams = {
@@ -32,7 +24,7 @@ export default new Vuex.Store({
     account: null,
     categories: [],
     transactions: [],
-    displayDate: DEFAULT_DISPLAY_DATE(new Date()),
+    displayDate: {},
     alert: {
       type: 'error',
       message: ''
@@ -150,7 +142,7 @@ export default new Vuex.Store({
           commit('unAuthenticate')
           commit('setCategories', [])
           commit('setTransactions', [])
-          commit('setDisplayDate', DEFAULT_DISPLAY_DATE(new Date()))
+          commit('setDisplayDate', {})
         })
     },
     createCategory ({ commit, dispatch }, requestBody) {

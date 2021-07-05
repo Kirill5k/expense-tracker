@@ -56,53 +56,62 @@ export default {
       required: true
     }
   },
+  created () {
+    if (!this.displayDate.text) {
+      this.resetDate('monthly')
+    }
+  },
   data: () => ({
     dateRangeOptions: DATE_RANGE_OPTIONS
   }),
   methods: {
     update (newDisplayDate) {
-      this.$emit('update', { ...newDisplayDate, text: this.getDisplayedDateText(newDisplayDate) })
+      this.$emit('update', newDisplayDate)
     },
     resetDate (newRange) {
-      this.update(this.applyNewRange(newRange))
+      const newDate = this.applyNewRange(newRange)
+      const previous = this.incrementBy(-1, newDate)
+      this.update({ ...newDate, previous })
     },
     goBack () {
-      this.update(this.incrementBy(-1))
+      const newDate = this.incrementBy(-1, this.displayDate)
+      const previous = this.incrementBy(-1, newDate)
+      this.update({ ...newDate, previous })
     },
     goForward () {
-      this.update(this.incrementBy(1))
+      const newDate = this.incrementBy(1, this.displayDate)
+      const previous = this.displayDate
+      this.update({ ...newDate, previous })
     },
-    incrementBy (amount) {
-      const start = this.displayDate.start
-      const end = this.displayDate.end
-      const range = this.displayDate.range
-      switch (this.displayDate.range) {
+    incrementBy (amount, { start, end, range }) {
+      switch (range) {
         case 'monthly':
-          return { range, start: addMonths(start, amount), end: endOfMonth(addMonths(end, amount)) }
+          return this.newDisplayDate(range, addMonths(start, amount), endOfMonth(addMonths(end, amount)))
         case 'weekly':
-          return { range, start: addWeeks(start, amount), end: addWeeks(end, amount) }
+          return this.newDisplayDate(range, addWeeks(start, amount), addWeeks(end, amount))
         default:
-          return { range, start: addYears(start, amount), end: addYears(end, amount) }
+          return this.newDisplayDate(range, addYears(start, amount), addYears(end, amount))
       }
     },
     applyNewRange (newRange) {
       const today = new Date()
       switch (newRange) {
         case 'weekly':
-          return { range: newRange, start: startOfWeek(today), end: endOfWeek(today) }
+          return this.newDisplayDate(newRange, startOfWeek(today), endOfWeek(today))
         case 'monthly':
-          return { range: newRange, start: startOfMonth(today), end: endOfMonth(today) }
+          return this.newDisplayDate(newRange, startOfMonth(today), endOfMonth(today))
         default:
-          return { range: newRange, start: startOfYear(today), end: endOfYear(today) }
+          return this.newDisplayDate(newRange, startOfYear(today), endOfYear(today))
       }
     },
-    getDisplayedDateText (newDisplayDate) {
-      if (newDisplayDate.range === 'monthly') {
-        return format(newDisplayDate.start, 'LLLL yyyy')
-      } else if (newDisplayDate.range === 'yearly') {
-        return format(newDisplayDate.start, 'yyyy')
-      } else {
-        return `${format(newDisplayDate.start, 'do MMM')} - ${format(newDisplayDate.end, 'do MMM')}`
+    newDisplayDate (range, start, end) {
+      switch (range) {
+        case 'monthly':
+          return { range, start, end, text: format(start, 'LLLL yyyy') }
+        case 'yearly':
+          return { range, start, end, text: format(start, 'yyyy') }
+        default:
+          return { range, start, end, text: `${format(start, 'do MMM')} - ${format(end, 'do MMM')}` }
       }
     }
   }
