@@ -71,6 +71,16 @@
                 </span>
               </template>
             </v-select>
+            <v-color-picker
+              v-model="newCategory.color"
+              width="100%"
+              dot-size="22"
+              hide-inputs
+              hide-canvas
+              hide-mode-switch
+              mode="hexa"
+              swatches-max-height="250"
+            />
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -100,7 +110,8 @@ const DEFAULT_CATEGORY = {
   id: undefined,
   icon: '',
   name: '',
-  kind: 'expense'
+  kind: 'expense',
+  color: '#6200EE'
 }
 
 const ICONS = [

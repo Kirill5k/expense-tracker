@@ -34,6 +34,7 @@ trait EmbeddedMongo {
         "kind"      -> "expense",
         "name"      -> name,
         "icon"      -> "icon",
+        "color"     -> "#2962FF",
         "accountId" -> uid.map(id => new ObjectId(id.value)).orNull
       ).asJava
     )
