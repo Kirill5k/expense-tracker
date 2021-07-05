@@ -28,6 +28,7 @@
       <v-subheader sense class="mb-0 ml-2 pb-0">Sort by</v-subheader>
       <v-list-item-group
         v-model="currentSort"
+        mandatory
       >
         <v-list-item
           link
