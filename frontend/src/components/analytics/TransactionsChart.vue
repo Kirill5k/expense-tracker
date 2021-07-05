@@ -2,7 +2,7 @@
   <div class="transactions-chart">
     <figure>
       <v-chart
-        class="chart"
+        class="transactions-chart__canvas"
         :init-options="initOptions"
         :option="option"
         autoresize
@@ -52,15 +52,33 @@ export default {
     totalAmount: {
       type: [String, Number],
       required: true
+    },
+    previousTotalAmount: {
+      type: [String, Number],
+      required: true
     }
   },
   data: () => ({
-    priceUp: true,
     initOptions: {
       renderer: 'canvas'
     }
   }),
   computed: {
+    spendingDown () {
+      return Number(this.totalAmount) < Number(this.previousTotalAmount)
+    },
+    spendingDifference () {
+      return Math.abs(Number(this.totalAmount) - Number(this.previousTotalAmount))
+    },
+    subtext () {
+      if (this.totalAmount === this.previousTotalAmount) {
+        return 'Total spend'
+      } else if (Number(this.totalAmount) < Number(this.previousTotalAmount)) {
+        return `Total spend {up|↓}{a|${this.currency.symbol}${this.spendingDifference}}`
+      } else {
+        return `Total spend {down|↑}{b|${this.currency.symbol}${this.spendingDifference}}`
+      }
+    },
     period () {
       if (this.displayDate.range === 'weekly') {
         return 'week'
@@ -90,7 +108,7 @@ export default {
           itemGap: 5,
           padding: [15, 0, 5, 10],
           text: `${this.currency.symbol}${this.totalAmount}`,
-          subtext: `Total spend {${this.priceUp ? 'up' : 'down'}|${this.priceUp ? '↓' : '↑'}}{${this.priceUp ? 'a' : 'b'}|${this.currency.symbol}40}`,
+          subtext: this.subtext,
           subtextStyle: {
             rich: {
               a: { fontSize: 12, fontWeight: 'bold', color: 'green' },
@@ -182,10 +200,9 @@ export default {
 </script>
 
 <style lang="scss">
-.chart {
-  height: 220px;
-}
 .transactions-chart {
-
+  &__canvas {
+    height: 220px;
+  }
 }
 </style>

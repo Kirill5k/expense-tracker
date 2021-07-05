@@ -19,6 +19,7 @@
           :categories="$store.getters.catsByIds"
           :items="$store.getters.expenseTransactions.current"
           :total-amount="$store.getters.totalSpent.current"
+          :previous-total-amount="$store.getters.totalSpent.previous"
         />
         <p class="text-subtitle-2 ml-2 mb-0 mt-1">Spending breakdown</p>
         <transactions-breakdown
