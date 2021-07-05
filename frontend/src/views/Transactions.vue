@@ -116,7 +116,7 @@ export default {
   }),
   computed: {
     transactions () {
-      return this.$store.getters.displayedTransactions
+      return this.$store.getters.displayedTransactions.current
     },
     currency () {
       return this.$store.state.account.settings.currency

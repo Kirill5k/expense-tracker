@@ -44,9 +44,12 @@ export default new Vuex.Store({
       acc[el.id] = el
       return acc
     }, {}),
-    displayedTransactions: state => withinDates(state.transactions, state.displayDate),
-    expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'expense'),
-    incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'income'),
+    displayedTransactions: state => ({
+      current: withinDates(state.transactions, state.displayDate),
+      previous: withinDates(state.transactions, state.displayDate.previous || {})
+    }),
+    expenseTransactions: (state, getters) => getters.displayedTransactions.current.filter(t => t.kind === 'expense'),
+    incomeTransactions: (state, getters) => getters.displayedTransactions.current.filter(t => t.kind === 'income'),
     totalSpent: (state, getters) => totalAmount(getters.expenseTransactions),
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },

@@ -61,11 +61,6 @@ export default {
   data: () => ({
     loading: false
   }),
-  computed: {
-    transactions () {
-      return this.$store.getters.displayedTransactions
-    }
-  },
   methods: {
     dispatchAction (name, arg) {
       this.loading = true
