@@ -34,13 +34,13 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
     collection
-      .find(Filters.eq("accountId", new ObjectId(aid.value)))
+      .find(Filters.eq(AccIdField, new ObjectId(aid.value)))
       .all[F]
       .map(_.map(_.toDomain).toList)
 
   override def get(aid: AccountId, txid: TransactionId): F[Transaction] =
     collection
-      .find(Filters.and(Filters.eq("accountId", new ObjectId(aid.value)), Filters.eq("_id", new ObjectId(txid.value))))
+      .find(Filters.and(Filters.eq(AccIdField, new ObjectId(aid.value)), Filters.eq(IdField, new ObjectId(txid.value))))
       .first[F]
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .map(_.toDomain)
@@ -48,14 +48,14 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def update(tx: Transaction): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(idEq("accountId", tx.accountId.value), idEq("_id", tx.id.value)),
+        Filters.and(idEq(AccIdField, tx.accountId.value), idEq(IdField, tx.id.value)),
         TransactionEntity.from(tx)
       )
       .flatMap(r => errorIfNull(TransactionDoesNotExist(tx.id))(r).void)
 
   override def delete(aid: AccountId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete[F](Filters.and(idEq("accountId", aid.value), idEq("_id", txid.value)))
+      .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value)))
       .flatMap(r => errorIfNull(TransactionDoesNotExist(txid))(r).void)
 }
 

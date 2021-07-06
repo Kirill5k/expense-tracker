@@ -84,5 +84,20 @@ class CategoryServiceSpec extends CatsSpec {
         res mustBe ()
       }
     }
+
+    "assign default categories to a user" in {
+      val repo = mock[CategoryRepository[IO]]
+      when(repo.assignDefault(any[AccountId])).thenReturn(IO.unit)
+
+      val result = for {
+        svc <- CategoryService.make[IO](repo)
+        res <- svc.assignDefault(aid)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).assignDefault(aid)
+        res mustBe ()
+      }
+    }
   }
 }

@@ -10,6 +10,7 @@ trait CategoryService[F[_]] {
   def get(aid: AccountId, cid: CategoryId): F[Category]
   def getAll(aid: AccountId): F[List[Category]]
   def delete(aid: AccountId, cid: CategoryId): F[Unit]
+  def assignDefault(aid: AccountId): F[Unit]
 }
 
 final private class LiveCategoryService[F[_]](
@@ -30,6 +31,9 @@ final private class LiveCategoryService[F[_]](
 
   override def get(aid: AccountId, cid: CategoryId): F[Category] =
     repository.get(aid, cid)
+
+  override def assignDefault(aid: AccountId): F[Unit] =
+    repository.assignDefault(aid)
 }
 
 object CategoryService {

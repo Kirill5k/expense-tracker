@@ -28,20 +28,20 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Category]] =
     collection
-      .find(idEq(AccountId, aid.value))
+      .find(idEq(AccIdField, aid.value))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
   override def get(aid: AccountId, cid: CategoryId): F[Category] =
     collection
-      .find(Filters.and(idEq(AccountId, aid.value), idEq(Id, cid.value)))
+      .find(Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)))
       .first[F]
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .map(_.toDomain)
 
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
-      .findOneAndDelete[F](Filters.and(idEq(AccountId, aid.value), idEq(Id, cid.value)))
+      .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)))
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cid))(r).void)
 
   override def create(cat: CreateCategory): F[CategoryId] = {
@@ -53,14 +53,14 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def update(cat: Category): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(idEq(AccountId, cat.accountId.map(_.value).orNull), idEq(Id, cat.id.value)),
+        Filters.and(idEq(AccIdField, cat.accountId.map(_.value).orNull), idEq(IdField, cat.id.value)),
         CategoryEntity.from(cat)
       )
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cat.id))(r).void)
 
   override def assignDefault(aid: AccountId): F[Unit] =
     collection
-      .find(Filters.or(Filters.exists(AccountId, false), Filters.eq(AccountId, null)))
+      .find(Filters.or(Filters.exists(AccIdField, false), Filters.eq(AccIdField, null)))
       .all[F]
       .map(_.map(_.copy(_id = new ObjectId(), accountId = Some(new ObjectId(aid.value)))).toList)
       .flatMap { cats =>

@@ -4,14 +4,14 @@ import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Filters
 import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, PasswordHash}
+import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.common.json._
 import io.circe.generic.auto._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
-import org.bson.types.ObjectId
 
-trait AccountRepository[F[_]] {
+trait AccountRepository[F[_]] extends Repository[F] {
   def find(aid: AccountId): F[Account]
   def findBy(email: AccountEmail): F[Option[Account]]
   def create(details: AccountDetails, password: PasswordHash): F[AccountId]
@@ -40,14 +40,10 @@ final private class LiveAccountRepository[F[_]: Async](
 
   override def find(aid: AccountId): F[Account] =
     collection
-      .find(Filters.eq("_id", new ObjectId(aid.value)))
+      .find(idEq(IdField, aid.value))
       .first[F]
-      .map(a => Option(a))
-      .flatMap {
-        case Some(ent) => ent.toDomain.pure[F]
-        case None => AccountDoesNotExist(aid).raiseError[F, Account]
-      }
-
+      .flatMap(errorIfNull[AccountEntity](AccountDoesNotExist(aid)))
+      .map(_.toDomain)
 }
 
 object AccountRepository {
