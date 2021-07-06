@@ -6,7 +6,7 @@ import com.mongodb.client.model.Filters
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.db.Repository
-import expensetracker.common.errors.AppError.CategoryDoesNotExist
+import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import io.circe.generic.auto._
 import expensetracker.common.json._
 import mongo4cats.circe._
@@ -45,9 +45,13 @@ final private class LiveCategoryRepository[F[_]: Async](
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cid))(r).void)
 
   override def create(cat: CreateCategory): F[CategoryId] = {
-    // TODO: return CategoryAlreadyExists if already exists
     val newCat = CategoryEntity.from(cat)
-    collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
+    collection
+      .count(Filters.and(idEq(AccIdField, cat.accountId.value), Filters.eq("name", newCat.name)))
+      .flatMap {
+        case 0 => collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
+        case _ => CategoryAlreadyExists(cat.name).raiseError[F, CategoryId]
+      }
   }
 
   override def update(cat: Category): F[Unit] =

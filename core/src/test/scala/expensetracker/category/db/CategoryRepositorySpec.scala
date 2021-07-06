@@ -3,17 +3,9 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{
-  Category,
-  CategoryColor,
-  CategoryIcon,
-  CategoryId,
-  CategoryKind,
-  CategoryName,
-  CreateCategory
-}
+import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
 import expensetracker.auth.account.AccountId
-import expensetracker.common.errors.AppError.CategoryDoesNotExist
+import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
@@ -50,6 +42,26 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
             cat.icon mustBe create.icon
             cat.accountId mustBe Some(acc1Id)
             cat.kind mustBe create.kind
+          }
+        }
+      }
+
+      "return error if cat with such name already exists" in {
+        withEmbeddedMongoDb { client =>
+          val create = CreateCategory(
+            CategoryKind.Income,
+            CategoryName("c2"),
+            CategoryIcon("icon"),
+            CategoryColor.Blue,
+            acc2Id
+          )
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            id   <- repo.create(create)
+          } yield id
+
+          result.attempt.map { err =>
+            err mustBe Left(CategoryAlreadyExists(CategoryName("c2")))
           }
         }
       }

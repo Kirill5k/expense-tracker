@@ -11,7 +11,7 @@ const withinDates = (txs, { start, end }) => txs.filter(tx => {
 const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
 
 const reject = (res, commit) => res.json().then(e => {
-  if (commit) {
+  if (commit && e.message) {
     commit('setAlert', { type: 'error', message: e.message })
   }
   return Promise.reject(new Error(e.message))
@@ -171,7 +171,7 @@ export default new Vuex.Store({
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
-        .then(res => res.status === 201 ? res.json() : reject(res))
+        .then(res => res.status === 201 ? res.json() : reject(res, commit))
         .then(res => dispatch('getCategory', res.id))
     },
     getCategories ({ commit }) {
@@ -194,7 +194,7 @@ export default new Vuex.Store({
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
-        .then(res => res.status === 204 ? commit('updateCategory', requestBody) : reject(res))
+        .then(res => res.status === 204 ? commit('updateCategory', requestBody) : reject(res, commit))
     },
     getTransactions ({ commit }) {
       return fetch('/api/transactions', defaultRequestParams)
@@ -207,7 +207,7 @@ export default new Vuex.Store({
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
-        .then(res => res.status === 201 ? res.json() : reject(res))
+        .then(res => res.status === 201 ? res.json() : reject(res, commit))
         .then(res => dispatch('getTransaction', res.id))
     },
     getTransaction ({ commit }, id) {
