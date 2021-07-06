@@ -2,6 +2,7 @@
   <v-app>
     <v-app-bar
       v-if="isAuthenticated"
+      class="d-none d-sm-block"
       app
       color="white"
       dense
@@ -35,7 +36,7 @@
 
     </v-app-bar>
 
-    <v-main class="grey lighten-3">
+    <v-main class="grey lighten-3 pt-0 pt-sm-12">
       <div
         v-if="isLoading"
         class="d-flex justify-center align-center"
