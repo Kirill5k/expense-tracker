@@ -151,7 +151,7 @@ export default {
           axisLabel: {
             show: true,
             margin: 3,
-            formatter: `${this.currency.symbol}{value}`,
+            formatter: (value) => `${this.currency.symbol}${this.formatYAxisLabel(value)}`,
             showMaxLabel: true
           },
           splitLine: { show: true }
@@ -221,6 +221,15 @@ export default {
           return acc
         }, data)
         .map(i => i.toFixed(2))
+    },
+    formatYAxisLabel (value) {
+      if (value >= 1000000) {
+        return (value / 1000000).toFixed(1) + 'm'
+      }
+      if (value >= 1000) {
+        return (value / 1000).toFixed(1) + 'k'
+      }
+      return value
     }
   }
 }
