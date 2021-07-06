@@ -88,6 +88,22 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
       }
     }
 
+    "assignDefaults" should {
+      "copy default categories with a new account id" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            _    <- repo.assignDefault(acc2Id)
+            cats <- repo.getAll(acc2Id)
+          } yield cats
+
+          result.map { cats =>
+            cats must have size 2
+          }
+        }
+      }
+    }
+
     "delete" should {
       "remove account's category" in {
         withEmbeddedMongoDb { client =>
@@ -98,7 +114,8 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
           } yield cats
 
           result.map { cats =>
-            cats must have size 0
+            cats.map(_.name) mustBe List(CategoryName("c1"), CategoryName("c2"))
+            cats.flatMap(_.accountId) mustBe List(acc2Id, acc2Id)
           }
         }
       }
