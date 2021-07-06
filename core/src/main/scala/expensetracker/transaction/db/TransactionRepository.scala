@@ -51,12 +51,14 @@ final private class LiveTransactionRepository[F[_]: Async](
         Filters.and(idEq(AccIdField, tx.accountId.value), idEq(IdField, tx.id.value)),
         TransactionEntity.from(tx)
       )
-      .flatMap(r => errorIfNull(TransactionDoesNotExist(tx.id))(r).void)
+      .flatMap(errorIfNull(TransactionDoesNotExist(tx.id)))
+      .void
 
   override def delete(aid: AccountId, txid: TransactionId): F[Unit] =
     collection
       .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value)))
-      .flatMap(r => errorIfNull(TransactionDoesNotExist(txid))(r).void)
+      .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
+      .void
 }
 
 object TransactionRepository {

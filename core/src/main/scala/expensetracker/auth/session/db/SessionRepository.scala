@@ -5,6 +5,7 @@ import cats.implicits._
 import com.mongodb.client.model.{Filters, Updates}
 import io.circe.generic.auto._
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
+import expensetracker.common.db.Repository
 import expensetracker.common.json._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import mongo4cats.circe._
@@ -13,7 +14,7 @@ import org.bson.types.ObjectId
 
 import scala.jdk.CollectionConverters._
 
-trait SessionRepository[F[_]] {
+trait SessionRepository[F[_]] extends Repository[F] {
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
@@ -29,7 +30,7 @@ final private class LiveSessionRepository[F[_]: Async](
   }
 
   override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] = {
-    val idFilter = Filters.eq("_id", new ObjectId(sid.value))
+    val idFilter =idEq(IdField, sid.value)
     val sess = activity
       .map(sa => new Document(Map[String, Object]("ipAddress" -> sa.ipAddress.toUriString, "time" -> sa.time).asJava))
       .map(sa => collection.findOneAndUpdate(idFilter, Updates.set("lastRecordedActivity", sa)))
@@ -40,7 +41,7 @@ final private class LiveSessionRepository[F[_]: Async](
 
   override def unauth(sid: SessionId): F[Unit] = {
     collection.updateOne(
-      Filters.eq("_id", new ObjectId(sid.value)),
+      idEq(IdField, sid.value),
       Updates.combine(Updates.set("status", "logged-out"), Updates.set("active", false))
     )
       .void
