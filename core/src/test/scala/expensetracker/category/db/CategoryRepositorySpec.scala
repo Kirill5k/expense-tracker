@@ -99,6 +99,8 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
 
           result.map { cats =>
             cats must have size 2
+            cats.map(_.name) mustBe List(CategoryName("c2"), CategoryName("c1"))
+            cats.flatMap(_.accountId) mustBe List(acc2Id, acc2Id)
           }
         }
       }
@@ -114,8 +116,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
           } yield cats
 
           result.map { cats =>
-            cats.map(_.name) mustBe List(CategoryName("c1"), CategoryName("c2"))
-            cats.flatMap(_.accountId) mustBe List(acc2Id, acc2Id)
+            cats must have size 0
           }
         }
       }
