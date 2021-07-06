@@ -3,6 +3,7 @@ package expensetracker
 import cats.effect.{IO, IOApp}
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
+import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AppConfig
 import expensetracker.transaction.Transactions
 import org.http4s.blaze.server.BlazeServerBuilder
@@ -18,7 +19,8 @@ object Application extends IOApp.Simple {
   override val run: IO[Unit] =
     Resources.make[IO](config).use { res =>
       for {
-        auth <- Auth.make(config.auth, res)
+        dispatcher <- ActionDispatcher.make[IO]
+        auth <- Auth.make(config.auth, res, dispatcher)
         cats <- Categories.make(res)
         txs  <- Transactions.make(res)
         http <- Http.make(auth, cats, txs)

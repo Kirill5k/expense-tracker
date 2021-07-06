@@ -8,6 +8,7 @@ import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountName, AccountSettings, Password}
 import expensetracker.auth.session.{CreateSession, Session}
+import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
 import io.circe.refined._
@@ -19,7 +20,8 @@ import org.typelevel.log4cats.Logger
 import java.time.Instant
 
 final class AuthController[F[_]: Logger: Temporal](
-    private val service: AuthService[F]
+    private val service: AuthService[F],
+    private val dispatcher: ActionDispatcher[F]
 ) extends Controller[F] {
   import AuthController._
 
@@ -31,6 +33,7 @@ final class AuthController[F[_]: Logger: Temporal](
         for {
           create <- req.as[CreateAccountRequest]
           aid    <- service.createAccount(create.accountDetails, create.accountPassword)
+          _      <- dispatcher.dispatch(Action.SetupNewAccount(aid))
           res    <- Created(CreateAccountResponse(aid.value))
         } yield res
       }
@@ -40,8 +43,8 @@ final class AuthController[F[_]: Logger: Temporal](
           login <- req.as[LoginRequest]
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
           acc   <- service.login(login.accountEmail, login.accountPassword)
-          sid <- service.createSession(CreateSession(acc.id, req.from, time))
-          res <- Ok(AccountView.from(acc))
+          sid   <- service.createSession(CreateSession(acc.id, req.from, time))
+          res   <- Ok(AccountView.from(acc))
         } yield res.addCookie(sessionIdResponseCookie(sid.value))
       }
   }
@@ -108,6 +111,6 @@ object AuthController {
       )
   }
 
-  def make[F[_]: Temporal: Logger](service: AuthService[F]): F[AuthController[F]] =
-    Monad[F].pure(new AuthController[F](service))
+  def make[F[_]: Temporal: Logger](service: AuthService[F], dispatcher: ActionDispatcher[F]): F[AuthController[F]] =
+    Monad[F].pure(new AuthController[F](service, dispatcher))
 }

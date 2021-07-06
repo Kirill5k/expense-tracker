@@ -7,6 +7,7 @@ import expensetracker.auth.account.{AccountService, PasswordEncryptor}
 import expensetracker.auth.account.db.AccountRepository
 import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.{Session, SessionAuthMiddleware, SessionService}
+import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
 import org.http4s.HttpRoutes
 import org.http4s.server.AuthMiddleware
@@ -22,7 +23,7 @@ final class Auth[F[_]: Temporal] private (
 }
 
 object Auth {
-  def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F]): F[Auth[F]] =
+  def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
     for {
       sessRepo <- SessionRepository.make[F](resources.mongo)
       sessSvc  <- SessionService.make[F](sessRepo)
@@ -30,6 +31,6 @@ object Auth {
       encr     <- PasswordEncryptor.make[F](config)
       accSvc   <- AccountService.make[F](accRepo, encr)
       authSvc  <- AuthService.make[F](accSvc, sessSvc)
-      authCtrl <- AuthController.make[F](authSvc)
+      authCtrl <- AuthController.make[F](authSvc, dispatcher)
     } yield new Auth[F](authSvc, authCtrl)
 }
