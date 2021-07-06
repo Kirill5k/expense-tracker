@@ -2,7 +2,7 @@ package expensetracker.auth.session.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Updates}
+import com.mongodb.client.model.Updates
 import io.circe.generic.auto._
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
 import expensetracker.common.db.Repository
@@ -10,7 +10,6 @@ import expensetracker.common.json._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import mongo4cats.circe._
 import org.bson.Document
-import org.bson.types.ObjectId
 
 import scala.jdk.CollectionConverters._
 
