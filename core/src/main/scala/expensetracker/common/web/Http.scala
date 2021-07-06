@@ -1,4 +1,4 @@
-package expensetracker
+package expensetracker.common.web
 
 import cats.Monad
 import cats.effect.Async
@@ -24,9 +24,7 @@ final class Http[F[_]: Async] private (
       categories.routes(auth.sessionAuthMiddleware) <+>
       transactions.routes(auth.sessionAuthMiddleware)
 
-    Router(
-      "/api" -> api
-    )
+    Router("/api" -> api)
   }
 
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { http: HttpRoutes[F] =>

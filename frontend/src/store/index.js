@@ -38,7 +38,7 @@ export default new Vuex.Store({
     },
     sortBy: {
       field: 'tx',
-      desc: false
+      desc: true
     }
   },
   getters: {

@@ -10,9 +10,10 @@ import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
 
 final class Categories[F[_]] private (
-    private val categoryController: CategoryController[F]
+    val service: CategoryService[F],
+    val controller: CategoryController[F]
 ) {
-  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = categoryController.routes(authMiddleware)
+  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = controller.routes(authMiddleware)
 }
 
 object Categories {
@@ -21,5 +22,5 @@ object Categories {
       repo <- CategoryRepository.make[F](resources.mongo)
       svc  <- CategoryService.make[F](repo)
       ctrl <- CategoryController.make[F](svc)
-    } yield new Categories[F](ctrl)
+    } yield new Categories[F](svc, ctrl)
 }
