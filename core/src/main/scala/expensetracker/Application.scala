@@ -26,7 +26,7 @@ object Application extends IOApp.Simple {
         cats       <- Categories.make(res)
         txs        <- Transactions.make(res)
         http       <- Http.make(auth, cats, txs)
-        processor  <- ActionProcessor.make[IO](dispatcher, cats)
+        processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
         server = BlazeServerBuilder[IO](runtime.compute)
           .bindHttp(config.server.port, config.server.host)
           .withHttpApp(http.httpApp)
