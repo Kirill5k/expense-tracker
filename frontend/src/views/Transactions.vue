@@ -20,6 +20,7 @@
 
         <transaction-list
           :categories="$store.getters.catsByIds"
+          :sort-by="$store.state.sortBy"
           :items="transactions"
           :editable="editable"
           @edit="edit"
@@ -141,8 +142,8 @@ export default {
       this.editable = false
       this.$store.commit('setDisplayDate', newRange)
     },
-    sort (opt) {
-      console.log(opt)
+    sort (sortBy) {
+      this.$store.commit('sort', sortBy)
     }
   }
 }

@@ -1,6 +1,8 @@
 <template>
   <v-data-table
     class="transaction-list"
+    :sort-by.sync="sortBy.field"
+    :sort-desc.sync="sortBy.desc"
     :headers="headers"
     :items="tableData"
     hide-default-header
@@ -34,7 +36,7 @@
       <v-list-item-content class="py-2 px-1">
         <p class="text-subtitle-2 mb-0">{{ item.tx.name }}</p>
         <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
-        <p class="text-caption mb-0 font-weight-light">{{ item.tx.date }}</p>
+        <p class="text-caption mb-0 font-weight-light">{{ item.tx.displayDate }}</p>
       </v-list-item-content>
     </template>
 
@@ -73,10 +75,10 @@
 
 <script>
 const DEFAULT_HEADERS = [
-  { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 px-1' },
+  { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 px-1', sortable: false },
   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
-  { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0' },
-  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0' }
+  { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sort: (a, b) => a.date.localeCompare(b.date) },
+  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sort: (a, b) => b.value - a.value }
 ]
 
 export default {
@@ -93,6 +95,10 @@ export default {
     categories: {
       type: Object,
       required: true
+    },
+    sortBy: {
+      type: Object,
+      required: true
     }
   },
   data: () => ({
@@ -105,7 +111,7 @@ export default {
         id: i.id,
         color: this.categories[i.categoryId].color,
         icon: this.categories[i.categoryId].icon,
-        tx: { name: this.categories[i.categoryId].name, note: i.note, date: this.formatTxDate(i) },
+        tx: { name: this.categories[i.categoryId].name, note: i.note, displayDate: this.formatTxDate(i), date: i.date },
         amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency.code },
         original: i
       }))

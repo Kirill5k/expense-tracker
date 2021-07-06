@@ -51,10 +51,10 @@ export default {
   data: () => ({
     currentSort: 0,
     sortOptions: [
-      { text: 'Date (Newest First)', value: 'date-new' },
-      { text: 'Date (Oldest First)', value: 'date-old' },
-      { text: 'Amount (Highest First)', value: 'amount-high' },
-      { text: 'Amount (Lowest First)', value: 'amount-low' }
+      { text: 'Date (Newest First)', value: { field: 'tx', desc: true } },
+      { text: 'Date (Oldest First)', value: { field: 'tx', desc: false } },
+      { text: 'Amount (Highest First)', value: { field: 'amount', desc: false } },
+      { text: 'Amount (Lowest First)', value: { field: 'amount', desc: true } }
     ]
   })
 }

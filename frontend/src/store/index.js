@@ -35,6 +35,10 @@ export default new Vuex.Store({
     alert: {
       type: 'error',
       message: ''
+    },
+    sortBy: {
+      field: 'tx',
+      desc: false
     }
   },
   getters: {
@@ -60,6 +64,9 @@ export default new Vuex.Store({
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {
+    sort (state, sortBy) {
+      state.sortBy = { ...sortBy }
+    },
     setAlert (state, alert) {
       state.alert = { ...alert }
     },
@@ -94,10 +101,10 @@ export default new Vuex.Store({
       state.categories = state.categories.filter(cat => cat.id !== id)
     },
     setTransactions (state, txs) {
-      state.transactions = txs.sort((a, b) => -a.date.localeCompare(b.date))
+      state.transactions = txs
     },
     addTransaction (state, tx) {
-      state.transactions = [...state.transactions, tx].sort((a, b) => -a.date.localeCompare(b.date))
+      state.transactions = [...state.transactions, tx]
     },
     setDisplayDate (state, newDate) {
       state.displayDate = newDate
