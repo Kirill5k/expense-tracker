@@ -63,10 +63,16 @@
       class="mb-1"
       dense
       v-model="accept"
-      :rules="[v => !!v || 'You must agree to our terms and conditions to continue!']"
-      label="I accept terms and condition"
+      :rules="rules.accept"
       required
-    />
+    >
+      <template v-slot:label>
+        <div @click.stop="">
+          I accept
+          <terms-and-conditions/>
+        </div>
+      </template>
+    </v-checkbox>
 
     <v-btn
       tabindex="7"
@@ -80,6 +86,8 @@
 </template>
 
 <script>
+import TermsAndConditions from '@/components/auth/TermsAndConditions'
+
 export default {
   name: 'SignUp',
   props: {
@@ -88,7 +96,11 @@ export default {
       default: false
     }
   },
+  components: {
+    TermsAndConditions
+  },
   data: () => ({
+    tsAndCs: false,
     valid: true,
     firstName: '',
     lastName: '',
@@ -115,7 +127,8 @@ export default {
         confirmPassword: [
           v => !!v || 'Please enter your password',
           v => v === this.password || 'Passwords do not match'
-        ]
+        ],
+        accept: [v => !!v || 'You must agree to our terms and conditions to continue!']
       }
     }
   },
