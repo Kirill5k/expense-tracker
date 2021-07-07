@@ -1,6 +1,6 @@
 package expensetracker
 
-import de.flapdoodle.embed.mongo.MongodStarter
+import de.flapdoodle.embed.mongo.{MongodExecutable, MongodProcess, MongodStarter}
 import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
@@ -26,11 +26,15 @@ trait EmbeddedMongo {
       .version(Version.Main.PRODUCTION)
       .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
       .build
-    val mongodExecutable = EmbeddedMongo.starter.prepare(mongodConfig)
+    val mongodExecutable: MongodExecutable = EmbeddedMongo.starter.prepare(mongodConfig)
+    var mongodProcess: MongodProcess = null
     try {
-      val _ = mongodExecutable.start
+      mongodProcess = mongodExecutable.start
       test
-    } finally mongodExecutable.stop()
+    } finally {
+      if (mongodProcess != null) mongodProcess.stop()
+      if (mongodExecutable != null) mongodExecutable.stop()
+    }
   }
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[AccountId] = None): Document =
