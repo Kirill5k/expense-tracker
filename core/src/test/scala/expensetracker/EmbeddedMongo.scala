@@ -18,24 +18,19 @@ object EmbeddedMongo {
 trait EmbeddedMongo {
 
   protected val mongoHost = "localhost"
-  protected val mongoPort = 12345
-
-  private val mongodConfig = MongodConfig
-    .builder()
-    .version(Version.Main.PRODUCTION)
-    .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
-    .build
+  protected val mongoPort = 12343
 
   def withRunningEmbeddedMongo[A](test: => A): A = {
-    val mongoExecutable: MongodExecutable = EmbeddedMongo.starter.prepare(mongodConfig)
-    var mongoProcess: MongodProcess = null
+    val mongodConfig = MongodConfig
+      .builder()
+      .version(Version.Main.PRODUCTION)
+      .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
+      .build
+    val mongodExecutable = EmbeddedMongo.starter.prepare(mongodConfig)
     try {
-      mongoProcess = mongoExecutable.start
+      val _ = mongodExecutable.start
       test
-    } finally {
-      if (mongoProcess != null) mongoProcess.stop()
-      if (mongoExecutable != null) mongoExecutable.stop()
-    }
+    } finally mongodExecutable.stop()
   }
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[AccountId] = None): Document =
