@@ -2,6 +2,7 @@
   <v-card
     :loading="loading"
     class="transactions mx-auto"
+    elevation="8"
   >
     <v-card-title>
       Transactions

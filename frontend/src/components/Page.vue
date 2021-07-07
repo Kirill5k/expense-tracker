@@ -17,6 +17,38 @@
     </div>
     <v-row justify="center" v-else>
       <v-col
+        v-if="!slim"
+        cols="2"
+        class="d-none d-sm-block"
+      >
+        <v-card
+          elevation="8"
+          width="256"
+        >
+          <v-navigation-drawer
+            floating
+            permanent
+          >
+            <v-list dense>
+              <v-list-item
+                v-for="link in navLinks"
+                :key="link.to"
+                :to="link.to"
+                link
+              >
+                <v-list-item-icon>
+                  <v-icon>{{ link.icon }}</v-icon>
+                </v-list-item-icon>
+
+                <v-list-item-content>
+                  <v-list-item-title>{{ link.name }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-navigation-drawer>
+        </v-card>
+      </v-col>
+      <v-col
         :cols="dimensions.cols"
         :xs="dimensions.xs"
         :sm="dimensions.sm"
@@ -39,6 +71,11 @@
         </v-slide-y-transition>
         <slot></slot>
       </v-col>
+      <v-col
+        v-if="!slim"
+        cols="2"
+        class="d-none d-sm-block"
+      />
     </v-row>
   </v-container>
 </template>
@@ -60,6 +97,10 @@ export default {
     },
     loading: {
       type: Boolean,
+      required: true
+    },
+    navLinks: {
+      type: Array,
       required: true
     }
   },

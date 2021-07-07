@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-app-bar
+      clipped-left
       v-if="isAuthenticated"
       class="d-none d-sm-block"
       app
@@ -38,6 +39,7 @@
         :loading="isLoading"
         :slim="$route.meta.slim"
         :alert="$store.state.alert"
+        :nav-links="navLinks"
         @clear-alert="$store.commit('clearAlert')"
       >
         <router-view/>
@@ -46,32 +48,20 @@
 
     <v-bottom-navigation
       v-if="isAuthenticated"
+      class="d-flex d-sm-none"
       app
       shift
     >
-      <v-btn
-        to="/"
-        icon
-      >
-        <span>Analytics</span>
-        <v-icon class="mr-1">mdi-chart-bar</v-icon>
-      </v-btn>
-
-      <v-btn
-        to="/transactions"
-        icon
-      >
-        <span>Transactions</span>
-        <v-icon class="mr-1">mdi-bank-transfer</v-icon>
-      </v-btn>
-
-      <v-btn
-        to="/categories"
-        icon
-      >
-        <span>Categories</span>
-        <v-icon class="mr-1">mdi-shape</v-icon>
-      </v-btn>
+      <template v-for="link in navLinks">
+        <v-btn
+          :key="link.to"
+          :to="link.to"
+          icon
+        >
+          <span>{{link.name}}</span>
+          <v-icon class="mr-1">{{link.icon}}</v-icon>
+        </v-btn>
+      </template>
     </v-bottom-navigation>
   </v-app>
 </template>
@@ -88,10 +78,10 @@ export default {
     this.$store.dispatch('getAccount')
   },
   data: () => ({
-    items: [
-      { title: 'Dashboard', icon: 'mdi-view-dashboard' },
-      { title: 'Photos', icon: 'mdi-image' },
-      { title: 'About', icon: 'mdi-help-box' }
+    navLinks: [
+      { to: '/', name: 'Analytics', icon: 'mdi-chart-bar' },
+      { to: '/transactions', name: 'Transactions', icon: 'mdi-bank-transfer' },
+      { to: '/categories', name: 'Categories', icon: 'mdi-shape' }
     ]
   }),
   computed: {
