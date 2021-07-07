@@ -18,6 +18,8 @@ import java.time.temporal.ChronoField
 
 class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
+  override protected val mongoPort: Int = 12347
+
   val aid = AccountId(new ObjectId().toHexString)
   val ts = Instant.now().`with`(ChronoField.MILLI_OF_SECOND, 0)
 
@@ -92,9 +94,9 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo(port = 12345) {
+    withRunningEmbeddedMongo {
       MongoClientF
-        .fromConnectionString[IO]("mongodb://localhost:12345")
+        .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for {
             db  <- client.getDatabase("expense-tracker")

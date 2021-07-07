@@ -1,41 +1,41 @@
 package expensetracker
 
-import de.flapdoodle.embed.mongo.MongodStarter
+import de.flapdoodle.embed.mongo.{MongodExecutable, MongodProcess, MongodStarter}
 import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
-import expensetracker.category.CategoryId
 import expensetracker.auth.account.AccountId
+import expensetracker.category.CategoryId
 import org.bson.Document
 import org.bson.types.ObjectId
 
-import java.io.File
-import java.nio.file.Files
 import scala.jdk.CollectionConverters._
+
+object EmbeddedMongo {
+  val starter = MongodStarter.getDefaultInstance
+}
 
 trait EmbeddedMongo {
 
-  private def clearResources(): Unit = {
-    val tempFile = System.getenv("temp") + File.separator + "extract-" + System.getenv("USERNAME") + "-extractmongod";
-    val extension = if (System.getenv("OS") != null && System.getenv("OS").contains("Windows")) ".exe" else ".sh"
-    Files.deleteIfExists(new File(s"$tempFile$extension").toPath)
-    Files.deleteIfExists(new File(tempFile + ".pid").toPath)
-    ()
-  }
+  protected val mongoHost = "localhost"
+  protected val mongoPort = 12345
 
-  def withRunningEmbeddedMongo[A](host: String = "localhost", port: Int = 12345)(test: => A): A = {
-    clearResources()
-    val starter = MongodStarter.getDefaultInstance
-    val mongodConfig = MongodConfig
-      .builder()
-      .version(Version.Main.PRODUCTION)
-      .net(new Net(host, port, Network.localhostIsIPv6))
-      .build
-    val mongodExecutable = starter.prepare(mongodConfig)
+  private val mongodConfig = MongodConfig
+    .builder()
+    .version(Version.Main.PRODUCTION)
+    .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
+    .build
+
+  def withRunningEmbeddedMongo[A](test: => A): A = {
+    val mongoExecutable: MongodExecutable = EmbeddedMongo.starter.prepare(mongodConfig)
+    var mongoProcess: MongodProcess = null
     try {
-      val _ = mongodExecutable.start
+      mongoProcess = mongoExecutable.start
       test
-    } finally mongodExecutable.stop()
+    } finally {
+      if (mongoProcess != null) mongoProcess.stop()
+      if (mongoExecutable != null) mongoExecutable.stop()
+    }
   }
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[AccountId] = None): Document =

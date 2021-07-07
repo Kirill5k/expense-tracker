@@ -14,6 +14,8 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
+  override protected val mongoPort: Int = 12348
+
   val acc1Id = AccountId(new ObjectId().toHexString)
   val acc2Id = AccountId(new ObjectId().toHexString)
   val cat1Id = CategoryId(new ObjectId().toHexString)
@@ -195,9 +197,9 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo(port = 12347) {
+    withRunningEmbeddedMongo {
       MongoClientF
-        .fromConnectionString[IO]("mongodb://localhost:12347")
+        .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for {
             db         <- client.getDatabase("expense-tracker")

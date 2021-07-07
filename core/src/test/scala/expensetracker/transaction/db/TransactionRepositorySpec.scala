@@ -19,6 +19,8 @@ import java.time.Instant
 
 class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matchers {
 
+  override protected val mongoPort: Int = 12349
+
   val acc1Id = AccountId(new ObjectId().toHexString)
   val acc2Id = AccountId(new ObjectId().toHexString)
   val cat1Id = CategoryId(new ObjectId().toHexString)
@@ -168,9 +170,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo(port = 12349) {
+    withRunningEmbeddedMongo {
       MongoClientF
-        .fromConnectionString[IO]("mongodb://localhost:12349")
+        .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for {
             db         <- client.getDatabase("expense-tracker")
