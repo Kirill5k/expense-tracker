@@ -130,7 +130,7 @@ class TransactionControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NotFound, Some("""{"message":"transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""))
+        verifyJsonResponse(res, Status.NotFound, Some("""{"message":"Transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""))
         verify(svc).get(aid,  txid)
       }
     }
@@ -172,7 +172,7 @@ class TransactionControllerSpec extends ControllerSpec {
           .withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"message":"the id supplied in the path does not match with the id in the request body"}"""
+        val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
         verifyJsonResponse(res, Status.BadRequest, Some(resBody))
         verifyZeroInteractions(svc)
       }
@@ -201,7 +201,7 @@ class TransactionControllerSpec extends ControllerSpec {
           .withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"message":"transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""
+        val resBody = """{"message":"Transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""
         verifyJsonResponse(res, Status.NotFound, Some(resBody))
         verify(svc).update(tx)
       }

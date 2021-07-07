@@ -51,7 +51,7 @@ class AuthControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.Conflict,
-          Some("""{"message":"account with email foo@bar.com already exists"}""")
+          Some("""{"message":"An account with email foo@bar.com already exists"}""")
         )
         verify(svc).createAccount(
           AccountDetails(AccountEmail("foo@bar.com"), AccountName("John", "Bloggs")),
@@ -139,7 +139,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid email or password"}"""))
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Invalid email or password"}"""))
         verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")))
         verifyZeroInteractions(disp)
       }

@@ -21,31 +21,31 @@ object errors {
     final case class Mongo(message: String) extends AppError
 
     final case class AccountAlreadyExists(email: AccountEmail) extends ConflictError {
-      override def message: String = s"account with email ${email.value} already exists"
+      override def message: String = s"An account with email ${email.value} already exists"
     }
 
     final case class AccountDoesNotExist(id: AccountId) extends NotFoundError {
-      override def message: String = s"account with id ${id.value} does not exist"
+      override def message: String = s"Account with id ${id.value} does not exist"
     }
 
     case object InvalidEmailOrPassword extends AuthError {
-      override def message: String = "invalid email or password"
+      override def message: String = "Invalid email or password"
     }
 
     case object IdMismatch extends BadRequestError {
-      override def message: String = "the id supplied in the path does not match with the id in the request body"
+      override def message: String = "The id supplied in the path does not match with the id in the request body"
     }
 
     final case class CategoryDoesNotExist(id: CategoryId) extends NotFoundError {
-      override def message: String = s"category with id ${id.value} does not exist"
+      override def message: String = s"Category with id ${id.value} does not exist"
     }
 
     final case class CategoryAlreadyExists(name: CategoryName) extends ConflictError {
-      override def message: String = s"category with name ${name.value} already exists"
+      override def message: String = s"A category with name ${name.value} already exists"
     }
 
     final case class TransactionDoesNotExist(id: TransactionId) extends NotFoundError {
-      override def message: String = s"transaction with id ${id.value} does not exist"
+      override def message: String = s"Transaction with id ${id.value} does not exist"
     }
   }
 }

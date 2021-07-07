@@ -42,7 +42,7 @@ class CategoryControllerSpec extends ControllerSpec {
           Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Conflict, Some(s"""{"message":"category with name cat-1 already exists"}"""))
+        verifyJsonResponse(res, Status.Conflict, Some(s"""{"message":"A category with name cat-1 already exists"}"""))
         verify(svc).create {
           CreateCategory(
             CategoryKind.Expense,
@@ -159,7 +159,7 @@ class CategoryControllerSpec extends ControllerSpec {
           .withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"message":"the id supplied in the path does not match with the id in the request body"}"""
+        val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
         verifyJsonResponse(res, Status.BadRequest, Some(resBody))
         verifyZeroInteractions(svc)
       }
@@ -190,7 +190,7 @@ class CategoryControllerSpec extends ControllerSpec {
           .withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"message":"category with id AB0C5342AB0C5342AB0C5342 does not exist"}"""
+        val resBody = """{"message":"Category with id AB0C5342AB0C5342AB0C5342 does not exist"}"""
         verifyJsonResponse(res, Status.NotFound, Some(resBody))
         verify(svc).update(
           Category(
