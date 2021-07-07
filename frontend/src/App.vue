@@ -37,18 +37,7 @@
     </v-app-bar>
 
     <v-main class="grey lighten-3 pt-0 pt-sm-12">
-      <div
-        v-if="isLoading"
-        class="d-flex justify-center align-center"
-        style="height: 70%"
-      >
-        <v-progress-circular
-          size="70"
-          width="7"
-          color="primary"
-          indeterminate
-        />
-      </div>
+      <loading-spinner v-if="isLoading" />
       <template v-else>
         <notification
           :message="$store.state.alert.message"
@@ -93,11 +82,13 @@
 
 <script>
 import Notification from '@/components/Notification'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 export default {
   name: 'App',
   components: {
-    Notification
+    Notification,
+    LoadingSpinner
   },
   created () {
     this.$store.dispatch('getAccount')
