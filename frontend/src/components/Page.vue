@@ -3,7 +3,19 @@
     class="page mb-0 pb-0"
     fluid
   >
-    <v-row justify="center">
+    <div
+      v-if="loading"
+      class="loading-spinner d-flex justify-center align-center"
+      style="height: 70%"
+    >
+      <v-progress-circular
+        size="70"
+        width="7"
+        color="primary"
+        indeterminate
+      />
+    </div>
+    <v-row justify="center" v-else>
       <v-col
         :cols="dimensions.cols"
         :xs="dimensions.xs"
@@ -11,6 +23,20 @@
         :md="dimensions.md"
         :lg="dimensions.lg"
       >
+        <v-slide-y-transition>
+          <v-alert
+            class="mb-4"
+            v-if="alert.message"
+            dense
+            outlined
+            :type="alert.type"
+            close-text="Hide"
+            dismissible
+            @click="$emit('clear-alert')"
+          >
+            {{ alert.message }}
+          </v-alert>
+        </v-slide-y-transition>
         <slot></slot>
       </v-col>
     </v-row>
@@ -27,6 +53,14 @@ export default {
     slim: {
       type: Boolean,
       default: false
+    },
+    alert: {
+      type: Object,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      required: true
     }
   },
   computed: {

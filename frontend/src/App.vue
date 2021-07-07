@@ -23,9 +23,7 @@
         </v-avatar>
         <strong>{{ name }}</strong>
       </v-chip>
-
       <v-spacer/>
-
       <v-btn
         icon
         class="mr-2"
@@ -33,19 +31,17 @@
       >
         <v-icon>mdi-logout</v-icon>
       </v-btn>
-
     </v-app-bar>
 
     <v-main class="grey lighten-3 pt-0 pt-sm-12">
-      <loading-spinner v-if="isLoading" />
-      <template v-else>
-        <notification
-          :message="$store.state.alert.message"
-          :type="$store.state.alert.type"
-          @clear="$store.commit('clearAlert')"
-        />
+      <page
+        :loading="isLoading"
+        :slim="$route.meta.slim"
+        :alert="$store.state.alert"
+        @clear-alert="$store.commit('clearAlert')"
+      >
         <router-view/>
-      </template>
+      </page>
     </v-main>
 
     <v-bottom-navigation
@@ -81,18 +77,23 @@
 </template>
 
 <script>
-import Notification from '@/components/Notification'
-import LoadingSpinner from '@/components/LoadingSpinner'
+import Page from '@/components/Page'
 
 export default {
   name: 'App',
   components: {
-    Notification,
-    LoadingSpinner
+    Page
   },
   created () {
     this.$store.dispatch('getAccount')
   },
+  data: () => ({
+    items: [
+      { title: 'Dashboard', icon: 'mdi-view-dashboard' },
+      { title: 'Photos', icon: 'mdi-image' },
+      { title: 'About', icon: 'mdi-help-box' }
+    ]
+  }),
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated

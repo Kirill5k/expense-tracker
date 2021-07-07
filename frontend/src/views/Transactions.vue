@@ -1,95 +1,92 @@
 <template>
-  <page>
-    <v-card
-      :loading="loading"
-      class="transactions mx-auto"
-    >
-      <v-card-title>
-        Transactions
-        <v-spacer></v-spacer>
-        <transactions-sorter
-          @sort="sort"
-        />
-      </v-card-title>
+  <v-card
+    :loading="loading"
+    class="transactions mx-auto"
+  >
+    <v-card-title>
+      Transactions
+      <v-spacer></v-spacer>
+      <transactions-sorter
+        @sort="sort"
+      />
+    </v-card-title>
 
-      <v-card-text class="pb-0">
-        <date-period-selector
-          :display-date="$store.state.displayDate"
-          @update="updateDisplayDate"
-        />
+    <v-card-text class="pb-0">
+      <date-period-selector
+        :display-date="$store.state.displayDate"
+        @update="updateDisplayDate"
+      />
 
-        <transaction-list
-          :categories="$store.getters.catsByIds"
-          :sort-by="$store.state.sortBy"
-          :items="transactions"
-          :editable="editable"
-          @edit="edit"
-          @delete="remove"
-        />
-      </v-card-text>
+      <transaction-list
+        :categories="$store.getters.catsByIds"
+        :sort-by="$store.state.sortBy"
+        :items="transactions"
+        :editable="editable"
+        @edit="edit"
+        @delete="remove"
+      />
+    </v-card-text>
 
-      <v-divider></v-divider>
-      <v-card-actions class="py-0">
+    <v-divider></v-divider>
+    <v-card-actions class="py-0">
 
-        <v-btn
-          v-if="transactions.length"
-          color="primary"
-          x-small
-          absolute
-          bottom
-          left
-          fab
-          @click="editable = !editable"
+      <v-btn
+        v-if="transactions.length"
+        color="primary"
+        x-small
+        absolute
+        bottom
+        left
+        fab
+        @click="editable = !editable"
+      >
+        <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
+      </v-btn>
+
+      <div
+        v-if="transactions.length"
+        class="transactions__summary"
+      >
+        <v-chip
+          small
+          class="ma-2 px-4"
+          color="success"
+          outlined
         >
-          <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
-        </v-btn>
+          <v-icon>
+            mdi-currency-{{currency.code.toLowerCase()}}
+          </v-icon>
+          <span>{{ $store.getters.totalEarned }}</span>
+        </v-chip>
 
-        <div
-          v-if="transactions.length"
-          class="transactions__summary"
+        <v-chip
+          small
+          class="ma-2 px-4"
+          color="pink"
+          outlined
         >
-          <v-chip
-            small
-            class="ma-2 px-4"
-            color="success"
-            outlined
-          >
-            <v-icon>
-              mdi-currency-{{currency.code.toLowerCase()}}
-            </v-icon>
-            <span>{{ $store.getters.totalEarned }}</span>
-          </v-chip>
+          <v-icon>
+            mdi-currency-{{currency.code.toLowerCase()}}
+          </v-icon>
+          <span>{{ $store.getters.totalSpent.current }}</span>
+        </v-chip>
 
-          <v-chip
-            small
-            class="ma-2 px-4"
-            color="pink"
-            outlined
-          >
-            <v-icon>
-              mdi-currency-{{currency.code.toLowerCase()}}
-            </v-icon>
-            <span>{{ $store.getters.totalSpent.current }}</span>
-          </v-chip>
+      </div>
+      <v-spacer></v-spacer>
+      <new-transaction-dialog
+        ref="newTransactionDialog"
+        :currency="currency"
+        :expense-cats="$store.getters.expenseCats"
+        :income-cats="$store.getters.incomeCats"
+        @save="create"
+        @update="update"
+      />
+    </v-card-actions>
 
-        </div>
-        <v-spacer></v-spacer>
-        <new-transaction-dialog
-          ref="newTransactionDialog"
-          :currency="currency"
-          :expense-cats="$store.getters.expenseCats"
-          :income-cats="$store.getters.incomeCats"
-          @save="create"
-          @update="update"
-        />
-      </v-card-actions>
-
-    </v-card>
-  </page>
+  </v-card>
 </template>
 
 <script>
-import Page from '@/components/Page'
 import TransactionList from '@/components/transactions/TransactionList'
 import TransactionsSorter from '@/components/transactions/TransactionsSorter'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
@@ -98,7 +95,6 @@ import DatePeriodSelector from '@/components/DatePeriodSelector'
 export default {
   name: 'Transactions',
   components: {
-    Page,
     TransactionList,
     TransactionsSorter,
     NewTransactionDialog,

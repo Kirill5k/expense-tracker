@@ -10,6 +10,7 @@ const routes = [
     name: 'home',
     component: Analytics,
     meta: {
+      slim: false,
       authAccess: true,
       unAuthAccess: false
     }
@@ -19,6 +20,7 @@ const routes = [
     name: 'transactions',
     component: () => import(/* webpackChunkName: "about" */ '../views/Transactions.vue'),
     meta: {
+      slim: false,
       authAccess: true,
       unAuthAccess: false
     }
@@ -28,6 +30,7 @@ const routes = [
     name: 'categories',
     component: () => import(/* webpackChunkName: "about" */ '../views/Categories.vue'),
     meta: {
+      slim: false,
       authAccess: true,
       unAuthAccess: false
     }
@@ -37,6 +40,7 @@ const routes = [
     name: 'login',
     component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
     meta: {
+      slim: true,
       authAccess: false,
       unAuthAccess: true
     }
@@ -46,6 +50,7 @@ const routes = [
     name: 'register',
     component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue'),
     meta: {
+      slim: true,
       authAccess: false,
       unAuthAccess: true
     }

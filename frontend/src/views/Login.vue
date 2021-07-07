@@ -1,47 +1,44 @@
 <template>
-  <page slim>
-    <v-card
-      :loading="loading"
-      class="mx-auto"
-    >
-      <v-card-title>
-        Sign in into your account
-      </v-card-title>
+  <v-card
+    :loading="loading"
+    class="mx-auto"
+  >
+    <v-card-title>
+      Sign in into your account
+    </v-card-title>
 
-      <v-card-text>
-        <sign-in
-          :disabled="loading"
-          @sign-in="login"
-          @reset-password="reset"
-        />
-      </v-card-text>
+    <v-card-text>
+      <sign-in
+        :disabled="loading"
+        @sign-in="login"
+        @reset-password="reset"
+      />
+    </v-card-text>
 
-      <v-divider></v-divider>
+    <v-divider></v-divider>
 
-      <v-card-subtitle>
-        New?
-        <v-btn
-          class="pl-0 pr-0"
-          :style="{textTransform: 'unset'}"
-          small
-          color="primary"
-          text
-          @click="createAccount"
-        >
-          Create an account.
-        </v-btn>
-      </v-card-subtitle>
-    </v-card>
-  </page>
+    <v-card-subtitle>
+      New?
+      <v-btn
+        class="pl-0 pr-0"
+        :style="{textTransform: 'unset'}"
+        small
+        color="primary"
+        text
+        @click="createAccount"
+      >
+        Create an account.
+      </v-btn>
+    </v-card-subtitle>
+  </v-card>
 </template>
 
 <script>
 import SignIn from '@/components/auth/SignIn'
-import Page from '@/components/Page'
 
 export default {
   name: 'Login',
-  components: { SignIn, Page },
+  components: { SignIn },
   data: () => ({
     loading: false,
     error: ''
