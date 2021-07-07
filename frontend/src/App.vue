@@ -81,7 +81,8 @@ export default {
     navLinks: [
       { to: '/', name: 'Analytics', icon: 'mdi-chart-bar' },
       { to: '/transactions', name: 'Transactions', icon: 'mdi-bank-transfer' },
-      { to: '/categories', name: 'Categories', icon: 'mdi-shape' }
+      { to: '/categories', name: 'Categories', icon: 'mdi-shape' },
+      { to: '/account', name: 'Settings', icon: 'mdi-account-cog' }
     ]
   }),
   computed: {
