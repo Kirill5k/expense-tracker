@@ -5,7 +5,7 @@
       sm="4"
       md="3"
       cols="4"
-      class="pr-0"
+      class="pr-0 pt-0"
     >
       <v-icon
         size="100"
@@ -21,7 +21,7 @@
       sm="8"
       md="8"
       cols="8"
-      class="pl-0"
+      class="pl-0 pt-0"
     >
       <v-list>
         <v-list-item class="px-0">

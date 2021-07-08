@@ -16,7 +16,7 @@
 
     <v-divider/>
 
-    <v-card-text>
+    <v-card-text class="pb-0">
       <p class="text-subtitle-1 mb-0">Interface</p>
       <interface-settings
         v-model="interfacePanel"
@@ -25,7 +25,7 @@
       />
     </v-card-text>
 
-    <v-card-text class="pt-0">
+    <v-card-text class="py-0">
       <p class="text-subtitle-1 mb-0">Security</p>
       <security-settings
         v-model="securityPanel"
