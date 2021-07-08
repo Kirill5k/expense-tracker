@@ -24,7 +24,7 @@
       <v-col
         v-if="!slim"
         cols="2"
-        class="d-none d-sm-block"
+        class="d-none d-md-block"
       >
         <v-card
           elevation="8"
@@ -80,7 +80,7 @@
       <v-col
         v-if="!slim"
         cols="2"
-        class="d-none d-sm-block"
+        class="d-none d-md-block"
       />
     </v-row>
   </v-container>

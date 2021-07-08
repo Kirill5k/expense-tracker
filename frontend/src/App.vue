@@ -3,7 +3,7 @@
     <v-app-bar
       clipped-left
       v-if="isAuthenticated"
-      class="d-none d-sm-block"
+      class="d-none d-md-block"
       app
       color="white"
       dense
@@ -48,7 +48,7 @@
 
     <v-bottom-navigation
       v-if="isAuthenticated"
-      class="d-flex d-sm-none"
+      class="d-flex d-md-none"
       app
       shift
     >
