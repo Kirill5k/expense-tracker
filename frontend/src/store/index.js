@@ -48,6 +48,9 @@ export default new Vuex.Store({
       acc[el.id] = el
       return acc
     }, {}),
+    filteredTransactions: state => state.transactions
+      .filter(t => t.amount.currency.code === state.account.settings.currency.code)
+      .filter(t => state.account.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
     displayedTransactions: state => ({
       current: withinDates(state.transactions, state.displayDate),
       previous: withinDates(state.transactions, state.displayDate.previous || {})
