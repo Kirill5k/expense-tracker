@@ -77,6 +77,9 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content color="grey lighten-5">
         <v-switch
+          :input-value="settings.hideFutureTransactions"
+          :true-value="true"
+          :false-value="false"
           hide-details
           :value="settings.hideFutureTransactions"
           :label="settings.hideFutureTransactions ? 'Yes' : 'No'"
@@ -121,14 +124,14 @@ export default {
     }
   },
   methods: {
-    selectCurrency (newCurrency) {
-      this.$emit('update', { ...this.settings, currency: newCurrency })
-    },
     openPanel (panel) {
       this.$emit('input', panel)
     },
+    selectCurrency (newCurrency) {
+      this.$emit('update', { ...this.settings, currency: newCurrency })
+    },
     updateFutureTransactionsDisplay (newValue) {
-      this.$emit('update', { ...this.settings, hideFutureTransactions: newValue || false })
+      this.$emit('update', { ...this.settings, hideFutureTransactions: newValue })
     }
   }
 }

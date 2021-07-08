@@ -79,10 +79,10 @@ export default {
   },
   methods: {
     updateSettings (newSettings) {
-      console.log(newSettings)
       this.loading = true
       this.$store
         .dispatch('updateAccountSettings', newSettings)
+        .catch(() => {})
         .then(() => {
           this.loading = false
         })
