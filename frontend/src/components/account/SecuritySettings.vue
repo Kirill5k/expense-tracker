@@ -9,15 +9,12 @@
       @change="resetPasswordChangeForm"
     >
       <v-expansion-panel-header class="px-0">
-        <template v-slot:default="{ }">
-          <v-row no-gutters>
-            <v-col cols="8">
-              Change password
-            </v-col>
-          </v-row>
-        </template>
+        Change password
       </v-expansion-panel-header>
-      <v-expansion-panel-content>
+      <v-expansion-panel-content
+        color="grey lighten-5"
+        class="pt-4"
+      >
         <v-form
           ref="passwordChangeForm"
           v-model="valid"
@@ -72,6 +69,40 @@
             Change
           </v-btn>
         </v-form>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
+    <v-expansion-panel>
+      <v-expansion-panel-header class="px-0">
+        Erase all transactions
+      </v-expansion-panel-header>
+      <v-expansion-panel-content
+        color="grey lighten-5"
+        class="text-center pt-4"
+      >
+        <v-btn
+          small
+          color="error"
+        >
+          Delete all
+        </v-btn>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
+    <v-expansion-panel>
+      <v-expansion-panel-header class="px-0">
+        Close account
+      </v-expansion-panel-header>
+      <v-expansion-panel-content
+        color="grey lighten-5"
+        class="text-center pt-4"
+      >
+        <v-btn
+          small
+          color="error"
+        >
+          Delete account
+        </v-btn>
       </v-expansion-panel-content>
     </v-expansion-panel>
 

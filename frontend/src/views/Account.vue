@@ -8,14 +8,15 @@
       Account
     </v-card-title>
 
-    <v-card-text>
+    <v-card-text class="pb-0">
       <account-details
         :account="account"
       />
-      <v-divider/>
     </v-card-text>
 
-    <v-card-text class="pt-0">
+    <v-divider/>
+
+    <v-card-text>
       <p class="text-subtitle-1 mb-0">Interface</p>
       <interface-settings
         v-model="interfacePanel"

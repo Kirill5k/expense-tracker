@@ -34,7 +34,7 @@
           </v-row>
         </template>
       </v-expansion-panel-header>
-      <v-expansion-panel-content>
+      <v-expansion-panel-content color="grey lighten-5">
         <v-select
           name="currency"
           persistent-hint
@@ -75,8 +75,9 @@
           </v-row>
         </template>
       </v-expansion-panel-header>
-      <v-expansion-panel-content>
+      <v-expansion-panel-content color="grey lighten-5">
         <v-switch
+          hide-details
           v-model="showFutureTransactions"
           :label="showFutureTransactions ? 'Yes' : 'No'"
           color="primary"
