@@ -96,7 +96,8 @@ export default {
         newPassword: [
           v => !!v || 'Please enter your new password',
           v => v.length >= 8 || 'Must be at least 8 characters in length',
-          v => /[A-Z].*\d|\d.*[A-Z]/.test(v) || 'Must contain at least 1 digit and 1 uppercase letter'
+          v => /[A-Z].*\d|\d.*[A-Z]/.test(v) || 'Must contain at least 1 digit and 1 uppercase letter',
+          v => v.length < 60 || 'Your new password is too long'
         ],
         confirmPassword: [
           v => !!v || 'Please confirm your new password',

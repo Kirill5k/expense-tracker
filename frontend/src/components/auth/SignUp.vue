@@ -122,7 +122,8 @@ export default {
         password: [
           v => !!v || 'Please enter your password',
           v => v.length >= 8 || 'Must be at least 8 characters in length',
-          v => /[A-Z].*\d|\d.*[A-Z]/.test(v) || 'Must contain at least 1 digit and 1 uppercase letter'
+          v => /[A-Z].*\d|\d.*[A-Z]/.test(v) || 'Must contain at least 1 digit and 1 uppercase letter',
+          v => v.length < 60 || 'Your password is too long'
         ],
         confirmPassword: [
           v => !!v || 'Please enter your password',
