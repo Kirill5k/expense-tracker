@@ -89,8 +89,14 @@
 
 <script>
 const CURRENCIES = [
-  { code: 'GBP', symbol: '£', country: 'United Kingdom' },
-  { code: 'USD', symbol: '$', country: 'United States' }
+  { country: 'United States dollar', code: 'USD', symbol: '$' },
+  { country: 'Euro', code: 'EUR', symbol: '€' },
+  { country: 'Pound sterling', code: 'GBP', symbol: '£' },
+  { country: 'Japanese yen', code: 'JPY', symbol: '¥' },
+  { country: 'South Korean won', code: 'KRW', symbol: '₩' },
+  { country: 'Indian rupee', code: 'INR', symbol: '₹' },
+  { country: 'Russian ruble', code: 'RUB', symbol: '₽' },
+  { country: 'Turkish lira', code: 'TRY', symbol: '₺' }
 ]
 
 export default {
