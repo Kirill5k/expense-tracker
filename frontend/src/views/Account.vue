@@ -20,7 +20,8 @@
       <p class="text-subtitle-1 mb-0">Interface</p>
       <interface-settings
         v-model="interfacePanel"
-        :account="account"
+        :settings="account.settings"
+        @update="updateSettings"
       />
     </v-card-text>
 
@@ -74,6 +75,11 @@ export default {
   computed: {
     account () {
       return this.$store.state.account
+    }
+  },
+  methods: {
+    updateSettings (newSettings) {
+      console.log(newSettings)
     }
   }
 }

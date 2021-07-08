@@ -27,7 +27,7 @@
                   v-else
                   key="1"
                 >
-                  {{ account.settings.currency.symbol }}
+                  {{ settings.currency.symbol }}
                 </span>
               </v-fade-transition>
             </v-col>
@@ -59,7 +59,7 @@
         <template v-slot:default="{ open }">
           <v-row no-gutters>
             <v-col cols="10">
-              Show future transactions
+              Hide future transactions
             </v-col>
             <v-col
               cols="2"
@@ -69,7 +69,7 @@
                 v-if="!open"
                 key="0"
               >
-                  {{ showFutureTransactions ? 'Yes' : 'No' }}
+                  {{ settings.hideFutureTransactions ? 'Yes' : 'No' }}
                 </span>
             </v-col>
           </v-row>
@@ -78,9 +78,10 @@
       <v-expansion-panel-content color="grey lighten-5">
         <v-switch
           hide-details
-          v-model="showFutureTransactions"
-          :label="showFutureTransactions ? 'Yes' : 'No'"
+          :value="settings.hideFutureTransactions"
+          :label="settings.hideFutureTransactions ? 'Yes' : 'No'"
           color="primary"
+          @change="updateFutureTransactionsDisplay"
         ></v-switch>
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -102,7 +103,7 @@ const CURRENCIES = [
 export default {
   name: 'InterfaceSettings',
   props: {
-    account: {
+    settings: {
       type: Object,
       required: true
     },
@@ -112,20 +113,22 @@ export default {
     }
   },
   data: () => ({
-    currencies: CURRENCIES,
-    showFutureTransactions: true
+    currencies: CURRENCIES
   }),
   computed: {
     currentCurrency () {
-      return this.currencies.find(c => c.code === this.account.settings.currency.code)
+      return this.currencies.find(c => c.code === this.settings.currency.code)
     }
   },
   methods: {
     selectCurrency (newCurrency) {
-      console.log(newCurrency)
+      this.$emit('update', { ...this.settings, currency: newCurrency })
     },
     openPanel (panel) {
       this.$emit('input', panel)
+    },
+    updateFutureTransactionsDisplay (newValue) {
+      this.$emit('update', { ...this.settings, hideFutureTransactions: newValue })
     }
   }
 }
