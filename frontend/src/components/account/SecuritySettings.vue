@@ -1,5 +1,7 @@
 <template>
   <v-expansion-panels
+    :value="value"
+    @change="openPanel"
     accordion
     flat
   >
@@ -79,6 +81,12 @@
 <script>
 export default {
   name: 'SecuritySettings',
+  props: {
+    value: {
+      type: Number,
+      require: true
+    }
+  },
   data: () => ({
     valid: true,
     showCurrentPassword: false,
@@ -107,6 +115,9 @@ export default {
     }
   },
   methods: {
+    openPanel (panel) {
+      this.$emit('input', panel)
+    },
     resetPasswordChangeForm () {
       if (this.$refs.passwordChangeForm) {
         this.currentPassword = ''

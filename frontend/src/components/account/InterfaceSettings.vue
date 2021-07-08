@@ -1,9 +1,11 @@
 <template>
   <v-expansion-panels
+    :value="value"
+    @change="openPanel"
     accordion
     flat
   >
-    <v-expansion-panel>
+    <v-expansion-panel :key="0">
       <v-expansion-panel-header class="px-0">
         <template v-slot:default="{ open }">
           <v-row no-gutters>
@@ -52,7 +54,7 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
 
-    <v-expansion-panel>
+    <v-expansion-panel :key="1">
       <v-expansion-panel-header class="px-0">
         <template v-slot:default="{ open }">
           <v-row no-gutters>
@@ -96,6 +98,10 @@ export default {
     account: {
       type: Object,
       required: true
+    },
+    value: {
+      type: Number,
+      require: true
     }
   },
   data: () => ({
@@ -110,6 +116,9 @@ export default {
   methods: {
     selectCurrency (newCurrency) {
       console.log(newCurrency)
+    },
+    openPanel (panel) {
+      this.$emit('input', panel)
     }
   }
 }

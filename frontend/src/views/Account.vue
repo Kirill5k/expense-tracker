@@ -18,6 +18,7 @@
     <v-card-text class="pt-0">
       <p class="text-subtitle-1 mb-0">Interface</p>
       <interface-settings
+        v-model="interfacePanel"
         :account="account"
       />
     </v-card-text>
@@ -25,6 +26,7 @@
     <v-card-text class="pt-0">
       <p class="text-subtitle-1 mb-0">Security</p>
       <security-settings
+        v-model="securityPanel"
       />
     </v-card-text>
 
@@ -57,8 +59,17 @@ export default {
   },
   data: () => ({
     loading: false,
-    editable: false
+    interfacePanel: undefined,
+    securityPanel: undefined
   }),
+  watch: {
+    interfacePanel () {
+      this.securityPanel = undefined
+    },
+    securityPanel () {
+      this.interfacePanel = undefined
+    }
+  },
   computed: {
     account () {
       return this.$store.state.account
