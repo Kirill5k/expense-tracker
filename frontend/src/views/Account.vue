@@ -80,6 +80,12 @@ export default {
   methods: {
     updateSettings (newSettings) {
       console.log(newSettings)
+      this.loading = true
+      this.$store
+        .dispatch('updateAccountSettings', newSettings)
+        .then(() => {
+          this.loading = false
+        })
     }
   }
 }

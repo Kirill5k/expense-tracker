@@ -88,6 +88,9 @@ export default new Vuex.Store({
     setAccount (state, account) {
       state.account = account
     },
+    setSettings (state, newSettings) {
+      state.account.settings = newSettings
+    },
     setCategories (state, categories) {
       state.categories = categories
     },
@@ -141,6 +144,14 @@ export default new Vuex.Store({
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => dispatch('loadData', acc))
         .catch(() => commit('loaded'))
+    },
+    updateAccountSettings ({ commit, state }, requestBody) {
+      return fetch(`/api/auth/account/${state.account.id}/settings`, {
+        method: 'PUT',
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
+      })
+        .then(res => res.status === 204 ? commit('setSettings', requestBody) : reject(res, commit))
     },
     login ({ commit, dispatch }, requestBody) {
       return fetch('/api/auth/login', {

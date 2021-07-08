@@ -128,7 +128,7 @@ export default {
       this.$emit('input', panel)
     },
     updateFutureTransactionsDisplay (newValue) {
-      this.$emit('update', { ...this.settings, hideFutureTransactions: newValue })
+      this.$emit('update', { ...this.settings, hideFutureTransactions: newValue || false })
     }
   }
 }
