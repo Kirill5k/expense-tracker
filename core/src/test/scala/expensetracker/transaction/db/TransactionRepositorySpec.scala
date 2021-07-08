@@ -3,11 +3,11 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.CategoryId
-import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
-import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.auth.account.AccountId
+import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
+import expensetracker.transaction.TransactionKind.Expense
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
@@ -15,7 +15,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import squants.market.GBP
 
-import java.time.Instant
+import java.time.LocalDate
 
 class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matchers {
 
@@ -32,7 +32,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          txId  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          txId  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
           txs <- repo.getAll(acc1Id)
         } yield (txId, txs)
 
@@ -48,8 +48,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Income, cat2Id, GBP(45.0), Instant.now(), None))
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Income, cat2Id, GBP(45.0), LocalDate.now(), None))
           txs <- repo.getAll(acc1Id)
         } yield txs
 
@@ -66,7 +66,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
           tx <- repo.get(acc1Id, id)
         } yield tx
 
@@ -80,7 +80,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
           err <- repo.get(acc2Id, id).attempt
         } yield (id, err)
 
@@ -94,8 +94,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat2Id, GBP(45.0), Instant.now(), None))
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
+          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat2Id, GBP(45.0), LocalDate.now(), None))
           txs <- repo.getAll(acc2Id)
         } yield txs
 
@@ -110,7 +110,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- TransactionRepository.make(client)
-            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
             _    <- repo.delete(acc2Id, txid)
             cats <- repo.getAll(acc2Id)
           } yield cats
@@ -125,7 +125,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- TransactionRepository.make(client)
-            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
             res  <- repo.delete(acc1Id, txid).attempt
           } yield (txid, res)
 
@@ -141,7 +141,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         withEmbeddedMongoDb { db =>
           val result = for {
             repo <- TransactionRepository.make(db)
-            txid <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            txid <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
             tx   <- repo.get(acc2Id, txid)
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
             txs <- repo.getAll(acc2Id)
@@ -158,7 +158,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val txid = TransactionId(new ObjectId().toHexString)
           val result = for {
             repo <- TransactionRepository.make(db)
-            res  <- repo.update(Transaction(txid, acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), Instant.now(), None))
+            res  <- repo.update(Transaction(txid, acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
           } yield res
 
           result.attempt.map { res =>

@@ -7,7 +7,7 @@ import expensetracker.auth.account.AccountId
 import expensetracker.transaction.db.TransactionRepository
 import squants.market.GBP
 
-import java.time.Instant
+import java.time.LocalDate
 
 class TransactionServiceSpec extends CatsSpec {
 
@@ -76,7 +76,7 @@ class TransactionServiceSpec extends CatsSpec {
       val repo = mock[TransactionRepository[IO]]
       when(repo.create(any[CreateTransaction])).thenReturn(IO.pure(txid))
 
-      val create = CreateTransaction(aid, TransactionKind.Income, cid, GBP(5.0), Instant.now(), None)
+      val create = CreateTransaction(aid, TransactionKind.Income, cid, GBP(5.0), LocalDate.now(), None)
       val result = for {
         svc <- TransactionService.make[IO](repo)
         res <- svc.create(create)

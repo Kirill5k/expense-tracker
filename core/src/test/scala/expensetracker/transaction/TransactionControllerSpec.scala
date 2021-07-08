@@ -9,7 +9,7 @@ import org.http4s.implicits._
 import org.http4s.{Method, Request, Status}
 import squants.market.GBP
 
-import java.time.Instant
+import java.time.LocalDate
 
 class TransactionControllerSpec extends ControllerSpec {
 
@@ -30,7 +30,7 @@ class TransactionControllerSpec extends ControllerSpec {
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${txid.value}"}"""))
         verify(svc).create(
-          CreateTransaction(aid, TransactionKind.Expense, cid, GBP(5.99), Instant.parse("2021-01-01T00:00:00Z"), None)
+          CreateTransaction(aid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None)
         )
       }
 
@@ -89,7 +89,7 @@ class TransactionControllerSpec extends ControllerSpec {
           |      "value" : 10.99,
           |      "currency":{"code":"GBP","symbol":"£"}
           |    },
-          |    "date" : "2021-06-06T00:00:00Z",
+          |    "date" : "2021-06-06",
           |    "note" : "test tx"
           |  }
           |]""".stripMargin
@@ -115,7 +115,7 @@ class TransactionControllerSpec extends ControllerSpec {
                         |  "value" : 10.99,
                         |  "currency":{"code":"GBP","symbol":"£"}
                         |},
-                        |"date" : "2021-06-06T00:00:00Z",
+                        |"date" : "2021-06-06",
                         |"note" : "test tx"
                         |}""".stripMargin
 

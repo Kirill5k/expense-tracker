@@ -4,7 +4,7 @@ import expensetracker.auth.account.AccountId
 import expensetracker.category.CategoryId
 import squants.market.Money
 
-import java.time.Instant
+import java.time.LocalDate
 
 final case class TransactionId(value: String) extends AnyVal
 
@@ -20,7 +20,7 @@ final case class Transaction(
     kind: TransactionKind,
     categoryId: CategoryId,
     amount: Money,
-    date: Instant,
+    date: LocalDate,
     note: Option[String]
 )
 
@@ -29,6 +29,6 @@ final case class CreateTransaction(
     kind: TransactionKind,
     categoryId: CategoryId,
     amount: Money,
-    date: Instant,
+    date: LocalDate,
     note: Option[String]
 )

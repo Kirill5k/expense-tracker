@@ -19,7 +19,7 @@ import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.typelevel.log4cats.Logger
 import squants.market.Money
 
-import java.time.{Instant, LocalDate, ZoneOffset}
+import java.time.{LocalDate}
 
 final class TransactionController[F[_]: Logger](
     private val service: TransactionService[F]
@@ -91,7 +91,7 @@ object TransactionController {
         kind = kind,
         categoryId = CategoryId(categoryId.value),
         amount = amount,
-        date = date.atStartOfDay().toInstant(ZoneOffset.UTC),
+        date = date,
         note = note.filter(_.nonEmpty)
       )
   }
@@ -103,7 +103,7 @@ object TransactionController {
       kind: TransactionKind,
       categoryId: String,
       amount: Money,
-      date: Instant,
+      date: LocalDate,
       note: Option[String]
   )
 
@@ -134,7 +134,7 @@ object TransactionController {
         categoryId = CategoryId(categoryId.value),
         accountId = aid,
         amount = amount,
-        date = date.atStartOfDay().toInstant(ZoneOffset.UTC),
+        date = date,
         note = note
       )
   }

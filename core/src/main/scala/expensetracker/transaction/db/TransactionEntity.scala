@@ -6,7 +6,7 @@ import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId
 import org.bson.types.ObjectId
 import squants.market._
 
-import java.time.Instant
+import java.time.LocalDate
 
 final case class TransactionEntity(
     _id: ObjectId,
@@ -14,7 +14,7 @@ final case class TransactionEntity(
     categoryId: ObjectId,
     kind: TransactionKind,
     amount: Money,
-    date: Instant,
+    date: LocalDate,
     note: Option[String]
 ) {
   def toDomain: Transaction =

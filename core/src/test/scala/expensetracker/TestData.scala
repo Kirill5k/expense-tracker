@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 import org.http4s.RequestCookie
 import squants.market.GBP
 
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 
 trait TestData {
 
@@ -27,7 +27,7 @@ trait TestData {
   val cat   = Category(cid, CategoryKind.Expense, cname, CategoryIcon("icon"), CategoryColor.Blue, Some(aid))
 
   val txid = TransactionId("BC0C5342AB0C5342AB0C5342")
-  val tx   = Transaction(txid, aid, TransactionKind.Expense, cid, GBP(10.99), Instant.parse("2021-06-06T00:00:00Z"), Some("test tx"))
+  val tx   = Transaction(txid, aid, TransactionKind.Expense, cid, GBP(10.99), LocalDate.parse("2021-06-06"), Some("test tx"))
 
   val sid             = SessionId(new ObjectId().toHexString)
   val sa              = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))
