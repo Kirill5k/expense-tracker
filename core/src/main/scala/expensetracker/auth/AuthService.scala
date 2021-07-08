@@ -10,7 +10,8 @@ trait AuthService[F[_]] {
   def login(email: AccountEmail, password: Password): F[Account]
   def logout(sid: SessionId): F[Unit]
   def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
-  def findAccount(aic: AccountId): F[Account]
+  def findAccount(aid: AccountId): F[Account]
+  def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
 }
 
 final private class LiveAuthService[F[_]](
@@ -35,6 +36,9 @@ final private class LiveAuthService[F[_]](
 
   override def findAccount(aid: AccountId): F[Account] =
     accountService.find(aid)
+
+  override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
+    accountService.updateSettings(aid, settings)
 }
 
 object AuthService {

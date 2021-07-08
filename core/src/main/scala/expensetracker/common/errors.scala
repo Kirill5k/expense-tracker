@@ -32,6 +32,10 @@ object errors {
       override def message: String = "Invalid email or password"
     }
 
+    case object DifferentAccountSession extends AuthError {
+      override def message: String = "The current session belongs to a different account"
+    }
+
     case object IdMismatch extends BadRequestError {
       override def message: String = "The id supplied in the path does not match with the id in the request body"
     }

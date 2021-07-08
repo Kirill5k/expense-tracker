@@ -2,13 +2,14 @@ package expensetracker.auth
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, Password}
+import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, AccountSettings, Password}
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
 import org.http4s.{HttpDate, Method, Request, ResponseCookie, Status}
+import squants.market.USD
 
 class AuthControllerSpec extends ControllerSpec {
 
@@ -25,14 +26,60 @@ class AuthControllerSpec extends ControllerSpec {
 
         val resBody =
           """{
+            |"id":"60e70e87fb134e0c1a271121",
             |"email":"email",
             |"firstName":"John",
             |"lastName":"Bloggs",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"}},
+            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":false},
             |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         verifyJsonResponse(res, Status.Ok, Some(resBody))
         verify(svc).findAccount(sess.accountId)
+        verifyZeroInteractions(disp)
+      }
+    }
+
+    "PUT /auth/account/:id/settings" should {
+      "return error when id in path is different from id in session" in {
+        val svc = mock[AuthService[IO]]
+        val disp = mock[ActionDispatcher[IO]]
+
+        val reqBody =
+          """{
+            |"currency":{"code":"USD","symbol":"$"},
+            |"hideFutureTransactions":false,
+            |"darkMode":false
+            |}""".stripMargin
+
+        val req = Request[IO](uri = uri"/auth/account/60e70e87fb134e0c1a271122/settings", method = Method.PUT)
+          .withEntity(parseJson(reqBody))
+          .addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different account"}"""))
+        verifyZeroInteractions(disp, svc)
+      }
+
+      "return 204 when after updating account settings" in {
+        val svc = mock[AuthService[IO]]
+        val disp = mock[ActionDispatcher[IO]]
+
+        when(svc.updateSettings(any[AccountId], any[AccountSettings])).thenReturn(IO.unit)
+
+        val reqBody =
+          """{
+            |"currency":{"code":"USD","symbol":"$"},
+            |"hideFutureTransactions":false,
+            |"darkMode":false
+            |}""".stripMargin
+
+        val req = Request[IO](uri = uri"/auth/account/60e70e87fb134e0c1a271121/settings", method = Method.PUT)
+          .withEntity(parseJson(reqBody))
+          .addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.NoContent, None)
+        svc.updateSettings(aid, AccountSettings(USD, false, false))
         verifyZeroInteractions(disp)
       }
     }
@@ -158,10 +205,11 @@ class AuthControllerSpec extends ControllerSpec {
 
         val resBody =
           """{
+            |"id":"60e70e87fb134e0c1a271121",
             |"email":"email",
             |"firstName":"John",
             |"lastName":"Bloggs",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"}},
+            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":false},
             |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         val sessCookie = ResponseCookie(
@@ -183,7 +231,6 @@ class AuthControllerSpec extends ControllerSpec {
       "return forbidden if session id cookie is missing" in {
         val svc = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
-
 
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST)
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))

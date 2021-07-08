@@ -3,7 +3,7 @@ package expensetracker.auth
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountService, Password}
+import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountService, AccountSettings, Password}
 import expensetracker.auth.session.{SessionActivity, SessionId, SessionService}
 
 class AuthServiceSpec extends CatsSpec {
@@ -86,6 +86,22 @@ class AuthServiceSpec extends CatsSpec {
       result.unsafeToFuture().map { res =>
         verify(sessSvc).unauth(sid)
         verifyZeroInteractions(accSvc)
+        res mustBe ()
+      }
+    }
+
+    "update settings" in {
+      val (accSvc, sessSvc) = mocks
+      when(accSvc.updateSettings(any[AccountId], any[AccountSettings])).thenReturn(IO.unit)
+
+      val result = for {
+        authSvc <- AuthService.make[IO](accSvc, sessSvc)
+        res     <- authSvc.updateSettings(aid, AccountSettings.Default)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(accSvc).updateSettings(aid, AccountSettings.Default)
+        verifyZeroInteractions(sessSvc)
         res mustBe ()
       }
     }

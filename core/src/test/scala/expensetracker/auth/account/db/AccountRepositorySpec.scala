@@ -3,13 +3,22 @@ package expensetracker.auth.account.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountName, AccountSettings, PasswordHash}
+import expensetracker.auth.account.{
+  Account,
+  AccountDetails,
+  AccountEmail,
+  AccountId,
+  AccountName,
+  AccountSettings,
+  PasswordHash
+}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import squants.market.USD
 
 import java.time.Instant
 
@@ -17,10 +26,10 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
   override protected val mongoPort: Int = 12346
 
-  val regDate = Instant.parse("2021-06-01T00:00:00Z")
-  val acc1Id = AccountId(new ObjectId().toHexString)
-  val acc2Id = AccountId(new ObjectId().toHexString)
-  val hash = PasswordHash("hash")
+  val regDate    = Instant.parse("2021-06-01T00:00:00Z")
+  val acc1Id     = AccountId(new ObjectId().toHexString)
+  val acc2Id     = AccountId(new ObjectId().toHexString)
+  val hash       = PasswordHash("hash")
   val accDetails = AccountDetails(AccountEmail("acc1@et.com"), AccountName("John", "Bloggs"))
 
   "An AccountRepository" when {
@@ -81,6 +90,36 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
       }
     }
 
+    "updateSettings" should {
+      "update account settings" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- AccountRepository.make(client)
+            _    <- repo.updateSettings(acc1Id, AccountSettings(USD, false, false))
+            acc  <- repo.find(acc1Id)
+          } yield acc
+
+          result.map { acc =>
+            acc.settings mustBe AccountSettings(USD, false, false)
+          }
+        }
+      }
+
+      "return error when account does not exist" in {
+        withEmbeddedMongoDb { client =>
+          val id = AccountId(new ObjectId().toHexString)
+          val result = for {
+            repo <- AccountRepository.make(client)
+            acc  <- repo.updateSettings(id, AccountSettings.Default)
+          } yield acc
+
+          result.attempt.map { res =>
+            res mustBe Left(AccountDoesNotExist(id))
+          }
+        }
+      }
+    }
+
     "create" should {
       "create new account" in {
         withEmbeddedMongoDb { client =>
@@ -88,7 +127,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
           val result = for {
             repo <- AccountRepository.make(client)
-            aid    <- repo.create(accDetails.copy(email = email), hash)
+            aid  <- repo.create(accDetails.copy(email = email), hash)
             acc  <- repo.findBy(email)
           } yield (aid, acc)
 

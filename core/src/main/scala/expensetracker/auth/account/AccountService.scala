@@ -15,6 +15,7 @@ trait AccountService[F[_]] {
   def create(details: AccountDetails, password: Password): F[AccountId]
   def login(email: AccountEmail, password: Password): F[Account]
   def find(aid: AccountId): F[Account]
+  def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
 }
 
 final private class LiveAccountService[F[_]](
@@ -43,6 +44,9 @@ final private class LiveAccountService[F[_]](
 
   override def find(aid: AccountId): F[Account] =
     repository.find(aid)
+
+  override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
+    repository.updateSettings(aid, settings)
 }
 
 object AccountService {

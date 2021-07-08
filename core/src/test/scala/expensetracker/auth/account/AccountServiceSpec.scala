@@ -28,6 +28,23 @@ class AccountServiceSpec extends CatsSpec {
       }
     }
 
+    "updateSettings" should {
+      "return unit when success" in {
+        val (repo, encr) = mocks
+        when(repo.updateSettings(any[AccountId], any[AccountSettings])).thenReturn(IO.unit)
+
+        val result = for {
+          service <- AccountService.make[IO](repo, encr)
+          res     <- service.updateSettings(aid, AccountSettings.Default)
+        } yield res
+
+        result.unsafeToFuture().map { res =>
+          verify(repo).updateSettings(aid, AccountSettings.Default)
+          res mustBe ()
+        }
+      }
+    }
+
     "find" should {
       "return account on success" in {
         val (repo, encr) = mocks

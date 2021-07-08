@@ -2,19 +2,22 @@ package expensetracker.auth.account.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.Filters
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, PasswordHash}
+import com.mongodb.client.model.{Filters, Updates}
+import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountSettings, PasswordHash}
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.common.json._
 import io.circe.generic.auto._
+import io.circe.syntax._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
+import org.bson.Document
 
 trait AccountRepository[F[_]] extends Repository[F] {
   def find(aid: AccountId): F[Account]
   def findBy(email: AccountEmail): F[Option[Account]]
   def create(details: AccountDetails, password: PasswordHash): F[AccountId]
+  def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
 }
 
 final private class LiveAccountRepository[F[_]: Async](
@@ -44,6 +47,13 @@ final private class LiveAccountRepository[F[_]: Async](
       .first[F]
       .flatMap(errorIfNull[AccountEntity](AccountDoesNotExist(aid)))
       .map(_.toDomain)
+
+  override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
+    collection
+      .updateOne(idEq(IdField, aid.value), Updates.set("settings", Document.parse(settings.asJson.noSpaces)))
+      .flatMap { res =>
+        if (res.getMatchedCount > 0) ().pure[F] else AccountDoesNotExist(aid).raiseError[F, Unit]
+      }
 }
 
 object AccountRepository {

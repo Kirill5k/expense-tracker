@@ -15,11 +15,17 @@ final case class AccountName(
 )
 
 final case class AccountSettings(
-    currency: Currency
+    currency: Currency,
+    hideFutureTransactions: Boolean,
+    darkMode: Boolean
 )
 
 object AccountSettings {
-  val Default = AccountSettings(GBP)
+  val Default = AccountSettings(
+    GBP,
+    hideFutureTransactions = false,
+    darkMode = false
+  )
 }
 
 final case class Account(

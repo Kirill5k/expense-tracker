@@ -6,24 +6,42 @@ import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountName, AccountSettings, Password}
+import expensetracker.auth.account.{
+  Account,
+  AccountDetails,
+  AccountEmail,
+  AccountId,
+  AccountName,
+  AccountSettings,
+  Password
+}
 import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
+import expensetracker.common.errors.AppError.DifferentAccountSession
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
 import io.circe.refined._
+import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
+import squants.market.Currency
 
 import java.time.Instant
 
-final class AuthController[F[_]: Logger: Temporal](
+final class AuthController[F[_]: Logger](
     private val service: AuthService[F],
     private val dispatcher: ActionDispatcher[F]
+)(implicit
+    F: Temporal[F]
 ) extends Controller[F] {
   import AuthController._
+
+  object AccountIdPath {
+    def unapply(cid: String): Option[AccountId] =
+      ObjectId.isValid(cid).guard[Option].as(AccountId(cid))
+  }
 
   private val prefixPath = "/auth"
 
@@ -54,6 +72,15 @@ final class AuthController[F[_]: Logger: Temporal](
       case GET -> Root / "account" as session =>
         withErrorHandling {
           service.findAccount(session.accountId).map(AccountView.from).flatMap(Ok(_))
+        }
+      case authedReq @ PUT -> Root / "account" / AccountIdPath(id) / "settings" as session =>
+        withErrorHandling {
+          for {
+            _   <- F.ensure(id.pure[F])(DifferentAccountSession)(_ == session.accountId)
+            req <- authedReq.req.as[UpdateAccountSettingsRequest]
+            _   <- service.updateSettings(id, req.toDomain)
+            res <- NoContent()
+          } yield res
         }
       case POST -> Root / "logout" as session =>
         withErrorHandling {
@@ -95,6 +122,7 @@ object AuthController {
   }
 
   final case class AccountView(
+      id: String,
       firstName: String,
       lastName: String,
       email: String,
@@ -105,11 +133,25 @@ object AuthController {
   object AccountView {
     def from(acc: Account): AccountView =
       AccountView(
+        acc.id.value,
         acc.name.first,
         acc.name.last,
         acc.email.value,
         acc.settings,
         acc.registrationDate
+      )
+  }
+
+  final case class UpdateAccountSettingsRequest(
+      currency: Currency,
+      hideFutureTransactions: Boolean,
+      darkMode: Boolean
+  ) {
+    def toDomain: AccountSettings =
+      AccountSettings(
+        currency,
+        hideFutureTransactions = hideFutureTransactions,
+        darkMode = darkMode
       )
   }
 

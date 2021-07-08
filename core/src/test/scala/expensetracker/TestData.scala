@@ -15,12 +15,12 @@ trait TestData {
 
   val regDate = Instant.parse("2021-06-01T00:00:00Z")
 
-  val aid     = AccountId(new ObjectId().toHexString)
+  val aid     = AccountId("60e70e87fb134e0c1a271121")
   val pwd     = Password("pwd")
   val hash    = PasswordHash("hash")
   val email   = AccountEmail("email")
   val details = AccountDetails(email, AccountName("John", "Bloggs"))
-  val acc     = Account(aid, details.email, details.name, hash, AccountSettings(GBP), regDate)
+  val acc     = Account(aid, details.email, details.name, hash, AccountSettings.Default, regDate)
 
   val cid   = CategoryId("AB0C5342AB0C5342AB0C5342")
   val cname = CategoryName("cat-1")
