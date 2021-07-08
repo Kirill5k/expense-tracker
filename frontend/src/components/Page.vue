@@ -2,6 +2,7 @@
   <v-container
     class="page mb-0 pb-0"
     fluid
+    style="height: 100%"
   >
     <div
       v-if="loading"
@@ -15,7 +16,11 @@
         indeterminate
       />
     </div>
-    <v-row justify="center" v-else>
+    <v-row
+      v-else
+      justify="center"
+      style="height: 80%"
+    >
       <v-col
         v-if="!slim"
         cols="2"
@@ -54,6 +59,7 @@
         :sm="dimensions.sm"
         :md="dimensions.md"
         :lg="dimensions.lg"
+        :align-self="slim ? 'center' : 'baseline'"
       >
         <v-slide-y-transition>
           <v-alert
