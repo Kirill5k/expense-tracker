@@ -24,7 +24,7 @@
       class="pl-0"
     >
       <v-list>
-        <v-list-item>
+        <v-list-item class="px-0">
           <v-list-item-content class="py-0">
             <v-list-item-title class="mt-9 text-h6">
               {{ account.firstName }}
