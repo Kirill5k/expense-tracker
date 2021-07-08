@@ -98,7 +98,8 @@ object AuthController {
       firstName: String,
       lastName: String,
       email: String,
-      settings: AccountSettings
+      settings: AccountSettings,
+      registrationDate: Instant
   )
 
   object AccountView {
@@ -107,7 +108,8 @@ object AuthController {
         acc.name.first,
         acc.name.last,
         acc.email.value,
-        acc.settings
+        acc.settings,
+        acc.registrationDate
       )
   }
 

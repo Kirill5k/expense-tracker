@@ -11,10 +11,13 @@ import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.time.Instant
+
 class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
 
   override protected val mongoPort: Int = 12346
 
+  val regDate = Instant.parse("2021-06-01T00:00:00Z")
   val acc1Id = AccountId(new ObjectId().toHexString)
   val acc2Id = AccountId(new ObjectId().toHexString)
   val hash = PasswordHash("hash")
@@ -31,7 +34,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           } yield acc
 
           result.map { acc =>
-            acc mustBe Account(acc1Id, accDetails.email, accDetails.name, hash, AccountSettings.Default)
+            acc mustBe Account(acc1Id, accDetails.email, accDetails.name, hash, AccountSettings.Default, regDate)
           }
         }
       }
@@ -59,7 +62,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
           } yield acc
 
           result.map { acc =>
-            acc mustBe Some(Account(acc1Id, accDetails.email, accDetails.name, hash, AccountSettings.Default))
+            acc mustBe Some(Account(acc1Id, accDetails.email, accDetails.name, hash, AccountSettings.Default, regDate))
           }
         }
       }
@@ -89,8 +92,10 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
             acc  <- repo.findBy(email)
           } yield (aid, acc)
 
-          result.map { case (aid, acc) =>
-            acc mustBe Some(Account(aid, email, accDetails.name, hash, AccountSettings.Default))
+          result.map {
+            case (aid, Some(acc)) =>
+              acc mustBe Account(aid, email, accDetails.name, hash, AccountSettings.Default, acc.registrationDate)
+            case _ => fail("unmatched case")
           }
         }
       }

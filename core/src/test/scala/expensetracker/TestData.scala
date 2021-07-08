@@ -13,12 +13,14 @@ import java.time.Instant
 
 trait TestData {
 
+  val regDate = Instant.parse("2021-06-01T00:00:00Z")
+
   val aid     = AccountId(new ObjectId().toHexString)
   val pwd     = Password("pwd")
   val hash    = PasswordHash("hash")
   val email   = AccountEmail("email")
   val details = AccountDetails(email, AccountName("John", "Bloggs"))
-  val acc     = Account(aid, details.email, details.name, hash, AccountSettings(GBP))
+  val acc     = Account(aid, details.email, details.name, hash, AccountSettings(GBP), regDate)
 
   val cid   = CategoryId("AB0C5342AB0C5342AB0C5342")
   val cname = CategoryName("cat-1")

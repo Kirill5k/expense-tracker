@@ -9,6 +9,7 @@ import expensetracker.category.CategoryId
 import org.bson.Document
 import org.bson.types.ObjectId
 
+import java.time.Instant
 import scala.jdk.CollectionConverters._
 
 object EmbeddedMongo {
@@ -55,7 +56,8 @@ trait EmbeddedMongo {
         "_id"      -> new ObjectId(id.value),
         "email"    -> email,
         "password" -> password,
-        "name"     -> Document.parse("""{"first":"John","last":"Bloggs"}""")
+        "name"     -> Document.parse("""{"first":"John","last":"Bloggs"}"""),
+        "registrationDate" -> Instant.parse("2021-06-01T00:00:00Z")
       ).asJava
     )
 }

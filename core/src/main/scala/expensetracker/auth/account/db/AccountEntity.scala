@@ -3,12 +3,15 @@ package expensetracker.auth.account.db
 import expensetracker.auth.account._
 import org.bson.types.ObjectId
 
+import java.time.Instant
+
 final case class AccountEntity(
     _id: ObjectId,
     email: String,
     name: AccountName,
     password: String,
-    settings: Option[AccountSettings]
+    settings: Option[AccountSettings],
+    registrationDate: Instant
 ) {
   def toDomain: Account =
     Account(
@@ -16,7 +19,8 @@ final case class AccountEntity(
       email = AccountEmail(email),
       name = name,
       password = PasswordHash(password),
-      settings.getOrElse(AccountSettings.Default)
+      settings = settings.getOrElse(AccountSettings.Default),
+      registrationDate = registrationDate
     )
 }
 
@@ -27,6 +31,7 @@ object AccountEntity {
       details.email.value,
       details.name,
       password.value,
-      Some(AccountSettings.Default)
+      Some(AccountSettings.Default),
+      Instant.now()
     )
 }

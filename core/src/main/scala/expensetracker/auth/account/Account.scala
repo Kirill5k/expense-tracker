@@ -2,6 +2,8 @@ package expensetracker.auth.account
 
 import squants.market.{Currency, GBP}
 
+import java.time.Instant
+
 final case class AccountId(value: String)    extends AnyVal
 final case class AccountEmail(value: String) extends AnyVal
 final case class Password(value: String)     extends AnyVal
@@ -25,7 +27,8 @@ final case class Account(
     email: AccountEmail,
     name: AccountName,
     password: PasswordHash,
-    settings: AccountSettings
+    settings: AccountSettings,
+    registrationDate: Instant
 )
 
 final case class AccountDetails(

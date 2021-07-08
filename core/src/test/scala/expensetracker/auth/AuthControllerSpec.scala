@@ -28,7 +28,8 @@ class AuthControllerSpec extends ControllerSpec {
             |"email":"email",
             |"firstName":"John",
             |"lastName":"Bloggs",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"}}
+            |"settings":{"currency":{"code":"GBP","symbol":"£"}},
+            |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         verifyJsonResponse(res, Status.Ok, Some(resBody))
         verify(svc).findAccount(sess.accountId)
@@ -160,7 +161,8 @@ class AuthControllerSpec extends ControllerSpec {
             |"email":"email",
             |"firstName":"John",
             |"lastName":"Bloggs",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"}}
+            |"settings":{"currency":{"code":"GBP","symbol":"£"}},
+            |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         val sessCookie = ResponseCookie(
           "session-id",
