@@ -83,14 +83,14 @@ export default {
       const previous = this.displayDate
       this.update({ ...newDate, previous })
     },
-    incrementBy (amount, { start, end, range }) {
+    incrementBy (amount, { start, end, range, index }) {
       switch (range) {
         case 'monthly':
-          return this.newDisplayDate(range, addMonths(start, amount), endOfMonth(addMonths(end, amount)))
+          return this.newDisplayDate(range, addMonths(start, amount), endOfMonth(addMonths(end, amount)), index + amount)
         case 'weekly':
-          return this.newDisplayDate(range, addWeeks(start, amount), addWeeks(end, amount))
+          return this.newDisplayDate(range, addWeeks(start, amount), addWeeks(end, amount), index + amount)
         default:
-          return this.newDisplayDate(range, addYears(start, amount), addYears(end, amount))
+          return this.newDisplayDate(range, addYears(start, amount), addYears(end, amount), index + amount)
       }
     },
     applyNewRange (newRange) {
@@ -104,14 +104,14 @@ export default {
           return this.newDisplayDate(newRange, startOfYear(today), endOfYear(today))
       }
     },
-    newDisplayDate (range, start, end) {
+    newDisplayDate (range, start, end, index = 0) {
       switch (range) {
         case 'monthly':
-          return { range, start, end, text: format(start, 'LLLL yyyy') }
+          return { index, range, start, end, text: format(start, 'LLLL yyyy') }
         case 'yearly':
-          return { range, start, end, text: format(start, 'yyyy') }
+          return { index, range, start, end, text: format(start, 'yyyy') }
         default:
-          return { range, start, end, text: `${format(start, 'do MMM')} - ${format(end, 'do MMM')}` }
+          return { index, range, start, end, text: `${format(start, 'do MMM')} - ${format(end, 'do MMM')}` }
       }
     }
   }
