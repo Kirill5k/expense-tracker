@@ -9,9 +9,10 @@ import org.bson.types.ObjectId
 
 trait Repository[F[_]] {
 
-  protected val AccIdField = "accountId"
-  protected val IdField = "_id"
-  protected val EmailField = "email"
+  protected val AccIdField  = "accountId"
+  protected val IdField     = "_id"
+  protected val EmailField  = "email"
+  protected val HiddenField = "hidden"
 
   protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =
     Option(res).map(_.pure[F]).getOrElse(error.raiseError[F, A])

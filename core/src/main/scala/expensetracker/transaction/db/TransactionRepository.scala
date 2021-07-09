@@ -2,7 +2,7 @@ package expensetracker.transaction.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.{Filters, Updates}
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.common.json._
 import expensetracker.auth.account.AccountId
@@ -19,6 +19,7 @@ trait TransactionRepository[F[_]] extends Repository[F] {
   def get(aid: AccountId, txid: TransactionId): F[Transaction]
   def delete(aid: AccountId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
+  def hide(aid: AccountId, txid: TransactionId, hidden: Boolean = true): F[Unit]
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
@@ -34,7 +35,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
     collection
-      .find(Filters.eq(AccIdField, new ObjectId(aid.value)))
+      .find(Filters.and(Filters.eq(AccIdField, new ObjectId(aid.value)), Filters.ne(HiddenField, true)))
       .all[F]
       .map(_.map(_.toDomain).toList)
 
@@ -59,6 +60,14 @@ final private class LiveTransactionRepository[F[_]: Async](
       .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value)))
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .void
+
+  override def hide(aid: AccountId, txid: TransactionId, hidden: Boolean): F[Unit] =
+    collection
+      .updateOne(
+        Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value)),
+        Updates.set(HiddenField, hidden)
+      )
+      .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 }
 
 object TransactionRepository {

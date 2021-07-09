@@ -6,7 +6,6 @@ import expensetracker.EmbeddedMongo
 import expensetracker.auth.account.AccountId
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
-import expensetracker.transaction.TransactionKind.Expense
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
@@ -28,12 +27,14 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
 
   "A TransactionRepository" should {
 
+    val create = CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None)
+
     "create new transaction and return id" in {
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          txId  <- repo.create(CreateTransaction(acc1Id, Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-          txs <- repo.getAll(acc1Id)
+          txId <- repo.create(create)
+          txs  <- repo.getAll(acc1Id)
         } yield (txId, txs)
 
         result.map { case (txId, txs) =>
@@ -48,8 +49,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Income, cat2Id, GBP(45.0), LocalDate.now(), None))
+          _    <- repo.create(create)
+          _ <- repo.create(CreateTransaction(acc1Id, TransactionKind.Income, cat2Id, GBP(45.0), LocalDate.now(), None))
           txs <- repo.getAll(acc1Id)
         } yield txs
 
@@ -66,8 +67,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-          tx <- repo.get(acc1Id, id)
+          id   <- repo.create(create)
+          tx   <- repo.get(acc1Id, id)
         } yield tx
 
         result.map { tx =>
@@ -80,8 +81,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          id   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-          err <- repo.get(acc2Id, id).attempt
+          id   <- repo.create(create)
+          err  <- repo.get(acc2Id, id).attempt
         } yield (id, err)
 
         result.map { case (id, err) =>
@@ -94,9 +95,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-          _   <- repo.create(CreateTransaction(acc1Id, TransactionKind.Expense, cat2Id, GBP(45.0), LocalDate.now(), None))
-          txs <- repo.getAll(acc2Id)
+          _    <- repo.create(create)
+          _    <- repo.create(create.copy(categoryId = cat2Id, amount = GBP(45.0)))
+          txs  <- repo.getAll(acc2Id)
         } yield txs
 
         result.map { txs =>
@@ -110,9 +111,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- TransactionRepository.make(client)
-            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-            _    <- repo.delete(acc2Id, txid)
-            cats <- repo.getAll(acc2Id)
+            txid <- repo.create(create)
+            _    <- repo.delete(acc1Id, txid)
+            cats <- repo.getAll(acc1Id)
           } yield cats
 
           result.map { txs =>
@@ -125,8 +126,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- TransactionRepository.make(client)
-            txid  <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-            res  <- repo.delete(acc1Id, txid).attempt
+            txid <- repo.create(create)
+            res  <- repo.delete(acc2Id, txid).attempt
           } yield (txid, res)
 
           result.map { case (txid, res) =>
@@ -141,10 +142,10 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         withEmbeddedMongoDb { db =>
           val result = for {
             repo <- TransactionRepository.make(db)
-            txid <- repo.create(CreateTransaction(acc2Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
-            tx   <- repo.get(acc2Id, txid)
+            txid <- repo.create(create)
+            tx   <- repo.get(acc1Id, txid)
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
-            txs <- repo.getAll(acc2Id)
+            txs  <- repo.getAll(acc1Id)
           } yield (tx, txs)
 
           result.map { case (tx, txs) =>
@@ -158,10 +159,43 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val txid = TransactionId(new ObjectId().toHexString)
           val result = for {
             repo <- TransactionRepository.make(db)
-            res  <- repo.update(Transaction(txid, acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None))
+            res <- repo.update(
+              Transaction(txid, acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None)
+            )
           } yield res
 
           result.attempt.map { res =>
+            res mustBe Left(TransactionDoesNotExist(txid))
+          }
+        }
+      }
+    }
+
+    "hide" should {
+      "update hidden field of a tx" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- TransactionRepository.make(client)
+            txid <- repo.create(create)
+            _    <- repo.hide(acc1Id, txid)
+            txs  <- repo.getAll(acc1Id)
+          } yield txs
+
+          result.map { res =>
+            res mustBe Nil
+          }
+        }
+      }
+
+      "return error when tx does not exist" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- TransactionRepository.make(client)
+            txid <- repo.create(create)
+            res  <- repo.hide(acc2Id, txid).attempt
+          } yield (txid, res)
+
+          result.map { case (txid, res) =>
             res mustBe Left(TransactionDoesNotExist(txid))
           }
         }

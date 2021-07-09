@@ -3,7 +3,15 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
+import expensetracker.category.{
+  Category,
+  CategoryColor,
+  CategoryIcon,
+  CategoryId,
+  CategoryKind,
+  CategoryName,
+  CreateCategory
+}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import mongo4cats.client.MongoClientF
@@ -76,6 +84,35 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
             repo <- CategoryRepository.make(client)
             cat  <- repo.get(acc1Id, cat2Id)
           } yield cat
+
+          result.attempt.map { res =>
+            res mustBe Left(CategoryDoesNotExist(cat2Id))
+          }
+        }
+      }
+    }
+
+    "hide" should {
+      "update hidden field of a cat" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            _    <- repo.hide(acc2Id, cat2Id)
+            cats <- repo.getAll(acc2Id)
+          } yield cats
+
+          result.map { res =>
+            res mustBe Nil
+          }
+        }
+      }
+
+      "return error when cat does not exist" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            res  <- repo.hide(acc1Id, cat2Id)
+          } yield res
 
           result.attempt.map { res =>
             res mustBe Left(CategoryDoesNotExist(cat2Id))

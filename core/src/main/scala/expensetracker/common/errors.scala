@@ -18,8 +18,6 @@ object errors {
   sealed trait AuthError       extends AppError
 
   object AppError {
-    final case class Mongo(message: String) extends AppError
-
     final case class AccountAlreadyExists(email: AccountEmail) extends ConflictError {
       override def message: String = s"An account with email ${email.value} already exists"
     }

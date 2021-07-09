@@ -2,7 +2,7 @@ package expensetracker.category.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.{Filters, Updates}
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.account.AccountId
 import expensetracker.common.db.Repository
@@ -20,6 +20,7 @@ trait CategoryRepository[F[_]] extends Repository[F] {
   def getAll(aid: AccountId): F[List[Category]]
   def delete(aid: AccountId, cid: CategoryId): F[Unit]
   def assignDefault(aid: AccountId): F[Unit]
+  def hide(aid: AccountId, cid: CategoryId, hidden: Boolean = true): F[Unit]
 }
 
 final private class LiveCategoryRepository[F[_]: Async](
@@ -28,7 +29,7 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Category]] =
     collection
-      .find(idEq(AccIdField, aid.value))
+      .find(Filters.and(idEq(AccIdField, aid.value), Filters.ne(HiddenField, true)))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
@@ -42,7 +43,8 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
       .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)))
-      .flatMap(r => errorIfNull(CategoryDoesNotExist(cid))(r).void)
+      .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
+      .void
 
   override def create(cat: CreateCategory): F[CategoryId] = {
     val newCat = CategoryEntity.from(cat)
@@ -71,6 +73,14 @@ final private class LiveCategoryRepository[F[_]: Async](
         collection.insertMany(cats)
       }
       .void
+
+  override def hide(aid: AccountId, cid: CategoryId, hidden: Boolean = true): F[Unit] =
+    collection
+      .updateOne(
+        Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)),
+        Updates.set(HiddenField, hidden)
+      )
+      .flatMap(errorIfNoMatches(CategoryDoesNotExist(cid)))
 }
 
 object CategoryRepository {
