@@ -23,13 +23,15 @@ final private class LiveSessionRepository[F[_]: Async](
     private val collection: MongoCollectionF[SessionEntity]
 ) extends SessionRepository[F] {
 
+  private val logoutUpdate = Updates.combine(Updates.set("status", "logged-out"), Updates.set("active", false))
+
   override def create(cs: CreateSession): F[SessionId] = {
     val createSession = SessionEntity.create(cs)
     collection.insertOne[F](createSession).as(SessionId(createSession._id.toHexString))
   }
 
   override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] = {
-    val idFilter =idEq(IdField, sid.value)
+    val idFilter = idEq(sid.value)
     val sess = activity
       .map(sa => new Document(Map[String, Object]("ipAddress" -> sa.ipAddress.toUriString, "time" -> sa.time).asJava))
       .map(sa => collection.findOneAndUpdate(idFilter, Updates.set("lastRecordedActivity", sa)))
@@ -39,11 +41,7 @@ final private class LiveSessionRepository[F[_]: Async](
   }
 
   override def unauth(sid: SessionId): F[Unit] = {
-    collection.updateOne(
-      idEq(IdField, sid.value),
-      Updates.combine(Updates.set("status", "logged-out"), Updates.set("active", false))
-    )
-      .void
+    collection.updateOne(idEq(sid.value), logoutUpdate).void
   }
 }
 

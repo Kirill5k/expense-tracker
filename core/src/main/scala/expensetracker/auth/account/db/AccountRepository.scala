@@ -44,19 +44,19 @@ final private class LiveAccountRepository[F[_]: Async](
 
   override def find(aid: AccountId): F[Account] =
     collection
-      .find(idEq(IdField, aid.value))
+      .find(idEq(aid.value))
       .first[F]
       .flatMap(errorIfNull[AccountEntity](AccountDoesNotExist(aid)))
       .map(_.toDomain)
 
   override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
     collection
-      .updateOne(idEq(IdField, aid.value), Updates.set("settings", Document.parse(settings.asJson.noSpaces)))
+      .updateOne(idEq(aid.value), Updates.set("settings", Document.parse(settings.asJson.noSpaces)))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 
   override def updatePassword(aid: AccountId)(password: PasswordHash): F[Unit] =
     collection
-      .updateOne(idEq(IdField, aid.value), Updates.set("password", password.value))
+      .updateOne(idEq(aid.value), Updates.set("password", password.value))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 }
 

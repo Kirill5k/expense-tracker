@@ -30,27 +30,27 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Category]] =
     collection
-      .find(Filters.and(idEq(AccIdField, aid.value), NotHidden))
+      .find(Filters.and(accIdEq(aid), notHidden))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
   override def get(aid: AccountId, cid: CategoryId): F[Category] =
     collection
-      .find(Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)))
+      .find(Filters.and(accIdEq(aid), idEq(cid.value)))
       .first[F]
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .map(_.toDomain)
 
   override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
     collection
-      .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)))
+      .findOneAndDelete[F](Filters.and(accIdEq(aid), idEq(cid.value)))
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .void
 
   override def create(cat: CreateCategory): F[CategoryId] = {
     val newCat = CategoryEntity.from(cat)
     collection
-      .count(Filters.and(idEq(AccIdField, cat.accountId.value), Filters.eq("name", newCat.name), NotHidden))
+      .count(Filters.and(accIdEq(cat.accountId), Filters.eq("name", newCat.name), notHidden))
       .flatMap {
         case 0 => collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
         case _ => CategoryAlreadyExists(cat.name).raiseError[F, CategoryId]
@@ -60,14 +60,14 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def update(cat: Category): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(idEq(AccIdField, cat.accountId.map(_.value).orNull), idEq(IdField, cat.id.value)),
+        Filters.and(accIdEq(cat.accountId), idEq(cat.id.value)),
         CategoryEntity.from(cat)
       )
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cat.id))(r).void)
 
   override def assignDefault(aid: AccountId): F[Unit] =
     collection
-      .find(Filters.or(Filters.exists(AccIdField, false), Filters.eq(AccIdField, null)))
+      .find(Filters.or(Filters.exists(AccIdField, false), isNull(AccIdField)))
       .all[F]
       .map(_.map(_.copy(_id = new ObjectId(), accountId = Some(new ObjectId(aid.value)))).toList)
       .flatMap { cats =>
@@ -78,14 +78,14 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def hide(aid: AccountId, cid: CategoryId, hidden: Boolean = true): F[Unit] =
     collection
       .updateOne(
-        Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value)),
+        Filters.and(accIdEq(aid), idEq(cid.value)),
         Updates.set(HiddenField, hidden)
       )
       .flatMap(errorIfNoMatches(CategoryDoesNotExist(cid)))
 
   override def isHidden(aid: AccountId, cid: CategoryId): F[Boolean] =
     collection
-      .count(Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value), Filters.eq(HiddenField, true)))
+      .count(Filters.and(accIdEq(aid), idEq(cid.value), Filters.eq(HiddenField, true)))
       .map(_ > 0)
 }
 

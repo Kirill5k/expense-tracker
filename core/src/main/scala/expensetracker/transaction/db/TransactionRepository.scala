@@ -11,7 +11,6 @@ import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import io.circe.generic.auto._
 import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
-import org.bson.types.ObjectId
 
 trait TransactionRepository[F[_]] extends Repository[F] {
   def create(tx: CreateTransaction): F[TransactionId]
@@ -36,13 +35,13 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
     collection
-      .find(Filters.and(Filters.eq(AccIdField, new ObjectId(aid.value)), NotHidden))
+      .find(Filters.and(accIdEq(aid), notHidden))
       .all[F]
       .map(_.map(_.toDomain).toList)
 
   override def get(aid: AccountId, txid: TransactionId): F[Transaction] =
     collection
-      .find(Filters.and(Filters.eq(AccIdField, new ObjectId(aid.value)), Filters.eq(IdField, new ObjectId(txid.value))))
+      .find(Filters.and(accIdEq(aid), idEq(txid.value)))
       .first[F]
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .map(_.toDomain)
@@ -50,7 +49,7 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def update(tx: Transaction): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(idEq(AccIdField, tx.accountId.value), idEq(IdField, tx.id.value)),
+        Filters.and(accIdEq(tx.accountId), idEq(tx.id.value)),
         TransactionEntity.from(tx)
       )
       .flatMap(errorIfNull(TransactionDoesNotExist(tx.id)))
@@ -58,21 +57,18 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def delete(aid: AccountId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete[F](Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value)))
+      .findOneAndDelete[F](Filters.and(accIdEq(aid), idEq(txid.value)))
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .void
 
   override def hide(aid: AccountId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
-      .updateOne(
-        Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value)),
-        Updates.set(HiddenField, hidden)
-      )
+      .updateOne(Filters.and(accIdEq(aid), idEq(txid.value)), Updates.set(HiddenField, hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
   override def isHidden(aid: AccountId, txid: TransactionId): F[Boolean] =
     collection
-      .count(Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value), Filters.eq(HiddenField, true)))
+      .count(Filters.and(accIdEq(aid), idEq(txid.value), Filters.eq(HiddenField, true)))
       .map(_ > 0)
 }
 
