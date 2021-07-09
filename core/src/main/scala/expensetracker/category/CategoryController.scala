@@ -8,7 +8,13 @@ import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.account.AccountId
 import expensetracker.auth.session.Session
-import expensetracker.category.CategoryController.{CategoryView, CreateCategoryRequest, CreateCategoryResponse, UpdateCategoryRequest}
+import expensetracker.category.CategoryController.{
+  CategoryView,
+  CreateCategoryRequest,
+  CreateCategoryResponse,
+  HideCategoryRequest,
+  UpdateCategoryRequest
+}
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
@@ -62,6 +68,14 @@ final class CategoryController[F[_]: Logger](
           res     <- NoContent()
         } yield res
       }
+    case authReq @ PUT -> Root / CategoryIdPath(cid) / "hidden" as session =>
+      withErrorHandling {
+        for {
+          req <- authReq.req.as[HideCategoryRequest]
+          _   <- service.hide(session.accountId, cid, req.hidden)
+          res <- NoContent()
+        } yield res
+      }
     case DELETE -> Root / CategoryIdPath(cid) as session =>
       withErrorHandling {
         service.delete(session.accountId, cid) *> NoContent()
@@ -111,6 +125,8 @@ object CategoryController {
         accountId = Some(aid)
       )
   }
+
+  final case class HideCategoryRequest(hidden: Boolean)
 
   final case class CategoryView(
       id: String,

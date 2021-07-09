@@ -201,6 +201,37 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         }
       }
     }
+
+    "isHidden" should {
+      "return status of a hidden tx" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- TransactionRepository.make(client)
+            txid <- repo.create(create)
+            _    <- repo.hide(acc1Id, txid)
+            txs  <- repo.isHidden(acc1Id, txid)
+          } yield txs
+
+          result.map { res =>
+            res mustBe true
+          }
+        }
+      }
+
+      "return status of a displayed tx" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- TransactionRepository.make(client)
+            txid <- repo.create(create)
+            txs  <- repo.isHidden(acc1Id, txid)
+          } yield txs
+
+          result.map { res =>
+            res mustBe false
+          }
+        }
+      }
+    }
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =

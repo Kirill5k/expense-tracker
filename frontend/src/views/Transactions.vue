@@ -127,7 +127,7 @@ export default {
       this.dispatchAction('createTransaction', newTransaction)
     },
     remove (id) {
-      this.dispatchAction('deleteTransaction', id)
+      this.dispatchAction('hideTransaction', { id, hidden: true })
     },
     update (updatedTransaction) {
       this.dispatchAction('updateTransaction', updatedTransaction)

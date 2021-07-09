@@ -10,6 +10,7 @@ trait TransactionService[F[_]] {
   def delete(aid: AccountId, txid: TransactionId): F[Unit]
   def create(tx: CreateTransaction): F[TransactionId]
   def update(tx: Transaction): F[Unit]
+  def hide(aid: AccountId, txid: TransactionId, hidden: Boolean): F[Unit]
 }
 
 final private class LiveTransactionService[F[_]](
@@ -29,6 +30,9 @@ final private class LiveTransactionService[F[_]](
 
   override def update(tx: Transaction): F[Unit] =
     repository.update(tx)
+
+  override def hide(aid: AccountId, txid: TransactionId, hidden: Boolean): F[Unit] =
+    repository.hide(aid, txid, hidden)
 }
 
 object TransactionService {

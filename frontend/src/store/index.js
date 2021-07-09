@@ -107,8 +107,8 @@ export default new Vuex.Store({
     updateCategory (state, updatedCategory) {
       state.categories = state.categories.map(c => c.id === updatedCategory.id ? updatedCategory : c)
     },
-    removeCategory (state, id) {
-      state.categories = state.categories.filter(cat => cat.id !== id)
+    hideCategory (state, { id, hidden }) {
+      state.categories = state.categories.map(cat => cat.id === id ? { ...cat, hidden } : cat)
     },
     setTransactions (state, txs) {
       state.transactions = txs
@@ -119,8 +119,8 @@ export default new Vuex.Store({
     setDisplayDate (state, newDate) {
       state.displayDate = newDate
     },
-    removeTransaction (state, id) {
-      state.transactions = state.transactions.filter(tx => tx.id !== id)
+    hideTransaction (state, { id, hidden }) {
+      state.transactions = state.transactions.filter(tx => tx.id === id ? { ...tx, hidden } : tx)
     },
     updateTransaction (state, updatedTx) {
       state.transactions = state.transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
@@ -211,9 +211,13 @@ export default new Vuex.Store({
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(cat => commit('addCategory', cat))
     },
-    deleteCategory ({ commit }, id) {
-      return fetch(`/api/categories/${id}`, { ...defaultRequestParams, method: 'DELETE' })
-        .then(res => res.status === 204 ? commit('removeCategory', id) : reject(res))
+    hideCategory ({ commit }, { id, hidden }) {
+      return fetch(`/api/categories/${id}/hidden`, {
+        ...defaultRequestParams,
+        method: 'PUT',
+        body: JSON.stringify({ hidden })
+      })
+        .then(res => res.status === 204 ? commit('hideCategory', { id, hidden }) : reject(res))
     },
     updateCategory ({ commit }, requestBody) {
       return fetch(`/api/categories/${requestBody.id}`, {
@@ -242,9 +246,13 @@ export default new Vuex.Store({
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(tx => commit('addTransaction', tx))
     },
-    deleteTransaction ({ commit }, id) {
-      return fetch(`/api/transactions/${id}`, { ...defaultRequestParams, method: 'DELETE' })
-        .then(res => res.status === 204 ? commit('removeTransaction', id) : reject(res))
+    hideTransaction ({ commit }, { id, hidden }) {
+      return fetch(`/api/transactions/${id}`, {
+        ...defaultRequestParams,
+        method: 'PUT',
+        body: JSON.stringify({ hidden }),
+      })
+        .then(res => res.status === 204 ? commit('hideTransaction', { id, hidden }) : reject(res))
     },
     updateTransaction ({ commit }, requestBody) {
       return fetch(`/api/transactions/${requestBody.id}`, {

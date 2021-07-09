@@ -87,6 +87,21 @@ class TransactionServiceSpec extends CatsSpec {
         res mustBe txid
       }
     }
+
+    "hide a tx in db" in {
+      val repo = mock[TransactionRepository[IO]]
+      when(repo.hide(any[AccountId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+
+      val result = for {
+        svc <- TransactionService.make[IO](repo)
+        res <- svc.hide(aid, txid, true)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).hide(aid, txid, true)
+        res mustBe ()
+      }
+    }
   }
 
 }

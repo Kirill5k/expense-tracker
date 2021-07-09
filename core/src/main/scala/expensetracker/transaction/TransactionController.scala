@@ -62,6 +62,14 @@ final class TransactionController[F[_]: Logger](
       withErrorHandling {
         service.delete(session.accountId, txid) *> NoContent()
       }
+    case authReq @ PUT -> Root / TransactionIdPath(cid) / "hidden" as session =>
+      withErrorHandling {
+        for {
+          req <- authReq.req.as[HideTransactionRequest]
+          _   <- service.hide(session.accountId, cid, req.hidden)
+          res <- NoContent()
+        } yield res
+      }
     case authReq @ PUT -> Root / TransactionIdPath(cid) as session =>
       withErrorHandling {
         for {
@@ -118,6 +126,8 @@ object TransactionController {
         note = tx.note
       )
   }
+
+  final case class HideTransactionRequest(hidden: Boolean)
 
   final case class UpdateTransactionRequest(
       id: NonEmptyString,

@@ -92,6 +92,35 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
       }
     }
 
+    "isHidden" should {
+      "return hidden status of hidden cat" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            _    <- repo.hide(acc2Id, cat2Id)
+            isHidden <- repo.isHidden(acc2Id, cat2Id)
+          } yield isHidden
+
+          result.map { res =>
+            res mustBe true
+          }
+        }
+      }
+
+      "return hidden status of displayed cat" in {
+        withEmbeddedMongoDb { client =>
+          val result = for {
+            repo <- CategoryRepository.make(client)
+            isHidden <- repo.isHidden(acc2Id, cat2Id)
+          } yield isHidden
+
+          result.map { res =>
+            res mustBe false
+          }
+        }
+      }
+    }
+
     "hide" should {
       "update hidden field of a cat" in {
         withEmbeddedMongoDb { client =>

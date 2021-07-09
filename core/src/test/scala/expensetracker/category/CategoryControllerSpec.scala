@@ -122,6 +122,22 @@ class CategoryControllerSpec extends ControllerSpec {
       }
     }
 
+    "PUT /categories/:id/hidden" should {
+      "update user's category hidden status" in {
+        val svc = mock[CategoryService[IO]]
+        when(svc.hide(any[AccountId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+
+        val reqBody = parseJson("""{"hidden":true}""")
+        val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342/hidden", method = Method.PUT)
+          .addCookie(sessIdCookie)
+          .withEntity(reqBody)
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.NoContent, None)
+        verify(svc).hide(aid, cid, true)
+      }
+    }
+
     "PUT /categories/:id" should {
       "update user's category" in {
         val svc = mock[CategoryService[IO]]

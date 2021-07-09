@@ -99,5 +99,20 @@ class CategoryServiceSpec extends CatsSpec {
         res mustBe ()
       }
     }
+
+    "hide a category" in {
+      val repo = mock[CategoryRepository[IO]]
+      when(repo.hide(any[AccountId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+
+      val result = for {
+        svc <- CategoryService.make[IO](repo)
+        res <- svc.hide(aid, cid, true)
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(repo).hide(aid, cid, true)
+        res mustBe ()
+      }
+    }
   }
 }

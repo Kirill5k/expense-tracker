@@ -135,6 +135,22 @@ class TransactionControllerSpec extends ControllerSpec {
       }
     }
 
+    "PUT /transactions/:id/hidden" should {
+      "update user's category hidden status" in {
+        val svc = mock[TransactionService[IO]]
+        when(svc.hide(any[AccountId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+
+        val reqBody = parseJson("""{"hidden":true}""")
+        val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342/hidden", method = Method.PUT)
+          .addCookie(sessIdCookie)
+          .withEntity(reqBody)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.NoContent, None)
+        verify(svc).hide(aid, txid, true)
+      }
+    }
+
     "PUT /transactions/:id" should {
 
       val reqBodyJson = """{
@@ -149,7 +165,7 @@ class TransactionControllerSpec extends ControllerSpec {
                       |"note" : "test tx"
                       |}""".stripMargin
 
-      "update user's category" in {
+      "update user's transaction" in {
         val svc = mock[TransactionService[IO]]
         when(svc.update(any[Transaction])).thenReturn(IO.unit)
 

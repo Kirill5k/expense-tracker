@@ -80,7 +80,7 @@ export default {
       this.dispatchAction('createCategory', newCategory)
     },
     remove (id) {
-      this.dispatchAction('deleteCategory', id)
+      this.dispatchAction('hideCategory', { id, hidden: true })
     },
     update (updatedCategory) {
       this.dispatchAction('updateCategory', updatedCategory)

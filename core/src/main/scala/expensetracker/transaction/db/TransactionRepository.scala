@@ -20,6 +20,7 @@ trait TransactionRepository[F[_]] extends Repository[F] {
   def delete(aid: AccountId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
   def hide(aid: AccountId, txid: TransactionId, hidden: Boolean = true): F[Unit]
+  def isHidden(aid: AccountId, txid: TransactionId): F[Boolean]
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
@@ -68,6 +69,11 @@ final private class LiveTransactionRepository[F[_]: Async](
         Updates.set(HiddenField, hidden)
       )
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
+
+  override def isHidden(aid: AccountId, txid: TransactionId): F[Boolean] =
+    collection
+      .count(Filters.and(idEq(AccIdField, aid.value), idEq(IdField, txid.value), Filters.eq(HiddenField, true)))
+      .map(_ > 0)
 }
 
 object TransactionRepository {

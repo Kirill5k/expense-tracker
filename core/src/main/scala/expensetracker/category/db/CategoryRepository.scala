@@ -21,6 +21,7 @@ trait CategoryRepository[F[_]] extends Repository[F] {
   def delete(aid: AccountId, cid: CategoryId): F[Unit]
   def assignDefault(aid: AccountId): F[Unit]
   def hide(aid: AccountId, cid: CategoryId, hidden: Boolean = true): F[Unit]
+  def isHidden(aid: AccountId, cid: CategoryId): F[Boolean]
 }
 
 final private class LiveCategoryRepository[F[_]: Async](
@@ -81,6 +82,11 @@ final private class LiveCategoryRepository[F[_]: Async](
         Updates.set(HiddenField, hidden)
       )
       .flatMap(errorIfNoMatches(CategoryDoesNotExist(cid)))
+
+  override def isHidden(aid: AccountId, cid: CategoryId): F[Boolean] =
+    collection
+      .count(Filters.and(idEq(AccIdField, aid.value), idEq(IdField, cid.value), Filters.eq(HiddenField, true)))
+      .map(_ > 0)
 }
 
 object CategoryRepository {
