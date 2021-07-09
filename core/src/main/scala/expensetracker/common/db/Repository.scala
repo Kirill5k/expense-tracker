@@ -14,6 +14,8 @@ trait Repository[F[_]] {
   protected val EmailField  = "email"
   protected val HiddenField = "hidden"
 
+  protected val NotHidden = Filters.ne(HiddenField, true)
+
   protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =
     Option(res).map(_.pure[F]).getOrElse(error.raiseError[F, A])
 

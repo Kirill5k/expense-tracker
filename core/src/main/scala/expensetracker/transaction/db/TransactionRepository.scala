@@ -36,7 +36,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Transaction]] =
     collection
-      .find(Filters.and(Filters.eq(AccIdField, new ObjectId(aid.value)), Filters.ne(HiddenField, true)))
+      .find(Filters.and(Filters.eq(AccIdField, new ObjectId(aid.value)), NotHidden))
       .all[F]
       .map(_.map(_.toDomain).toList)
 

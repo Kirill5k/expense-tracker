@@ -30,7 +30,7 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def getAll(aid: AccountId): F[List[Category]] =
     collection
-      .find(Filters.and(idEq(AccIdField, aid.value), Filters.ne(HiddenField, true)))
+      .find(Filters.and(idEq(AccIdField, aid.value), NotHidden))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
@@ -50,7 +50,7 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def create(cat: CreateCategory): F[CategoryId] = {
     val newCat = CategoryEntity.from(cat)
     collection
-      .count(Filters.and(idEq(AccIdField, cat.accountId.value), Filters.eq("name", newCat.name)))
+      .count(Filters.and(idEq(AccIdField, cat.accountId.value), Filters.eq("name", newCat.name), NotHidden))
       .flatMap {
         case 0 => collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
         case _ => CategoryAlreadyExists(cat.name).raiseError[F, CategoryId]
