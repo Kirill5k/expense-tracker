@@ -12,7 +12,9 @@ const withinDates = (txs, { start, end }) => txs.filter(tx => {
 const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
 
 const reject = (res, commit) => res.json().then(e => {
-  if (commit && e.message) {
+  if (commit && res.status === 403) {
+    commit('unAuthenticate')
+  } else if (commit && e.message) {
     commit('setAlert', { type: 'error', message: e.message })
   }
   return Promise.reject(new Error(e.message))
@@ -43,18 +45,19 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    incomeCats: state => state.categories.filter(c => c.kind === 'income'),
-    expenseCats: state => state.categories.filter(c => c.kind === 'expense'),
-    catsByIds: state => state.categories.reduce((acc, el) => {
+    filteredCats: state => state.categories,
+    incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
+    expenseCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'expense'),
+    catsByIds: (state, getters) => getters.filteredCats.reduce((acc, el) => {
       acc[el.id] = el
       return acc
     }, {}),
     filteredTransactions: state => state.transactions
       .filter(t => t.amount.currency.code === state.account.settings.currency.code)
       .filter(t => state.account.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
-    displayedTransactions: state => ({
-      current: withinDates(state.transactions, state.displayDate),
-      previous: withinDates(state.transactions, state.displayDate.previous || {})
+    displayedTransactions: (state, getters) => ({
+      current: withinDates(getters.filteredTransactions, state.displayDate),
+      previous: withinDates(getters.filteredTransactions, state.displayDate.previous || {})
     }),
     expenseTransactions: (state, getters) => ({
       current: getters.displayedTransactions.current.filter(t => t.kind === 'expense'),

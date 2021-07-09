@@ -80,23 +80,19 @@ export default {
     }
   },
   methods: {
-    updateSettings (newSettings) {
+    dispatch (action, args) {
       this.loading = true
       this.$store
-        .dispatch('updateAccountSettings', newSettings)
-        .catch(() => {})
+        .dispatch(action, args)
         .then(() => {
           this.loading = false
         })
     },
+    updateSettings (newSettings) {
+      this.dispatch('updateAccountSettings', newSettings)
+    },
     changePassword (newPassword) {
-      this.loading = true
-      this.$store
-        .dispatch('changeAccountPassword', newPassword)
-        .catch(() => {})
-        .then(() => {
-          this.loading = false
-        })
+      this.dispatch('changeAccountPassword', newPassword)
     }
   }
 }

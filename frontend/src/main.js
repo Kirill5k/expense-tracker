@@ -8,6 +8,7 @@ import vuetify from './plugins/vuetify'
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
+  store.commit('clearAlert')
   if (to.matched.some(record => record.meta.authAccess)) {
     if (!store.state.isAuthenticated) {
       next({ path: '/login' })

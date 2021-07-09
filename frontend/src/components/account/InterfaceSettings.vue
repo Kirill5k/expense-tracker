@@ -111,8 +111,7 @@ export default {
       required: true
     },
     value: {
-      type: Number,
-      require: true
+      type: Number
     }
   },
   data: () => ({

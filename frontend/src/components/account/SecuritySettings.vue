@@ -116,8 +116,7 @@ export default {
   name: 'SecuritySettings',
   props: {
     value: {
-      type: Number,
-      required: true
+      type: Number
     },
     loading: {
       type: Boolean,
