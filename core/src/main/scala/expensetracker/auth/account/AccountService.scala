@@ -3,7 +3,7 @@ package expensetracker.auth.account
 import cats.MonadError
 import cats.implicits._
 import expensetracker.auth.account.db.AccountRepository
-import expensetracker.common.errors.AppError.InvalidEmailOrPassword
+import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
 sealed trait LoginResult
 object LoginResult {
@@ -16,6 +16,7 @@ trait AccountService[F[_]] {
   def login(email: AccountEmail, password: Password): F[Account]
   def find(aid: AccountId): F[Account]
   def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
+  def changePassword(cp: ChangePassword): F[Unit]
 }
 
 final private class LiveAccountService[F[_]](
@@ -47,6 +48,17 @@ final private class LiveAccountService[F[_]](
 
   override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
     repository.updateSettings(aid, settings)
+
+  override def changePassword(cp: ChangePassword): F[Unit] =
+    repository
+      .find(cp.id)
+      .flatMap(acc => encryptor.isValid(cp.currentPassword, acc.password))
+      .flatMap {
+        case false => InvalidPassword.raiseError[F, PasswordHash]
+        case true => encryptor.hash(cp.newPassword)
+      }
+      .flatMap(repository.updatePassword(cp.id))
+
 }
 
 object AccountService {

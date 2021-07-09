@@ -4,7 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.account.db.AccountRepository
-import expensetracker.common.errors.AppError.InvalidEmailOrPassword
+import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
 class AccountServiceSpec extends CatsSpec {
 
@@ -29,7 +29,7 @@ class AccountServiceSpec extends CatsSpec {
     }
 
     "updateSettings" should {
-      "return unit when success" in {
+      "return unit on success" in {
         val (repo, encr) = mocks
         when(repo.updateSettings(any[AccountId], any[AccountSettings])).thenReturn(IO.unit)
 
@@ -40,7 +40,51 @@ class AccountServiceSpec extends CatsSpec {
 
         result.unsafeToFuture().map { res =>
           verify(repo).updateSettings(aid, AccountSettings.Default)
+          verifyZeroInteractions(encr)
           res mustBe ()
+        }
+      }
+    }
+
+    "updatePassword" should {
+      val cp = ChangePassword(aid, pwd, Password("new-password"))
+
+      "return unit on success" in {
+        val (repo, encr) = mocks
+        when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
+        when(encr.hash(any[Password])).thenReturn(IO.pure(hash))
+        when(repo.find(any[AccountId])).thenReturn(IO.pure(acc))
+        when(repo.updatePassword(any[AccountId])(any[PasswordHash])).thenReturn(IO.unit)
+
+        val result = for {
+          service <- AccountService.make[IO](repo, encr)
+          res     <- service.changePassword(cp)
+        } yield res
+
+        result.unsafeToFuture().map { res =>
+          verify(repo).find(cp.id)
+          verify(encr).isValid(cp.currentPassword, acc.password)
+          verify(encr).hash(cp.newPassword)
+          verify(repo).updatePassword(cp.id)(hash)
+          res mustBe ()
+        }
+      }
+
+      "return error when passwords do not match" in {
+        val (repo, encr) = mocks
+        when(repo.find(any[AccountId])).thenReturn(IO.pure(acc))
+        when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
+
+        val result = for {
+          service <- AccountService.make[IO](repo, encr)
+          res     <- service.changePassword(cp)
+        } yield res
+
+        result.attempt.unsafeToFuture().map { res =>
+          verify(repo).find(cp.id)
+          verify(encr).isValid(cp.currentPassword, acc.password)
+          verifyNoMoreInteractions(repo, encr)
+          res mustBe Left(InvalidPassword)
         }
       }
     }

@@ -57,14 +57,7 @@ export default {
       this.$store.commit('clearAlert')
       this.$store
         .dispatch('createAccount', account)
-        .then(() => {
-          const alert = {
-            type: 'success',
-            message: 'Account has been successfully created! Redirecting to the sign in page.'
-          }
-          this.$store.commit('setAlert', alert)
-          setTimeout(() => this.login(), 1750)
-        })
+        .then(() => setTimeout(() => this.login(), 1750))
         .catch(() => {
           this.loading = false
         })

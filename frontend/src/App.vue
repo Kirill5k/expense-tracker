@@ -2,28 +2,12 @@
   <v-app>
     <v-app-bar
       clipped-left
-      v-if="isAuthenticated"
       class="d-none d-md-block"
       app
       color="white"
       dense
     >
-      <v-chip
-        color="black"
-        text-color="white"
-        class="mr-2"
-      >
-        <v-avatar
-          left
-          class="mr-2"
-          color="primary"
-        >
-          <v-icon dark large>
-            mdi-account-circle
-          </v-icon>
-        </v-avatar>
-        <strong>{{ name }}</strong>
-      </v-chip>
+      <v-app-bar-title>Expense-tracker</v-app-bar-title>
       <v-spacer/>
       <v-btn
         icon
@@ -36,7 +20,7 @@
 
     <v-main class="grey lighten-3 pt-0 pt-sm-12">
       <page
-        :loading="isLoading"
+        :loading="$store.state.isLoading"
         :slim="$route.meta.slim"
         :alert="$store.state.alert"
         :nav-links="navLinks"
@@ -88,12 +72,6 @@ export default {
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
-    },
-    isLoading () {
-      return this.$store.state.isLoading
-    },
-    name () {
-      return this.isAuthenticated ? this.$store.state.account.firstName : ''
     }
   },
   watch: {

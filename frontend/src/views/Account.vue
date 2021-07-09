@@ -28,7 +28,9 @@
     <v-card-text class="py-0">
       <p class="text-subtitle-1 mb-0">Security</p>
       <security-settings
+        :loading="loading"
         v-model="securityPanel"
+        @change-password="changePassword"
       />
     </v-card-text>
 
@@ -82,6 +84,15 @@ export default {
       this.loading = true
       this.$store
         .dispatch('updateAccountSettings', newSettings)
+        .catch(() => {})
+        .then(() => {
+          this.loading = false
+        })
+    },
+    changePassword (newPassword) {
+      this.loading = true
+      this.$store
+        .dispatch('changeAccountPassword', newPassword)
         .catch(() => {})
         .then(() => {
           this.loading = false

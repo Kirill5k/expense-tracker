@@ -120,6 +120,37 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
       }
     }
 
+    "updatePassword" should {
+      "update account password" in {
+        withEmbeddedMongoDb { client =>
+          val newpwd = PasswordHash("new-password")
+          val result = for {
+            repo <- AccountRepository.make(client)
+            _    <- repo.updatePassword(acc1Id)(newpwd)
+            acc  <- repo.find(acc1Id)
+          } yield acc
+
+          result.map { acc =>
+            acc.password mustBe newpwd
+          }
+        }
+      }
+
+      "return error when account does not exist" in {
+        withEmbeddedMongoDb { client =>
+          val id = AccountId(new ObjectId().toHexString)
+          val result = for {
+            repo <- AccountRepository.make(client)
+            acc  <- repo.updatePassword(id)(hash)
+          } yield acc
+
+          result.attempt.map { res =>
+            res mustBe Left(AccountDoesNotExist(id))
+          }
+        }
+      }
+    }
+
     "create" should {
       "create new account" in {
         withEmbeddedMongoDb { client =>

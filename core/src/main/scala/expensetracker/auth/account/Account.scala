@@ -41,3 +41,9 @@ final case class AccountDetails(
     email: AccountEmail,
     name: AccountName
 )
+
+final case class ChangePassword(
+    id: AccountId,
+    currentPassword: Password,
+    newPassword: Password
+)

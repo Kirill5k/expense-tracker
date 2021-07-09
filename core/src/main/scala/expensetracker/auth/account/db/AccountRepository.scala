@@ -18,6 +18,7 @@ trait AccountRepository[F[_]] extends Repository[F] {
   def findBy(email: AccountEmail): F[Option[Account]]
   def create(details: AccountDetails, password: PasswordHash): F[AccountId]
   def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
+  def updatePassword(aid: AccountId)(password: PasswordHash): F[Unit]
 }
 
 final private class LiveAccountRepository[F[_]: Async](
@@ -51,9 +52,12 @@ final private class LiveAccountRepository[F[_]: Async](
   override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
     collection
       .updateOne(idEq(IdField, aid.value), Updates.set("settings", Document.parse(settings.asJson.noSpaces)))
-      .flatMap { res =>
-        if (res.getMatchedCount > 0) ().pure[F] else AccountDoesNotExist(aid).raiseError[F, Unit]
-      }
+      .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
+
+  override def updatePassword(aid: AccountId)(password: PasswordHash): F[Unit] =
+    collection
+      .updateOne(idEq(IdField, aid.value), Updates.set("password", password.value))
+      .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 }
 
 object AccountRepository {

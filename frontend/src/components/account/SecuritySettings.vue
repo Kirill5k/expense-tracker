@@ -64,7 +64,8 @@
             small
             tabindex="4"
             color="success"
-            @click="updatePassword"
+            @click="changePassword"
+            :disabled="loading"
           >
             Change
           </v-btn>
@@ -82,9 +83,10 @@
       >
         <v-btn
           small
+          outlined
           color="error"
         >
-          Delete all
+          Delete all data
         </v-btn>
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -115,7 +117,11 @@ export default {
   props: {
     value: {
       type: Number,
-      require: true
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      required: true
     }
   },
   data: () => ({
@@ -136,7 +142,8 @@ export default {
           v => !!v || 'Please enter your new password',
           v => v.length >= 8 || 'Must be at least 8 characters in length',
           v => /[A-Z].*\d|\d.*[A-Z]/.test(v) || 'Must contain at least 1 digit and 1 uppercase letter',
-          v => v.length < 60 || 'Your new password is too long'
+          v => v.length < 60 || 'Your new password is too long',
+          v => v !== this.currentPassword || 'Your new password must differ from the current one'
         ],
         confirmPassword: [
           v => !!v || 'Please confirm your new password',
@@ -157,13 +164,13 @@ export default {
         this.$refs.passwordChangeForm.resetValidation()
       }
     },
-    updatePassword () {
+    changePassword () {
       if (this.$refs.passwordChangeForm.validate()) {
         const passwordChange = {
-          password: this.currentPassword,
+          currentPassword: this.currentPassword,
           newPassword: this.newPassword
         }
-        this.$emit('update-password', passwordChange)
+        this.$emit('change-password', passwordChange)
       }
     }
   }

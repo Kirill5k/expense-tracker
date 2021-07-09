@@ -32,6 +32,10 @@ object errors {
       override def message: String = "Invalid email or password"
     }
 
+    case object InvalidPassword extends BadRequestError {
+      override def message: String = "Entered password appears to be incorrect"
+    }
+
     case object DifferentAccountSession extends AuthError {
       override def message: String = "The current session belongs to a different account"
     }

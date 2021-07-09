@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Alerts from './alerts'
 
 Vue.use(Vuex)
 
@@ -141,6 +142,7 @@ export default new Vuex.Store({
         ...defaultRequestParams
       })
         .then(res => res.status === 201 ? res.json() : reject(res, commit))
+        .then(() => commit('setAlert', Alerts.REGISTRATION_SUCCESS))
     },
     getAccount ({ commit, dispatch }) {
       return fetch('/api/auth/account', defaultRequestParams)
@@ -155,6 +157,14 @@ export default new Vuex.Store({
         ...defaultRequestParams
       })
         .then(res => res.status === 204 ? commit('setSettings', requestBody) : reject(res, commit))
+    },
+    changeAccountPassword ({ commit, state }, requestBody) {
+      return fetch(`/api/auth/account/${state.account.id}/password`, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        ...defaultRequestParams
+      })
+        .then(res => res.status === 204 ? commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS) : reject(res, commit))
     },
     login ({ commit, dispatch }, requestBody) {
       return fetch('/api/auth/login', {

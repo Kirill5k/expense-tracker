@@ -2,7 +2,7 @@ package expensetracker.auth
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, AccountSettings, Password}
+import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountName, AccountSettings, ChangePassword, Password}
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
@@ -79,7 +79,40 @@ class AuthControllerSpec extends ControllerSpec {
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        svc.updateSettings(aid, AccountSettings(USD, false, false))
+        verify(svc).updateSettings(aid, AccountSettings(USD, false, false))
+        verifyZeroInteractions(disp)
+      }
+    }
+
+    "POST /auth/account/:id/password" should {
+      "return error when id in path is different from id in session" in {
+        val svc = mock[AuthService[IO]]
+        val disp = mock[ActionDispatcher[IO]]
+
+        val reqBody ="""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
+        val req = Request[IO](uri = uri"/auth/account/60e70e87fb134e0c1a271122/password", method = Method.POST)
+          .withEntity(parseJson(reqBody))
+          .addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different account"}"""))
+        verifyZeroInteractions(disp, svc)
+      }
+
+      "return 204 when after updating account password" in {
+        val svc = mock[AuthService[IO]]
+        val disp = mock[ActionDispatcher[IO]]
+
+        when(svc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
+
+        val reqBody ="""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
+        val req = Request[IO](uri = uri"/auth/account/60e70e87fb134e0c1a271121/password", method = Method.POST)
+          .withEntity(parseJson(reqBody))
+          .addCookie(sessIdCookie)
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.NoContent, None)
+        verify(svc).changePassword(ChangePassword(aid, Password("curr-pwd"), Password("new-pwd")))
         verifyZeroInteractions(disp)
       }
     }
