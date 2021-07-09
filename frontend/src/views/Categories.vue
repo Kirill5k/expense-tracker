@@ -39,6 +39,29 @@
       />
     </v-card-actions>
 
+    <v-snackbar
+      v-model="undoOp"
+    >
+      The category has been deleted
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="undoRemove"
+        >
+          Undo
+        </v-btn>
+        <v-btn
+          color="success"
+          text
+          v-bind="attrs"
+          @click="undoOp = null"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -53,6 +76,8 @@ export default {
     NewCategoryDialog
   },
   data: () => ({
+    lastDeletedId: null,
+    undoOp: false,
     loading: false,
     editable: false
   }),
@@ -80,7 +105,19 @@ export default {
       this.dispatchAction('createCategory', newCategory)
     },
     remove (id) {
+      this.undoOp = false
       this.dispatchAction('hideCategory', { id, hidden: true })
+        .then(() => {
+          this.lastDeletedId = id
+          this.undoOp = true
+        })
+    },
+    undoRemove () {
+      if (this.lastDeletedId) {
+        this.dispatchAction('hideCategory', { id: this.lastDeletedId, hidden: false })
+        this.lastDeletedId = null
+        this.undoOp = false
+      }
     },
     update (updatedCategory) {
       this.dispatchAction('updateCategory', updatedCategory)

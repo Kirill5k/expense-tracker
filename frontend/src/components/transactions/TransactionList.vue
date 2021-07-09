@@ -136,7 +136,7 @@ export default {
     },
     height () {
       if (this.items.length === 0) {
-        return 200
+        return 130
       } else if (this.items.length > 6) {
         return 500
       } else {

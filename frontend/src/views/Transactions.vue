@@ -84,6 +84,29 @@
       />
     </v-card-actions>
 
+    <v-snackbar
+      v-model="undoOp"
+    >
+      The transaction has been deleted
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="undoRemove"
+        >
+          Undo
+        </v-btn>
+        <v-btn
+          color="success"
+          text
+          v-bind="attrs"
+          @click="undoOp = null"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -102,6 +125,8 @@ export default {
     DatePeriodSelector
   },
   data: () => ({
+    lastDeletedId: null,
+    undoOp: false,
     loading: false,
     editable: false
   }),
@@ -127,7 +152,20 @@ export default {
       this.dispatchAction('createTransaction', newTransaction)
     },
     remove (id) {
-      this.dispatchAction('hideTransaction', { id, hidden: true })
+      this.undoOp = false
+      this
+        .dispatchAction('hideTransaction', { id, hidden: true })
+        .then(() => {
+          this.lastDeletedId = id
+          this.undoOp = true
+        })
+    },
+    undoRemove () {
+      if (this.lastDeletedId) {
+        this.dispatchAction('hideTransaction', { id: this.lastDeletedId, hidden: false })
+        this.lastDeletedId = null
+        this.undoOp = false
+      }
     },
     update (updatedTransaction) {
       this.dispatchAction('updateTransaction', updatedTransaction)
