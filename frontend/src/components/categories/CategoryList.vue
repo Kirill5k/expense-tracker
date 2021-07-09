@@ -57,7 +57,7 @@
 
           <v-list-item-action
             class="mt-0 mb-1"
-            :class="!editable ? 'mx-0 px-0' : ''"
+            :class="!editable ? 'd-none' : ''"
           >
             <v-slide-x-reverse-transition>
               <v-btn

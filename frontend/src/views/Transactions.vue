@@ -140,6 +140,7 @@ export default {
   },
   methods: {
     dispatchAction (name, arg) {
+      this.undoOp = false
       this.loading = true
       return this.$store
         .dispatch(name, arg)
@@ -152,7 +153,6 @@ export default {
       this.dispatchAction('createTransaction', newTransaction)
     },
     remove (id) {
-      this.undoOp = false
       this
         .dispatchAction('hideTransaction', { id, hidden: true })
         .then(() => {
@@ -164,7 +164,6 @@ export default {
       if (this.lastDeletedId) {
         this.dispatchAction('hideTransaction', { id: this.lastDeletedId, hidden: false })
         this.lastDeletedId = null
-        this.undoOp = false
       }
     },
     update (updatedTransaction) {

@@ -94,6 +94,7 @@ export default {
   },
   methods: {
     dispatchAction (name, arg) {
+      this.undoOp = false
       this.loading = true
       return this.$store
         .dispatch(name, arg)
@@ -105,7 +106,6 @@ export default {
       this.dispatchAction('createCategory', newCategory)
     },
     remove (id) {
-      this.undoOp = false
       this.dispatchAction('hideCategory', { id, hidden: true })
         .then(() => {
           this.lastDeletedId = id
@@ -116,7 +116,6 @@ export default {
       if (this.lastDeletedId) {
         this.dispatchAction('hideCategory', { id: this.lastDeletedId, hidden: false })
         this.lastDeletedId = null
-        this.undoOp = false
       }
     },
     update (updatedCategory) {
