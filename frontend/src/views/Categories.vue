@@ -10,18 +10,7 @@
 
     <v-card-text class="pb-0">
       <category-list
-        name="EXPENSE"
-        :items="expenseCats"
-        :editable="editable"
-        @delete="remove"
-        @edit="edit"
-      />
-    </v-card-text>
-
-    <v-card-text class="pt-0">
-      <category-list
-        name="INCOME"
-        :items="incomeCats"
+        :items="[...expenseCats, ...incomeCats]"
         :editable="editable"
         @delete="remove"
         @edit="edit"

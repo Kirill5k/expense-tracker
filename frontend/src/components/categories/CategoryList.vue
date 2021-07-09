@@ -3,8 +3,6 @@
     class="category-list"
     dense
   >
-    <v-subheader>{{name}}</v-subheader>
-    <v-divider></v-divider>
     <v-list-item
       dense
       v-if="!items.length"
@@ -18,7 +16,7 @@
     <v-virtual-scroll
       :items="items"
       bench="3"
-      max-height="180"
+      max-height="585"
       item-height="45"
     >
       <template v-slot:default="{ item }">
@@ -52,11 +50,15 @@
               v-text="item.icon"
             />
           </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.name"/>
+          <v-list-item-content class="flex-nowrap">
+            <v-list-item-title v-text="item.name" class="d-flex"/>
+            <v-list-item-subtitle v-text="item.kind" class="text-right font-weight-light text-capitalize"/>
           </v-list-item-content>
 
-          <v-list-item-action class="mt-0 mb-1">
+          <v-list-item-action
+            class="mt-0 mb-1"
+            :class="!editable ? 'mx-0 px-0' : ''"
+          >
             <v-slide-x-reverse-transition>
               <v-btn
                 v-if="editable"
@@ -85,10 +87,6 @@
 export default {
   name: 'CategoryList',
   props: {
-    name: {
-      type: String,
-      required: true
-    },
     items: {
       type: Array,
       required: true
