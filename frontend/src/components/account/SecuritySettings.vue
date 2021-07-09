@@ -21,10 +21,10 @@
           lazy-validation
         >
           <v-text-field
+            class="mb-3"
             dense
             tabindex="1"
-            name="currentPassword"
-            autocomplete="new-password"
+            autocomplete="current-password"
             v-model="currentPassword"
             :append-icon="showCurrentPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :rules="rules.password"
@@ -35,9 +35,9 @@
           />
 
           <v-text-field
+            class="mb-3"
             dense
             tabindex="2"
-            name="newPassword"
             autocomplete="new-password"
             v-model="newPassword"
             :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
@@ -51,7 +51,6 @@
           <v-text-field
             dense
             tabindex="3"
-            name="confirmPassword"
             autocomplete="new-password"
             v-model="confirmPassword"
             :rules="rules.confirmPassword"

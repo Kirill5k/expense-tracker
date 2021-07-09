@@ -84,6 +84,7 @@ export default {
       this.loading = true
       this.$store
         .dispatch(action, args)
+        .catch(() => {})
         .then(() => {
           this.loading = false
         })

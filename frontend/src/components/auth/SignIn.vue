@@ -13,12 +13,16 @@
       label="Email"
       :rules="emailRules"
       required
+      placeholder=" "
+      persistent-placeholder
     />
 
     <v-text-field
       tabindex="2"
       name="password"
       autocomplete="password"
+      placeholder=" "
+      persistent-placeholder
       outlined
       v-model="password"
       :rules="passwordRules"

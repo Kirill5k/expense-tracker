@@ -36,8 +36,8 @@
 
     <v-text-field
       tabindex="4"
-      name="password"
-      autocomplete="new-password"
+      autocomplete="off"
+      name="new-password"
       v-model="password"
       :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
       :rules="rules.password"
@@ -49,8 +49,8 @@
 
     <v-text-field
       tabindex="5"
-      name="confirmPassword"
-      autocomplete="new-password"
+      autocomplete="off"
+      name="new-password"
       v-model="confirmPassword"
       :rules="rules.confirmPassword"
       type="password"
