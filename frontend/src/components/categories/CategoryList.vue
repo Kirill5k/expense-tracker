@@ -24,7 +24,7 @@
       <template v-slot:default="{ item }">
 
         <v-list-item
-          @click="$emit('edit', item)"
+          @click="editable ? '' : $emit('edit', item)"
           :key="item.id"
           class="pr-3 pl-0"
           link
@@ -56,6 +56,23 @@
             <v-list-item-title v-text="item.name"/>
           </v-list-item-content>
 
+          <v-list-item-action class="mt-0 mb-1">
+            <v-slide-x-reverse-transition>
+              <v-btn
+                v-if="editable"
+                class="mr-0 pl-2 ml-0 mt-0 pr-2"
+                icon
+                dark
+                color="black"
+                x-small
+                @click="$emit('edit', item)"
+              >
+                <v-icon dark>
+                  mdi-chevron-right
+                </v-icon>
+              </v-btn>
+            </v-slide-x-reverse-transition>
+          </v-list-item-action>
         </v-list-item>
 
         <v-divider></v-divider>

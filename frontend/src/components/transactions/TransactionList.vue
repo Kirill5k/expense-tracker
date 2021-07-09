@@ -54,7 +54,7 @@
       </v-chip>
     </template>
 
-    <template v-slot:item.edit="{ item }">
+    <template v-slot:item.delete="{ item }">
       <v-slide-x-transition>
         <v-btn
           v-if="editable"
@@ -70,15 +70,33 @@
         </v-btn>
       </v-slide-x-transition>
     </template>
+
+    <template v-slot:item.edit="{ item }">
+      <v-slide-x-reverse-transition>
+        <v-btn
+          v-if="editable"
+          icon
+          dark
+          color="black"
+          x-small
+          @click="$emit('edit', item.original)"
+        >
+          <v-icon dark>
+            mdi-chevron-right
+          </v-icon>
+        </v-btn>
+      </v-slide-x-reverse-transition>
+    </template>
   </v-data-table>
 </template>
 
 <script>
 const DEFAULT_HEADERS = [
-  { text: '', value: 'edit', align: 'start', cellClass: 'pa-0 px-1', sortable: false },
+  { text: '', value: 'delete', align: 'start', cellClass: 'pa-0 px-1', sortable: false },
   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
   { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sort: (a, b) => a.date.localeCompare(b.date) },
-  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sort: (a, b) => b.value - a.value }
+  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sort: (a, b) => b.value - a.value },
+  { text: '', value: 'edit', align: 'end', cellClass: 'pa-0 px-1', sortable: false }
 ]
 
 export default {
@@ -132,7 +150,9 @@ export default {
       return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     },
     rowClick (clickedItem, rowData) {
-      this.$emit('edit', rowData.item.original)
+      if (!this.editable) {
+        this.$emit('edit', rowData.item.original)
+      }
     }
   }
 }
