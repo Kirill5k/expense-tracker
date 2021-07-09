@@ -93,7 +93,7 @@ export default {
       }
     },
     subtext () {
-      if (this.displayDate.index > 0 || this.spendingDifference === 0) {
+      if (this.displayDate.index > 0 || this.spendingDifference === '0.00') {
         return 'Total spend'
       } else if (this.spendingDifference < 0) {
         return `Total spend {up|↓}{a|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
