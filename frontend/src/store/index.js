@@ -45,7 +45,7 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    filteredCats: state => state.categories,
+    filteredCats: state => state.categories.filter(c => c.hidden !== true),
     incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
     expenseCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'expense'),
     catsByIds: (state, getters) => getters.filteredCats.reduce((acc, el) => {
@@ -53,6 +53,7 @@ export default new Vuex.Store({
       return acc
     }, {}),
     filteredTransactions: state => state.transactions
+      .filter(t => t.hidden !== true)
       .filter(t => t.amount.currency.code === state.account.settings.currency.code)
       .filter(t => state.account.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
     displayedTransactions: (state, getters) => ({
@@ -120,7 +121,7 @@ export default new Vuex.Store({
       state.displayDate = newDate
     },
     hideTransaction (state, { id, hidden }) {
-      state.transactions = state.transactions.filter(tx => tx.id === id ? { ...tx, hidden } : tx)
+      state.transactions = state.transactions.map(tx => tx.id === id ? { ...tx, hidden } : tx)
     },
     updateTransaction (state, updatedTx) {
       state.transactions = state.transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
@@ -247,10 +248,10 @@ export default new Vuex.Store({
         .then(tx => commit('addTransaction', tx))
     },
     hideTransaction ({ commit }, { id, hidden }) {
-      return fetch(`/api/transactions/${id}`, {
+      return fetch(`/api/transactions/${id}/hidden`, {
         ...defaultRequestParams,
         method: 'PUT',
-        body: JSON.stringify({ hidden }),
+        body: JSON.stringify({ hidden })
       })
         .then(res => res.status === 204 ? commit('hideTransaction', { id, hidden }) : reject(res))
     },
