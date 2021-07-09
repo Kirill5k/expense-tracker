@@ -8,7 +8,7 @@
       Account
     </v-card-title>
 
-    <v-card-text class="pb-0">
+    <v-card-text class="pb-0 account__details">
       <account-details
         :account="account"
       />
@@ -101,6 +101,8 @@ export default {
 
 <style lang="scss">
 .account {
-
+  &__details {
+    margin-top: -24px
+  }
 }
 </style>
