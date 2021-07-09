@@ -69,7 +69,7 @@
           <v-icon>
             mdi-currency-{{currency.code.toLowerCase()}}
           </v-icon>
-          <span>{{ $store.getters.totalSpent.current }}</span>
+          <span>{{ $store.getters.totalSpent }}</span>
         </v-chip>
 
       </div>

@@ -56,15 +56,12 @@ export default {
     totalAmount: {
       type: [String, Number],
       required: true
-    },
-    previousTotalAmount: {
-      type: [String, Number],
-      required: true
     }
   },
   data: () => ({
     initOptions: {
-      renderer: 'canvas'
+      renderer: 'canvas',
+      previousTotalAmount: '1'
     }
   }),
   computed: {
@@ -84,15 +81,24 @@ export default {
       return this.groupItemsByDate(this.previousItems)
     },
     spendingDifference () {
-      return Math.abs(Number(this.totalAmount) - Number(this.previousTotalAmount)).toFixed(2)
+      if (this.displayDate.index < 0) {
+        return (Number(this.totalAmount) - Number(this.totalSpent(this.previousItems))).toFixed(2)
+      } else if (this.displayDate.index === 0) {
+        const currentGroup = this.getDateGroup(new Date())
+        const currentSpend = this.totalSpent(this.currentItems.filter(tx => this.getItemGroup(tx) <= currentGroup))
+        const previousSpend = this.totalSpent(this.previousItems.filter(tx => this.getItemGroup(tx) <= currentGroup))
+        return (Number(currentSpend) - Number(previousSpend)).toFixed(2)
+      } else {
+        return 0
+      }
     },
     subtext () {
-      if (this.totalAmount === this.previousTotalAmount) {
+      if (this.displayDate.index > 0 || this.spendingDifference === 0) {
         return 'Total spend'
-      } else if (Number(this.totalAmount) < Number(this.previousTotalAmount)) {
-        return `Total spend {up|↓}{a|${this.currency.symbol}${this.spendingDifference}}`
+      } else if (this.spendingDifference < 0) {
+        return `Total spend {up|↓}{a|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
       } else {
-        return `Total spend {down|↑}{b|${this.currency.symbol}${this.spendingDifference}}`
+        return `Total spend {down|↑}{b|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
       }
     },
     period () {
@@ -150,7 +156,7 @@ export default {
           axisLine: { show: false },
           axisLabel: {
             show: true,
-            margin: 3,
+            margin: 0,
             formatter: (value) => `${this.currency.symbol}${this.formatYAxisLabel(value)}`,
             showMaxLabel: true
           },
@@ -203,13 +209,16 @@ export default {
   },
   methods: {
     getItemGroup (item) {
+      return this.getDateGroup(new Date(item.date))
+    },
+    getDateGroup (date) {
       switch (this.displayDate.range) {
         case 'yearly':
-          return new Date(item.date).getMonth()
+          return date.getMonth()
         case 'weekly':
-          return new Date(item.date).getDay()
+          return date.getDay()
         default:
-          return Math.floor((new Date(item.date).getDate() - 1) / 7)
+          return Math.floor((date.getDate() - 1) / 7)
       }
     },
     groupItemsByDate (items) {
@@ -224,12 +233,15 @@ export default {
     },
     formatYAxisLabel (value) {
       if (value >= 1000000) {
-        return (value / 1000000).toFixed(1) + 'm'
+        return (value / 1000000).toFixed(1) + 'M'
       }
       if (value >= 1000) {
-        return (value / 1000).toFixed(1) + 'k'
+        return (value / 1000).toFixed(1) + 'K'
       }
       return value
+    },
+    totalSpent (txs) {
+      return txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
     }
   }
 }
