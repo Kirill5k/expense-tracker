@@ -4,6 +4,7 @@ import cats.Monad
 import cats.effect.Temporal
 import cats.implicits._
 import expensetracker.category.CategoryService
+import expensetracker.common.errors.AppError
 import fs2.Stream
 import org.typelevel.log4cats.Logger
 
@@ -21,15 +22,18 @@ private final class LiveActionProcessor[F[_]: Temporal: Logger](
   override def process: Stream[F, Unit] =
     dispatcher
       .stream
-      .evalMap(handleAction)
+      .parEvalMapUnordered(Int.MaxValue)(handleAction)
 
   private def handleAction(action: Action): F[Unit] =
     (action match {
       case Action.SetupNewAccount(id) => categoryService.assignDefault(id)
-    }).handleErrorWith { error =>
-      Logger[F].error(error)(s"error processing action $action") *>
-        Temporal[F].sleep(1.second) *>
-        dispatcher.dispatch(action)
+    }).handleErrorWith {
+      case error: AppError =>
+        Logger[F].warn(error)(s"domain error while processing action $action")
+      case error =>
+        Logger[F].error(error)(s"unexpected error processing action $action") *>
+          Temporal[F].sleep(1.second) *>
+          dispatcher.dispatch(action)
     }
 }
 
