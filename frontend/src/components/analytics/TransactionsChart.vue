@@ -60,8 +60,7 @@ export default {
   },
   data: () => ({
     initOptions: {
-      renderer: 'canvas',
-      previousTotalAmount: '1'
+      renderer: 'canvas'
     }
   }),
   computed: {

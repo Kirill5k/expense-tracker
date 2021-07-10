@@ -4,7 +4,6 @@
       clipped-left
       class="d-none d-md-block"
       app
-      color="white"
       dense
     >
       <v-app-bar-title>Expense-tracker</v-app-bar-title>
@@ -18,7 +17,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-main class="grey lighten-3 pt-0 pt-sm-12">
+    <v-main class="pt-0 pt-sm-12">
       <page
         :loading="$store.state.isLoading"
         :slim="$route.meta.slim"
