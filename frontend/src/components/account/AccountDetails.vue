@@ -1,14 +1,14 @@
 <template>
   <v-row>
     <v-col
-      xs="4"
-      sm="4"
-      md="3"
-      cols="4"
+      xs="3"
+      sm="3"
+      md="2"
+      cols="3"
       class="pr-0 pt-0"
     >
       <v-icon
-        size="100"
+        size="76"
         dense
         :color="dark ? 'white' : 'black'"
         class="mx-auto"
@@ -25,8 +25,8 @@
     >
       <v-list>
         <v-list-item class="px-0">
-          <v-list-item-content class="py-0">
-            <v-list-item-title class="mt-9 text-h6">
+          <v-list-item-content class="py-0 pl-4">
+            <v-list-item-title class="mt-4 text-h6">
               {{ account.firstName }}
               {{ account.lastName }}
             </v-list-item-title>
