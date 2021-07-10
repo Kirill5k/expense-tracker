@@ -24,7 +24,9 @@
       <v-col
         v-if="!slim"
         cols="2"
-        class="d-none d-md-block"
+        sm="3"
+        md="2"
+        class="d-none d-sm-block"
       >
         <v-card
           elevation="8"
@@ -79,14 +81,14 @@
       <v-col
         v-if="!slim"
         cols="2"
-        class="d-none d-md-block"
+        class="d-none d-sm-block"
       />
     </v-row>
   </v-container>
 </template>
 
 <script>
-const REGULAR_DIMENSIONS = { cols: '12', xs: '9', sm: '6', md: '5', lg: '4' }
+const REGULAR_DIMENSIONS = { cols: '12', xs: '9', sm: '7', md: '5', lg: '4' }
 const SLIM_DIMENSIONS = { cols: '12', xs: '9', sm: '6', md: '4', lg: '3' }
 
 export default {

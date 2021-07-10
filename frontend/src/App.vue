@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       clipped-left
-      class="d-none d-md-block"
+      class="d-none d-sm-block"
       app
       dense
     >
@@ -32,7 +32,7 @@
 
     <v-bottom-navigation
       v-if="isAuthenticated"
-      class="d-flex d-md-none"
+      class="d-flex d-sm-none"
       app
       shift
     >
