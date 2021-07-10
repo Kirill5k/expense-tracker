@@ -27,10 +27,12 @@ trait TestData {
   val cat   = Category(cid, CategoryKind.Expense, cname, CategoryIcon("icon"), CategoryColor.Blue, Some(aid))
 
   val txid = TransactionId("BC0C5342AB0C5342AB0C5342")
-  val tx   = Transaction(txid, aid, TransactionKind.Expense, cid, GBP(10.99), LocalDate.parse("2021-06-06"), Some("test tx"))
+  val tx =
+    Transaction(txid, aid, TransactionKind.Expense, cid, GBP(10.99), LocalDate.parse("2021-06-06"), Some("test tx"))
 
-  val sid             = SessionId(new ObjectId().toHexString)
-  val sa              = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))
-  val sess            = Session(sid, aid, Instant.now(), true, SessionStatus.Authenticated, sa)
+  val sid          = SessionId(new ObjectId().toHexString)
+  val sid2         = SessionId(new ObjectId().toHexString)
+  val sa           = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))
+  val sess         = Session(sid, aid, Instant.now(), true, SessionStatus.Authenticated, sa)
   val sessIdCookie = RequestCookie("session-id", sid.value)
 }

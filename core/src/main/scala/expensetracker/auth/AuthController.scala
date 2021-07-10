@@ -6,7 +6,16 @@ import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.{Account, AccountDetails, AccountEmail, AccountId, AccountName, AccountSettings, ChangePassword, Password}
+import expensetracker.auth.account.{
+  Account,
+  AccountDetails,
+  AccountEmail,
+  AccountId,
+  AccountName,
+  AccountSettings,
+  ChangePassword,
+  Password
+}
 import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.DifferentAccountSession
@@ -77,11 +86,13 @@ final class AuthController[F[_]: Logger](
       case authedReq @ POST -> Root / "account" / AccountIdPath(id) / "password" as session =>
         withErrorHandling {
           for {
-            _   <- F.ensure(id.pure[F])(DifferentAccountSession)(_ == session.accountId)
-            req <- authedReq.req.as[ChangePasswordRequest]
-            _   <- service.changePassword(req.toDomain(id))
-            res <- NoContent()
-          } yield res
+            _    <- F.ensure(id.pure[F])(DifferentAccountSession)(_ == session.accountId)
+            req  <- authedReq.req.as[ChangePasswordRequest]
+            _    <- service.changePassword(req.toDomain(id))
+            time <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
+            sid  <- service.createSession(CreateSession(id, authedReq.req.from, time))
+            res  <- NoContent()
+          } yield res.addCookie(sessionIdResponseCookie(sid.value))
         }
       case POST -> Root / "logout" as session =>
         withErrorHandling {

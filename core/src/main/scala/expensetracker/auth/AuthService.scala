@@ -1,6 +1,7 @@
 package expensetracker.auth
 
 import cats.Monad
+import cats.implicits._
 import expensetracker.auth.account._
 import expensetracker.auth.session._
 
@@ -15,7 +16,7 @@ trait AuthService[F[_]] {
   def changePassword(cp: ChangePassword): F[Unit]
 }
 
-final private class LiveAuthService[F[_]](
+final private class LiveAuthService[F[_]: Monad](
     private val accountService: AccountService[F],
     private val sessionService: SessionService[F]
 ) extends AuthService[F] {
@@ -42,7 +43,8 @@ final private class LiveAuthService[F[_]](
     accountService.updateSettings(aid, settings)
 
   override def changePassword(cp: ChangePassword): F[Unit] =
-    accountService.changePassword(cp)
+    accountService.changePassword(cp) *>
+      sessionService.invalidateAll(cp.id)
 }
 
 object AuthService {

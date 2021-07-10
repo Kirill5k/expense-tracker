@@ -104,6 +104,7 @@ class AuthControllerSpec extends ControllerSpec {
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
+        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(sid2))
 
         val reqBody ="""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
         val req = Request[IO](uri = uri"/auth/account/60e70e87fb134e0c1a271121/password", method = Method.POST)
@@ -111,8 +112,17 @@ class AuthControllerSpec extends ControllerSpec {
           .addCookie(sessIdCookie)
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        val sessCookie = ResponseCookie(
+          "session-id",
+          sid2.value,
+          httpOnly = true,
+          maxAge = Some(Long.MaxValue),
+          expires = Some(HttpDate.MaxValue),
+          path = Some("/")
+        )
+        verifyJsonResponse(res, Status.NoContent, None, List(sessCookie))
         verify(svc).changePassword(ChangePassword(aid, Password("curr-pwd"), Password("new-pwd")))
+        verify(svc).createSession(any[CreateSession])
         verifyZeroInteractions(disp)
       }
     }

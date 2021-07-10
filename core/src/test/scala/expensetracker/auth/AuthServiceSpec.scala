@@ -109,6 +109,7 @@ class AuthServiceSpec extends CatsSpec {
     "change password" in {
       val (accSvc, sessSvc) = mocks
       when(accSvc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
+      when(sessSvc.invalidateAll(any[AccountId])).thenReturn(IO.unit)
 
       val cp = ChangePassword(aid, pwd, pwd)
       val result = for {
@@ -118,7 +119,7 @@ class AuthServiceSpec extends CatsSpec {
 
       result.unsafeToFuture().map { res =>
         verify(accSvc).changePassword(cp)
-        verifyZeroInteractions(sessSvc)
+        verify(sessSvc).invalidateAll(aid)
         res mustBe ()
       }
     }
