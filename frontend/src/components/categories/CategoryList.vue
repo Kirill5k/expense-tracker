@@ -117,7 +117,7 @@ export default {
       if (this.items.length === 0) {
         return 130
       } else if (this.items.length > 6) {
-        return 500
+        return 560
       } else {
         return this.items.length * 80
       }
