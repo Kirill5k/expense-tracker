@@ -6,6 +6,7 @@ import expensetracker.category.Categories
 import expensetracker.common.actions.{ActionDispatcher, ActionProcessor}
 import expensetracker.common.config.AppConfig
 import expensetracker.common.web.Http
+import expensetracker.health.Health
 import expensetracker.transaction.Transactions
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
@@ -22,10 +23,11 @@ object Application extends IOApp.Simple {
     Resources.make[IO](config).use { res =>
       for {
         dispatcher <- ActionDispatcher.make[IO]
+        health     <- Health.make[IO]
         auth       <- Auth.make(config.auth, res, dispatcher)
         cats       <- Categories.make(res)
         txs        <- Transactions.make(res)
-        http       <- Http.make(auth, cats, txs)
+        http       <- Http.make(health, auth, cats, txs)
         processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
         server = BlazeServerBuilder[IO](runtime.compute)
           .bindHttp(config.server.port, config.server.host)

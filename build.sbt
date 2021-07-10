@@ -17,6 +17,8 @@ lazy val docker = Seq(
   maintainer := "immotional@aol.com",
   dockerBaseImage := "adoptopenjdk/openjdk16-openj9:x86_64-alpine-jre-16_36_openj9-0.25.0",
   dockerUpdateLatest := true,
+  dockerUsername := sys.env.get("DOCKER_USERNAME"),
+  dockerRepository := sys.env.get("DOCKER_REPO_URI"),
   makeBatScripts := List(),
   dockerCommands := {
     val commands         = dockerCommands.value
@@ -42,5 +44,6 @@ lazy val core = project
   .settings(
     name := "expense-tracker-core",
     moduleName := "expense-tracker-core",
+    Docker / packageName := "expense-tracker-core",
     libraryDependencies ++= Dependencies.core ++ Dependencies.test
   )

@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "expense-tracker-core"
+spec:
+  ports:
+    - targetPort: 8080
+      port: 8080
+  selector:
+    app: "expense-tracker-core"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "expense-tracker-core"
+  namespace: "default"
+  labels:
+    app: "expense-tracker-core"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: "expense-tracker-core"
+  template:
+    metadata:
+      labels:
+        app: "expense-tracker-core"
+    spec:
+      containers:
+        - name: "core"
+          image: "registry.cloud.okteto.net/expense-tracker-kirill5k/expense-tracker-core:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+          envFrom:
+            - secretRef:
+                name: "expense-tracker-secret"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "0.1"
+            limits:
+              memory: "384Mi"
+              cpu: "0.2"
+          readinessProbe:
+            httpGet:
+              path: /health/status
+              port: 8080
+            periodSeconds: 60
+          livenessProbe:
+            httpGet:
+              path: /health/status
+              port: 8080
+            periodSeconds: 60

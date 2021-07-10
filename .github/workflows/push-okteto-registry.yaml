@@ -1,0 +1,31 @@
+name: Publish to OKTETO container registry
+on: [workflow_dispatch]
+
+jobs:
+
+  build-image:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_REPO_URI: "registry.cloud.okteto.net"
+      DOCKER_USERNAME: "expense-tracker-kirill5k"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: "registry.cloud.okteto.net"
+          username: "kirill5k"
+          password: ${{ secrets.OKTETO_API_KEY }}
+
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: adopt@1.15
+      - name: Build and push Docker images
+        run: sbt docker:publish
+
+      - name: Build and push Captcha-bypass Docker image
+        run: |-
+          docker build -t ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend:latest -t ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend:${GITHUB_SHA::8} frontend/
+          docker push -a ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend
