@@ -33,6 +33,10 @@ export default {
     [THEME_KEY]: 'light'
   },
   props: {
+    dark: {
+      type: Boolean,
+      default: false
+    },
     currentItems: {
       type: Array,
       required: true
@@ -117,6 +121,7 @@ export default {
           top: '25%'
         },
         title: {
+          textStyle: { color: this.dark ? 'white' : '#424242' },
           itemGap: 5,
           padding: [15, 0, 5, 10],
           text: `${this.currency.symbol}${this.totalAmount}`,

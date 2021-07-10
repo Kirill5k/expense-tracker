@@ -14,6 +14,7 @@
         @update="updateDisplayDate"
       />
       <transactions-chart
+        :dark="$vuetify.theme.dark"
         v-if="$store.state.displayDate.previous"
         :key="$store.state.displayDate.text"
         :display-date="$store.state.displayDate"

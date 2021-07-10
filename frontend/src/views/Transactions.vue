@@ -63,7 +63,7 @@
         <v-chip
           small
           class="ma-2 px-4"
-          color="pink"
+          color="error"
           outlined
         >
           <v-icon>

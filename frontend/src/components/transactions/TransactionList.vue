@@ -44,7 +44,7 @@
       <v-chip
         small
         outlined
-        :color="item.amount.kind === 'expense' ? 'pink' : 'success'"
+        :color="item.amount.kind === 'expense' ? 'error' : 'success'"
       >
         {{ item.amount.kind === 'expense' ? '-' : '+' }}
         <v-icon>
@@ -77,7 +77,7 @@
           v-if="editable"
           icon
           dark
-          color="black"
+          color="secondary"
           x-small
           @click="$emit('edit', item.original)"
         >

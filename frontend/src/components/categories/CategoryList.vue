@@ -65,7 +65,7 @@
                 class="mr-0 pl-2 ml-0 mt-0 pr-2"
                 icon
                 dark
-                color="black"
+                color="secondary"
                 x-small
                 @click="$emit('edit', item)"
               >

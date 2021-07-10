@@ -10,6 +10,7 @@
 
     <v-card-text class="pb-0 account__details">
       <account-details
+        :dark="$vuetify.theme.dark"
         :account="account"
       />
     </v-card-text>

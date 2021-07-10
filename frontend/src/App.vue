@@ -8,6 +8,15 @@
     >
       <v-app-bar-title>Expense-tracker</v-app-bar-title>
       <v-spacer/>
+      <v-switch
+        dense
+        hide-details
+        :input-value="$vuetify.theme.dark"
+        v-model="$vuetify.theme.dark"
+        inset
+        label="Dark mode"
+      ></v-switch>
+
       <v-btn
         icon
         class="mr-2"

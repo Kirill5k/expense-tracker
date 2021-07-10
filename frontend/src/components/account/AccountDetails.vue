@@ -10,7 +10,7 @@
       <v-icon
         size="100"
         dense
-        color="black"
+        :color="dark ? 'white' : 'black'"
         class="mx-auto"
       >
         mdi-account
@@ -43,6 +43,10 @@
 export default {
   name: 'AccountDetails',
   props: {
+    dark: {
+      type: Boolean,
+      required: true
+    },
     account: {
       type: Object,
       required: true
