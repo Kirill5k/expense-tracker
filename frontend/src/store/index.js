@@ -12,9 +12,7 @@ const withinDates = (txs, { start, end }) => txs.filter(tx => {
 const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
 
 const reject = (res, commit) => res.json().then(e => {
-  if (commit && res.status === 403) {
-    commit('unAuthenticate')
-  } else if (commit && e.message) {
+  if (commit && e.message) {
     commit('setAlert', { type: 'error', message: e.message })
   }
   return Promise.reject(new Error(e.message))
@@ -37,7 +35,8 @@ export default new Vuex.Store({
     displayDate: {},
     alert: {
       type: 'error',
-      message: ''
+      message: null,
+      show: false
     },
     sortBy: {
       field: 'tx',
@@ -73,10 +72,10 @@ export default new Vuex.Store({
       state.sortBy = { ...sortBy }
     },
     setAlert (state, alert) {
-      state.alert = { ...alert }
+      state.alert = { ...alert, show: true }
     },
     clearAlert (state) {
-      state.alert = { message: '', type: '' }
+      state.alert = { message: '', type: 'error', show: false }
     },
     authenticate (state) {
       state.isAuthenticated = true

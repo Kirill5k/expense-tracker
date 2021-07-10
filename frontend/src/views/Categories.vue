@@ -9,6 +9,7 @@
     </v-card-title>
 
     <v-card-text class="pb-0">
+      <v-divider/>
       <category-list
         :items="[...expenseCats, ...incomeCats]"
         :editable="editable"

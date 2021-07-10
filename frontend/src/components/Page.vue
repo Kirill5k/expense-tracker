@@ -19,7 +19,7 @@
     <v-row
       v-else
       justify="center"
-      style="height: 80%"
+      style="height: 70%"
     >
       <v-col
         v-if="!slim"
@@ -61,20 +61,19 @@
         :lg="dimensions.lg"
         :align-self="slim ? 'center' : 'baseline'"
       >
-        <v-slide-y-transition>
-          <v-alert
-            class="mb-4"
-            v-if="alert.message"
-            dense
-            outlined
-            :type="alert.type"
-            close-text="Hide"
-            dismissible
-            @click="$emit('clear-alert')"
-          >
-            {{ alert.message }}
-          </v-alert>
-        </v-slide-y-transition>
+        <v-alert
+          class="mb-4"
+          transition="scale-transition"
+          :value="alert.show"
+          dense
+          :type="alert.type"
+          close-text="Hide"
+          dismissible
+          elevation="12"
+          @click="$emit('clear-alert')"
+        >
+          {{ alert.message }}
+        </v-alert>
         <slot></slot>
       </v-col>
       <v-col
