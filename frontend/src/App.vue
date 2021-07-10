@@ -8,14 +8,6 @@
     >
       <v-app-bar-title>Expense-tracker</v-app-bar-title>
       <v-spacer/>
-      <v-switch
-        dense
-        hide-details
-        :input-value="$vuetify.theme.dark"
-        v-model="$vuetify.theme.dark"
-        inset
-        label="Dark mode"
-      ></v-switch>
 
       <v-btn
         icon
@@ -80,6 +72,9 @@ export default {
   computed: {
     isAuthenticated () {
       return this.$store.state.isAuthenticated
+    },
+    darkMode () {
+      return this.$store.state.account?.settings?.darkMode
     }
   },
   watch: {
@@ -90,6 +85,9 @@ export default {
       if (newVal === false) {
         this.$router.push('/login')
       }
+    },
+    darkMode (newVal) {
+      this.$vuetify.theme.dark = newVal
     }
   },
   methods: {

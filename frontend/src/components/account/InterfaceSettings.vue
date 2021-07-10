@@ -92,6 +92,42 @@
         ></v-switch>
       </v-expansion-panel-content>
     </v-expansion-panel>
+
+    <v-expansion-panel :key="2">
+      <v-expansion-panel-header class="px-0">
+        <template v-slot:default="{ open }">
+          <v-row no-gutters>
+            <v-col cols="10">
+              Dark mode
+            </v-col>
+            <v-col
+              cols="2"
+              class="text--secondary text-right"
+            >
+              <span
+                v-if="!open"
+                key="0"
+              >
+                  {{ settings.darkMode ? 'On' : 'Off' }}
+                </span>
+            </v-col>
+          </v-row>
+        </template>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-switch
+          class="pt-0 mt-0"
+          :input-value="settings.darkMode"
+          :true-value="true"
+          :false-value="false"
+          hide-details
+          :value="settings.darkMode"
+          :label="settings.darkMode ? 'Yes' : 'No'"
+          color="primary"
+          @change="toggleDarkMode"
+        ></v-switch>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
@@ -135,6 +171,9 @@ export default {
     },
     updateFutureTransactionsDisplay (newValue) {
       this.$emit('update', { ...this.settings, hideFutureTransactions: newValue })
+    },
+    toggleDarkMode (newValue) {
+      this.$emit('update', { ...this.settings, darkMode: newValue })
     }
   }
 }
