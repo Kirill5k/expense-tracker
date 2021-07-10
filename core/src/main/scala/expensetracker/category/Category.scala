@@ -15,10 +15,10 @@ object CategoryColor {
   val DeepPurple = CategoryColor("#6200EA")
 }
 
-sealed trait CategoryKind
+sealed abstract class CategoryKind(val value: String)
 object CategoryKind {
-  case object Expense extends CategoryKind
-  case object Income  extends CategoryKind
+  case object Expense extends CategoryKind("expense")
+  case object Income  extends CategoryKind("income")
 }
 
 final case class Category(

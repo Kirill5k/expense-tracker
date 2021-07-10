@@ -7,10 +7,11 @@ import java.time.Instant
 
 final case class SessionId(value: String) extends AnyVal
 
-sealed trait SessionStatus
+sealed abstract class SessionStatus(val value: String)
 object SessionStatus {
-  case object Authenticated extends SessionStatus
-  case object LoggedOut     extends SessionStatus
+  case object Authenticated extends SessionStatus("authenticated")
+  case object LoggedOut     extends SessionStatus("logged-out")
+  case object Invalidated   extends SessionStatus("invalidated")
 }
 
 final case class SessionActivity(

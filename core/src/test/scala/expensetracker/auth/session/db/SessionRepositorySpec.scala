@@ -76,6 +76,27 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
       }
     }
 
+    "invalidate all sessions" in {
+      withEmbeddedMongoDb { db =>
+        val result = for {
+          repo <- SessionRepository.make(db)
+          sid1  <- repo.create(CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts))
+          sid2  <- repo.create(CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts))
+          _    <- repo.invalidatedAll(aid)
+          res  <- (repo.find(sid1, None), repo.find(sid2, None)).tupled
+        } yield res
+
+        result.map {
+          case (Some(s1), Some(s2)) =>
+            s1.status mustBe SessionStatus.Invalidated
+            s1.active mustBe false
+            s2.status mustBe SessionStatus.Invalidated
+            s2.active mustBe false
+          case _ => fail("unexpected match")
+        }
+      }
+    }
+
     "update session last recorded activity on find" in {
       withEmbeddedMongoDb { db =>
         val activity = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, ts))

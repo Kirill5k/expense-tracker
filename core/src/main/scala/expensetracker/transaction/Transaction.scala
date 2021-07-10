@@ -8,10 +8,10 @@ import java.time.LocalDate
 
 final case class TransactionId(value: String) extends AnyVal
 
-sealed trait TransactionKind
+sealed abstract class TransactionKind(val value: String)
 object TransactionKind {
-  case object Expense extends TransactionKind
-  case object Income  extends TransactionKind
+  case object Expense extends TransactionKind("expense")
+  case object Income  extends TransactionKind("income")
 }
 
 final case class Transaction(

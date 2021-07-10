@@ -3,7 +3,6 @@ package expensetracker.common
 import cats.implicits._
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.session.SessionStatus
-import expensetracker.auth.session.SessionStatus.{Authenticated, LoggedOut}
 import expensetracker.category.CategoryKind
 import expensetracker.transaction.TransactionKind
 import io.circe.{Decoder, Encoder, Json, JsonObject}
@@ -19,15 +18,13 @@ trait JsonCodecs {
   }
 
   implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap {
-    case "authenticated" => Right(Authenticated)
-    case "logged-out"    => Right(LoggedOut)
-    case other           => Left(s"invalid session status $other")
+    case SessionStatus.Authenticated.value => Right(SessionStatus.Authenticated)
+    case SessionStatus.LoggedOut.value     => Right(SessionStatus.LoggedOut)
+    case SessionStatus.Invalidated.value   => Right(SessionStatus.Invalidated)
+    case other                             => Left(s"invalid session status $other")
   }
 
-  implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap {
-    case Authenticated => "authenticated"
-    case LoggedOut     => "logged-out"
-  }
+  implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap(_.value)
 
   implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 
@@ -62,24 +59,18 @@ trait JsonCodecs {
   }
 
   implicit val decodeTransactionKind: Decoder[TransactionKind] = Decoder[String].emap {
-    case "expense" => Right(TransactionKind.Expense)
-    case "income"  => Right(TransactionKind.Income)
-    case other     => Left(s"invalid transaction kind $other")
+    case TransactionKind.Expense.value => Right(TransactionKind.Expense)
+    case TransactionKind.Income.value  => Right(TransactionKind.Income)
+    case other                         => Left(s"invalid transaction kind $other")
   }
 
-  implicit val encodeTransactionKind: Encoder[TransactionKind] = Encoder[String].contramap {
-    case TransactionKind.Expense => "expense"
-    case TransactionKind.Income  => "income"
-  }
+  implicit val encodeTransactionKind: Encoder[TransactionKind] = Encoder[String].contramap(_.value)
 
   implicit val decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap {
-    case "expense" => Right(CategoryKind.Expense)
-    case "income"  => Right(CategoryKind.Income)
-    case other     => Left(s"invalid category kind $other")
+    case CategoryKind.Expense.value => Right(CategoryKind.Expense)
+    case CategoryKind.Income.value  => Right(CategoryKind.Income)
+    case other                      => Left(s"invalid category kind $other")
   }
 
-  implicit val encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap {
-    case CategoryKind.Expense => "expense"
-    case CategoryKind.Income  => "income"
-  }
+  implicit val encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap(_.value)
 }
