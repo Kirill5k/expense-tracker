@@ -87,7 +87,7 @@ export default {
       }
     },
     darkMode (newVal) {
-      if (typeof variable === 'boolean') {
+      if (typeof newVal === 'boolean') {
         this.$vuetify.theme.dark = newVal
       }
     }

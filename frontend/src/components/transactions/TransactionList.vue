@@ -120,7 +120,6 @@ export default {
     }
   },
   data: () => ({
-    selectedItem: null,
     headers: DEFAULT_HEADERS
   }),
   computed: {
