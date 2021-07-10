@@ -13,7 +13,7 @@
     disable-pagination
     mobile-breakpoint="100"
   >
-    <template v-slot:item.tx="{ item }">
+    <template v-slot:[`item.tx`]="{ item }">
       <v-list-item>
         <v-list-item-avatar
           :color="categories[item.id].color"
@@ -35,7 +35,7 @@
       </v-list-item>
     </template>
 
-    <template v-slot:item.amount="{ item }">
+    <template v-slot:[`item.amount`]="{ item }">
       <div class="transactions-breakdown__amount">
         <v-chip
           small

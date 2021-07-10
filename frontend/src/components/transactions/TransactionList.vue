@@ -16,7 +16,7 @@
     mobile-breakpoint="100"
     @click:row="rowClick"
   >
-    <template v-slot:item.icon="{ item }">
+    <template v-slot:[`item.icon`]="{ item }">
       <v-list-item-avatar
         size="26"
         :color="item.color"
@@ -32,7 +32,7 @@
       </v-list-item-avatar>
     </template>
 
-    <template v-slot:item.tx="{ item }">
+    <template v-slot:[`item.tx`]="{ item }">
       <v-list-item-content class="py-2 px-1">
         <p class="text-subtitle-2 mb-0">{{ item.tx.name }}</p>
         <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
@@ -40,7 +40,7 @@
       </v-list-item-content>
     </template>
 
-    <template v-slot:item.amount="{ item }">
+    <template v-slot:[`item.amount`]="{ item }">
       <v-chip
         small
         outlined
@@ -54,7 +54,7 @@
       </v-chip>
     </template>
 
-    <template v-slot:item.delete="{ item }">
+    <template v-slot:[`item.delete`]="{ item }">
       <v-slide-x-transition>
         <v-btn
           v-if="editable"
@@ -71,7 +71,7 @@
       </v-slide-x-transition>
     </template>
 
-    <template v-slot:item.edit="{ item }">
+    <template v-slot:[`item.edit`]="{ item }">
       <v-slide-x-reverse-transition>
         <v-btn
           v-if="editable"
