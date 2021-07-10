@@ -12,8 +12,7 @@
         Change password
       </v-expansion-panel-header>
       <v-expansion-panel-content
-        color="grey lighten-5"
-        class="pt-4"
+        class="pt-1"
       >
         <v-form
           ref="passwordChangeForm"
@@ -21,7 +20,7 @@
           lazy-validation
         >
           <v-text-field
-            class="mb-3"
+            class="mb-3 mt-0 pt-0"
             dense
             tabindex="1"
             autocomplete="current-password"
@@ -77,10 +76,11 @@
         Erase all transactions
       </v-expansion-panel-header>
       <v-expansion-panel-content
-        color="grey lighten-5"
-        class="text-center pt-4"
+
+        class="text-center"
       >
         <v-btn
+          class="mt-0 pt-0"
           small
           outlined
           color="error"
@@ -95,8 +95,8 @@
         Close account
       </v-expansion-panel-header>
       <v-expansion-panel-content
-        color="grey lighten-5"
-        class="text-center pt-4"
+
+        class="text-center"
       >
         <v-btn
           small

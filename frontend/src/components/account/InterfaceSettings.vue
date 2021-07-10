@@ -6,7 +6,9 @@
     flat
   >
     <v-expansion-panel :key="0">
-      <v-expansion-panel-header class="px-0">
+      <v-expansion-panel-header
+        class="px-0"
+      >
         <template v-slot:default="{ open }">
           <v-row no-gutters>
             <v-col cols="4">
@@ -34,8 +36,9 @@
           </v-row>
         </template>
       </v-expansion-panel-header>
-      <v-expansion-panel-content color="grey lighten-5">
+      <v-expansion-panel-content>
         <v-select
+          class="pt-0 mt-0"
           name="currency"
           persistent-hint
           return-object
@@ -75,8 +78,9 @@
           </v-row>
         </template>
       </v-expansion-panel-header>
-      <v-expansion-panel-content color="grey lighten-5">
+      <v-expansion-panel-content>
         <v-switch
+          class="pt-0 mt-0"
           :input-value="settings.hideFutureTransactions"
           :true-value="true"
           :false-value="false"
