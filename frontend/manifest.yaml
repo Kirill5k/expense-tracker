@@ -15,7 +15,6 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   name: "expense-tracker-frontend"
-  namespace: "default"
   labels:
     app: "expense-tracker-frontend"
 spec:

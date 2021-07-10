@@ -13,7 +13,6 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   name: "expense-tracker-core"
-  namespace: "default"
   labels:
     app: "expense-tracker-core"
 spec:
