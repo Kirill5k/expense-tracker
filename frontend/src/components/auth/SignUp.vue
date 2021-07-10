@@ -26,6 +26,7 @@
 
     <v-text-field
       tabindex="3"
+      type="email"
       name="email"
       v-model="email"
       :rules="rules.email"

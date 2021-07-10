@@ -16,7 +16,7 @@
     <v-virtual-scroll
       :items="items"
       bench="3"
-      max-height="585"
+      max-height="540"
       item-height="45"
     >
       <template v-slot:default="{ item }">

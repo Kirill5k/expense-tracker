@@ -5,6 +5,7 @@
     lazy-validation
   >
     <v-text-field
+      type="email"
       tabindex="1"
       name="email"
       autocomplete="email"
