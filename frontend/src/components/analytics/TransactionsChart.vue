@@ -2,10 +2,10 @@
   <div class="transactions-chart">
     <figure>
       <v-chart
-        class="transactions-chart__canvas"
         :init-options="initOptions"
         :option="option"
         autoresize
+        v-bind:style="{ height: `${canvasHeight}px` }"
       />
     </figure>
   </div>
@@ -60,6 +60,10 @@ export default {
     totalAmount: {
       type: [String, Number],
       required: true
+    },
+    windowHeight: {
+      type: Number,
+      required: true
     }
   },
   data: () => ({
@@ -68,6 +72,15 @@ export default {
     }
   }),
   computed: {
+    canvasHeight () {
+      if (this.windowHeight < 600) {
+        return 120
+      } else if (this.windowHeight < 700) {
+        return 200
+      } else {
+        return 240
+      }
+    },
     xAxisData () {
       if (this.displayDate.range === 'weekly') {
         return WEEKLY_LABELS

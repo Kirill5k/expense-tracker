@@ -76,6 +76,10 @@ export default {
     currency: {
       type: Object,
       required: true
+    },
+    windowHeight: {
+      type: Number,
+      required: true
     }
   },
   data: () => ({
@@ -95,12 +99,14 @@ export default {
       return Object.values(grouped).sort((a, b) => b.total - a.total)
     },
     height () {
-      if (this.items.length === 0) {
-        return 100
-      } else if (this.items.length > 4) {
-        return 250
+      if (this.windowHeight < 600) {
+        return 170
+      } else if (this.windowHeight < 700) {
+        return 195
+      } else if (this.windowHeight < 800) {
+        return 220
       } else {
-        return this.items.length * 80
+        return 290
       }
     }
   },

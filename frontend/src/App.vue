@@ -94,9 +94,6 @@ export default {
       if (typeof newVal === 'boolean') {
         this.$vuetify.theme.dark = newVal
       }
-    },
-    windowHeight (newHeight) {
-      console.log('new window height', newHeight)
     }
   },
   methods: {
