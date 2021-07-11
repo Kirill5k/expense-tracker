@@ -266,8 +266,6 @@ export default {
 
 <style lang="scss">
 .transactions-chart {
-  &__canvas {
-    height: 220px;
-  }
+
 }
 </style>

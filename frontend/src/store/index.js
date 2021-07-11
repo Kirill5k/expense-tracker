@@ -49,7 +49,7 @@ const DEFAULT_STATE = {
 export default new Vuex.Store({
   state: {
     windowHeight: window.innerHeight,
-    ...DEFAULT_STATE,
+    ...DEFAULT_STATE
   },
   getters: {
     filteredCats: state => state.categories.filter(c => c.hidden !== true),
