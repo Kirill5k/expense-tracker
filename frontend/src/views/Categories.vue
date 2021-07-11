@@ -13,6 +13,7 @@
       <category-list
         :items="[...expenseCats, ...incomeCats]"
         :editable="editable"
+        :window-height="windowHeight"
         @delete="remove"
         @edit="edit"
       />
@@ -91,6 +92,9 @@ export default {
     },
     incomeCats () {
       return this.$store.getters.incomeCats
+    },
+    windowHeight () {
+      return this.$store.state.windowHeight
     }
   },
   methods: {

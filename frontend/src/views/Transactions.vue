@@ -23,6 +23,7 @@
         :sort-by="$store.state.sortBy"
         :items="transactions"
         :editable="editable"
+        :window-height="$store.state.windowHeight"
         @edit="edit"
         @delete="remove"
       />

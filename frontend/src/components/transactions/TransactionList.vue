@@ -117,6 +117,10 @@ export default {
     sortBy: {
       type: Object,
       required: true
+    },
+    windowHeight: {
+      type: Number,
+      required: true
     }
   },
   data: () => ({
@@ -136,10 +140,9 @@ export default {
     height () {
       if (this.items.length === 0) {
         return 130
-      } else if (this.items.length > 6) {
-        return 500
       } else {
-        return this.items.length * 80
+        const h = this.windowHeight - 250
+        return h > 550 ? 550 : h
       }
     }
   },

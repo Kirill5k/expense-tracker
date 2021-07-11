@@ -97,6 +97,10 @@ export default {
     editable: {
       type: Boolean,
       default: false
+    },
+    windowHeight: {
+      type: Number,
+      required: true
     }
   },
   data: () => ({
@@ -114,13 +118,8 @@ export default {
       }))
     },
     height () {
-      if (this.items.length === 0) {
-        return 130
-      } else if (this.items.length > 6) {
-        return 560
-      } else {
-        return this.items.length * 80
-      }
+      const h = this.windowHeight - 190
+      return h > 605 ? 605 : h
     }
   },
   methods: {
