@@ -65,7 +65,7 @@ class CategoryControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some(s"""{"message":"invalid category kind foo: Field(kind)"}""")
+          Some(s"""{"message":"Invalid category kind foo"}""")
         )
         verifyZeroInteractions(svc)
       }
@@ -81,7 +81,7 @@ class CategoryControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some("""{"message":"Validation failed: \"blue\".matches(\"^#[A-Za-z0-9]{3,6}$\").: Field(color)"}""")
+          Some("""{"message":"blue is not a valid color"}""")
         )
         verifyZeroInteractions(svc)
       }
@@ -189,7 +189,7 @@ class CategoryControllerSpec extends ControllerSpec {
           .withEntity(reqBody)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"message":"Validation isEmpty() did not fail.: Field(name)"}"""
+        val resBody = """{"message":"Name must not be empty"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(resBody))
         verifyZeroInteractions(svc)
       }

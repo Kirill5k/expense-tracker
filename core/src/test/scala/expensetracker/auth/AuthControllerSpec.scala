@@ -162,7 +162,7 @@ class AuthControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some("""{"message":"Validation isEmpty() did not fail.: Field(password)"}""")
+          Some("""{"message":"Password must not be empty"}""")
         )
         verifyZeroInteractions(svc)
         verifyZeroInteractions(disp)
@@ -198,7 +198,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity("""{foo}""")
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        val responseBody = """{"message":"Attempt to decode value on failed cursor: Field(email)"}"""
+        val responseBody = """{"message":"Email is required"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
         verifyZeroInteractions(svc)
         verifyZeroInteractions(disp)
@@ -213,8 +213,7 @@ class AuthControllerSpec extends ControllerSpec {
         val res      = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val response = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(res))
 
-        val resBody =
-          """{"message":"Validation failed: \"foo\".matches(\"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+$\").: Field(email)"}"""
+        val resBody = """{"message":"foo is not a valid email"}"""
         verifyJsonResponse(response, Status.UnprocessableEntity, Some(resBody))
         verifyZeroInteractions(svc)
         verifyZeroInteractions(disp)

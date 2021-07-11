@@ -45,7 +45,7 @@ class TransactionControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some(s"""{"message":"invalid transaction kind foo: Field(kind)"}""")
+          Some(s"""{"message":"Invalid transaction kind foo"}""")
         )
         verifyZeroInteractions(svc)
       }
@@ -66,7 +66,7 @@ class TransactionControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some(s"""{"message":"Validation failed: (FOO is valid id).: Field(categoryId)"}""")
+          Some(s"""{"message":"FOO is not a valid categoryId"}""")
         )
         verifyZeroInteractions(svc)
       }
@@ -202,7 +202,7 @@ class TransactionControllerSpec extends ControllerSpec {
           .withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        val resBody = """{"message":"Attempt to decode value on failed cursor: Field(kind)"}"""
+        val resBody = """{"message":"Kind is required"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(resBody))
         verifyZeroInteractions(svc)
       }

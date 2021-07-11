@@ -12,6 +12,11 @@ object SessionStatus {
   case object Authenticated extends SessionStatus("authenticated")
   case object LoggedOut     extends SessionStatus("logged-out")
   case object Invalidated   extends SessionStatus("invalidated")
+
+  private val all: List[SessionStatus] = List(Authenticated, LoggedOut, Invalidated)
+
+  def from(value: String): Either[String, SessionStatus] =
+    all.find(_.value == value).toRight(s"Unexpected session status $value")
 }
 
 final case class SessionActivity(

@@ -17,13 +17,7 @@ trait JsonCodecs {
     IpAddress.fromString(ip).toRight(s"invalid ip address $ip")
   }
 
-  implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap {
-    case SessionStatus.Authenticated.value => Right(SessionStatus.Authenticated)
-    case SessionStatus.LoggedOut.value     => Right(SessionStatus.LoggedOut)
-    case SessionStatus.Invalidated.value   => Right(SessionStatus.Invalidated)
-    case other                             => Left(s"invalid session status $other")
-  }
-
+  implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
   implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap(_.value)
 
   implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)

@@ -1,20 +1,24 @@
 package expensetracker.common.web
 
-import cats.MonadError
+import cats.{MonadError}
 import cats.implicits._
 import expensetracker.common.JsonCodecs
-import expensetracker.common.errors.{AppError}
+import expensetracker.common.errors.AppError
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.dsl.Http4sDsl
 import org.http4s._
 import org.http4s.headers.`WWW-Authenticate`
 import org.typelevel.log4cats.Logger
-
 final case class ErrorResponse(message: String)
 
 trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
   val SessionIdCookie = "session-id"
+
+  private val FailedRegexValidation = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.: DownField\\((.*)\\)".r
+  private val NullFieldValidation = "Attempt to decode value on failed cursor: DownField\\((.*)\\)".r
+  private val EmptyFieldValidation = "Predicate isEmpty\\(\\) did not fail\\.: DownField\\((.*)\\)".r
+  private val IdValidation = "Predicate failed: \\((.*) is valid id\\).: DownField\\((.*)\\)".r
 
   private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
 
@@ -42,15 +46,7 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
           Unauthorized(WWWAuthHeader, ErrorResponse(err.getMessage))
       case err: InvalidMessageBodyFailure =>
         logger.error(err.getCause())(err.getMessage()) *>
-          UnprocessableEntity(
-            ErrorResponse(
-              err
-                .getCause()
-                .getMessage
-                .replaceAll("Predicate", "Validation")
-                .replaceAll("DownField", "Field")
-            )
-          )
+          UnprocessableEntity(ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.getCause().getMessage)))
       case err =>
         logger.error(err)(s"unexpected error: ${err.getMessage}") *>
           InternalServerError(ErrorResponse(err.getMessage))
@@ -69,4 +65,20 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
       expires = Some(HttpDate.MaxValue),
       path = Some("/")
     )
+
+  private def formatValidationError(cause: Throwable): Option[String] =
+    cause.getMessage match {
+      case IdValidation(value, field) =>
+        Some(s"$value is not a valid $field")
+      case EmptyFieldValidation(field) =>
+        Some(s"${field.capitalize} must not be empty")
+      case NullFieldValidation(field) =>
+        Some(s"${field.capitalize} is required")
+      case FailedRegexValidation(value, field) =>
+        Some(s"$value is not a valid $field")
+      case s if s.contains("DownField") =>
+        s.split(": DownField").headOption.map(_.capitalize)
+      case _ =>
+        None
+    }
 }
