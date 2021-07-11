@@ -12,6 +12,9 @@ const withinDates = (txs, { start, end }) => txs.filter(tx => {
 const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
 
 const reject = (res, commit) => res.json().then(e => {
+  if (commit && res.status === 403) {
+    commit('logout')
+  }
   if (commit && e.message) {
     commit('setAlert', { type: 'error', message: e.message })
   }
@@ -25,24 +28,26 @@ const defaultRequestParams = {
   headers: { 'Content-Type': 'application/json' }
 }
 
-export default new Vuex.Store({
-  state: {
-    isLoading: true,
-    isAuthenticated: false,
-    account: null,
-    categories: [],
-    transactions: [],
-    displayDate: {},
-    alert: {
-      type: 'error',
-      message: null,
-      show: false
-    },
-    sortBy: {
-      field: 'tx',
-      desc: true
-    }
+const DEFAULT_STATE = {
+  isLoading: true,
+  isAuthenticated: false,
+  account: null,
+  categories: [],
+  transactions: [],
+  displayDate: {},
+  alert: {
+    type: 'error',
+    message: null,
+    show: false
   },
+  sortBy: {
+    field: 'tx',
+    desc: true
+  }
+}
+
+export default new Vuex.Store({
+  state: DEFAULT_STATE,
   getters: {
     filteredCats: state => state.categories.filter(c => c.hidden !== true),
     incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
@@ -75,13 +80,10 @@ export default new Vuex.Store({
       state.alert = { ...alert, show: true }
     },
     clearAlert (state) {
-      state.alert = { message: '', type: 'error', show: false }
+      state.alert = { ...state.alert, show: false }
     },
     authenticate (state) {
       state.isAuthenticated = true
-    },
-    unAuthenticate (state) {
-      state.isAuthenticated = false
     },
     loading (state) {
       state.isLoading = true
@@ -121,6 +123,13 @@ export default new Vuex.Store({
     },
     updateTransaction (state, updatedTx) {
       state.transactions = state.transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
+    },
+    logout (state) {
+      state.isAuthenticated = false
+      state.account = {}
+      state.categories = []
+      state.transaction = []
+      state.displayDate = {}
     }
   },
   actions: {
@@ -130,10 +139,8 @@ export default new Vuex.Store({
           commit('authenticate')
           commit('setAccount', account)
         })
-        .catch(() => {
-          commit('unAuthenticate')
-        })
         .then(() => commit('loaded'))
+        .catch(() => commit('logout'))
     },
     createAccount ({ commit }, requestBody) {
       return fetch('/api/auth/account', {
@@ -180,14 +187,7 @@ export default new Vuex.Store({
         method: 'POST',
         ...defaultRequestParams
       })
-        .then(res => res.status === 204 ? {} : reject(res))
-        .then(() => {
-          commit('setAccount', {})
-          commit('unAuthenticate')
-          commit('setCategories', [])
-          commit('setTransactions', [])
-          commit('setDisplayDate', {})
-        })
+        .then(res => res.status === 204 ? commit('logout') : reject(res, commit))
     },
     createCategory ({ commit, dispatch }, requestBody) {
       return fetch('/api/categories', {

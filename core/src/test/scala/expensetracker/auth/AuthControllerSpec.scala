@@ -220,7 +220,7 @@ class AuthControllerSpec extends ControllerSpec {
         verifyZeroInteractions(disp)
       }
 
-      "return forbidden when invalid password or email" in {
+      "return unauthorized when invalid password or email" in {
         val svc = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
@@ -230,7 +230,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Invalid email or password"}"""))
+        verifyJsonResponse(res, Status.Unauthorized, Some("""{"message":"Invalid email or password"}"""))
         verify(svc).login(eqTo(AccountEmail("foo@bar.com")), eqTo(Password("bar")))
         verifyZeroInteractions(disp)
       }

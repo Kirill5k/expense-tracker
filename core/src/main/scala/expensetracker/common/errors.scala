@@ -12,45 +12,46 @@ object errors {
     override def getMessage: String = message
   }
 
-  sealed trait NotFoundError   extends AppError
-  sealed trait ConflictError   extends AppError
-  sealed trait BadRequestError extends AppError
-  sealed trait AuthError       extends AppError
-
   object AppError {
-    final case class AccountAlreadyExists(email: AccountEmail) extends ConflictError {
+    sealed trait Unauth    extends AppError
+    sealed trait NotFound  extends AppError
+    sealed trait Conflict  extends AppError
+    sealed trait BadReq    extends AppError
+    sealed trait Forbidden extends AppError
+
+    final case class AccountAlreadyExists(email: AccountEmail) extends Conflict {
       override def message: String = s"An account with email ${email.value} already exists"
     }
 
-    final case class AccountDoesNotExist(id: AccountId) extends NotFoundError {
+    final case class AccountDoesNotExist(id: AccountId) extends NotFound {
       override def message: String = s"Account with id ${id.value} does not exist"
     }
 
-    case object InvalidEmailOrPassword extends AuthError {
+    case object InvalidEmailOrPassword extends Unauth {
       override def message: String = "Invalid email or password"
     }
 
-    case object InvalidPassword extends BadRequestError {
+    case object InvalidPassword extends Unauth {
       override def message: String = "Entered password appears to be incorrect"
     }
 
-    case object DifferentAccountSession extends AuthError {
+    case object DifferentAccountSession extends Forbidden {
       override def message: String = "The current session belongs to a different account"
     }
 
-    case object IdMismatch extends BadRequestError {
+    case object IdMismatch extends BadReq {
       override def message: String = "The id supplied in the path does not match with the id in the request body"
     }
 
-    final case class CategoryDoesNotExist(id: CategoryId) extends NotFoundError {
+    final case class CategoryDoesNotExist(id: CategoryId) extends NotFound {
       override def message: String = s"Category with id ${id.value} does not exist"
     }
 
-    final case class CategoryAlreadyExists(name: CategoryName) extends ConflictError {
+    final case class CategoryAlreadyExists(name: CategoryName) extends Conflict {
       override def message: String = s"A category with name ${name.value} already exists"
     }
 
-    final case class TransactionDoesNotExist(id: TransactionId) extends NotFoundError {
+    final case class TransactionDoesNotExist(id: TransactionId) extends NotFound {
       override def message: String = s"Transaction with id ${id.value} does not exist"
     }
   }

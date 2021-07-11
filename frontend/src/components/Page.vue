@@ -4,6 +4,29 @@
     fluid
     style="height: 100%"
   >
+    <v-snackbar
+      class="mt-1"
+      absolute
+      top
+      :value="alert.show"
+      :color="alert.type"
+      :timeout="5000"
+      @input="$emit('clear-alert')"
+      elevation="12"
+      transition="v-slide-y-transition"
+    >
+      {{ alert.message }}
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="white"
+          text
+          v-bind="attrs"
+          @click="$emit('clear-alert')"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     <div
       v-if="loading"
       class="loading-spinner d-flex justify-center align-center"
@@ -63,19 +86,6 @@
         :lg="dimensions.lg"
         :align-self="slim ? 'center' : 'baseline'"
       >
-        <v-alert
-          class="mb-4"
-          transition="scale-transition"
-          :value="alert.show"
-          dense
-          :type="alert.type"
-          close-text="Hide"
-          dismissible
-          elevation="12"
-          @click="$emit('clear-alert')"
-        >
-          {{ alert.message }}
-        </v-alert>
         <slot></slot>
       </v-col>
       <v-col
