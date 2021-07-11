@@ -5,8 +5,7 @@
     style="height: 100%"
   >
     <v-snackbar
-      class="mt-1"
-      absolute
+      class="mt-1 pt-0 pt-sm-12"
       top
       :value="alert.show"
       :color="alert.type"
