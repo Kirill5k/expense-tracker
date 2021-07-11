@@ -59,6 +59,7 @@ export default {
     Page
   },
   created () {
+    window.addEventListener('resize', () => this.$store.commit('setWindowHeight', window.innerHeight))
     this.$store.dispatch('getAccount')
   },
   data: () => ({
@@ -75,6 +76,9 @@ export default {
     },
     darkMode () {
       return this.$store.state.account?.settings?.darkMode
+    },
+    windowHeight () {
+      return this.$store.state.windowHeight
     }
   },
   watch: {
@@ -90,6 +94,9 @@ export default {
       if (typeof newVal === 'boolean') {
         this.$vuetify.theme.dark = newVal
       }
+    },
+    windowHeight (newHeight) {
+      console.log('new window height', newHeight)
     }
   },
   methods: {

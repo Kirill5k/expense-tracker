@@ -47,7 +47,10 @@ const DEFAULT_STATE = {
 }
 
 export default new Vuex.Store({
-  state: DEFAULT_STATE,
+  state: {
+    windowHeight: window.innerHeight,
+    ...DEFAULT_STATE,
+  },
   getters: {
     filteredCats: state => state.categories.filter(c => c.hidden !== true),
     incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
@@ -73,6 +76,9 @@ export default new Vuex.Store({
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {
+    setWindowHeight (state, newHeight) {
+      state.windowHeight = newHeight
+    },
     sort (state, sortBy) {
       state.sortBy = { ...sortBy }
     },
