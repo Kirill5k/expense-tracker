@@ -36,7 +36,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         withEmbeddedMongoDb { client =>
           val create = CreateCategory(
             CategoryKind.Income,
-            CategoryName("test"),
+            CategoryName("c2i"),
             CategoryIcon("icon"),
             CategoryColor.Blue,
             acc1Id
@@ -60,7 +60,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         withEmbeddedMongoDb { client =>
           val create = CreateCategory(
             CategoryKind.Income,
-            CategoryName("c2"),
+            CategoryName("C2"),
             CategoryIcon("icon"),
             CategoryColor.Blue,
             acc2Id
@@ -71,7 +71,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
           } yield id
 
           result.attempt.map { err =>
-            err mustBe Left(CategoryAlreadyExists(CategoryName("c2")))
+            err mustBe Left(CategoryAlreadyExists(CategoryName("C2")))
           }
         }
       }

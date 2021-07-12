@@ -50,7 +50,7 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def create(cat: CreateCategory): F[CategoryId] = {
     val newCat = CategoryEntity.from(cat)
     collection
-      .count(Filters.and(accIdEq(cat.accountId), Filters.eq("name", newCat.name), notHidden))
+      .count(Filters.and(accIdEq(cat.accountId), Filters.regex("name", "(?i)^" + newCat.name  + "$"), notHidden))
       .flatMap {
         case 0 => collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
         case _ => CategoryAlreadyExists(cat.name).raiseError[F, CategoryId]
