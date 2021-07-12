@@ -19,6 +19,11 @@ sealed abstract class CategoryKind(val value: String)
 object CategoryKind {
   case object Expense extends CategoryKind("expense")
   case object Income  extends CategoryKind("income")
+
+  private val all: List[CategoryKind] = List(Expense, Income)
+
+  def from(value: String): Either[String, CategoryKind] =
+    all.find(_.value == value).toRight(s"invalid category kind $value")
 }
 
 final case class Category(

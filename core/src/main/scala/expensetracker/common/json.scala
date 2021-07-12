@@ -52,19 +52,9 @@ trait JsonCodecs {
     )
   }
 
-  implicit val decodeTransactionKind: Decoder[TransactionKind] = Decoder[String].emap {
-    case TransactionKind.Expense.value => Right(TransactionKind.Expense)
-    case TransactionKind.Income.value  => Right(TransactionKind.Income)
-    case other                         => Left(s"invalid transaction kind $other")
-  }
-
+  implicit val decodeTransactionKind: Decoder[TransactionKind] = Decoder[String].emap(TransactionKind.from)
   implicit val encodeTransactionKind: Encoder[TransactionKind] = Encoder[String].contramap(_.value)
 
-  implicit val decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap {
-    case CategoryKind.Expense.value => Right(CategoryKind.Expense)
-    case CategoryKind.Income.value  => Right(CategoryKind.Income)
-    case other                      => Left(s"invalid category kind $other")
-  }
-
+  implicit val decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap(CategoryKind.from)
   implicit val encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap(_.value)
 }

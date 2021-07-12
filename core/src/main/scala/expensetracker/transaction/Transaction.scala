@@ -12,6 +12,11 @@ sealed abstract class TransactionKind(val value: String)
 object TransactionKind {
   case object Expense extends TransactionKind("expense")
   case object Income  extends TransactionKind("income")
+
+  private val all: List[TransactionKind] = List(Expense, Income)
+
+  def from(value: String): Either[String, TransactionKind] =
+    all.find(_.value == value).toRight(s"Invalid transaction kind $value")
 }
 
 final case class Transaction(
