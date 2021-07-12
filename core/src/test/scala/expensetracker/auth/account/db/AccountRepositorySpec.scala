@@ -95,12 +95,12 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- AccountRepository.make(client)
-            _    <- repo.updateSettings(acc1Id, AccountSettings(USD, false, false))
+            _    <- repo.updateSettings(acc1Id, AccountSettings(USD, false, None))
             acc  <- repo.find(acc1Id)
           } yield acc
 
           result.map { acc =>
-            acc.settings mustBe AccountSettings(USD, false, false)
+            acc.settings mustBe AccountSettings(USD, false, None)
           }
         }
       }

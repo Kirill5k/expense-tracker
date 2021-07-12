@@ -30,7 +30,7 @@ class AuthControllerSpec extends ControllerSpec {
             |"email":"email",
             |"firstName":"John",
             |"lastName":"Bloggs",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":false},
+            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
             |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         verifyJsonResponse(res, Status.Ok, Some(resBody))
@@ -79,7 +79,7 @@ class AuthControllerSpec extends ControllerSpec {
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        verify(svc).updateSettings(aid, AccountSettings(USD, false, false))
+        verify(svc).updateSettings(aid, AccountSettings(USD, false, Some(false)))
         verifyZeroInteractions(disp)
       }
     }
@@ -251,7 +251,7 @@ class AuthControllerSpec extends ControllerSpec {
             |"email":"email",
             |"firstName":"John",
             |"lastName":"Bloggs",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":false},
+            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
             |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         val sessCookie = ResponseCookie(

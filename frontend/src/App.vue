@@ -92,8 +92,11 @@ export default {
       }
     },
     darkMode (newVal) {
+      console.log('darkmode', newVal)
       if (typeof newVal === 'boolean') {
         this.$vuetify.theme.dark = newVal
+      } else {
+        this.$vuetify.theme.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
       }
     }
   },

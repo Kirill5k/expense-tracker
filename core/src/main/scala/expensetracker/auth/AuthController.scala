@@ -157,7 +157,7 @@ object AuthController {
   final case class UpdateAccountSettingsRequest(
       currency: Currency,
       hideFutureTransactions: Boolean,
-      darkMode: Boolean
+      darkMode: Option[Boolean]
   ) {
     def toDomain: AccountSettings =
       AccountSettings(

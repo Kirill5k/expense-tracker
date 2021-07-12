@@ -108,24 +108,25 @@
                 v-if="!open"
                 key="0"
               >
-                  {{ settings.darkMode ? 'On' : 'Off' }}
+                  {{ darkModeSettings }}
                 </span>
             </v-col>
           </v-row>
         </template>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        <v-switch
-          class="pt-0 mt-0"
-          :input-value="settings.darkMode"
-          :true-value="true"
-          :false-value="false"
+        <v-slider
+          :value="darkModeToggle"
+          hint="Im a hint"
+          min="0"
+          max="2"
+          height="34"
+          ticks
+          dense
+          :tick-labels="['Off', 'On', 'Auto']"
           hide-details
-          :value="settings.darkMode"
-          :label="settings.darkMode ? 'Yes' : 'No'"
-          color="primary"
           @change="toggleDarkMode"
-        ></v-switch>
+        ></v-slider>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
@@ -160,6 +161,24 @@ export default {
   computed: {
     currentCurrency () {
       return this.currencies.find(c => c.code === this.settings.currency.code)
+    },
+    darkModeToggle () {
+      if (this.settings.darkMode === false) {
+        return 0
+      } else if (this.settings.darkMode === true) {
+        return 1
+      } else {
+        return 2
+      }
+    },
+    darkModeSettings () {
+      if (this.settings.darkMode === false) {
+        return 'Off'
+      } else if (this.settings.darkMode === true) {
+        return 'On'
+      } else {
+        return 'Auto'
+      }
     }
   },
   methods: {
@@ -173,7 +192,17 @@ export default {
       this.$emit('update', { ...this.settings, hideFutureTransactions: newValue })
     },
     toggleDarkMode (newValue) {
-      this.$emit('update', { ...this.settings, darkMode: newValue })
+      this.$emit('update', { ...this.settings, darkMode: this.mapDarkMode(newValue) })
+    },
+    mapDarkMode (newValue) {
+      switch (newValue) {
+        case 0:
+          return false
+        case 1:
+          return true
+        default:
+          return null
+      }
     }
   }
 }
