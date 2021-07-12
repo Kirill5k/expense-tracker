@@ -4,7 +4,7 @@
     class="analytics mx-auto"
     elevation="8"
   >
-    <v-card-title>
+    <v-card-title class="py-1">
       Analytics
     </v-card-title>
 

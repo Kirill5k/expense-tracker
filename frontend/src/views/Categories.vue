@@ -4,7 +4,7 @@
     class="categories mx-auto"
     elevation="8"
   >
-    <v-card-title>
+    <v-card-title class="py-1">
       Categories
     </v-card-title>
 
