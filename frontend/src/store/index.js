@@ -29,7 +29,7 @@ const defaultRequestParams = {
 }
 
 const DEFAULT_STATE = {
-  isLoading: true,
+  isLoading: false,
   isAuthenticated: false,
   account: null,
   categories: [],
@@ -136,6 +136,7 @@ export default new Vuex.Store({
       state.categories = []
       state.transaction = []
       state.displayDate = {}
+      state.isLoading = false
     }
   },
   actions: {
@@ -180,12 +181,14 @@ export default new Vuex.Store({
         .then(res => res.status === 204 ? commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS) : reject(res, commit))
     },
     login ({ commit, dispatch }, requestBody) {
+      commit('loading')
       return fetch('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
         .then(res => res.status === 200 ? res.json() : reject(res, commit))
+        .catch(() => commit('loaded'))
         .then(acc => dispatch('loadData', acc))
     },
     logout ({ commit }) {

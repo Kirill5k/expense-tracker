@@ -60,6 +60,7 @@ export default {
   },
   created () {
     window.addEventListener('resize', () => this.$store.commit('setWindowHeight', window.innerHeight))
+    this.$store.commit('loading')
     this.$store.dispatch('getAccount')
   },
   data: () => ({
