@@ -4,7 +4,7 @@
     class="account mx-auto"
     elevation="8"
   >
-    <v-card-title class="pt-1">
+    <v-card-title class="pt-1 pb-1">
       Account
     </v-card-title>
 
@@ -103,7 +103,7 @@ export default {
 <style lang="scss">
 .account {
   &__details {
-    margin-top: -24px
+    margin-top: 0px
   }
 }
 </style>
