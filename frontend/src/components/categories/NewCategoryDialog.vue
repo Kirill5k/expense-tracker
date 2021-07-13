@@ -31,6 +31,7 @@
             lazy-validation
           >
             <v-radio-group
+              hide-details
               dense
               v-model="newCategory.kind"
               row
