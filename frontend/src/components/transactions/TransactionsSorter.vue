@@ -1,53 +1,31 @@
 <template>
-  <v-menu
-    nudge-bottom="24"
-    bottom
-    left
-    rounded="md"
+  <options-selector
+    header="Sort by"
+    icon="mdi-sort"
   >
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn
-        class="mr-1"
-        elevation="2"
-        x-small
-        text
-        rounded
-        plain
-        v-bind="attrs"
-        v-on="on"
-      >
-        <v-icon>
-          mdi-sort
-        </v-icon>
-      </v-btn>
-    </template>
-
-    <v-list
-      dense
+    <v-list-item-group
+      v-model="currentSort"
+      mandatory
     >
-      <v-subheader sense class="mb-0 ml-2 pb-0">Sort by</v-subheader>
-      <v-list-item-group
-        v-model="currentSort"
-        mandatory
+      <v-list-item
+        link
+        dense
+        v-for="(item, i) in sortOptions"
+        :key="i"
+        @click="$emit('sort', item.value)"
       >
-        <v-list-item
-          link
-          dense
-          v-for="(item, i) in sortOptions"
-          :key="i"
-          @click="$emit('sort', item.value)"
-        >
-          <v-list-item-title>{{ item.text }}</v-list-item-title>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
-  </v-menu>
+        <v-list-item-title>{{ item.text }}</v-list-item-title>
+      </v-list-item>
+    </v-list-item-group>
+  </options-selector>
 </template>
 
 <script>
+import OptionsSelector from '@/components/transactions/OptionsSelector'
 
 export default {
   name: 'TransactionsSorter',
+  components: { OptionsSelector },
   data: () => ({
     currentSort: 0,
     sortOptions: [
