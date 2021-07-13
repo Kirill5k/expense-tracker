@@ -28,7 +28,7 @@
       class="transactions-filter__categories-select"
       dense
     >
-      <v-subheader sense class="mb-0 ml-2 pb-0">Filter by</v-subheader>
+      <v-subheader class="transactions-filter__menu-header ml-2 pb-0">Filter by</v-subheader>
       <v-virtual-scroll
         :bench="3"
         item-height="34"
@@ -96,6 +96,10 @@ export default {
 
 <style lang="scss">
 .transactions-filter {
+  &__menu-header {
+    margin-bottom: -10px;
+  }
+
   &__categories-select {
     width: 150px;
   }
