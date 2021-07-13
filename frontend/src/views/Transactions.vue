@@ -7,13 +7,13 @@
     <v-card-title class="py-1">
       Transactions
       <v-spacer></v-spacer>
+      <transactions-sorter
+        @sort="(sortBy) => $store.commit('sort', sortBy)"
+      />
       <transactions-filter
         :categories="$store.getters.filteredCats"
         :filters="$store.state.filterBy"
-        @update="filter"
-      />
-      <transactions-sorter
-        @sort="sort"
+        @filter="(filters) => $store.commit('filter', filters)"
       />
     </v-card-title>
 
@@ -85,8 +85,8 @@
         :currency="currency"
         :expense-cats="$store.getters.expenseCats"
         :income-cats="$store.getters.incomeCats"
-        @save="create"
-        @update="update"
+        @save="(newTx) => dispatchAction('createTransaction', newTx)"
+        @update="(tx) => dispatchAction('updateTransaction', tx)"
       />
     </v-card-actions>
 
@@ -157,9 +157,6 @@ export default {
           this.loading = false
         })
     },
-    create (newTransaction) {
-      this.dispatchAction('createTransaction', newTransaction)
-    },
     remove (id) {
       this
         .dispatchAction('hideTransaction', { id, hidden: true })
@@ -174,21 +171,12 @@ export default {
         this.lastDeletedId = null
       }
     },
-    update (updatedTransaction) {
-      this.dispatchAction('updateTransaction', updatedTransaction)
-    },
     edit (transaction) {
       this.$refs.newTransactionDialog.update(transaction)
     },
     updateDisplayDate (newRange) {
       this.editable = false
       this.$store.commit('setDisplayDate', newRange)
-    },
-    sort (sortBy) {
-      this.$store.commit('sort', sortBy)
-    },
-    filter (filters) {
-      this.$store.commit('filter', filters)
     }
   }
 }

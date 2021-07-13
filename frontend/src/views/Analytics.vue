@@ -6,6 +6,12 @@
   >
     <v-card-title class="py-1">
       Analytics
+      <v-spacer></v-spacer>
+      <transactions-filter
+        :categories="$store.getters.filteredCats"
+        :filters="$store.state.filterBy"
+        @filter="(filters) => $store.commit('filter', filters)"
+      />
     </v-card-title>
 
     <v-card-text>
@@ -52,6 +58,7 @@ import DatePeriodSelector from '@/components/DatePeriodSelector'
 import TransactionsChart from '@/components/analytics/TransactionsChart'
 import TransactionsBreakdown from '@/components/analytics/TransactionsBreakdown'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
+import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 
 export default {
   name: 'Analytics',
@@ -59,7 +66,8 @@ export default {
     DatePeriodSelector,
     TransactionsBreakdown,
     TransactionsChart,
-    NewTransactionDialog
+    NewTransactionDialog,
+    TransactionsFilter
   },
   data: () => ({
     loading: false

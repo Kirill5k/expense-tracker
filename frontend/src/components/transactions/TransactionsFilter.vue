@@ -48,7 +48,12 @@
                 :input-value="item.displayed"
               />
             </v-list-item-action>
-
+            <v-list-item-icon class="mb-0 mt-3">
+              <v-icon
+                small
+                v-text="item.icon"
+              />
+            </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>{{ item.name }}</v-list-item-title>
             </v-list-item-content>
@@ -73,11 +78,6 @@ export default {
       required: true
     }
   },
-  watch: {
-    filters (newVal) {
-      console.log(newVal)
-    }
-  },
   computed: {
     selections () {
       return this.categories.map(c => ({ ...c, displayed: this.filters.includes(c.id) }))
@@ -85,10 +85,10 @@ export default {
   },
   methods: {
     exclude (catId) {
-      this.$emit('update', this.filters.filter(c => c !== catId))
+      this.$emit('filter', this.filters.filter(c => c !== catId))
     },
     include (catId) {
-      this.$emit('update', [...this.filters, catId])
+      this.$emit('filter', [...this.filters, catId])
     }
   }
 }
@@ -101,7 +101,7 @@ export default {
   }
 
   &__categories-select {
-    width: 150px;
+    width: 176px;
   }
 }
 </style>
