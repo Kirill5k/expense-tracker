@@ -5,7 +5,7 @@
   >
     <v-virtual-scroll
       :bench="3"
-      item-height="34"
+      item-height="38"
       height="200"
       :items="selections"
     >
@@ -70,13 +70,4 @@ export default {
 </script>
 
 <style lang="scss">
-.transactions-filter {
-  &__menu-header {
-    margin-bottom: -10px;
-  }
-
-  &__categories-select {
-    width: 176px;
-  }
-}
 </style>
