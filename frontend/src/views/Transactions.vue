@@ -7,6 +7,11 @@
     <v-card-title class="py-1">
       Transactions
       <v-spacer></v-spacer>
+      <transactions-filter
+        :categories="$store.getters.filteredCats"
+        :filters="$store.state.filterBy"
+        @update="filter"
+      />
       <transactions-sorter
         @sort="sort"
       />
@@ -114,6 +119,7 @@
 <script>
 import TransactionList from '@/components/transactions/TransactionList'
 import TransactionsSorter from '@/components/transactions/TransactionsSorter'
+import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import DatePeriodSelector from '@/components/DatePeriodSelector'
 
@@ -123,7 +129,8 @@ export default {
     TransactionList,
     TransactionsSorter,
     NewTransactionDialog,
-    DatePeriodSelector
+    DatePeriodSelector,
+    TransactionsFilter
   },
   data: () => ({
     lastDeletedId: null,
@@ -179,6 +186,9 @@ export default {
     },
     sort (sortBy) {
       this.$store.commit('sort', sortBy)
+    },
+    filter (filters) {
+      this.$store.commit('filter', filters)
     }
   }
 }

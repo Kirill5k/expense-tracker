@@ -43,7 +43,8 @@ const DEFAULT_STATE = {
   sortBy: {
     field: 'tx',
     desc: true
-  }
+  },
+  filterBy: []
 }
 
 export default new Vuex.Store({
@@ -82,6 +83,9 @@ export default new Vuex.Store({
     sort (state, sortBy) {
       state.sortBy = { ...sortBy }
     },
+    filter (state, filters) {
+      state.filterBy = filters
+    },
     setAlert (state, alert) {
       state.alert = { ...alert, show: true }
     },
@@ -105,15 +109,18 @@ export default new Vuex.Store({
     },
     setCategories (state, categories) {
       state.categories = categories
+      state.filterBy = categories.map(c => c.id)
     },
     addCategory (state, category) {
       state.categories = [...state.categories, category]
+      state.filterBy = [...state.filterBy, category.id]
     },
     updateCategory (state, updatedCategory) {
       state.categories = state.categories.map(c => c.id === updatedCategory.id ? updatedCategory : c)
     },
     hideCategory (state, { id, hidden }) {
       state.categories = state.categories.map(cat => cat.id === id ? { ...cat, hidden } : cat)
+      state.filterBy = hidden ? state.filterBy.filter(c => c !== id) : [...state.filterBy, id]
     },
     setTransactions (state, txs) {
       state.transactions = txs
