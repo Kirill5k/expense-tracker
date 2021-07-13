@@ -11,9 +11,14 @@ import org.bson.types.ObjectId
 
 import java.time.Instant
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
 object EmbeddedMongo {
-  val starter = MongodStarter.getDefaultInstance
+  private val starter = MongodStarter.getDefaultInstance
+
+  def prepare(config: MongodConfig, attempt: Int = 5): MongodExecutable =
+    if (attempt < 0) throw new RuntimeException("tried to prepare executable far too many times")
+    else Try(starter.prepare(config)).getOrElse(prepare(config, attempt - 1))
 }
 
 trait EmbeddedMongo {
@@ -27,7 +32,7 @@ trait EmbeddedMongo {
       .version(Version.Main.PRODUCTION)
       .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
       .build
-    val mongodExecutable: MongodExecutable = EmbeddedMongo.starter.prepare(mongodConfig)
+    val mongodExecutable: MongodExecutable = EmbeddedMongo.prepare(mongodConfig)
     var mongodProcess: MongodProcess = null
     try {
       mongodProcess = mongodExecutable.start
