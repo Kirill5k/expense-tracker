@@ -52,11 +52,11 @@ export default {
       this.$store.commit('clearAlert')
       this.$router.push('/login')
     },
-    register (account) {
+    register (user) {
       this.loading = true
       this.$store.commit('clearAlert')
       this.$store
-        .dispatch('createAccount', account)
+        .dispatch('createUser', user)
         .then(() => setTimeout(() => this.login(), 1750))
         .catch(() => {
           this.loading = false

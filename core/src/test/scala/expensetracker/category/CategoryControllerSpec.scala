@@ -2,7 +2,7 @@ package expensetracker.category
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import org.http4s.{Method, Request, Status}
 import org.http4s.implicits._
@@ -28,7 +28,7 @@ class CategoryControllerSpec extends ControllerSpec {
             CategoryName("cat-1"),
             CategoryIcon("icon"),
             CategoryColor("#2962FF"),
-            aid
+            uid
           )
         }
       }
@@ -49,7 +49,7 @@ class CategoryControllerSpec extends ControllerSpec {
             CategoryName("cat-1"),
             CategoryIcon("icon"),
             CategoryColor("#2962FF"),
-            aid
+            uid
           )
         }
       }
@@ -90,7 +90,7 @@ class CategoryControllerSpec extends ControllerSpec {
     "GET /categories" should {
       "return user's categories" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.getAll(any[AccountId])).thenReturn(IO.pure(List(cat)))
+        when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(cat)))
 
         val req = Request[IO](uri = uri"/categories", method = Method.GET).addCookie(sessIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -100,14 +100,14 @@ class CategoryControllerSpec extends ControllerSpec {
           Status.Ok,
           Some(s"""[{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}]""")
         )
-        verify(svc).getAll(aid)
+        verify(svc).getAll(uid)
       }
     }
 
     "GET /categories/:id" should {
       "return user's category by id" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.get(any[AccountId], any[CategoryId])).thenReturn(IO.pure(cat))
+        when(svc.get(any[UserId], any[CategoryId])).thenReturn(IO.pure(cat))
 
         val req =
           Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
@@ -118,14 +118,14 @@ class CategoryControllerSpec extends ControllerSpec {
           Status.Ok,
           Some(s"""{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}""")
         )
-        verify(svc).get(aid, cid)
+        verify(svc).get(uid, cid)
       }
     }
 
     "PUT /categories/:id/hidden" should {
       "update user's category hidden status" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.hide(any[AccountId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+        when(svc.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"hidden":true}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342/hidden", method = Method.PUT)
@@ -134,7 +134,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        verify(svc).hide(aid, cid, true)
+        verify(svc).hide(uid, cid, true)
       }
     }
 
@@ -159,7 +159,7 @@ class CategoryControllerSpec extends ControllerSpec {
             CategoryName("c2"),
             CategoryIcon("icon"),
             CategoryColor("#2962FF"),
-            Some(aid)
+            Some(uid)
           )
         )
       }
@@ -215,7 +215,7 @@ class CategoryControllerSpec extends ControllerSpec {
             CategoryName("c2"),
             CategoryIcon("icon"),
             CategoryColor("#2962FF"),
-            Some(aid)
+            Some(uid)
           )
         )
       }
@@ -224,14 +224,14 @@ class CategoryControllerSpec extends ControllerSpec {
     "DELETE /categories/:id" should {
       "delete category by id" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.delete(any[AccountId], any[CategoryId])).thenReturn(IO.unit)
+        when(svc.delete(any[UserId], any[CategoryId])).thenReturn(IO.unit)
 
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.DELETE)
           .addCookie(sessIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        verify(svc).delete(aid, CategoryId("AB0C5342AB0C5342AB0C5342"))
+        verify(svc).delete(uid, CategoryId("AB0C5342AB0C5342AB0C5342"))
       }
     }
   }

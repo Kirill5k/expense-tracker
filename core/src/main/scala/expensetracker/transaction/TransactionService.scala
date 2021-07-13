@@ -2,15 +2,15 @@ package expensetracker.transaction
 
 import cats.Monad
 import expensetracker.transaction.db.TransactionRepository
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 
 trait TransactionService[F[_]] {
-  def getAll(aid: AccountId): F[List[Transaction]]
-  def get(aid: AccountId, txid: TransactionId): F[Transaction]
-  def delete(aid: AccountId, txid: TransactionId): F[Unit]
+  def getAll(aid: UserId): F[List[Transaction]]
+  def get(aid: UserId, txid: TransactionId): F[Transaction]
+  def delete(aid: UserId, txid: TransactionId): F[Unit]
   def create(tx: CreateTransaction): F[TransactionId]
   def update(tx: Transaction): F[Unit]
-  def hide(aid: AccountId, txid: TransactionId, hidden: Boolean): F[Unit]
+  def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
 }
 
 final private class LiveTransactionService[F[_]](
@@ -19,19 +19,19 @@ final private class LiveTransactionService[F[_]](
   override def create(tx: CreateTransaction): F[TransactionId] =
     repository.create(tx)
 
-  override def getAll(aid: AccountId): F[List[Transaction]] =
+  override def getAll(aid: UserId): F[List[Transaction]] =
     repository.getAll(aid)
 
-  override def get(aid: AccountId, txid: TransactionId): F[Transaction] =
+  override def get(aid: UserId, txid: TransactionId): F[Transaction] =
     repository.get(aid, txid)
 
-  override def delete(aid: AccountId, txid: TransactionId): F[Unit] =
+  override def delete(aid: UserId, txid: TransactionId): F[Unit] =
     repository.delete(aid, txid)
 
   override def update(tx: Transaction): F[Unit] =
     repository.update(tx)
 
-  override def hide(aid: AccountId, txid: TransactionId, hidden: Boolean): F[Unit] =
+  override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     repository.hide(aid, txid, hidden)
 }
 

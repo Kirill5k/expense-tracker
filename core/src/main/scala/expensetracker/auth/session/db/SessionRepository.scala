@@ -3,7 +3,7 @@ package expensetracker.auth.session.db
 import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.Updates
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import io.circe.generic.auto._
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
 import expensetracker.common.db.Repository
@@ -18,7 +18,7 @@ trait SessionRepository[F[_]] extends Repository[F] {
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
-  def invalidatedAll(aid: AccountId): F[Unit]
+  def invalidatedAll(aid: UserId): F[Unit]
 }
 
 final private class LiveSessionRepository[F[_]: Async](
@@ -46,7 +46,7 @@ final private class LiveSessionRepository[F[_]: Async](
   override def unauth(sid: SessionId): F[Unit] =
     collection.updateOne(idEq(sid.value), logoutUpdate).void
 
-  override def invalidatedAll(aid: AccountId): F[Unit] =
+  override def invalidatedAll(aid: UserId): F[Unit] =
     collection.updateMany(accIdEq(aid), invalidateUpdate).void
 }
 

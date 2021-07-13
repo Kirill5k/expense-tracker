@@ -26,7 +26,7 @@
         small
         color="primary"
         text
-        @click="createAccount"
+        @click="register"
       >
         Create an account.
       </v-btn>
@@ -50,7 +50,7 @@ export default {
     }
   },
   methods: {
-    createAccount () {
+    register () {
       this.$router.push('/register')
     },
     login (credentials) {

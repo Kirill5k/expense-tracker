@@ -61,14 +61,14 @@ export default {
   created () {
     window.addEventListener('resize', () => this.$store.commit('setWindowHeight', window.innerHeight))
     this.$store.commit('loading')
-    this.$store.dispatch('getAccount')
+    this.$store.dispatch('getUser')
   },
   data: () => ({
     navLinks: [
       { to: '/', name: 'Analytics', icon: 'mdi-chart-bar' },
       { to: '/transactions', name: 'Transactions', icon: 'mdi-bank-transfer' },
       { to: '/categories', name: 'Categories', icon: 'mdi-shape' },
-      { to: '/account', name: 'Settings', icon: 'mdi-account-cog' }
+      { to: '/settings', name: 'Settings', icon: 'mdi-account-cog' }
     ]
   }),
   computed: {
@@ -76,7 +76,7 @@ export default {
       return this.$store.state.isAuthenticated
     },
     darkMode () {
-      return this.$store.state.account?.settings?.darkMode
+      return this.$store.state.settings?.settings?.darkMode
     },
     windowHeight () {
       return this.$store.state.windowHeight

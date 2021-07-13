@@ -1,6 +1,6 @@
 package expensetracker.transaction.db
 
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import org.bson.types.ObjectId
@@ -20,7 +20,7 @@ final case class TransactionEntity(
   def toDomain: Transaction =
     Transaction(
       id = TransactionId(_id.toHexString),
-      accountId = AccountId(accountId.toHexString),
+      accountId = UserId(accountId.toHexString),
       categoryId = CategoryId(categoryId.toHexString),
       kind = kind,
       amount = amount,

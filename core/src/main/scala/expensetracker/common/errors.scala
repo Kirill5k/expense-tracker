@@ -1,6 +1,6 @@
 package expensetracker.common
 
-import expensetracker.auth.account.{AccountEmail, AccountId}
+import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.{CategoryId, CategoryName}
 import expensetracker.transaction.TransactionId
 
@@ -19,11 +19,11 @@ object errors {
     sealed trait BadReq    extends AppError
     sealed trait Forbidden extends AppError
 
-    final case class AccountAlreadyExists(email: AccountEmail) extends Conflict {
+    final case class AccountAlreadyExists(email: UserEmail) extends Conflict {
       override def message: String = s"An account with email ${email.value} already exists"
     }
 
-    final case class AccountDoesNotExist(id: AccountId) extends NotFound {
+    final case class AccountDoesNotExist(id: UserId) extends NotFound {
       override def message: String = s"Account with id ${id.value} does not exist"
     }
 
@@ -35,8 +35,8 @@ object errors {
       override def message: String = "Entered password appears to be incorrect"
     }
 
-    case object DifferentAccountSession extends Forbidden {
-      override def message: String = "The current session belongs to a different account"
+    case object SomeoneElsesSession extends Forbidden {
+      override def message: String = "The current session belongs to a different user"
     }
 
     case object IdMismatch extends BadReq {

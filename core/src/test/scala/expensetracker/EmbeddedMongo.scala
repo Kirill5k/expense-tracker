@@ -4,7 +4,7 @@ import de.flapdoodle.embed.mongo.{MongodExecutable, MongodProcess, MongodStarter
 import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import org.bson.Document
 import org.bson.types.ObjectId
@@ -43,7 +43,7 @@ trait EmbeddedMongo {
     }
   }
 
-  def categoryDoc(id: CategoryId, name: String, uid: Option[AccountId] = None): Document =
+  def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
     new Document(
       Map[String, Object](
         "_id"       -> new ObjectId(id.value),
@@ -55,7 +55,7 @@ trait EmbeddedMongo {
       ).asJava
     )
 
-  def accDoc(id: AccountId, email: String, password: String = "password"): Document =
+  def accDoc(id: UserId, email: String, password: String = "password"): Document =
     new Document(
       Map[String, Object](
         "_id"      -> new ObjectId(id.value),

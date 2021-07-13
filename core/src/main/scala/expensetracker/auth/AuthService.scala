@@ -2,32 +2,32 @@ package expensetracker.auth
 
 import cats.Monad
 import cats.implicits._
-import expensetracker.auth.account._
+import expensetracker.auth.user._
 import expensetracker.auth.session._
 
 trait AuthService[F[_]] {
-  def createAccount(details: AccountDetails, password: Password): F[AccountId]
+  def createUser(details: UserDetails, password: Password): F[UserId]
   def createSession(cs: CreateSession): F[SessionId]
-  def login(email: AccountEmail, password: Password): F[Account]
+  def login(email: UserEmail, password: Password): F[User]
   def logout(sid: SessionId): F[Unit]
   def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
-  def findAccount(aid: AccountId): F[Account]
-  def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
+  def findUser(aid: UserId): F[User]
+  def updateSettings(aid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
 }
 
 final private class LiveAuthService[F[_]: Monad](
-    private val accountService: AccountService[F],
+    private val accountService: UserService[F],
     private val sessionService: SessionService[F]
 ) extends AuthService[F] {
 
-  override def createAccount(details: AccountDetails, password: Password): F[AccountId] =
+  override def createUser(details: UserDetails, password: Password): F[UserId] =
     accountService.create(details, password)
 
   override def createSession(cs: CreateSession): F[SessionId] =
     sessionService.create(cs)
 
-  override def login(email: AccountEmail, password: Password): F[Account] =
+  override def login(email: UserEmail, password: Password): F[User] =
     accountService.login(email, password)
 
   override def logout(sid: SessionId): F[Unit] =
@@ -36,10 +36,10 @@ final private class LiveAuthService[F[_]: Monad](
   override def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
     sessionService.find(sid, activity)
 
-  override def findAccount(aid: AccountId): F[Account] =
+  override def findUser(aid: UserId): F[User] =
     accountService.find(aid)
 
-  override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
+  override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
     accountService.updateSettings(aid, settings)
 
   override def changePassword(cp: ChangePassword): F[Unit] =
@@ -48,6 +48,6 @@ final private class LiveAuthService[F[_]: Monad](
 }
 
 object AuthService {
-  def make[F[_]: Monad](accSvc: AccountService[F], sessSvc: SessionService[F]): F[AuthService[F]] =
+  def make[F[_]: Monad](accSvc: UserService[F], sessSvc: SessionService[F]): F[AuthService[F]] =
     Monad[F].pure(new LiveAuthService[F](accSvc, sessSvc))
 }

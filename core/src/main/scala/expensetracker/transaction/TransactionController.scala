@@ -4,7 +4,7 @@ import cats.Monad
 import cats.effect.Concurrent
 import cats.implicits._
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
@@ -93,7 +93,7 @@ object TransactionController {
       date: LocalDate,
       note: Option[String]
   ) {
-    def toDomain(aid: AccountId): CreateTransaction =
+    def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
         accountId = aid,
         kind = kind,
@@ -137,7 +137,7 @@ object TransactionController {
       date: LocalDate,
       note: Option[String]
   ) {
-    def toDomain(aid: AccountId): Transaction =
+    def toDomain(aid: UserId): Transaction =
       Transaction(
         id = TransactionId(id.value),
         kind = kind,

@@ -1,6 +1,6 @@
 package expensetracker.transaction
 
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import squants.market.Money
 
@@ -20,20 +20,20 @@ object TransactionKind {
 }
 
 final case class Transaction(
-    id: TransactionId,
-    accountId: AccountId,
-    kind: TransactionKind,
-    categoryId: CategoryId,
-    amount: Money,
-    date: LocalDate,
-    note: Option[String]
+                              id: TransactionId,
+                              accountId: UserId,
+                              kind: TransactionKind,
+                              categoryId: CategoryId,
+                              amount: Money,
+                              date: LocalDate,
+                              note: Option[String]
 )
 
 final case class CreateTransaction(
-    accountId: AccountId,
-    kind: TransactionKind,
-    categoryId: CategoryId,
-    amount: Money,
-    date: LocalDate,
-    note: Option[String]
+                                    accountId: UserId,
+                                    kind: TransactionKind,
+                                    categoryId: CategoryId,
+                                    amount: Money,
+                                    date: LocalDate,
+                                    note: Option[String]
 )

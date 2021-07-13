@@ -1,49 +1,49 @@
-package expensetracker.auth.account
+package expensetracker.auth.user
 
 import squants.market.{Currency, GBP}
 
 import java.time.Instant
 
-final case class AccountId(value: String)    extends AnyVal
-final case class AccountEmail(value: String) extends AnyVal
+final case class UserId(value: String)       extends AnyVal
+final case class UserEmail(value: String)    extends AnyVal
 final case class Password(value: String)     extends AnyVal
 final case class PasswordHash(value: String) extends AnyVal
 
-final case class AccountName(
+final case class UserName(
     first: String,
     last: String
 )
 
-final case class AccountSettings(
+final case class UserSettings(
     currency: Currency,
     hideFutureTransactions: Boolean,
     darkMode: Option[Boolean]
 )
 
-object AccountSettings {
-  val Default = AccountSettings(
+object UserSettings {
+  val Default = UserSettings(
     GBP,
     hideFutureTransactions = false,
     darkMode = None
   )
 }
 
-final case class Account(
-    id: AccountId,
-    email: AccountEmail,
-    name: AccountName,
+final case class User(
+    id: UserId,
+    email: UserEmail,
+    name: UserName,
     password: PasswordHash,
-    settings: AccountSettings,
+    settings: UserSettings,
     registrationDate: Instant
 )
 
-final case class AccountDetails(
-    email: AccountEmail,
-    name: AccountName
+final case class UserDetails(
+    email: UserEmail,
+    name: UserName
 )
 
 final case class ChangePassword(
-    id: AccountId,
+    id: UserId,
     currentPassword: Password,
     newPassword: Password
 )

@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
@@ -30,7 +30,7 @@ class TransactionControllerSpec extends ControllerSpec {
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${txid.value}"}"""))
         verify(svc).create(
-          CreateTransaction(aid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None)
+          CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None)
         )
       }
 
@@ -75,7 +75,7 @@ class TransactionControllerSpec extends ControllerSpec {
     "GET /transactions" should {
       "return user's txs" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.getAll(any[AccountId])).thenReturn(IO.pure(List(tx)))
+        when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(tx)))
 
         val req = Request[IO](uri = uri"/transactions", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -95,14 +95,14 @@ class TransactionControllerSpec extends ControllerSpec {
           |]""".stripMargin
 
         verifyJsonResponse(res, Status.Ok, Some(resBody))
-        verify(svc).getAll(aid)
+        verify(svc).getAll(uid)
       }
     }
 
     "GET /transactions/:id" should {
       "find user's tx by id" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.get(any[AccountId], any[TransactionId])).thenReturn(IO.pure(tx))
+        when(svc.get(any[UserId], any[TransactionId])).thenReturn(IO.pure(tx))
 
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -120,25 +120,25 @@ class TransactionControllerSpec extends ControllerSpec {
                         |}""".stripMargin
 
         verifyJsonResponse(res, Status.Ok, Some(resBody))
-        verify(svc).get(aid,  txid)
+        verify(svc).get(uid,  txid)
       }
 
       "return 404 when tx does not exist" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.get(any[AccountId], any[TransactionId])).thenReturn(IO.raiseError(TransactionDoesNotExist(txid)))
+        when(svc.get(any[UserId], any[TransactionId])).thenReturn(IO.raiseError(TransactionDoesNotExist(txid)))
 
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NotFound, Some("""{"message":"Transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""))
-        verify(svc).get(aid,  txid)
+        verify(svc).get(uid,  txid)
       }
     }
 
     "PUT /transactions/:id/hidden" should {
       "update user's category hidden status" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.hide(any[AccountId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+        when(svc.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"hidden":true}""")
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342/hidden", method = Method.PUT)
@@ -147,7 +147,7 @@ class TransactionControllerSpec extends ControllerSpec {
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        verify(svc).hide(aid, txid, true)
+        verify(svc).hide(uid, txid, true)
       }
     }
 
@@ -226,14 +226,14 @@ class TransactionControllerSpec extends ControllerSpec {
     "DELETE /transactions/:id" should {
       "delete tx by id" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.delete(any[AccountId], any[TransactionId])).thenReturn(IO.unit)
+        when(svc.delete(any[UserId], any[TransactionId])).thenReturn(IO.unit)
 
         val req = Request[IO](uri = uri"/transactions/AB0C5342AB0C5342AB0C5342", method = Method.DELETE)
           .addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
-        verify(svc).delete(aid, TransactionId("AB0C5342AB0C5342AB0C5342"))
+        verify(svc).delete(uid, TransactionId("AB0C5342AB0C5342AB0C5342"))
       }
     }
   }

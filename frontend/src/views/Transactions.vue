@@ -143,7 +143,7 @@ export default {
       return this.$store.getters.displayedTransactions.current
     },
     currency () {
-      return this.$store.state.account.settings.currency
+      return this.$store.state.user.settings.currency
     }
   },
   methods: {

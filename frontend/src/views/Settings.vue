@@ -1,17 +1,17 @@
 <template>
   <v-card
     :loading="loading"
-    class="account mx-auto"
+    class="settings mx-auto"
     elevation="8"
   >
     <v-card-title class="pt-1 pb-1">
-      Account
+      Settings
     </v-card-title>
 
-    <v-card-text class="pb-0 account__details">
-      <account-details
+    <v-card-text class="pb-0 settings__details">
+      <user-details
         :dark="$vuetify.theme.dark"
-        :account="account"
+        :user="user"
       />
     </v-card-text>
 
@@ -21,7 +21,7 @@
       <p class="text-subtitle-1 mb-0">Interface</p>
       <interface-settings
         v-model="interfacePanel"
-        :settings="account.settings"
+        :settings="user.settings"
         @update="updateSettings"
       />
     </v-card-text>
@@ -51,14 +51,14 @@
 </template>
 
 <script>
-import AccountDetails from '@/components/account/AccountDetails'
-import InterfaceSettings from '@/components/account/InterfaceSettings'
-import SecuritySettings from '@/components/account/SecuritySettings'
+import UserDetails from '@/components/settings/UserDetails'
+import InterfaceSettings from '@/components/settings/InterfaceSettings'
+import SecuritySettings from '@/components/settings/SecuritySettings'
 
 export default {
-  name: 'Account',
+  name: 'Settings',
   components: {
-    AccountDetails,
+    UserDetails,
     InterfaceSettings,
     SecuritySettings
   },
@@ -76,8 +76,8 @@ export default {
     }
   },
   computed: {
-    account () {
-      return this.$store.state.account
+    user () {
+      return this.$store.state.user
     }
   },
   methods: {
@@ -91,17 +91,17 @@ export default {
         })
     },
     updateSettings (newSettings) {
-      this.dispatch('updateAccountSettings', newSettings)
+      this.dispatch('updateUserSettings', newSettings)
     },
     changePassword (newPassword) {
-      this.dispatch('changeAccountPassword', newPassword)
+      this.dispatch('changeUserPassword', newPassword)
     }
   }
 }
 </script>
 
 <style lang="scss">
-.account {
+.user {
   &__details {
     margin-top: 0px
   }

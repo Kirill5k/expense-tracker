@@ -5,7 +5,7 @@ import cats.effect.unsafe.implicits.global
 import cats.implicits._
 import com.comcast.ip4s.IpAddress
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
@@ -20,7 +20,7 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
 
   override protected val mongoPort: Int = 12347
 
-  val aid = AccountId(new ObjectId().toHexString)
+  val aid = UserId(new ObjectId().toHexString)
   val ts = Instant.now().`with`(ChronoField.MILLI_OF_SECOND, 0)
 
   "A SessionRepository" should {

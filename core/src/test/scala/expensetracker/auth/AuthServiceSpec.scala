@@ -3,7 +3,7 @@ package expensetracker.auth
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.account.{AccountDetails, AccountEmail, AccountId, AccountService, AccountSettings, ChangePassword, Password}
+import expensetracker.auth.user.{UserDetails, UserEmail, UserId, UserService, UserSettings, ChangePassword, Password}
 import expensetracker.auth.session.{SessionActivity, SessionId, SessionService}
 
 class AuthServiceSpec extends CatsSpec {
@@ -12,17 +12,17 @@ class AuthServiceSpec extends CatsSpec {
 
     "create new accounts" in {
       val (accSvc, sessSvc) = mocks
-      when(accSvc.create(any[AccountDetails], any[Password])).thenReturn(IO.pure(aid))
+      when(accSvc.create(any[UserDetails], any[Password])).thenReturn(IO.pure(uid))
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.createAccount(details, pwd)
+        res     <- authSvc.createUser(details, pwd)
       } yield res
 
       result.unsafeToFuture().map { res =>
         verify(accSvc).create(details, pwd)
         verifyZeroInteractions(sessSvc)
-        res mustBe aid
+        res mustBe uid
       }
     }
 
@@ -44,23 +44,23 @@ class AuthServiceSpec extends CatsSpec {
 
     "find account by account id" in {
       val (accSvc, sessSvc) = mocks
-      when(accSvc.find(any[AccountId])).thenReturn(IO.pure(acc))
+      when(accSvc.find(any[UserId])).thenReturn(IO.pure(user))
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.findAccount(aid)
+        res     <- authSvc.findUser(uid)
       } yield res
 
       result.unsafeToFuture().map { res =>
         verifyZeroInteractions(sessSvc)
-        verify(accSvc).find(aid)
-        res mustBe acc
+        verify(accSvc).find(uid)
+        res mustBe user
       }
     }
 
     "return account on login" in {
       val (accSvc, sessSvc) = mocks
-      when(accSvc.login(any[AccountEmail], any[Password])).thenReturn(IO.pure(acc))
+      when(accSvc.login(any[UserEmail], any[Password])).thenReturn(IO.pure(user))
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
@@ -70,7 +70,7 @@ class AuthServiceSpec extends CatsSpec {
       result.unsafeToFuture().map { res =>
         verify(accSvc).login(email, pwd)
         verifyZeroInteractions(sessSvc)
-        res mustBe acc
+        res mustBe user
       }
     }
 
@@ -92,15 +92,15 @@ class AuthServiceSpec extends CatsSpec {
 
     "update settings" in {
       val (accSvc, sessSvc) = mocks
-      when(accSvc.updateSettings(any[AccountId], any[AccountSettings])).thenReturn(IO.unit)
+      when(accSvc.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.updateSettings(aid, AccountSettings.Default)
+        res     <- authSvc.updateSettings(uid, UserSettings.Default)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(accSvc).updateSettings(aid, AccountSettings.Default)
+        verify(accSvc).updateSettings(uid, UserSettings.Default)
         verifyZeroInteractions(sessSvc)
         res mustBe ()
       }
@@ -109,9 +109,9 @@ class AuthServiceSpec extends CatsSpec {
     "change password" in {
       val (accSvc, sessSvc) = mocks
       when(accSvc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
-      when(sessSvc.invalidateAll(any[AccountId])).thenReturn(IO.unit)
+      when(sessSvc.invalidateAll(any[UserId])).thenReturn(IO.unit)
 
-      val cp = ChangePassword(aid, pwd, pwd)
+      val cp = ChangePassword(uid, pwd, pwd)
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
         res     <- authSvc.changePassword(cp)
@@ -119,12 +119,12 @@ class AuthServiceSpec extends CatsSpec {
 
       result.unsafeToFuture().map { res =>
         verify(accSvc).changePassword(cp)
-        verify(sessSvc).invalidateAll(aid)
+        verify(sessSvc).invalidateAll(uid)
         res mustBe ()
       }
     }
   }
 
-  def mocks: (AccountService[IO], SessionService[IO]) =
-    (mock[AccountService[IO]], mock[SessionService[IO]])
+  def mocks: (UserService[IO], SessionService[IO]) =
+    (mock[UserService[IO]], mock[SessionService[IO]])
 }

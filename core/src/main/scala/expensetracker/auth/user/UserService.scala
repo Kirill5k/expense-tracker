@@ -1,37 +1,37 @@
-package expensetracker.auth.account
+package expensetracker.auth.user
 
 import cats.MonadError
 import cats.implicits._
-import expensetracker.auth.account.db.AccountRepository
+import expensetracker.auth.user.db.AccountRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
 sealed trait LoginResult
 object LoginResult {
-  case object Fail                           extends LoginResult
-  final case class Success(account: Account) extends LoginResult
+  case object Fail                     extends LoginResult
+  final case class Success(user: User) extends LoginResult
 }
 
-trait AccountService[F[_]] {
-  def create(details: AccountDetails, password: Password): F[AccountId]
-  def login(email: AccountEmail, password: Password): F[Account]
-  def find(aid: AccountId): F[Account]
-  def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit]
+trait UserService[F[_]] {
+  def create(details: UserDetails, password: Password): F[UserId]
+  def login(email: UserEmail, password: Password): F[User]
+  def find(aid: UserId): F[User]
+  def updateSettings(aid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
 }
 
-final private class LiveAccountService[F[_]](
+final private class LiveUserService[F[_]](
     private val repository: AccountRepository[F],
     private val encryptor: PasswordEncryptor[F]
 )(implicit
     F: MonadError[F, Throwable]
-) extends AccountService[F] {
+) extends UserService[F] {
 
   import LoginResult._
 
-  override def create(details: AccountDetails, password: Password): F[AccountId] =
+  override def create(details: UserDetails, password: Password): F[UserId] =
     encryptor.hash(password).flatMap(h => repository.create(details, h))
 
-  override def login(email: AccountEmail, password: Password): F[Account] =
+  override def login(email: UserEmail, password: Password): F[User] =
     repository
       .findBy(email)
       .flatMap {
@@ -39,14 +39,14 @@ final private class LiveAccountService[F[_]](
         case None      => F.pure[LoginResult](Fail)
       }
       .flatMap {
-        case Fail       => InvalidEmailOrPassword.raiseError[F, Account]
+        case Fail       => InvalidEmailOrPassword.raiseError[F, User]
         case Success(a) => F.pure(a)
       }
 
-  override def find(aid: AccountId): F[Account] =
+  override def find(aid: UserId): F[User] =
     repository.find(aid)
 
-  override def updateSettings(aid: AccountId, settings: AccountSettings): F[Unit] =
+  override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
     repository.updateSettings(aid, settings)
 
   override def changePassword(cp: ChangePassword): F[Unit] =
@@ -55,16 +55,16 @@ final private class LiveAccountService[F[_]](
       .flatMap(acc => encryptor.isValid(cp.currentPassword, acc.password))
       .flatMap {
         case false => InvalidPassword.raiseError[F, PasswordHash]
-        case true => encryptor.hash(cp.newPassword)
+        case true  => encryptor.hash(cp.newPassword)
       }
       .flatMap(repository.updatePassword(cp.id))
 
 }
 
-object AccountService {
+object UserService {
   def make[F[_]](repo: AccountRepository[F], encr: PasswordEncryptor[F])(implicit
       F: MonadError[F, Throwable]
-  ): F[AccountService[F]] =
-    F.pure(new LiveAccountService[F](repo, encr))
+  ): F[UserService[F]] =
+    F.pure(new LiveUserService[F](repo, encr))
 
 }

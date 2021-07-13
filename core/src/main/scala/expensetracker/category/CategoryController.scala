@@ -6,7 +6,7 @@ import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryController.{
   CategoryView,
@@ -96,7 +96,7 @@ object CategoryController {
       icon: NonEmptyString,
       color: Color
   ) {
-    def toDomain(aid: AccountId): CreateCategory =
+    def toDomain(aid: UserId): CreateCategory =
       CreateCategory(
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
@@ -115,7 +115,7 @@ object CategoryController {
       icon: NonEmptyString,
       color: Color
   ) {
-    def toDomain(aid: AccountId): Category =
+    def toDomain(aid: UserId): Category =
       Category(
         id = CategoryId(id.value),
         kind = kind,

@@ -1,4 +1,4 @@
-package expensetracker.auth.account
+package expensetracker.auth.user
 
 import cats.effect.Sync
 import cats.implicits._

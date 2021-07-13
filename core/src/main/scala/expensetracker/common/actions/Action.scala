@@ -1,9 +1,9 @@
 package expensetracker.common.actions
 
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 
 sealed trait Action
 
 object Action {
-  final case class SetupNewAccount(id: AccountId) extends Action
+  final case class SetupNewUser(id: UserId) extends Action
 }

@@ -36,9 +36,9 @@ const routes = [
     }
   },
   {
-    path: '/account',
-    name: 'account',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Account.vue'),
+    path: '/settings',
+    name: 'settings',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Settings.vue'),
     meta: {
       slim: false,
       authAccess: true,

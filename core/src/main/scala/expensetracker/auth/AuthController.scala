@@ -6,19 +6,10 @@ import cats.implicits._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.account.{
-  Account,
-  AccountDetails,
-  AccountEmail,
-  AccountId,
-  AccountName,
-  AccountSettings,
-  ChangePassword,
-  Password
-}
+import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
-import expensetracker.common.errors.AppError.DifferentAccountSession
+import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.common.web.Controller
 import io.circe.generic.auto._
 import io.circe.refined._
@@ -39,21 +30,21 @@ final class AuthController[F[_]: Logger](
 ) extends Controller[F] {
   import AuthController._
 
-  object AccountIdPath {
-    def unapply(cid: String): Option[AccountId] =
-      ObjectId.isValid(cid).guard[Option].as(AccountId(cid))
+  object UserIdPath {
+    def unapply(cid: String): Option[UserId] =
+      ObjectId.isValid(cid).guard[Option].as(UserId(cid))
   }
 
   private val prefixPath = "/auth"
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
-    case req @ POST -> Root / "account" =>
+    case req @ POST -> Root / "user" =>
       withErrorHandling {
         for {
-          create <- req.as[CreateAccountRequest]
-          aid    <- service.createAccount(create.accountDetails, create.accountPassword)
-          _      <- dispatcher.dispatch(Action.SetupNewAccount(aid))
-          res    <- Created(CreateAccountResponse(aid.value))
+          create <- req.as[CreateUserRequest]
+          aid    <- service.createUser(create.userDetails, create.userPassword)
+          _      <- dispatcher.dispatch(Action.SetupNewUser(aid))
+          res    <- Created(CreateUserResponse(aid.value))
         } yield res
       }
     case req @ POST -> Root / "login" =>
@@ -61,32 +52,32 @@ final class AuthController[F[_]: Logger](
         for {
           login <- req.as[LoginRequest]
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
-          acc   <- service.login(login.accountEmail, login.accountPassword)
+          acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
-          res   <- Ok(AccountView.from(acc))
+          res   <- Ok(UserView.from(acc))
         } yield res.addCookie(sessionIdResponseCookie(sid.value))
       }
   }
 
   private val authedRoutes: AuthedRoutes[Session, F] =
     AuthedRoutes.of {
-      case GET -> Root / "account" as session =>
+      case GET -> Root / "user" as session =>
         withErrorHandling {
-          service.findAccount(session.accountId).map(AccountView.from).flatMap(Ok(_))
+          service.findUser(session.accountId).map(UserView.from).flatMap(Ok(_))
         }
-      case authedReq @ PUT -> Root / "account" / AccountIdPath(id) / "settings" as session =>
+      case authedReq @ PUT -> Root / "user" / UserIdPath(id) / "settings" as session =>
         withErrorHandling {
           for {
-            _   <- F.ensure(id.pure[F])(DifferentAccountSession)(_ == session.accountId)
-            req <- authedReq.req.as[UpdateAccountSettingsRequest]
+            _   <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.accountId)
+            req <- authedReq.req.as[UpdateUserSettingsRequest]
             _   <- service.updateSettings(id, req.toDomain)
             res <- NoContent()
           } yield res
         }
-      case authedReq @ POST -> Root / "account" / AccountIdPath(id) / "password" as session =>
+      case authedReq @ POST -> Root / "user" / UserIdPath(id) / "password" as session =>
         withErrorHandling {
           for {
-            _    <- F.ensure(id.pure[F])(DifferentAccountSession)(_ == session.accountId)
+            _    <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.accountId)
             req  <- authedReq.req.as[ChangePasswordRequest]
             _    <- service.changePassword(req.toDomain(id))
             time <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
@@ -111,40 +102,40 @@ object AuthController {
 
   type Email = String Refined MatchesRegex["^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+$"]
 
-  final case class CreateAccountRequest(
+  final case class CreateUserRequest(
       email: Email,
       firstName: NonEmptyString,
       lastName: NonEmptyString,
       password: NonEmptyString
   ) {
-    def accountDetails: AccountDetails =
-      AccountDetails(AccountEmail(email.value.toLowerCase), AccountName(firstName.value, lastName.value))
+    def userDetails: UserDetails =
+      UserDetails(UserEmail(email.value.toLowerCase), UserName(firstName.value, lastName.value))
 
-    def accountPassword: Password = Password(password.value)
+    def userPassword: Password = Password(password.value)
   }
 
-  final case class CreateAccountResponse(id: String)
+  final case class CreateUserResponse(id: String)
 
   final case class LoginRequest(
       email: Email,
       password: NonEmptyString
   ) {
-    def accountEmail    = AccountEmail(email.value.toLowerCase)
-    def accountPassword = Password(password.value)
+    def userEmail    = UserEmail(email.value.toLowerCase)
+    def userPassword = Password(password.value)
   }
 
-  final case class AccountView(
+  final case class UserView(
       id: String,
       firstName: String,
       lastName: String,
       email: String,
-      settings: AccountSettings,
+      settings: UserSettings,
       registrationDate: Instant
   )
 
-  object AccountView {
-    def from(acc: Account): AccountView =
-      AccountView(
+  object UserView {
+    def from(acc: User): UserView =
+      UserView(
         acc.id.value,
         acc.name.first,
         acc.name.last,
@@ -154,13 +145,13 @@ object AuthController {
       )
   }
 
-  final case class UpdateAccountSettingsRequest(
+  final case class UpdateUserSettingsRequest(
       currency: Currency,
       hideFutureTransactions: Boolean,
       darkMode: Option[Boolean]
   ) {
-    def toDomain: AccountSettings =
-      AccountSettings(
+    def toDomain: UserSettings =
+      UserSettings(
         currency,
         hideFutureTransactions = hideFutureTransactions,
         darkMode = darkMode
@@ -171,7 +162,7 @@ object AuthController {
       currentPassword: NonEmptyString,
       newPassword: NonEmptyString
   ) {
-    def toDomain(id: AccountId): ChangePassword =
+    def toDomain(id: UserId): ChangePassword =
       ChangePassword(id, Password(currentPassword.value), Password(newPassword.value))
   }
 

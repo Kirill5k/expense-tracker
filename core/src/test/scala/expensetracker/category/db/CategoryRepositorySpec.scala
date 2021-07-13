@@ -12,7 +12,7 @@ import expensetracker.category.{
   CategoryName,
   CreateCategory
 }
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
@@ -24,8 +24,8 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
 
   override protected val mongoPort: Int = 12348
 
-  val acc1Id = AccountId(new ObjectId().toHexString)
-  val acc2Id = AccountId(new ObjectId().toHexString)
+  val acc1Id = UserId(new ObjectId().toHexString)
+  val acc2Id = UserId(new ObjectId().toHexString)
   val cat1Id = CategoryId(new ObjectId().toHexString)
   val cat2Id = CategoryId(new ObjectId().toHexString)
 

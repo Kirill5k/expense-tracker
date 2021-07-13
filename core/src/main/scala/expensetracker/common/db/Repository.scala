@@ -4,7 +4,7 @@ import cats.MonadError
 import cats.implicits._
 import com.mongodb.client.model.Filters
 import com.mongodb.client.result.UpdateResult
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
@@ -19,8 +19,8 @@ trait Repository[F[_]] {
 
   private def idEqFilter(name: String, id: String): Bson = Filters.eq(name, new ObjectId(id))
   protected def idEq(id: String): Bson                   = idEqFilter(IdField, id)
-  protected def accIdEq(aid: Option[AccountId]): Bson    = idEqFilter(AccIdField, aid.map(_.value).orNull)
-  protected def accIdEq(aid: AccountId): Bson            = idEqFilter(AccIdField, aid.value)
+  protected def accIdEq(aid: Option[UserId]): Bson    = idEqFilter(AccIdField, aid.map(_.value).orNull)
+  protected def accIdEq(aid: UserId): Bson            = idEqFilter(AccIdField, aid.value)
   protected def isNull(name: String): Bson               = Filters.eq(name, null)
 
   protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =

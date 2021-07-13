@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
@@ -20,8 +20,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
 
   override protected val mongoPort: Int = 12349
 
-  val acc1Id = AccountId(new ObjectId().toHexString)
-  val acc2Id = AccountId(new ObjectId().toHexString)
+  val acc1Id = UserId(new ObjectId().toHexString)
+  val acc2Id = UserId(new ObjectId().toHexString)
   val cat1Id = CategoryId(new ObjectId().toHexString)
   val cat2Id = CategoryId(new ObjectId().toHexString)
 

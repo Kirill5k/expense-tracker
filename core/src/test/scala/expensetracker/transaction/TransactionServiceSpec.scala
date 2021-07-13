@@ -3,7 +3,7 @@ package expensetracker.transaction
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.transaction.db.TransactionRepository
 import squants.market.GBP
 
@@ -14,15 +14,15 @@ class TransactionServiceSpec extends CatsSpec {
   "A TransactionService" should {
     "delete tx from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.delete(any[AccountId], any[TransactionId])).thenReturn(IO.unit)
+      when(repo.delete(any[UserId], any[TransactionId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
-        res <- svc.delete(aid, txid)
+        res <- svc.delete(uid, txid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).delete(aid, txid)
+        verify(repo).delete(uid, txid)
         res mustBe ()
       }
     }
@@ -44,30 +44,30 @@ class TransactionServiceSpec extends CatsSpec {
 
     "retrieve tx by id from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.get(any[AccountId], any[TransactionId])).thenReturn(IO.pure(tx))
+      when(repo.get(any[UserId], any[TransactionId])).thenReturn(IO.pure(tx))
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
-        res <- svc.get(aid, txid)
+        res <- svc.get(uid, txid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).get(aid, txid)
+        verify(repo).get(uid, txid)
         res mustBe tx
       }
     }
 
     "retrieve all txs from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.getAll(any[AccountId])).thenReturn(IO.pure(List(tx)))
+      when(repo.getAll(any[UserId])).thenReturn(IO.pure(List(tx)))
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
-        res <- svc.getAll(aid)
+        res <- svc.getAll(uid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).getAll(aid)
+        verify(repo).getAll(uid)
         res mustBe List(tx)
       }
     }
@@ -76,7 +76,7 @@ class TransactionServiceSpec extends CatsSpec {
       val repo = mock[TransactionRepository[IO]]
       when(repo.create(any[CreateTransaction])).thenReturn(IO.pure(txid))
 
-      val create = CreateTransaction(aid, TransactionKind.Income, cid, GBP(5.0), LocalDate.now(), None)
+      val create = CreateTransaction(uid, TransactionKind.Income, cid, GBP(5.0), LocalDate.now(), None)
       val result = for {
         svc <- TransactionService.make[IO](repo)
         res <- svc.create(create)
@@ -90,15 +90,15 @@ class TransactionServiceSpec extends CatsSpec {
 
     "hide a tx in db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.hide(any[AccountId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+      when(repo.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
-        res <- svc.hide(aid, txid, true)
+        res <- svc.hide(uid, txid, true)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).hide(aid, txid, true)
+        verify(repo).hide(uid, txid, true)
         res mustBe ()
       }
     }

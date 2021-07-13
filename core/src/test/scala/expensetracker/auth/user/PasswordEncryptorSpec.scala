@@ -1,4 +1,4 @@
-package expensetracker.auth.account
+package expensetracker.auth.user
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global

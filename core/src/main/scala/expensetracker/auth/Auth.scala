@@ -3,8 +3,8 @@ package expensetracker.auth
 import cats.effect.{Async, Temporal}
 import cats.implicits._
 import expensetracker.Resources
-import expensetracker.auth.account.{AccountService, PasswordEncryptor}
-import expensetracker.auth.account.db.AccountRepository
+import expensetracker.auth.user.{UserService, PasswordEncryptor}
+import expensetracker.auth.user.db.AccountRepository
 import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.{Session, SessionAuthMiddleware, SessionService}
 import expensetracker.common.actions.ActionDispatcher
@@ -29,7 +29,7 @@ object Auth {
       sessSvc  <- SessionService.make[F](sessRepo)
       accRepo  <- AccountRepository.make[F](resources.mongo)
       encr     <- PasswordEncryptor.make[F](config)
-      accSvc   <- AccountService.make[F](accRepo, encr)
+      accSvc   <- UserService.make[F](accRepo, encr)
       authSvc  <- AuthService.make[F](accSvc, sessSvc)
       authCtrl <- AuthController.make[F](authSvc, dispatcher)
     } yield new Auth[F](authSvc, authCtrl)

@@ -25,7 +25,7 @@
         v-if="$store.state.displayDate.previous"
         :key="$store.state.displayDate.text"
         :display-date="$store.state.displayDate"
-        :currency="$store.state.account.settings.currency"
+        :currency="$store.state.user.settings.currency"
         :categories="$store.getters.catsByIds"
         :current-items="$store.getters.expenseTransactions.current"
         :previous-items="$store.getters.expenseTransactions.previous"
@@ -34,7 +34,7 @@
       <p class="text-subtitle-2 ml-2 mb-0 mt-1">Spending breakdown</p>
       <transactions-breakdown
         :window-height="$store.state.windowHeight"
-        :currency="$store.state.account.settings.currency"
+        :currency="$store.state.user.settings.currency"
         :categories="$store.getters.catsByIds"
         :items="$store.getters.expenseTransactions.current"
         :total-amount="$store.getters.totalSpent"
@@ -44,7 +44,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <new-transaction-dialog
-        :currency="$store.state.account.settings.currency"
+        :currency="$store.state.user.settings.currency"
         :expense-cats="$store.getters.expenseCats"
         :income-cats="$store.getters.incomeCats"
         @save="create"

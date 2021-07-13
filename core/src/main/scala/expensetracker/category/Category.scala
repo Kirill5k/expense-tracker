@@ -1,6 +1,6 @@
 package expensetracker.category
 
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 
 final case class CategoryId(value: String)    extends AnyVal
 final case class CategoryName(value: String)  extends AnyVal
@@ -32,7 +32,7 @@ final case class Category(
     name: CategoryName,
     icon: CategoryIcon,
     color: CategoryColor,
-    accountId: Option[AccountId]
+    accountId: Option[UserId]
 )
 
 final case class CreateCategory(
@@ -40,5 +40,5 @@ final case class CreateCategory(
     name: CategoryName,
     icon: CategoryIcon,
     color: CategoryColor,
-    accountId: AccountId
+    accountId: UserId
 )

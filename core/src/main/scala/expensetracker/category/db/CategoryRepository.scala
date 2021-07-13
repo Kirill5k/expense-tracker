@@ -4,7 +4,7 @@ import cats.effect.Async
 import cats.implicits._
 import com.mongodb.client.model.{Filters, Updates}
 import expensetracker.category.{Category, CategoryId, CreateCategory}
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import io.circe.generic.auto._
@@ -16,32 +16,32 @@ import org.bson.types.ObjectId
 trait CategoryRepository[F[_]] extends Repository[F] {
   def create(cat: CreateCategory): F[CategoryId]
   def update(cat: Category): F[Unit]
-  def get(aid: AccountId, cid: CategoryId): F[Category]
-  def getAll(aid: AccountId): F[List[Category]]
-  def delete(aid: AccountId, cid: CategoryId): F[Unit]
-  def assignDefault(aid: AccountId): F[Unit]
-  def hide(aid: AccountId, cid: CategoryId, hidden: Boolean = true): F[Unit]
-  def isHidden(aid: AccountId, cid: CategoryId): F[Boolean]
+  def get(aid: UserId, cid: CategoryId): F[Category]
+  def getAll(aid: UserId): F[List[Category]]
+  def delete(aid: UserId, cid: CategoryId): F[Unit]
+  def assignDefault(aid: UserId): F[Unit]
+  def hide(aid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit]
+  def isHidden(aid: UserId, cid: CategoryId): F[Boolean]
 }
 
 final private class LiveCategoryRepository[F[_]: Async](
     private val collection: MongoCollectionF[CategoryEntity]
 ) extends CategoryRepository[F] {
 
-  override def getAll(aid: AccountId): F[List[Category]] =
+  override def getAll(aid: UserId): F[List[Category]] =
     collection
       .find(Filters.and(accIdEq(aid), notHidden))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
-  override def get(aid: AccountId, cid: CategoryId): F[Category] =
+  override def get(aid: UserId, cid: CategoryId): F[Category] =
     collection
       .find(Filters.and(accIdEq(aid), idEq(cid.value)))
       .first[F]
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .map(_.toDomain)
 
-  override def delete(aid: AccountId, cid: CategoryId): F[Unit] =
+  override def delete(aid: UserId, cid: CategoryId): F[Unit] =
     collection
       .findOneAndDelete[F](Filters.and(accIdEq(aid), idEq(cid.value)))
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
@@ -65,7 +65,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       )
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cat.id))(r).void)
 
-  override def assignDefault(aid: AccountId): F[Unit] =
+  override def assignDefault(aid: UserId): F[Unit] =
     collection
       .find(Filters.or(Filters.exists(AccIdField, false), isNull(AccIdField)))
       .all[F]
@@ -75,7 +75,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       }
       .void
 
-  override def hide(aid: AccountId, cid: CategoryId, hidden: Boolean = true): F[Unit] =
+  override def hide(aid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit] =
     collection
       .updateOne(
         Filters.and(accIdEq(aid), idEq(cid.value)),
@@ -83,7 +83,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       )
       .flatMap(errorIfNoMatches(CategoryDoesNotExist(cid)))
 
-  override def isHidden(aid: AccountId, cid: CategoryId): F[Boolean] =
+  override def isHidden(aid: UserId, cid: CategoryId): F[Boolean] =
     collection
       .count(Filters.and(accIdEq(aid), idEq(cid.value), Filters.eq(HiddenField, true)))
       .map(_ > 0)

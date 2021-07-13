@@ -137,13 +137,13 @@ export default {
   methods: {
     signUp () {
       if (this.$refs.signUpForm.validate()) {
-        const newAccount = {
+        const newUser = {
           firstName: this.firstName,
           lastName: this.lastName,
           email: this.email,
           password: this.password
         }
-        this.$emit('sign-up', newAccount)
+        this.$emit('sign-up', newUser)
       }
     }
   }

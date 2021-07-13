@@ -1,6 +1,6 @@
 package expensetracker.auth.session.db
 
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import org.bson.types.ObjectId
 
@@ -17,7 +17,7 @@ final case class SessionEntity(
   def toDomain: Session =
     Session(
       id = SessionId(_id.toHexString),
-      accountId = AccountId(accountId.toHexString),
+      accountId = UserId(accountId.toHexString),
       createdAt = createdAt,
       active = active,
       status = status,

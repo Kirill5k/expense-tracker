@@ -3,7 +3,7 @@ package expensetracker.auth.session
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
 
 import java.time.Instant
@@ -16,7 +16,7 @@ class SessionServiceSpec extends CatsSpec {
       val repo = mock[SessionRepository[IO]]
       when(repo.create(any[CreateSession])).thenReturn(IO.pure(sid))
 
-      val create = CreateSession(aid, None, Instant.now())
+      val create = CreateSession(uid, None, Instant.now())
       val result = for {
         svc <- SessionService.make(repo)
         sid <- svc.create(create)
@@ -60,15 +60,15 @@ class SessionServiceSpec extends CatsSpec {
 
     "invalidate all sessions" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.invalidatedAll(any[AccountId])).thenReturn(IO.unit)
+      when(repo.invalidatedAll(any[UserId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- SessionService.make(repo)
-        res <- svc.invalidateAll(aid)
+        res <- svc.invalidateAll(uid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).invalidatedAll(aid)
+        verify(repo).invalidatedAll(uid)
         res mustBe ()
       }
     }

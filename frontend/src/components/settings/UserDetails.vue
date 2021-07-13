@@ -27,10 +27,10 @@
         <v-list-item class="px-0">
           <v-list-item-content class="py-0 pl-4">
             <v-list-item-title class="mt-4 text-h6">
-              {{ account.firstName }}
-              {{ account.lastName }}
+              {{ user.firstName }}
+              {{ user.lastName }}
             </v-list-item-title>
-            <v-list-item-subtitle>{{account.email}}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -41,13 +41,13 @@
 <script>
 
 export default {
-  name: 'AccountDetails',
+  name: 'UserDetails',
   props: {
     dark: {
       type: Boolean,
       required: true
     },
-    account: {
+    user: {
       type: Object,
       required: true
     }

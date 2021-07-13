@@ -31,7 +31,7 @@ const defaultRequestParams = {
 const DEFAULT_STATE = {
   isLoading: false,
   isAuthenticated: false,
-  account: null,
+  user: null,
   categories: [],
   transactions: [],
   displayDate: {},
@@ -63,8 +63,8 @@ export default new Vuex.Store({
     filteredTransactions: state => state.transactions
       .filter(t => state.filterBy.includes(t.categoryId))
       .filter(t => t.hidden !== true)
-      .filter(t => t.amount.currency.code === state.account.settings.currency.code)
-      .filter(t => state.account.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
+      .filter(t => t.amount.currency.code === state.user.settings.currency.code)
+      .filter(t => state.user.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
     displayedTransactions: (state, getters) => ({
       current: withinDates(getters.filteredTransactions, state.displayDate),
       previous: withinDates(getters.filteredTransactions, state.displayDate.previous || {})
@@ -102,11 +102,11 @@ export default new Vuex.Store({
     loaded (state) {
       state.isLoading = false
     },
-    setAccount (state, account) {
-      state.account = account
+    setUser (state, user) {
+      state.user = user
     },
     setSettings (state, newSettings) {
-      state.account.settings = newSettings
+      state.user.settings = newSettings
     },
     setCategories (state, categories) {
       state.categories = categories
@@ -140,7 +140,7 @@ export default new Vuex.Store({
     },
     logout (state) {
       state.isAuthenticated = false
-      state.account = {}
+      state.user = {}
       state.categories = []
       state.transaction = []
       state.displayDate = {}
@@ -148,17 +148,17 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    loadData ({ commit, dispatch }, account) {
+    loadData ({ commit, dispatch }, user) {
       return Promise.all([dispatch('getCategories'), dispatch('getTransactions')])
         .then(() => {
           commit('authenticate')
-          commit('setAccount', account)
+          commit('setUser', user)
         })
         .then(() => commit('loaded'))
         .catch(() => commit('logout'))
     },
-    createAccount ({ commit }, requestBody) {
-      return fetch('/api/auth/account', {
+    createUser ({ commit }, requestBody) {
+      return fetch('/api/auth/user', {
         method: 'POST',
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
@@ -166,22 +166,22 @@ export default new Vuex.Store({
         .then(res => res.status === 201 ? res.json() : reject(res, commit))
         .then(() => commit('setAlert', Alerts.REGISTRATION_SUCCESS))
     },
-    getAccount ({ commit, dispatch }) {
-      return fetch('/api/auth/account', defaultRequestParams)
+    getUser ({ commit, dispatch }) {
+      return fetch('/api/auth/user', defaultRequestParams)
         .then(res => res.status === 200 ? res.json() : reject(res))
         .then(acc => dispatch('loadData', acc))
         .catch(() => commit('loaded'))
     },
-    updateAccountSettings ({ commit, state }, requestBody) {
-      return fetch(`/api/auth/account/${state.account.id}/settings`, {
+    updateUserSettings ({ commit, state }, requestBody) {
+      return fetch(`/api/auth/user/${state.user.id}/settings`, {
         method: 'PUT',
         body: JSON.stringify(requestBody),
         ...defaultRequestParams
       })
         .then(res => res.status === 204 ? commit('setSettings', requestBody) : reject(res, commit))
     },
-    changeAccountPassword ({ commit, state }, requestBody) {
-      return fetch(`/api/auth/account/${state.account.id}/password`, {
+    changeUserPassword ({ commit, state }, requestBody) {
+      return fetch(`/api/auth/user/${state.user.id}/password`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
         ...defaultRequestParams

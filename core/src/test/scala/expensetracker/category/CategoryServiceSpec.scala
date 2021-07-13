@@ -3,7 +3,7 @@ package expensetracker.category
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
 
 class CategoryServiceSpec extends CatsSpec {
@@ -11,45 +11,45 @@ class CategoryServiceSpec extends CatsSpec {
   "A CategoryService" should {
     "delete category from db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.delete(any[AccountId], any[CategoryId])).thenReturn(IO.unit)
+      when(repo.delete(any[UserId], any[CategoryId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
-        res <- svc.delete(aid, cid)
+        res <- svc.delete(uid, cid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).delete(aid, cid)
+        verify(repo).delete(uid, cid)
         res mustBe ()
       }
     }
 
     "retrieve categories from db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.getAll(any[AccountId])).thenReturn(IO.pure(List(cat)))
+      when(repo.getAll(any[UserId])).thenReturn(IO.pure(List(cat)))
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
-        res <- svc.getAll(aid)
+        res <- svc.getAll(uid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).getAll(aid)
+        verify(repo).getAll(uid)
         res mustBe List(cat)
       }
     }
 
     "retrieve category from db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.get(any[AccountId], any[CategoryId])).thenReturn(IO.pure(cat))
+      when(repo.get(any[UserId], any[CategoryId])).thenReturn(IO.pure(cat))
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
-        res <- svc.get(aid, cid)
+        res <- svc.get(uid, cid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).get(aid, cid)
+        verify(repo).get(uid, cid)
         res mustBe cat
       }
     }
@@ -58,7 +58,7 @@ class CategoryServiceSpec extends CatsSpec {
       val repo = mock[CategoryRepository[IO]]
       when(repo.create(any[CreateCategory])).thenReturn(IO.pure(cid))
 
-      val create = CreateCategory(CategoryKind.Expense, cname, CategoryIcon("icon"), CategoryColor("#6200EE"), aid)
+      val create = CreateCategory(CategoryKind.Expense, cname, CategoryIcon("icon"), CategoryColor("#6200EE"), uid)
       val result = for {
         svc <- CategoryService.make[IO](repo)
         res <- svc.create(create)
@@ -87,30 +87,30 @@ class CategoryServiceSpec extends CatsSpec {
 
     "assign default categories to a user" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.assignDefault(any[AccountId])).thenReturn(IO.unit)
+      when(repo.assignDefault(any[UserId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
-        res <- svc.assignDefault(aid)
+        res <- svc.assignDefault(uid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).assignDefault(aid)
+        verify(repo).assignDefault(uid)
         res mustBe ()
       }
     }
 
     "hide a category" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.hide(any[AccountId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+      when(repo.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
-        res <- svc.hide(aid, cid, true)
+        res <- svc.hide(uid, cid, true)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).hide(aid, cid, true)
+        verify(repo).hide(uid, cid, true)
         res mustBe ()
       }
     }

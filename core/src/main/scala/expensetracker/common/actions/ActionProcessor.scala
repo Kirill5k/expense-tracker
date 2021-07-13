@@ -26,7 +26,7 @@ private final class LiveActionProcessor[F[_]: Temporal: Logger](
 
   private def handleAction(action: Action): F[Unit] =
     (action match {
-      case Action.SetupNewAccount(id) => categoryService.assignDefault(id)
+      case Action.SetupNewUser(id) => categoryService.assignDefault(id)
     }).handleErrorWith {
       case error: AppError =>
         Logger[F].warn(error)(s"domain error while processing action $action")

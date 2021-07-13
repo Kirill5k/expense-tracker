@@ -2,7 +2,7 @@ package expensetracker.category.db
 
 import cats.implicits._
 import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
-import expensetracker.auth.account.AccountId
+import expensetracker.auth.user.UserId
 import org.bson.types.ObjectId
 
 final case class CategoryEntity(
@@ -20,7 +20,7 @@ final case class CategoryEntity(
       name = CategoryName(name),
       icon = CategoryIcon(icon),
       color = CategoryColor(color),
-      accountId = accountId.map(uid => AccountId(uid.toHexString))
+      accountId = accountId.map(uid => UserId(uid.toHexString))
     )
 }
 
