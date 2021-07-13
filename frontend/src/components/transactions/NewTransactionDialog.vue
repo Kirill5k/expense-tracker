@@ -31,6 +31,7 @@
             lazy-validation
           >
             <v-radio-group
+              hide-details
               dense
               v-model="newTransaction.kind"
               row
@@ -44,33 +45,6 @@
                 value="income"
               ></v-radio>
             </v-radio-group>
-
-            <v-menu
-              v-model="datePicker"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  name="date"
-                  v-model="formattedDate"
-                  :rules="rules.date"
-                  label="Date"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-              <v-date-picker
-                v-model="newTransaction.date"
-                @input="datePicker = false"
-                min="2000-01-01"
-              />
-            </v-menu>
 
             <v-select
               name="category"
@@ -99,6 +73,33 @@
               :prepend-icon="'mdi-currency-' + currency.code.toLowerCase()"
               :rules="rules.amount"
             />
+
+            <v-menu
+              v-model="datePicker"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  name="date"
+                  v-model="formattedDate"
+                  :rules="rules.date"
+                  label="Date"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+              <v-date-picker
+                v-model="newTransaction.date"
+                @input="datePicker = false"
+                min="2000-01-01"
+              />
+            </v-menu>
 
             <v-textarea
               rows="2"
