@@ -86,10 +86,6 @@ export default {
 
 <style lang="scss">
 .options-selector {
-  &__menu-header {
-    margin-bottom: -10px;
-  }
-
   &__menu {
     width: 176px;
   }

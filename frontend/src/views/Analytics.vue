@@ -8,6 +8,7 @@
       Analytics
       <v-spacer></v-spacer>
       <transactions-filter
+        v-if="$store.getters.filteredCats.length"
         :categories="$store.getters.filteredCats"
         :filters="$store.state.filterBy"
         @filter="(filters) => $store.commit('filter', filters)"
