@@ -70,6 +70,7 @@
             :categories="$store.getters.catsByIds"
             :total-amount="$store.getters.totalEarned"
             :transactions="$store.getters.incomeTransactions"
+            :dark="$vuetify.theme.dark"
           />
         </v-tab-item>
 
@@ -84,6 +85,7 @@
             :categories="$store.getters.catsByIds"
             :total-amount="$store.getters.totalSpent"
             :transactions="$store.getters.expenseTransactions.current"
+            :dark="$vuetify.theme.dark"
           />
         </v-tab-item>
       </v-tabs-items>

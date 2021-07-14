@@ -1,7 +1,7 @@
 <template>
   <p
     v-if="!transactions.length"
-    class="category-analysis text-center"
+    class="category-analysis text-center pt-5"
   >
     No {{ kind }} transactions for this period
   </p>
@@ -13,6 +13,7 @@
       :window-height="windowHeight"
       :category-breakdown="breakdown"
       :currency="currency"
+      :dark="dark"
     />
     <p class="text-subtitle-2 ml-2 mb-0 mt-1 text-capitalize">{{ kind }} breakdown</p>
     <categories-breakdown
@@ -57,6 +58,10 @@ export default {
     },
     totalAmount: {
       type: String,
+      required: true
+    },
+    dark: {
+      type: Boolean,
       required: true
     }
   },

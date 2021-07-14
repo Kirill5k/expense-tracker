@@ -37,7 +37,7 @@ export default {
   props: {
     dark: {
       type: Boolean,
-      default: false
+      required: true
     },
     windowHeight: {
       type: Number,
@@ -71,24 +71,18 @@ export default {
       return {
         tooltip: {
           trigger: 'item',
-          formatter: '{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-          data: [
-            'Direct',
-            'Email',
-            'Ad Networks',
-            'Video Ads',
-            'Search Engines'
-          ]
+          formatter: `{b}: ${this.currency.symbol}{c} ({d}%)`,
+          confine: true,
+          borderWidth: 0,
+          padding: 4,
+          className: 'text-subtitle-2'
         },
         series: [
           {
+            zlevel: 10,
             name: 'Categories Breakdown',
             type: 'pie',
-            radius: '80%',
+            radius: '75%',
             center: ['50%', '50%'],
             data: this.categoryBreakdown.map(c => ({ value: c.total, name: c.name, icon: c.icon, color: c.color })),
             emphasis: {
@@ -97,6 +91,17 @@ export default {
                 shadowOffsetX: 0,
                 shadowColor: 'rgba(0, 0, 0, 0.5)'
               }
+            },
+            label: {
+              color: this.dark ? 'white' : '#424242',
+              fontSize: 10,
+              position: 'outer',
+              alignTo: 'none',
+              edgeDistance: '0%',
+              bleedMargin: 0
+            },
+            itemStyle: {
+              color: ({ data }) => data.color
             }
           }
         ]
