@@ -70,13 +70,29 @@
         <v-tab-item
           :key="1"
         >
-          <p>Earnings</p>
+          <v-card-text
+            v-if="!$store.getters.incomeTransactions.length"
+            class="text-center"
+          >
+            No income transactions for this period
+          </v-card-text>
+          <p v-else>
+            Earnings
+          </p>
         </v-tab-item>
 
         <v-tab-item
           :key="2"
         >
-          <p>Spending</p>
+          <v-card-text
+            v-if="!$store.getters.expenseTransactions.length"
+            class="text-center"
+          >
+            No expense transactions for this period
+          </v-card-text>
+          <p v-else>
+            Spending
+          </p>
         </v-tab-item>
       </v-tabs-items>
     </v-card-text>
