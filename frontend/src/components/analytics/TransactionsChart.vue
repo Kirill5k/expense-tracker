@@ -16,9 +16,9 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, TitleComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
+import { GridComponent, TooltipComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
 
-use([CanvasRenderer, BarChart, LineChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent, ToolboxComponent])
+use([CanvasRenderer, BarChart, LineChart, GridComponent, TooltipComponent, LegendComponent, ToolboxComponent])
 
 const WEEKLY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHLY_LABELS = ['1-7', '8-14', '15-21', '22-28', '29-31']
@@ -37,16 +37,12 @@ export default {
       type: Boolean,
       default: false
     },
-    currentItems: {
+    incomeTransactions: {
       type: Array,
       required: true
     },
-    previousItems: {
+    expenseTransactions: {
       type: Array,
-      required: true
-    },
-    categories: {
-      type: Object,
       required: true
     },
     currency: {
@@ -55,10 +51,6 @@ export default {
     },
     displayDate: {
       type: Object,
-      required: true
-    },
-    totalAmount: {
-      type: [String, Number],
       required: true
     },
     windowHeight: {
@@ -91,62 +83,17 @@ export default {
       }
     },
     yAxisCurrentData () {
-      return this.groupItemsByDate(this.currentItems)
+      return this.groupItemsByDate(this.incomeTransactions)
     },
     yAxisPreviousData () {
-      return this.groupItemsByDate(this.previousItems)
-    },
-    spendingDifference () {
-      if (this.displayDate.index < 0) {
-        return (Number(this.totalAmount) - Number(this.totalSpent(this.previousItems))).toFixed(2)
-      } else if (this.displayDate.index === 0) {
-        const currentGroup = this.getDateGroup(new Date())
-        const currentSpend = this.totalSpent(this.currentItems.filter(tx => this.getItemGroup(tx) <= currentGroup))
-        const previousSpend = this.totalSpent(this.previousItems.filter(tx => this.getItemGroup(tx) <= currentGroup))
-        return (Number(currentSpend) - Number(previousSpend)).toFixed(2)
-      } else {
-        return 0
-      }
-    },
-    subtext () {
-      if (this.displayDate.index > 0 || this.spendingDifference === '0.00') {
-        return 'Total spend'
-      } else if (this.spendingDifference < 0) {
-        return `Total spend {up|↓}{a|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
-      } else {
-        return `Total spend {down|↑}{b|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
-      }
-    },
-    period () {
-      if (this.displayDate.range === 'weekly') {
-        return 'week'
-      } else if (this.displayDate.range === 'monthly') {
-        return 'month'
-      } else {
-        return 'year'
-      }
+      return this.groupItemsByDate(this.expenseTransactions)
     },
     option () {
       return {
         grid: {
           left: '5%',
-          bottom: '10%',
-          top: '25%'
-        },
-        title: {
-          textStyle: { color: this.dark ? 'white' : '#424242' },
-          itemGap: 5,
-          padding: [15, 0, 5, 10],
-          text: `${this.currency.symbol}${this.totalAmount}`,
-          subtext: this.subtext,
-          subtextStyle: {
-            rich: {
-              a: { fontSize: 12, fontWeight: 'bold', color: 'green' },
-              b: { fontSize: 12, fontWeight: 'bold', color: 'red' },
-              down: { color: 'red', fontWeight: '1000', fontSize: 20, padding: [-3, 1, -3, 1] },
-              up: { color: 'green', fontWeight: '1000', fontSize: 20, padding: [-3, 1, -3, 1] }
-            }
-          }
+          bottom: '24%',
+          top: '12%'
         },
         tooltip: {
           trigger: 'axis',
@@ -158,7 +105,7 @@ export default {
             magicType: { show: true, type: ['line', 'bar'] }
           },
           right: '2%',
-          top: '5%'
+          bottom: '0%'
         },
         xAxis: [{
           type: 'category',

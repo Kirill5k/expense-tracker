@@ -46,16 +46,13 @@
           :key="0"
         >
           <transactions-chart
+            :key="$store.state.displayDate.text"
             :window-height="$vuetify.breakpoint.height"
             :dark="$vuetify.theme.dark"
-            v-if="$store.state.displayDate.previous"
-            :key="$store.state.displayDate.text"
             :display-date="$store.state.displayDate"
             :currency="$store.state.user.settings.currency"
-            :categories="$store.getters.catsByIds"
-            :current-items="$store.getters.expenseTransactions.current"
-            :previous-items="$store.getters.expenseTransactions.previous"
-            :total-amount="$store.getters.totalSpent"
+            :income-transactions="$store.getters.incomeTransactions"
+            :expense-transactions="$store.getters.expenseTransactions"
           />
         </v-tab-item>
 
@@ -84,7 +81,7 @@
             :window-height="$vuetify.breakpoint.height"
             :categories="$store.getters.catsByIds"
             :total-amount="$store.getters.totalSpent"
-            :transactions="$store.getters.expenseTransactions.current"
+            :transactions="$store.getters.expenseTransactions"
             :dark="$vuetify.theme.dark"
           />
         </v-tab-item>

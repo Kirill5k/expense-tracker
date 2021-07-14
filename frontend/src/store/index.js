@@ -64,16 +64,10 @@ export default new Vuex.Store({
       .filter(t => t.hidden !== true)
       .filter(t => t.amount.currency.code === state.user.settings.currency.code)
       .filter(t => state.user.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
-    displayedTransactions: (state, getters) => ({
-      current: withinDates(getters.filteredTransactions, state.displayDate),
-      previous: withinDates(getters.filteredTransactions, state.displayDate.previous || {})
-    }),
-    expenseTransactions: (state, getters) => ({
-      current: getters.displayedTransactions.current.filter(t => t.kind === 'expense'),
-      previous: getters.displayedTransactions.previous.filter(t => t.kind === 'expense')
-    }),
-    totalSpent: (state, getters) => totalAmount(getters.expenseTransactions.current),
-    incomeTransactions: (state, getters) => getters.displayedTransactions.current.filter(t => t.kind === 'income'),
+    displayedTransactions: (state, getters) => withinDates(getters.filteredTransactions, state.displayDate),
+    expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'expense'),
+    incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'income'),
+    totalSpent: (state, getters) => totalAmount(getters.expenseTransactions),
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {
