@@ -21,7 +21,7 @@
         @update="updateDisplayDate"
       />
       <transactions-chart
-        :window-height="$store.state.windowHeight"
+        :window-height="$vuetify.breakpoint.height"
         :dark="$vuetify.theme.dark"
         v-if="$store.state.displayDate.previous"
         :key="$store.state.displayDate.text"
@@ -34,7 +34,7 @@
       />
       <p class="text-subtitle-2 ml-2 mb-0 mt-1">Spending breakdown</p>
       <transactions-breakdown
-        :window-height="$store.state.windowHeight"
+        :window-height="$vuetify.breakpoint.height"
         :currency="$store.state.user.settings.currency"
         :categories="$store.getters.catsByIds"
         :items="$store.getters.expenseTransactions.current"

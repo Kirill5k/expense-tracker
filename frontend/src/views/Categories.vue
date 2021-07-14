@@ -94,7 +94,7 @@ export default {
       return this.$store.getters.incomeCats
     },
     windowHeight () {
-      return this.$store.state.windowHeight
+      return this.$vuetify.breakpoint.height
     }
   },
   methods: {

@@ -59,7 +59,6 @@ export default {
     Page
   },
   created () {
-    window.addEventListener('resize', () => this.$store.commit('setWindowHeight', window.innerHeight))
     this.$store.commit('loading')
     this.$store.dispatch('getUser')
   },
@@ -77,9 +76,6 @@ export default {
     },
     darkMode () {
       return this.$store.state.user?.settings?.darkMode
-    },
-    windowHeight () {
-      return this.$store.state.windowHeight
     }
   },
   watch: {

@@ -29,7 +29,7 @@
         :sort-by="$store.state.sortBy"
         :items="transactions"
         :editable="editable"
-        :window-height="$store.state.windowHeight"
+        :window-height="$vuetify.breakpoint.height"
         @edit="edit"
         @delete="remove"
       />

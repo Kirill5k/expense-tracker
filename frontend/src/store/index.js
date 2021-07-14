@@ -49,7 +49,6 @@ const DEFAULT_STATE = {
 
 export default new Vuex.Store({
   state: {
-    windowHeight: window.innerHeight,
     ...DEFAULT_STATE
   },
   getters: {
@@ -78,9 +77,6 @@ export default new Vuex.Store({
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {
-    setWindowHeight (state, newHeight) {
-      state.windowHeight = newHeight
-    },
     sort (state, sortBy) {
       state.sortBy = { ...sortBy }
     },
