@@ -20,7 +20,7 @@ final case class CategoryEntity(
       name = CategoryName(name),
       icon = CategoryIcon(icon),
       color = CategoryColor(color),
-      accountId = accountId.map(uid => UserId(uid.toHexString))
+      userId = accountId.map(uid => UserId(uid.toHexString))
     )
 }
 
@@ -32,7 +32,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      accountId = cat.accountId.map(aid => new ObjectId(aid.value))
+      accountId = cat.userId.map(aid => new ObjectId(aid.value))
     )
 
   def from(cat: CreateCategory): CategoryEntity =

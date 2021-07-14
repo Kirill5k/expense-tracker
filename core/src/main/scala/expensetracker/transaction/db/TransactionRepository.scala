@@ -49,7 +49,7 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def update(tx: Transaction): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(accIdEq(tx.accountId), idEq(tx.id.value)),
+        Filters.and(accIdEq(tx.userId), idEq(tx.id.value)),
         TransactionEntity.from(tx)
       )
       .flatMap(errorIfNull(TransactionDoesNotExist(tx.id)))

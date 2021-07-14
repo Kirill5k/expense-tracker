@@ -25,16 +25,16 @@ final case class SessionActivity(
 )
 
 final case class Session(
-                          id: SessionId,
-                          accountId: UserId,
-                          createdAt: Instant,
-                          active: Boolean,
-                          status: SessionStatus,
-                          lastRecordedActivity: Option[SessionActivity]
+    id: SessionId,
+    userId: UserId,
+    createdAt: Instant,
+    active: Boolean,
+    status: SessionStatus,
+    lastRecordedActivity: Option[SessionActivity]
 )
 
 final case class CreateSession(
-                                accountId: UserId,
-                                ipAddress: Option[IpAddress],
-                                time: Instant
+    accountId: UserId,
+    ipAddress: Option[IpAddress],
+    time: Instant
 )

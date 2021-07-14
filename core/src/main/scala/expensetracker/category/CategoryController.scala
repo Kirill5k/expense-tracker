@@ -41,14 +41,14 @@ final class CategoryController[F[_]: Logger](
     case GET -> Root as session =>
       withErrorHandling {
         service
-          .getAll(session.accountId)
+          .getAll(session.userId)
           .map(_.map(CategoryView.from))
           .flatMap(Ok(_))
       }
     case GET -> Root / CategoryIdPath(cid) as session =>
       withErrorHandling {
         service
-          .get(session.accountId, cid)
+          .get(session.userId, cid)
           .map(CategoryView.from)
           .flatMap(Ok(_))
       }
@@ -56,7 +56,7 @@ final class CategoryController[F[_]: Logger](
       withErrorHandling {
         for {
           req <- authReq.req.as[CreateCategoryRequest]
-          cid <- service.create(req.toDomain(session.accountId))
+          cid <- service.create(req.toDomain(session.userId))
           res <- Created(CreateCategoryResponse(cid.value))
         } yield res
       }
@@ -64,7 +64,7 @@ final class CategoryController[F[_]: Logger](
       withErrorHandling {
         for {
           catView <- F.ensure(authReq.req.as[UpdateCategoryRequest])(IdMismatch)(_.id.value == cid.value)
-          _       <- service.update(catView.toDomain(session.accountId))
+          _       <- service.update(catView.toDomain(session.userId))
           res     <- NoContent()
         } yield res
       }
@@ -72,13 +72,13 @@ final class CategoryController[F[_]: Logger](
       withErrorHandling {
         for {
           req <- authReq.req.as[HideCategoryRequest]
-          _   <- service.hide(session.accountId, cid, req.hidden)
+          _   <- service.hide(session.userId, cid, req.hidden)
           res <- NoContent()
         } yield res
       }
     case DELETE -> Root / CategoryIdPath(cid) as session =>
       withErrorHandling {
-        service.delete(session.accountId, cid) *> NoContent()
+        service.delete(session.userId, cid) *> NoContent()
       }
   }
 
@@ -122,7 +122,7 @@ object CategoryController {
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
         color = CategoryColor(color.value),
-        accountId = Some(aid)
+        userId = Some(aid)
       )
   }
 

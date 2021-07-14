@@ -39,14 +39,14 @@ final class TransactionController[F[_]: Logger](
     case GET -> Root as session =>
       withErrorHandling {
         service
-          .getAll(session.accountId)
+          .getAll(session.userId)
           .map(_.map(TransactionView.from))
           .flatMap(Ok(_))
       }
     case GET -> Root / TransactionIdPath(txid) as session =>
       withErrorHandling {
         service
-          .get(session.accountId, txid)
+          .get(session.userId, txid)
           .map(TransactionView.from)
           .flatMap(Ok(_))
       }
@@ -54,19 +54,19 @@ final class TransactionController[F[_]: Logger](
       withErrorHandling {
         for {
           req <- authReq.req.as[CreateTransactionRequest]
-          cid <- service.create(req.toDomain(session.accountId))
+          cid <- service.create(req.toDomain(session.userId))
           res <- Created(CreateTransactionResponse(cid.value))
         } yield res
       }
     case DELETE -> Root / TransactionIdPath(txid) as session =>
       withErrorHandling {
-        service.delete(session.accountId, txid) *> NoContent()
+        service.delete(session.userId, txid) *> NoContent()
       }
     case authReq @ PUT -> Root / TransactionIdPath(cid) / "hidden" as session =>
       withErrorHandling {
         for {
           req <- authReq.req.as[HideTransactionRequest]
-          _   <- service.hide(session.accountId, cid, req.hidden)
+          _   <- service.hide(session.userId, cid, req.hidden)
           res <- NoContent()
         } yield res
       }
@@ -74,7 +74,7 @@ final class TransactionController[F[_]: Logger](
       withErrorHandling {
         for {
           txView <- F.ensure(authReq.req.as[UpdateTransactionRequest])(IdMismatch)(_.id.value == cid.value)
-          _      <- service.update(txView.toDomain(session.accountId))
+          _      <- service.update(txView.toDomain(session.userId))
           res    <- NoContent()
         } yield res
       }
@@ -142,7 +142,7 @@ object TransactionController {
         id = TransactionId(id.value),
         kind = kind,
         categoryId = CategoryId(categoryId.value),
-        accountId = aid,
+        userId = aid,
         amount = amount,
         date = date,
         note = note

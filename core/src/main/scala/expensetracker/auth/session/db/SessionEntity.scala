@@ -17,7 +17,7 @@ final case class SessionEntity(
   def toDomain: Session =
     Session(
       id = SessionId(_id.toHexString),
-      accountId = UserId(accountId.toHexString),
+      userId = UserId(accountId.toHexString),
       createdAt = createdAt,
       active = active,
       status = status,

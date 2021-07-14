@@ -72,7 +72,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         } yield tx
 
         result.map { tx =>
-          tx.accountId mustBe acc1Id
+          tx.userId mustBe acc1Id
         }
       }
     }

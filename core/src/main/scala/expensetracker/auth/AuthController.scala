@@ -63,12 +63,12 @@ final class AuthController[F[_]: Logger](
     AuthedRoutes.of {
       case GET -> Root / "user" as session =>
         withErrorHandling {
-          service.findUser(session.accountId).map(UserView.from).flatMap(Ok(_))
+          service.findUser(session.userId).map(UserView.from).flatMap(Ok(_))
         }
       case authedReq @ PUT -> Root / "user" / UserIdPath(id) / "settings" as session =>
         withErrorHandling {
           for {
-            _   <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.accountId)
+            _   <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
             req <- authedReq.req.as[UpdateUserSettingsRequest]
             _   <- service.updateSettings(id, req.toDomain)
             res <- NoContent()
@@ -77,7 +77,7 @@ final class AuthController[F[_]: Logger](
       case authedReq @ POST -> Root / "user" / UserIdPath(id) / "password" as session =>
         withErrorHandling {
           for {
-            _    <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.accountId)
+            _    <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
             req  <- authedReq.req.as[ChangePasswordRequest]
             _    <- service.changePassword(req.toDomain(id))
             time <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))

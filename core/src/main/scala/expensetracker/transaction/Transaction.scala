@@ -20,20 +20,20 @@ object TransactionKind {
 }
 
 final case class Transaction(
-                              id: TransactionId,
-                              accountId: UserId,
-                              kind: TransactionKind,
-                              categoryId: CategoryId,
-                              amount: Money,
-                              date: LocalDate,
-                              note: Option[String]
+    id: TransactionId,
+    userId: UserId,
+    kind: TransactionKind,
+    categoryId: CategoryId,
+    amount: Money,
+    date: LocalDate,
+    note: Option[String]
 )
 
 final case class CreateTransaction(
-                                    accountId: UserId,
-                                    kind: TransactionKind,
-                                    categoryId: CategoryId,
-                                    amount: Money,
-                                    date: LocalDate,
-                                    note: Option[String]
+    accountId: UserId,
+    kind: TransactionKind,
+    categoryId: CategoryId,
+    amount: Money,
+    date: LocalDate,
+    note: Option[String]
 )

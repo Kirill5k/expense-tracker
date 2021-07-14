@@ -34,7 +34,7 @@ class AuthControllerSpec extends ControllerSpec {
             |"registrationDate": "2021-06-01T00:00:00Z"
             |}""".stripMargin
         verifyJsonResponse(res, Status.Ok, Some(resBody))
-        verify(svc).findUser(sess.accountId)
+        verify(svc).findUser(sess.userId)
         verifyZeroInteractions(disp)
       }
     }

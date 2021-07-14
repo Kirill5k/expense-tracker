@@ -32,7 +32,7 @@ final case class Category(
     name: CategoryName,
     icon: CategoryIcon,
     color: CategoryColor,
-    accountId: Option[UserId]
+    userId: Option[UserId]
 )
 
 final case class CreateCategory(

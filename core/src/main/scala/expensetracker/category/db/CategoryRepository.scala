@@ -60,7 +60,7 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def update(cat: Category): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(accIdEq(cat.accountId), idEq(cat.id.value)),
+        Filters.and(accIdEq(cat.userId), idEq(cat.id.value)),
         CategoryEntity.from(cat)
       )
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cat.id))(r).void)

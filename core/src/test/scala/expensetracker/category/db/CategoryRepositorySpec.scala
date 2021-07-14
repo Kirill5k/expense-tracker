@@ -50,7 +50,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
           result.map { cat =>
             cat.name mustBe create.name
             cat.icon mustBe create.icon
-            cat.accountId mustBe Some(acc1Id)
+            cat.userId mustBe Some(acc1Id)
             cat.kind mustBe create.kind
           }
         }
@@ -162,7 +162,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
             cats must have size 1
             cats.head.id mustBe cat2Id
             cats.head.name mustBe CategoryName("c2")
-            cats.head.accountId mustBe Some(acc2Id)
+            cats.head.userId mustBe Some(acc2Id)
           }
         }
       }
@@ -180,7 +180,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
           result.map { cats =>
             cats must have size 2
             cats.map(_.name) mustBe List(CategoryName("c2"), CategoryName("c1"))
-            cats.flatMap(_.accountId) mustBe List(acc2Id, acc2Id)
+            cats.flatMap(_.userId) mustBe List(acc2Id, acc2Id)
           }
         }
       }

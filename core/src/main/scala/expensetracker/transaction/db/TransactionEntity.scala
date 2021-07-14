@@ -20,7 +20,7 @@ final case class TransactionEntity(
   def toDomain: Transaction =
     Transaction(
       id = TransactionId(_id.toHexString),
-      accountId = UserId(accountId.toHexString),
+      userId = UserId(accountId.toHexString),
       categoryId = CategoryId(categoryId.toHexString),
       kind = kind,
       amount = amount,
@@ -34,7 +34,7 @@ object TransactionEntity {
   def from(tx: Transaction): TransactionEntity =
     TransactionEntity(
       new ObjectId(tx.id.value),
-      new ObjectId(tx.accountId.value),
+      new ObjectId(tx.userId.value),
       new ObjectId(tx.categoryId.value),
       tx.kind,
       tx.amount,
