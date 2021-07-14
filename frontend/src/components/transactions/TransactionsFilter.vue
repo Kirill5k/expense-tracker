@@ -86,7 +86,6 @@ export default {
   },
   methods: {
     all (selectAll) {
-      console.log(selectAll)
       if (selectAll) {
         this.$emit('filter', this.allCatIds)
       } else {
