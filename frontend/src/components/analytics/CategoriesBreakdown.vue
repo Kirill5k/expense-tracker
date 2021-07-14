@@ -1,8 +1,8 @@
 <template>
   <v-data-table
-    class="transactions-breakdown"
+    class="categories-breakdown"
     :headers="headers"
-    :items="breakdown"
+    :items="categoryBreakdown"
     hide-default-header
     hide-default-footer
     dense
@@ -16,7 +16,7 @@
     <template v-slot:[`item.tx`]="{ item }">
       <v-list-item>
         <v-list-item-avatar
-          :color="categories[item.id].color"
+          :color="item.color"
           size="26"
         >
           <v-icon
@@ -25,18 +25,18 @@
             class="lighten-10"
             dark
           >
-            {{ categories[item.id].icon }}
+            {{ item.icon }}
           </v-icon>
         </v-list-item-avatar>
         <v-list-item-content class="py-2 px-0">
-          <p class="text-subtitle-2 mb-0">{{ categories[item.id].name }}</p>
+          <p class="text-subtitle-2 mb-0">{{ item.name }}</p>
           <p class="text-caption mb-0 font-weight-light">{{ item.count === 1 ? '1 transaction' : `${item.count} transactions` }}</p>
         </v-list-item-content>
       </v-list-item>
     </template>
 
     <template v-slot:[`item.amount`]="{ item }">
-      <div class="transactions-breakdown__amount">
+      <div class="categories-breakdown__amount">
         <v-chip
           small
           outlined
@@ -59,18 +59,14 @@ const DEFAULT_HEADERS = [
 ]
 
 export default {
-  name: 'TransactionsBreakdown',
+  name: 'CategoriesBreakdown',
   props: {
-    items: {
-      type: Array,
-      required: true
-    },
     totalAmount: {
       type: [String, Number],
       required: true
     },
-    categories: {
-      type: Object,
+    categoryBreakdown: {
+      type: Array,
       required: true
     },
     currency: {
@@ -86,18 +82,6 @@ export default {
     headers: DEFAULT_HEADERS
   }),
   computed: {
-    breakdown () {
-      const grouped = this.items.reduce((acc, tx) => {
-        const catId = tx.categoryId
-        if (!acc[catId]) {
-          acc[catId] = { count: 0, total: 0, id: catId }
-        }
-        acc[catId] = { id: catId, count: acc[catId].count + 1, total: tx.amount.value + acc[catId].total }
-        return acc
-      }, {})
-
-      return Object.values(grouped).sort((a, b) => b.total - a.total)
-    },
     height () {
       if (this.windowHeight < 600) {
         return 170
@@ -120,7 +104,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.transactions-breakdown {
+.categories-breakdown {
 
   &__amount {
     display: flex;

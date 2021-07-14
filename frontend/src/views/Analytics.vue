@@ -57,48 +57,34 @@
             :previous-items="$store.getters.expenseTransactions.previous"
             :total-amount="$store.getters.totalSpent"
           />
-          <p class="text-subtitle-2 ml-2 mb-0 mt-1">Spending breakdown</p>
-          <transactions-breakdown
-            :window-height="$vuetify.breakpoint.height"
-            :currency="$store.state.user.settings.currency"
-            :categories="$store.getters.catsByIds"
-            :items="$store.getters.expenseTransactions.current"
-            :total-amount="$store.getters.totalSpent"
-          />
         </v-tab-item>
 
         <v-tab-item
           :key="1"
         >
-          <v-card-text
-            v-if="!$store.getters.incomeTransactions.length"
-            class="text-center"
-          >
-            No income transactions for this period
-          </v-card-text>
-          <p v-else>
-            Earnings
-          </p>
+          <category-analysis
+            :key="$store.state.displayDate.text"
+            kind="income"
+            :currency="$store.state.user.settings.currency"
+            :window-height="$vuetify.breakpoint.height"
+            :categories="$store.getters.catsByIds"
+            :total-amount="$store.getters.totalEarned"
+            :transactions="$store.getters.incomeTransactions"
+          />
         </v-tab-item>
 
         <v-tab-item
           :key="2"
         >
-          <v-card-text
-            v-if="!$store.getters.expenseTransactions.current.length"
-            class="text-center"
-          >
-            No expense transactions for this period
-          </v-card-text>
-          <p v-else>
-            <categories-chart
-              :window-height="$vuetify.breakpoint.height"
-              :currency="$store.state.user.settings.currency"
-              :categories="$store.getters.catsByIds"
-              :items="$store.getters.expenseTransactions.current"
-              :total-amount="$store.getters.totalSpent"
-            />
-          </p>
+          <category-analysis
+            :key="$store.state.displayDate.text"
+            kind="expense"
+            :currency="$store.state.user.settings.currency"
+            :window-height="$vuetify.breakpoint.height"
+            :categories="$store.getters.catsByIds"
+            :total-amount="$store.getters.totalSpent"
+            :transactions="$store.getters.expenseTransactions.current"
+          />
         </v-tab-item>
       </v-tabs-items>
     </v-card-text>
@@ -118,20 +104,18 @@
 <script>
 import DatePeriodSelector from '@/components/DatePeriodSelector'
 import TransactionsChart from '@/components/analytics/TransactionsChart'
-import CategoriesChart from '@/components/analytics/CategoriesChart'
-import TransactionsBreakdown from '@/components/analytics/TransactionsBreakdown'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import TransactionsFilter from '@/components/transactions/TransactionsFilter'
+import CategoryAnalysis from '@/components/analytics/CategoryAnalysis'
 
 export default {
   name: 'Analytics',
   components: {
+    CategoryAnalysis,
     DatePeriodSelector,
-    TransactionsBreakdown,
     TransactionsChart,
     NewTransactionDialog,
-    TransactionsFilter,
-    CategoriesChart
+    TransactionsFilter
   },
   data: () => ({
     loading: false,

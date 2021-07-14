@@ -39,32 +39,16 @@ export default {
       type: Boolean,
       default: false
     },
-    currentItems: {
-      type: Array,
+    windowHeight: {
+      type: Number,
       required: true
     },
-    previousItems: {
+    categoryBreakdown: {
       type: Array,
-      required: true
-    },
-    categories: {
-      type: Object,
       required: true
     },
     currency: {
       type: Object,
-      required: true
-    },
-    displayDate: {
-      type: Object,
-      required: true
-    },
-    totalAmount: {
-      type: [String, Number],
-      required: true
-    },
-    windowHeight: {
-      type: Number,
       required: true
     }
   },
@@ -85,13 +69,9 @@ export default {
     },
     option () {
       return {
-        title: {
-          text: 'Traffic Sources',
-          left: 'center'
-        },
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
+          formatter: '{b} : {c} ({d}%)'
         },
         legend: {
           orient: 'vertical',
@@ -106,17 +86,11 @@ export default {
         },
         series: [
           {
-            name: 'Traffic Sources',
+            name: 'Categories Breakdown',
             type: 'pie',
-            radius: '55%',
-            center: ['50%', '60%'],
-            data: [
-              { value: 335, name: 'Direct' },
-              { value: 310, name: 'Email' },
-              { value: 234, name: 'Ad Networks' },
-              { value: 135, name: 'Video Ads' },
-              { value: 1548, name: 'Search Engines' }
-            ],
+            radius: '80%',
+            center: ['50%', '50%'],
+            data: this.categoryBreakdown.map(c => ({ value: c.total, name: c.name, icon: c.icon, color: c.color })),
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -130,41 +104,6 @@ export default {
     }
   },
   methods: {
-    getItemGroup (item) {
-      return this.getDateGroup(new Date(item.date))
-    },
-    getDateGroup (date) {
-      switch (this.displayDate.range) {
-        case 'yearly':
-          return date.getMonth()
-        case 'weekly':
-          return date.getDay()
-        default:
-          return Math.floor((date.getDate() - 1) / 7)
-      }
-    },
-    groupItemsByDate (items) {
-      const data = new Array(this.xAxisData.length).fill(0)
-      return items
-        .reduce((acc, i) => {
-          const group = this.getItemGroup(i)
-          acc[group] = acc[group] + i.amount.value
-          return acc
-        }, data)
-        .map(i => i.toFixed(2))
-    },
-    formatYAxisLabel (value) {
-      if (value >= 1000000) {
-        return (value / 1000000).toFixed(1) + 'M'
-      }
-      if (value >= 1000) {
-        return (value / 1000).toFixed(1) + 'K'
-      }
-      return value
-    },
-    totalSpent (txs) {
-      return txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
-    }
   }
 }
 </script>
