@@ -76,7 +76,7 @@ export default {
       return this.$store.state.isAuthenticated
     },
     darkMode () {
-      return this.$store.state.settings?.settings?.darkMode
+      return this.$store.state.user?.settings?.darkMode
     },
     windowHeight () {
       return this.$store.state.windowHeight
