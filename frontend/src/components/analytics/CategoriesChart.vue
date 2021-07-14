@@ -15,14 +15,16 @@
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, LineChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, TitleComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
+import { PieChart } from 'echarts/charts'
+import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 
-use([CanvasRenderer, BarChart, LineChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent, ToolboxComponent])
-
-const WEEKLY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHLY_LABELS = ['1-7', '8-14', '15-21', '22-28', '29-31']
-const YEARLY_LABELS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+use([
+  CanvasRenderer,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent
+])
 
 export default {
   name: 'CategoriesChart',
@@ -81,143 +83,46 @@ export default {
         return 240
       }
     },
-    xAxisData () {
-      if (this.displayDate.range === 'weekly') {
-        return WEEKLY_LABELS
-      } else if (this.displayDate.range === 'monthly') {
-        return MONTHLY_LABELS
-      } else {
-        return YEARLY_LABELS
-      }
-    },
-    yAxisCurrentData () {
-      return this.groupItemsByDate(this.currentItems)
-    },
-    yAxisPreviousData () {
-      return this.groupItemsByDate(this.previousItems)
-    },
-    spendingDifference () {
-      if (this.displayDate.index < 0) {
-        return (Number(this.totalAmount) - Number(this.totalSpent(this.previousItems))).toFixed(2)
-      } else if (this.displayDate.index === 0) {
-        const currentGroup = this.getDateGroup(new Date())
-        const currentSpend = this.totalSpent(this.currentItems.filter(tx => this.getItemGroup(tx) <= currentGroup))
-        const previousSpend = this.totalSpent(this.previousItems.filter(tx => this.getItemGroup(tx) <= currentGroup))
-        return (Number(currentSpend) - Number(previousSpend)).toFixed(2)
-      } else {
-        return 0
-      }
-    },
-    subtext () {
-      if (this.displayDate.index > 0 || this.spendingDifference === '0.00') {
-        return 'Total spend'
-      } else if (this.spendingDifference < 0) {
-        return `Total spend {up|↓}{a|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
-      } else {
-        return `Total spend {down|↑}{b|${this.currency.symbol}${Math.abs(this.spendingDifference)}}`
-      }
-    },
-    period () {
-      if (this.displayDate.range === 'weekly') {
-        return 'week'
-      } else if (this.displayDate.range === 'monthly') {
-        return 'month'
-      } else {
-        return 'year'
-      }
-    },
     option () {
       return {
-        grid: {
-          left: '5%',
-          bottom: '10%',
-          top: '25%'
-        },
         title: {
-          textStyle: { color: this.dark ? 'white' : '#424242' },
-          itemGap: 5,
-          padding: [15, 0, 5, 10],
-          text: `${this.currency.symbol}${this.totalAmount}`,
-          subtext: this.subtext,
-          subtextStyle: {
-            rich: {
-              a: { fontSize: 12, fontWeight: 'bold', color: 'green' },
-              b: { fontSize: 12, fontWeight: 'bold', color: 'red' },
-              down: { color: 'red', fontWeight: '1000', fontSize: 20, padding: [-3, 1, -3, 1] },
-              up: { color: 'green', fontWeight: '1000', fontSize: 20, padding: [-3, 1, -3, 1] }
-            }
-          }
+          text: 'Traffic Sources',
+          left: 'center'
         },
         tooltip: {
-          trigger: 'axis',
-          axisPointer: { type: 'shadow' }
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-        toolbox: {
-          show: true,
-          feature: {
-            magicType: { show: true, type: ['line', 'bar'] }
-          },
-          right: '2%',
-          top: '5%'
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+          data: [
+            'Direct',
+            'Email',
+            'Ad Networks',
+            'Video Ads',
+            'Search Engines'
+          ]
         },
-        xAxis: [{
-          type: 'category',
-          axisTick: { show: true, alignWithLabel: true },
-          data: this.xAxisData
-        }],
-        yAxis: [{
-          type: 'value',
-          boundaryGap: ['0%', '0%'],
-          splitNumber: 2,
-          position: 'right',
-          axisLine: { show: false },
-          axisLabel: {
-            show: true,
-            margin: 0,
-            formatter: (value) => `${this.currency.symbol}${this.formatYAxisLabel(value)}`,
-            showMaxLabel: true
-          },
-          splitLine: { show: true }
-        }],
         series: [
           {
-            name: this.displayDate.text,
-            type: 'bar',
-            showBackground: true,
-            barGap: -0.1,
-            barCategoryGap: '25%',
-            zlevel: 10,
-            label: { show: false },
-            emphasis: { focus: 'series' },
-            data: this.yAxisCurrentData,
-            itemStyle: {
-              color: '#6200EE',
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-              shadowBlur: 10,
-              shadowOffsetX: 5,
-              shadowOffsetY: 2
-            },
-            markLine: {
-              data: [{ type: 'average', name: 'Average' }]
-            }
-          },
-          {
-            name: this.displayDate.previous.text,
-            type: 'bar',
-            zlevel: 1,
-            showBackground: true,
-            label: { show: false },
-            emphasis: { focus: 'series' },
-            data: this.yAxisPreviousData,
-            itemStyle: {
-              color: 'rgba(3, 218, 198, 0.6)',
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-              shadowBlur: 10,
-              shadowOffsetX: 5,
-              shadowOffsetY: 2
-            },
-            markLine: {
-              data: [{ type: 'average', name: 'Average' }]
+            name: 'Traffic Sources',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [
+              { value: 335, name: 'Direct' },
+              { value: 310, name: 'Email' },
+              { value: 234, name: 'Ad Networks' },
+              { value: 135, name: 'Video Ads' },
+              { value: 1548, name: 'Search Engines' }
+            ],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
             }
           }
         ]

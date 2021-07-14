@@ -85,13 +85,19 @@
           :key="2"
         >
           <v-card-text
-            v-if="!$store.getters.expenseTransactions.length"
+            v-if="!$store.getters.expenseTransactions.current.length"
             class="text-center"
           >
             No expense transactions for this period
           </v-card-text>
           <p v-else>
-            Spending
+            <categories-chart
+              :window-height="$vuetify.breakpoint.height"
+              :currency="$store.state.user.settings.currency"
+              :categories="$store.getters.catsByIds"
+              :items="$store.getters.expenseTransactions.current"
+              :total-amount="$store.getters.totalSpent"
+            />
           </p>
         </v-tab-item>
       </v-tabs-items>
@@ -112,6 +118,7 @@
 <script>
 import DatePeriodSelector from '@/components/DatePeriodSelector'
 import TransactionsChart from '@/components/analytics/TransactionsChart'
+import CategoriesChart from '@/components/analytics/CategoriesChart'
 import TransactionsBreakdown from '@/components/analytics/TransactionsBreakdown'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import TransactionsFilter from '@/components/transactions/TransactionsFilter'
@@ -123,7 +130,8 @@ export default {
     TransactionsBreakdown,
     TransactionsChart,
     NewTransactionDialog,
-    TransactionsFilter
+    TransactionsFilter,
+    CategoriesChart
   },
   data: () => ({
     loading: false,
