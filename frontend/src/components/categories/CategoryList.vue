@@ -132,7 +132,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .category-list {
   &__icon {
     width: 20px;
