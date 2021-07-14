@@ -1,5 +1,5 @@
 <template>
-  <div class="transactions-chart">
+  <div class="categories-chart">
     <figure>
       <v-chart
         :init-options="initOptions"
@@ -25,7 +25,7 @@ const MONTHLY_LABELS = ['1-7', '8-14', '15-21', '22-28', '29-31']
 const YEARLY_LABELS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
 
 export default {
-  name: 'TransactionsChart',
+  name: 'CategoriesChart',
   components: {
     VChart
   },
@@ -265,7 +265,7 @@ export default {
 </script>
 
 <style lang="scss">
-.transactions-chart {
+.categories-chart {
 
 }
 </style>
