@@ -23,7 +23,7 @@
     </v-card-text>
 
     <v-tabs
-      class="mt-2"
+      class="mt-4"
       height="24"
       v-model="tab"
       grow
@@ -36,7 +36,7 @@
         Earnings
       </v-tab>
       <v-tab class="analytics__tab">
-        Spending
+        Spendings
       </v-tab>
     </v-tabs>
 
@@ -45,7 +45,7 @@
         <v-tab-item
           :key="0"
         >
-          <transactions-chart
+          <balance-analysis
             :key="$store.state.displayDate.text"
             :window-height="$vuetify.breakpoint.height"
             :dark="$vuetify.theme.dark"
@@ -53,6 +53,8 @@
             :currency="$store.state.user.settings.currency"
             :income-transactions="$store.getters.incomeTransactions"
             :expense-transactions="$store.getters.expenseTransactions"
+            :total-earned="$store.getters.totalEarned"
+            :total-spent="$store.getters.totalSpent"
           />
         </v-tab-item>
 
@@ -102,17 +104,17 @@
 
 <script>
 import DatePeriodSelector from '@/components/DatePeriodSelector'
-import TransactionsChart from '@/components/analytics/TransactionsChart'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 import CategoryAnalysis from '@/components/analytics/CategoryAnalysis'
+import BalanceAnalysis from '@/components/analytics/BalanceAnalysis'
 
 export default {
   name: 'Analytics',
   components: {
+    BalanceAnalysis,
     CategoryAnalysis,
     DatePeriodSelector,
-    TransactionsChart,
     NewTransactionDialog,
     TransactionsFilter
   },

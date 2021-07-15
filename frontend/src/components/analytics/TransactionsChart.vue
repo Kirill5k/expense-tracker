@@ -82,10 +82,10 @@ export default {
         return YEARLY_LABELS
       }
     },
-    yAxisCurrentData () {
+    yAxisIncomeTx () {
       return this.groupItemsByDate(this.incomeTransactions)
     },
-    yAxisPreviousData () {
+    yAxisExpenseTx () {
       return this.groupItemsByDate(this.expenseTransactions)
     },
     option () {
@@ -97,7 +97,11 @@ export default {
         },
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'shadow' }
+          axisPointer: { type: 'shadow' },
+          confine: true,
+          borderWidth: 0,
+          padding: 8,
+          className: 'text-subtitle-2'
         },
         toolbox: {
           show: true,
@@ -128,7 +132,7 @@ export default {
         }],
         series: [
           {
-            name: this.displayDate.text,
+            name: 'Spent',
             type: 'bar',
             showBackground: true,
             barGap: -0.1,
@@ -136,7 +140,7 @@ export default {
             zlevel: 10,
             label: { show: false },
             emphasis: { focus: 'series' },
-            data: this.yAxisCurrentData,
+            data: this.yAxisExpenseTx,
             itemStyle: {
               color: '#6200EE',
               shadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -149,15 +153,15 @@ export default {
             }
           },
           {
-            name: this.displayDate.previous.text,
+            name: 'Earned',
             type: 'bar',
             zlevel: 1,
             showBackground: true,
             label: { show: false },
             emphasis: { focus: 'series' },
-            data: this.yAxisPreviousData,
+            data: this.yAxisIncomeTx,
             itemStyle: {
-              color: 'rgba(3, 218, 198, 0.6)',
+              color: '#03DAC6',
               shadowColor: 'rgba(0, 0, 0, 0.5)',
               shadowBlur: 10,
               shadowOffsetX: 5,
