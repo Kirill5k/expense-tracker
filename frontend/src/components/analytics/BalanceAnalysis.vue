@@ -17,11 +17,11 @@
     <v-card-subtitle class="pb-1 pt-2">
       Balance for this period
     </v-card-subtitle>
-    <div class="d-flex justify-space-between">
-      <v-card-subtitle class="pt-0">
+    <div class="d-flex justify-space-between align-content-end">
+      <v-card-subtitle class="py-0">
         Earned {{currency.symbol}}{{totalEarned}}
       </v-card-subtitle>
-      <v-card-subtitle class="pt-0">
+      <v-card-subtitle class="py-0">
         Spent {{currency.symbol}}{{totalSpent}}
       </v-card-subtitle>
     </div>
