@@ -105,7 +105,6 @@ export default {
 
 <style lang="scss" scoped>
 .categories-breakdown {
-
   &__amount {
     display: flex;
     flex-direction: column;

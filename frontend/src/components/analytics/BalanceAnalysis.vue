@@ -17,6 +17,9 @@
     <v-card-subtitle class="pb-1 pt-2">
       Balance for this period
     </v-card-subtitle>
+    <v-card-text class="py-1">
+      <v-divider></v-divider>
+    </v-card-text>
     <div class="d-flex justify-space-between align-content-end">
       <v-card-subtitle class="py-0">
         Earned {{currency.symbol}}{{totalEarned}}
@@ -89,7 +92,7 @@ export default {
 .balance-analysis {
 
   &__current-balance {
-    margin-top: -40px;
+    margin-top: -30px;
   }
 }
 </style>
