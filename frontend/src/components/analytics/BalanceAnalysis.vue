@@ -11,7 +11,7 @@
       :income-transactions="incomeTransactions"
       :expense-transactions="expenseTransactions"
     />
-    <v-card-title class="py-0">
+    <v-card-title class="balance-analysis__current-balance py-0">
       {{sign}}{{currency.symbol}}{{balance}}
     </v-card-title>
     <v-card-subtitle class="pb-1 pt-2">
@@ -88,5 +88,8 @@ export default {
 <style lang="scss">
 .balance-analysis {
 
+  &__current-balance {
+    margin-top: -40px;
+  }
 }
 </style>
