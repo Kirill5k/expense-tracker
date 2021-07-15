@@ -30,21 +30,20 @@
             v-model="valid"
             lazy-validation
           >
-            <v-radio-group
-              hide-details
+            <v-btn-toggle
+              borderless
               dense
+              tile
               v-model="newCategory.kind"
-              row
+              mandatory
             >
-              <v-radio
-                label="Expense"
-                value="expense"
-              ></v-radio>
-              <v-radio
-                label="Income"
-                value="income"
-              ></v-radio>
-            </v-radio-group>
+              <v-btn small value="expense">
+                Expense
+              </v-btn>
+              <v-btn small value="income">
+                Income
+              </v-btn>
+            </v-btn-toggle>
             <v-text-field
               name="name"
               v-model="newCategory.name"
