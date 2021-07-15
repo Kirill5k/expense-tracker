@@ -1,5 +1,5 @@
 <template>
-  <div class="transactions-chart">
+  <div class="transactions-chart ml-4 mr-5">
     <figure>
       <v-chart
         :init-options="initOptions"
@@ -66,11 +66,9 @@ export default {
   computed: {
     canvasHeight () {
       if (this.windowHeight < 600) {
-        return 120
-      } else if (this.windowHeight < 700) {
         return 200
       } else {
-        return 240
+        return 280
       }
     },
     xAxisData () {
@@ -91,7 +89,7 @@ export default {
     option () {
       return {
         grid: {
-          left: '5%',
+          left: '0%',
           bottom: '24%',
           top: '12%'
         },

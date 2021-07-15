@@ -141,7 +141,7 @@ export default {
       if (this.items.length === 0) {
         return 130
       } else {
-        const h = this.windowHeight - 250
+        const h = this.windowHeight - 220
         return h > 550 ? 550 : h
       }
     }

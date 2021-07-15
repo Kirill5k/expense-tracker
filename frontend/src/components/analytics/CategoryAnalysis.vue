@@ -1,10 +1,10 @@
 <template>
-  <p
+  <v-card-subtitle
     v-if="!transactions.length"
     class="category-analysis text-center pt-5"
   >
     No {{ kind }} transactions for this period
-  </p>
+  </v-card-subtitle>
   <div
     v-else
     class="category-analysis"
@@ -15,13 +15,15 @@
       :currency="currency"
       :dark="dark"
     />
-    <p class="text-subtitle-2 ml-2 mb-0 mt-1 text-capitalize">{{ kind }} breakdown</p>
-    <categories-breakdown
-      :window-height="windowHeight"
-      :currency="currency"
-      :category-breakdown="breakdown"
-      :total-amount="totalAmount"
-    />
+    <v-card-text class="pt-0">
+      <p class="text-subtitle-2 ml-2 mb-0 mt-1 text-capitalize">{{ kind }} breakdown</p>
+      <categories-breakdown
+        :window-height="windowHeight"
+        :currency="currency"
+        :category-breakdown="breakdown"
+        :total-amount="totalAmount"
+      />
+    </v-card-text>
   </div>
 </template>
 

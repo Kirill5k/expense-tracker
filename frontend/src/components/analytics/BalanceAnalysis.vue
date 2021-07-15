@@ -11,24 +11,29 @@
       :income-transactions="incomeTransactions"
       :expense-transactions="expenseTransactions"
     />
-    <balance-breakdown
-      :window-height="windowHeight"
-      :dark="dark"
-      :currency="currency"
-      :total-earned="totalEarned"
-      :total-spent="totalSpent"
-    />
+    <v-card-title class="py-0">
+      {{sign}}{{currency.symbol}}{{balance}}
+    </v-card-title>
+    <v-card-subtitle class="pb-1 pt-2">
+      Balance for this period
+    </v-card-subtitle>
+    <div class="d-flex justify-space-between">
+      <v-card-subtitle class="pt-0">
+        Earned {{currency.symbol}}{{totalEarned}}
+      </v-card-subtitle>
+      <v-card-subtitle class="pt-0">
+        Spent {{currency.symbol}}{{totalSpent}}
+      </v-card-subtitle>
+    </div>
   </div>
 </template>
 
 <script>
 import TransactionsChart from '@/components/analytics/TransactionsChart'
-import BalanceBreakdown from '@/components/analytics/BalanceBreakdown'
 
 export default {
   name: 'BalanceAnalysis',
   components: {
-    BalanceBreakdown,
     TransactionsChart
   },
   props: {
@@ -66,6 +71,16 @@ export default {
     }
   },
   computed: {
+    sign () {
+      if (this.totalSpent > this.totalEarned) {
+        return '-'
+      } else {
+        return ''
+      }
+    },
+    balance () {
+      return Math.abs(Number(this.totalEarned) - Number(this.totalSpent))
+    }
   }
 }
 </script>

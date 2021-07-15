@@ -84,13 +84,13 @@ export default {
   computed: {
     height () {
       if (this.windowHeight < 600) {
-        return 170
+        return 185
       } else if (this.windowHeight < 700) {
-        return 195
+        return 210
       } else if (this.windowHeight < 800) {
-        return 220
+        return 235
       } else {
-        return 290
+        return 305
       }
     }
   },

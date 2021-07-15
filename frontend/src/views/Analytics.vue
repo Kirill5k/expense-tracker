@@ -40,55 +40,53 @@
       </v-tab>
     </v-tabs>
 
-    <v-card-text class="pt-0">
-      <v-tabs-items v-model="tab">
-        <v-tab-item
-          :key="0"
-        >
-          <balance-analysis
-            :key="$store.state.displayDate.text"
-            :window-height="$vuetify.breakpoint.height"
-            :dark="$vuetify.theme.dark"
-            :display-date="$store.state.displayDate"
-            :currency="$store.state.user.settings.currency"
-            :income-transactions="$store.getters.incomeTransactions"
-            :expense-transactions="$store.getters.expenseTransactions"
-            :total-earned="$store.getters.totalEarned"
-            :total-spent="$store.getters.totalSpent"
-          />
-        </v-tab-item>
+    <v-tabs-items v-model="tab">
+      <v-tab-item
+        :key="0"
+      >
+        <balance-analysis
+          :key="$store.state.displayDate.text"
+          :window-height="$vuetify.breakpoint.height"
+          :dark="$vuetify.theme.dark"
+          :display-date="$store.state.displayDate"
+          :currency="$store.state.user.settings.currency"
+          :income-transactions="$store.getters.incomeTransactions"
+          :expense-transactions="$store.getters.expenseTransactions"
+          :total-earned="$store.getters.totalEarned"
+          :total-spent="$store.getters.totalSpent"
+        />
+      </v-tab-item>
 
-        <v-tab-item
-          :key="1"
-        >
-          <category-analysis
-            :key="$store.state.displayDate.text"
-            kind="income"
-            :currency="$store.state.user.settings.currency"
-            :window-height="$vuetify.breakpoint.height"
-            :categories="$store.getters.catsByIds"
-            :total-amount="$store.getters.totalEarned"
-            :transactions="$store.getters.incomeTransactions"
-            :dark="$vuetify.theme.dark"
-          />
-        </v-tab-item>
+      <v-tab-item
+        :key="1"
+      >
+        <category-analysis
+          :key="$store.state.displayDate.text"
+          kind="income"
+          :currency="$store.state.user.settings.currency"
+          :window-height="$vuetify.breakpoint.height"
+          :categories="$store.getters.catsByIds"
+          :total-amount="$store.getters.totalEarned"
+          :transactions="$store.getters.incomeTransactions"
+          :dark="$vuetify.theme.dark"
+        />
+      </v-tab-item>
 
-        <v-tab-item
-          :key="2"
-        >
-          <category-analysis
-            :key="$store.state.displayDate.text"
-            kind="expense"
-            :currency="$store.state.user.settings.currency"
-            :window-height="$vuetify.breakpoint.height"
-            :categories="$store.getters.catsByIds"
-            :total-amount="$store.getters.totalSpent"
-            :transactions="$store.getters.expenseTransactions"
-            :dark="$vuetify.theme.dark"
-          />
-        </v-tab-item>
-      </v-tabs-items>
-    </v-card-text>
+      <v-tab-item
+        :key="2"
+      >
+        <category-analysis
+          :key="$store.state.displayDate.text"
+          kind="expense"
+          :currency="$store.state.user.settings.currency"
+          :window-height="$vuetify.breakpoint.height"
+          :categories="$store.getters.catsByIds"
+          :total-amount="$store.getters.totalSpent"
+          :transactions="$store.getters.expenseTransactions"
+          :dark="$vuetify.theme.dark"
+        />
+      </v-tab-item>
+    </v-tabs-items>
 
     <v-card-actions>
       <v-spacer></v-spacer>
