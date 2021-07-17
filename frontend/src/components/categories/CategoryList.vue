@@ -45,7 +45,7 @@
     <template v-slot:[`item.delete`]="{ item }">
       <v-slide-x-transition>
         <v-btn
-          class="category-list__icon"
+          class="category-list__icon ml-2 mr-2"
           v-if="editable"
           icon
           dark
@@ -81,7 +81,7 @@
 
 <script>
 const DEFAULT_HEADERS = [
-  { text: '', value: 'delete', align: 'start', cellClass: 'pa-0 pl-1', sortable: false },
+  { text: '', value: 'delete', align: 'start', cellClass: 'pa-0 pl-1 category-list__small-icon', sortable: false },
   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-2 category-list__icon', sortable: false },
   { text: 'Category', value: 'name', align: 'start', cellClass: 'px-0', sortable: false },
   { text: 'Kind', value: 'kind', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sortable: false },
@@ -137,6 +137,10 @@ export default {
 .category-list {
   &__icon {
     width: 20px;
+  }
+
+  &__small-icon {
+    width: 10px;
   }
 }
 </style>
