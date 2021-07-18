@@ -2,7 +2,7 @@ package expensetracker.transaction.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Updates}
+import com.mongodb.client.model.{Filters, Sorts, Updates}
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.common.json._
 import expensetracker.auth.user.UserId
@@ -36,6 +36,7 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def getAll(aid: UserId): F[List[Transaction]] =
     collection
       .find(Filters.and(accIdEq(aid), notHidden))
+      .sort(Sorts.descending("date"))
       .all[F]
       .map(_.map(_.toDomain).toList)
 
