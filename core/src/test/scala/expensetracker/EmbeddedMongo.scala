@@ -19,9 +19,16 @@ object EmbeddedMongo {
   def prepare(config: MongodConfig, attempt: Int = 5): MongodExecutable =
     if (attempt < 0) throw new RuntimeException("tried to prepare executable far too many times")
     else Try(starter.prepare(config)).getOrElse(prepare(config, attempt - 1))
+
+  implicit final class MongodExecutableOps(private val ex: MongodExecutable) extends AnyVal {
+    def startWithRetry(attempt: Int = 5): MongodProcess =
+      if (attempt < 0) throw new RuntimeException("failed to start process far too many time")
+      else Try(ex.start()).getOrElse(startWithRetry(attempt-1))
+  }
 }
 
 trait EmbeddedMongo {
+  import EmbeddedMongo._
 
   protected val mongoHost = "localhost"
   protected val mongoPort = 12343
@@ -35,7 +42,7 @@ trait EmbeddedMongo {
     val mongodExecutable: MongodExecutable = EmbeddedMongo.prepare(mongodConfig)
     var mongodProcess: MongodProcess = null
     try {
-      mongodProcess = mongodExecutable.start
+      mongodProcess = mongodExecutable.startWithRetry()
       test
     } finally {
       if (mongodProcess != null) mongodProcess.stop()
