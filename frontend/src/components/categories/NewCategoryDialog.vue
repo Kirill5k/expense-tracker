@@ -52,7 +52,16 @@
               required
               counter
             />
-
+            <v-color-picker
+              v-model="newCategory.color"
+              width="100%"
+              dot-size="22"
+              hide-inputs
+              hide-canvas
+              hide-mode-switch
+              mode="hexa"
+              swatches-max-height="250"
+            />
             <v-input
               :value="newCategory.icon"
               class="pt-2"
@@ -96,17 +105,6 @@
                 </template>
               </v-virtual-scroll>
             </v-input>
-
-            <v-color-picker
-              v-model="newCategory.color"
-              width="100%"
-              dot-size="22"
-              hide-inputs
-              hide-canvas
-              hide-mode-switch
-              mode="hexa"
-              swatches-max-height="250"
-            />
           </v-form>
         </v-card-text>
         <v-card-actions>
