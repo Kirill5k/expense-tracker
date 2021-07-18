@@ -7,14 +7,14 @@
     <v-card-title class="py-1">
       Transactions
       <v-spacer></v-spacer>
+      <transactions-sorter
+        @sort="(sortBy) => $store.commit('sort', sortBy)"
+      />
       <transactions-filter
         v-if="$store.getters.filteredCats.length"
         :categories="$store.getters.filteredCats"
         :filters="$store.state.filterBy"
         @filter="(filters) => $store.commit('filter', filters)"
-      />
-      <transactions-sorter
-        @sort="(sortBy) => $store.commit('sort', sortBy)"
       />
     </v-card-title>
 

@@ -22,8 +22,11 @@ object EmbeddedMongo {
 
   implicit final class MongodExecutableOps(private val ex: MongodExecutable) extends AnyVal {
     def startWithRetry(attempt: Int = 5): MongodProcess =
-      if (attempt < 0) throw new RuntimeException("failed to start process far too many time")
-      else Try(ex.start()).getOrElse(startWithRetry(attempt-1))
+      if (attempt < 0) throw new RuntimeException("failed to start process far too many times")
+      else Try(ex.start()).getOrElse {
+        Thread.sleep(2000)
+        startWithRetry(attempt-1)
+      }
   }
 }
 
