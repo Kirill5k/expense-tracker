@@ -24,7 +24,7 @@
         <v-card-title>
           {{newCategory.id ? 'Edit category' : 'New category'}}
         </v-card-title>
-        <v-card-text>
+        <v-card-text class="pb-0">
           <v-form
             ref="newCategoryForm"
             v-model="valid"
@@ -52,25 +52,44 @@
               required
               counter
             />
-            <v-select
-              name="icon"
-              v-model="newCategory.icon"
+
+            <v-input
+              :value="newCategory.icon"
+              class="pt-2"
               :rules="rules.icon"
-              :items="icons"
-              label="Icon"
-              required
             >
-              <template slot="selection" slot-scope="data">
-                <span class="mt-1 mb-1">
-                  <v-icon class="mr-2">{{data.item.value}}</v-icon>{{formatIconName(data.item.text)}}
-                </span>
-              </template>
-              <template slot="item" slot-scope="data">
-                <span>
-                  <v-icon class="mr-2">{{data.item.value}}</v-icon>{{formatIconName(data.item.text)}}
-                </span>
-              </template>
-            </v-select>
+              <v-virtual-scroll
+                :bench="1"
+                :items="groupedIcons"
+                height="120"
+                item-height="40"
+              >
+                <template v-slot:default="{ item }">
+                  <v-row class="text-center" no-gutters>
+                    <v-col
+                      v-for="icon in item"
+                      :key="icon.value"
+                      cols="2"
+                    >
+                      <v-btn
+                        :dark="newCategory.icon === icon.value"
+                        :light="newCategory.icon !== icon.value"
+                        elevation="2"
+                        fab
+                        x-small
+                        :value="newCategory.icon"
+                        @click="newCategory.icon = icon.value"
+                      >
+                        <v-icon>
+                          {{ icon.value }}
+                        </v-icon>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </template>
+              </v-virtual-scroll>
+            </v-input>
+
             <v-color-picker
               v-model="newCategory.color"
               width="100%"
@@ -196,7 +215,6 @@ const ICONS = [
   { value: 'mdi-ambulance', text: 'ambulance', disable: false },
   { value: 'mdi-bag-carry-on', text: 'bag-carry-on', disable: false },
   { value: 'mdi-bag-suitcase', text: 'bag-suitcase', disable: false },
-  { value: 'mdi-bike', text: 'bike', disable: false },
   { value: 'mdi-bus', text: 'bus', disable: false },
   { value: 'mdi-car', text: 'car', disable: false },
   { value: 'mdi-rocket', text: 'rocket', disable: false },
@@ -224,6 +242,20 @@ export default {
       ...DEFAULT_CATEGORY
     }
   }),
+  computed: {
+    groupedIcons () {
+      return this.icons
+        .filter(i => i.divider !== true)
+        .reduce((res, item, index) => {
+          const chunkIndex = Math.floor(index / 6)
+          if (!res[chunkIndex]) {
+            res[chunkIndex] = []
+          }
+          res[chunkIndex].push(item)
+          return res
+        }, [])
+    }
+  },
   methods: {
     formatIconName (icon) {
       return icon.charAt(0).toUpperCase() + icon.slice(1).replaceAll('-', ' ')
