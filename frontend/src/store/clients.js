@@ -12,6 +12,29 @@ const reject = (res) => res.json().then(e => {
 })
 
 class BackendClient {
+  getUser () {
+    return fetch('/api/auth/user', DEFAULT_REQUEST_PARAMS)
+      .then(res => res.status === 200 ? res.json() : reject(res))
+  }
+
+  login (requestBody) {
+    return fetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      ...DEFAULT_REQUEST_PARAMS
+    })
+      .then(res => res.status === 200 ? res.json() : reject(res))
+  }
+
+  createUser (requestBody) {
+    return fetch('/api/auth/user', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      ...DEFAULT_REQUEST_PARAMS
+    })
+      .then(res => res.status === 201 ? {} : reject(res))
+  }
+
   updateUserSettings (userId, requestBody) {
     return fetch(`/api/auth/user/${userId}/settings`, {
       method: 'PUT',

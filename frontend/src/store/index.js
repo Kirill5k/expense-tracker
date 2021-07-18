@@ -12,11 +12,14 @@ const withinDates = (txs, { start, end }) => txs.filter(tx => {
 
 const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
 
-const handleError = (commit, { status, message }) => {
+const handleError = (commit, { status, message }, rethrow = false) => {
   if (status === 403) {
     commit('logout')
   } else {
     commit('setAlert', { type: 'error', message })
+  }
+  if (rethrow) {
+    return Promise.reject(new Error(message))
   }
 }
 
@@ -156,31 +159,25 @@ export default new Vuex.Store({
         .then(() => commit('loaded'))
         .catch(() => commit('logout'))
     },
-    createUser ({ commit }, requestBody) {
-      return fetch('/api/auth/user', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 201 ? res.json() : reject(res, commit))
-        .then(() => commit('setAlert', Alerts.REGISTRATION_SUCCESS))
-    },
     getUser ({ commit, dispatch }) {
-      return fetch('/api/auth/user', defaultRequestParams)
-        .then(res => res.status === 200 ? res.json() : reject(res))
+      return Clients.online.getUser()
         .then(acc => dispatch('loadData', acc))
         .catch(() => commit('loaded'))
     },
     login ({ commit, dispatch }, requestBody) {
       commit('loading')
-      return fetch('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 200 ? res.json() : reject(res, commit))
-        .catch(() => commit('loaded'))
+      return Clients.online
+        .login(requestBody)
         .then(acc => dispatch('loadData', acc))
+        .catch(e => {
+          commit('loaded')
+          handleError(commit, e)
+        })
+    },
+    createUser ({ commit }, requestBody) {
+      return Clients.online.createUser(requestBody)
+        .then(() => commit('setAlert', Alerts.REGISTRATION_SUCCESS))
+        .catch(e => handleError(commit, e, true))
     },
     updateUserSettings ({ commit, state }, requestBody) {
       return Clients.online
