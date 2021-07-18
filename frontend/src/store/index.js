@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Alerts from './alerts'
+import Clients from './clients'
 
 Vue.use(Vuex)
 
@@ -10,6 +11,14 @@ const withinDates = (txs, { start, end }) => txs.filter(tx => {
 })
 
 const totalAmount = (txs) => txs.map(t => t.amount.value).reduce((acc, i) => acc + i, 0).toFixed(2)
+
+const handleError = (commit, { status, message }) => {
+  if (status === 403) {
+    commit('logout')
+  } else {
+    commit('setAlert', { type: 'error', message })
+  }
+}
 
 const reject = (res, commit) => res.json().then(e => {
   if (commit && res.status === 403) {
@@ -162,22 +171,6 @@ export default new Vuex.Store({
         .then(acc => dispatch('loadData', acc))
         .catch(() => commit('loaded'))
     },
-    updateUserSettings ({ commit, state }, requestBody) {
-      return fetch(`/api/auth/user/${state.user.id}/settings`, {
-        method: 'PUT',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 204 ? commit('setSettings', requestBody) : reject(res, commit))
-    },
-    changeUserPassword ({ commit, state }, requestBody) {
-      return fetch(`/api/auth/user/${state.user.id}/password`, {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 204 ? commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS) : reject(res, commit))
-    },
     login ({ commit, dispatch }, requestBody) {
       commit('loading')
       return fetch('/api/auth/login', {
@@ -189,82 +182,52 @@ export default new Vuex.Store({
         .catch(() => commit('loaded'))
         .then(acc => dispatch('loadData', acc))
     },
+    updateUserSettings ({ commit, state }, requestBody) {
+      return Clients.online
+        .updateUserSettings(state.user.id, requestBody)
+        .then(() => commit('setSettings', requestBody))
+        .catch(e => handleError(commit, e))
+    },
+    changeUserPassword ({ commit, state }, requestBody) {
+      return Clients.online
+        .changeUserPassword(state.user.id, requestBody)
+        .then(() => commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS))
+        .catch(e => handleError(commit, e))
+    },
     logout ({ commit }) {
-      return fetch('/api/auth/logout', {
-        method: 'POST',
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 204 ? commit('logout') : reject(res, commit))
+      return Clients.online.logout()
+        .then(() => commit('logout'))
+        .catch(e => handleError(commit, e))
     },
     createCategory ({ commit, dispatch }, requestBody) {
-      return fetch('/api/categories', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 201 ? res.json() : reject(res, commit))
-        .then(res => dispatch('getCategory', res.id))
+      return Clients.online.createCategory(requestBody)
+        .then(cat => commit('addCategory', cat))
+        .catch(e => handleError(commit, e))
     },
     getCategories ({ commit }) {
-      return fetch('/api/categories', defaultRequestParams)
-        .then(res => res.status === 200 ? res.json() : reject(res))
-        .then(cats => commit('setCategories', cats))
-    },
-    getCategory ({ commit }, id) {
-      return fetch(`/api/categories/${id}`, defaultRequestParams)
-        .then(res => res.status === 200 ? res.json() : reject(res))
-        .then(cat => commit('addCategory', cat))
+      return Clients.online.getCategories().then(cats => commit('setCategories', cats))
     },
     hideCategory ({ commit }, { id, hidden }) {
-      return fetch(`/api/categories/${id}/hidden`, {
-        ...defaultRequestParams,
-        method: 'PUT',
-        body: JSON.stringify({ hidden })
-      })
-        .then(res => res.status === 204 ? commit('hideCategory', { id, hidden }) : reject(res))
+      return Clients.online.hideCategory({ id, hidden })
+        .then(() => commit('hideCategory', { id, hidden }))
     },
     updateCategory ({ commit }, requestBody) {
-      return fetch(`/api/categories/${requestBody.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 204 ? commit('updateCategory', requestBody) : reject(res, commit))
+      return Clients.online
+        .updateCategory(requestBody)
+        .then(res => commit('updateCategory', res))
+        .catch(e => handleError(commit, e))
     },
     getTransactions ({ commit }) {
-      return fetch('/api/transactions', defaultRequestParams)
-        .then(res => res.status === 200 ? res.json() : reject(res))
-        .then(txs => commit('setTransactions', txs))
+      return Clients.online.getTransactions().then(txs => commit('setTransactions', txs))
     },
     createTransaction ({ commit, dispatch }, requestBody) {
-      return fetch('/api/transactions', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 201 ? res.json() : reject(res, commit))
-        .then(res => dispatch('getTransaction', res.id))
-    },
-    getTransaction ({ commit }, id) {
-      return fetch(`/api/transactions/${id}`, defaultRequestParams)
-        .then(res => res.status === 200 ? res.json() : reject(res))
-        .then(tx => commit('addTransaction', tx))
+      return Clients.online.createTransaction(requestBody).then(tx => commit('addTransaction', tx))
     },
     hideTransaction ({ commit }, { id, hidden }) {
-      return fetch(`/api/transactions/${id}/hidden`, {
-        ...defaultRequestParams,
-        method: 'PUT',
-        body: JSON.stringify({ hidden })
-      })
-        .then(res => res.status === 204 ? commit('hideTransaction', { id, hidden }) : reject(res))
+      return Clients.online.hideTransaction({ id, hidden }).then(() => commit('hideTransaction', { id, hidden }))
     },
     updateTransaction ({ commit }, requestBody) {
-      return fetch(`/api/transactions/${requestBody.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(requestBody),
-        ...defaultRequestParams
-      })
-        .then(res => res.status === 204 ? commit('updateTransaction', requestBody) : reject(res))
+      return Clients.online.updateTransaction(requestBody).then(() => commit('updateTransaction', requestBody))
     }
   },
   modules: {
