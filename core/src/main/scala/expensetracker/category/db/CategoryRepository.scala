@@ -2,7 +2,7 @@ package expensetracker.category.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Updates}
+import com.mongodb.client.model.{Filters, Sorts, Updates}
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
@@ -31,6 +31,7 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def getAll(aid: UserId): F[List[Category]] =
     collection
       .find(Filters.and(accIdEq(aid), notHidden))
+      .sort(Sorts.ascending("name"))
       .all[F]
       .map(_.toList.map(_.toDomain))
 
