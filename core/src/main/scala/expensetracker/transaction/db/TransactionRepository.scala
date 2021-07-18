@@ -2,7 +2,7 @@ package expensetracker.transaction.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Sorts, Updates}
+import com.mongodb.client.model.{Filters, Sorts}
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.common.json._
 import expensetracker.auth.user.UserId
@@ -64,7 +64,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
-      .updateOne(Filters.and(accIdEq(aid), idEq(txid.value)), Updates.set(HiddenField, hidden))
+      .updateOne(Filters.and(accIdEq(aid), idEq(txid.value)), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
   override def isHidden(aid: UserId, txid: TransactionId): F[Boolean] =

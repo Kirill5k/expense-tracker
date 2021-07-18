@@ -2,7 +2,7 @@ package expensetracker.category.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Sorts, Updates}
+import com.mongodb.client.model.{Filters, Sorts}
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
@@ -78,10 +78,7 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def hide(aid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit] =
     collection
-      .updateOne(
-        Filters.and(accIdEq(aid), idEq(cid.value)),
-        Updates.set(HiddenField, hidden)
-      )
+      .updateOne(Filters.and(accIdEq(aid), idEq(cid.value)), updateHidden(hidden))
       .flatMap(errorIfNoMatches(CategoryDoesNotExist(cid)))
 
   override def isHidden(aid: UserId, cid: CategoryId): F[Boolean] =

@@ -33,11 +33,10 @@
         @edit="edit"
         @delete="remove"
       />
-      <v-divider></v-divider>
+      <v-divider v-if="transactions.length"></v-divider>
     </v-card-text>
 
     <v-card-actions class="py-0">
-
       <v-btn
         v-if="transactions.length"
         color="primary"

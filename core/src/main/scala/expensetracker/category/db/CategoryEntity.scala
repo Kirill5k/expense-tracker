@@ -5,13 +5,16 @@ import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryI
 import expensetracker.auth.user.UserId
 import org.bson.types.ObjectId
 
+import java.time.Instant
+
 final case class CategoryEntity(
     _id: ObjectId,
     kind: CategoryKind,
     name: String,
     icon: String,
     color: String,
-    accountId: Option[ObjectId]
+    accountId: Option[ObjectId],
+    lastUpdatedAt: Option[Instant]
 ) {
   def toDomain: Category =
     Category(
@@ -32,7 +35,8 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      accountId = cat.userId.map(aid => new ObjectId(aid.value))
+      accountId = cat.userId.map(aid => new ObjectId(aid.value)),
+      lastUpdatedAt = Some(Instant.now())
     )
 
   def from(cat: CreateCategory): CategoryEntity =
@@ -42,6 +46,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      accountId = new ObjectId(cat.accountId.value).some
+      accountId = new ObjectId(cat.accountId.value).some,
+      lastUpdatedAt = None
     )
 }

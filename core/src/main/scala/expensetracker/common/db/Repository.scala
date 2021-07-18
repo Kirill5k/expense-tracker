@@ -2,11 +2,13 @@ package expensetracker.common.db
 
 import cats.MonadError
 import cats.implicits._
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.{Filters, Updates}
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
+
+import java.time.Instant
 
 trait Repository[F[_]] {
 
@@ -14,6 +16,7 @@ trait Repository[F[_]] {
   protected val IdField     = "_id"
   protected val EmailField  = "email"
   protected val HiddenField = "hidden"
+  protected val LastUpdatedAtField = "lastUpdatedAt"
 
   protected val notHidden: Bson = Filters.ne(HiddenField, true)
 
@@ -28,4 +31,7 @@ trait Repository[F[_]] {
 
   protected def errorIfNoMatches(error: Throwable)(res: UpdateResult)(implicit F: MonadError[F, Throwable]): F[Unit] =
     if (res.getMatchedCount > 0) F.unit else error.raiseError[F, Unit]
+
+  protected def updateHidden(hidden: Boolean): Bson =
+    Updates.combine(Updates.set(HiddenField, hidden), Updates.set(LastUpdatedAtField, Instant.now()))
 }
