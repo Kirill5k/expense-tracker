@@ -14,7 +14,7 @@
     <v-card-title class="balance-analysis__current-balance py-0">
       {{sign}}{{currency.symbol}}{{balance}}
     </v-card-title>
-    <v-card-subtitle class="pb-1 pt-2">
+    <v-card-subtitle class="text-subtitle-2 font-weight-light pb-1 pt-2">
       Balance for this period
     </v-card-subtitle>
     <v-card-text class="py-1">

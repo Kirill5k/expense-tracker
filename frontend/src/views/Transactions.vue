@@ -33,9 +33,9 @@
         @edit="edit"
         @delete="remove"
       />
+      <v-divider></v-divider>
     </v-card-text>
 
-    <v-divider></v-divider>
     <v-card-actions class="py-0">
 
       <v-btn

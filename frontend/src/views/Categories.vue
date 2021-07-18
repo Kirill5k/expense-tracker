@@ -8,7 +8,7 @@
       Categories
     </v-card-title>
 
-    <v-card-text class="pb-0">
+    <v-card-text>
       <v-divider/>
       <category-list
         :items="[...expenseCats, ...incomeCats]"
@@ -17,6 +17,7 @@
         @delete="remove"
         @edit="edit"
       />
+      <v-divider/>
     </v-card-text>
 
     <v-card-actions>

@@ -24,6 +24,7 @@
         :category-breakdown="breakdown"
         :total-amount="totalAmount"
       />
+      <v-divider></v-divider>
     </v-card-text>
   </div>
 </template>
