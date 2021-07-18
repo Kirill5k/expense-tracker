@@ -6,12 +6,27 @@
   >
     <v-card-title class="py-1">
       Categories
+      <v-spacer></v-spacer>
+      <v-btn-toggle
+        borderless
+        dense
+        tile
+        v-model="kind"
+        mandatory
+      >
+        <v-btn x-small value="expense">
+          Expense
+        </v-btn>
+        <v-btn x-small value="income">
+          Income
+        </v-btn>
+      </v-btn-toggle>
     </v-card-title>
 
     <v-card-text>
       <v-divider/>
       <category-list
-        :items="[...expenseCats, ...incomeCats]"
+        :items="kind === 'expense' ? expenseCats : incomeCats"
         :editable="editable"
         :window-height="windowHeight"
         @delete="remove"
@@ -82,7 +97,8 @@ export default {
     lastDeletedId: null,
     undoOp: false,
     loading: false,
-    editable: false
+    editable: false,
+    kind: 'expense'
   }),
   computed: {
     categories () {
