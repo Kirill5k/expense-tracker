@@ -23,23 +23,6 @@ const handleError = (commit, { status, message }, rethrow = false) => {
   }
 }
 
-const reject = (res, commit) => res.json().then(e => {
-  if (commit && res.status === 403) {
-    commit('logout')
-  }
-  if (commit && e.message) {
-    commit('setAlert', { type: 'error', message: e.message })
-  }
-  return Promise.reject(new Error(e.message))
-})
-
-const defaultRequestParams = {
-  mode: 'cors',
-  cache: 'no-cache',
-  credentials: 'include',
-  headers: { 'Content-Type': 'application/json' }
-}
-
 const DEFAULT_STATE = {
   isLoading: false,
   isAuthenticated: false,
