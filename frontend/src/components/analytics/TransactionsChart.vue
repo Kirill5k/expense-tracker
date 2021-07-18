@@ -16,9 +16,9 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
+import { GridComponent, TooltipComponent, LegendComponent, ToolboxComponent, MarkLineComponent } from 'echarts/components'
 
-use([CanvasRenderer, BarChart, LineChart, GridComponent, TooltipComponent, LegendComponent, ToolboxComponent])
+use([CanvasRenderer, BarChart, LineChart, GridComponent, TooltipComponent, LegendComponent, ToolboxComponent, MarkLineComponent])
 
 const WEEKLY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHLY_LABELS = ['1-7', '8-14', '15-21', '22-28', '29-31']
@@ -61,7 +61,24 @@ export default {
   data: () => ({
     initOptions: {
       renderer: 'canvas'
-    }
+    },
+    itemStyle: (color) => ({
+      color: color,
+      shadowColor: 'rgba(0, 0, 0, 0.5)',
+      shadowBlur: 10,
+      shadowOffsetX: 5,
+      shadowOffsetY: 2
+    }),
+    markLine: (isDark) => ({
+      silent: true,
+      precision: 0,
+      data: [
+        { type: 'average', name: 'Average' }
+      ],
+      label: {
+        color: isDark ? 'white' : '#424242'
+      }
+    })
   }),
   computed: {
     canvasHeight () {
@@ -139,16 +156,8 @@ export default {
             label: { show: false },
             emphasis: { focus: 'series' },
             data: this.yAxisExpenseTx,
-            itemStyle: {
-              color: '#6200EE',
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-              shadowBlur: 10,
-              shadowOffsetX: 5,
-              shadowOffsetY: 2
-            },
-            markLine: {
-              data: [{ type: 'average', name: 'Average' }]
-            }
+            itemStyle: this.itemStyle('#6200EE'),
+            markLine: this.markLine(this.dark)
           },
           {
             name: 'Earned',
@@ -158,16 +167,8 @@ export default {
             label: { show: false },
             emphasis: { focus: 'series' },
             data: this.yAxisIncomeTx,
-            itemStyle: {
-              color: '#03DAC6',
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-              shadowBlur: 10,
-              shadowOffsetX: 5,
-              shadowOffsetY: 2
-            },
-            markLine: {
-              data: [{ type: 'average', name: 'Average' }]
-            }
+            itemStyle: this.itemStyle('#03DAC6'),
+            markLine: this.markLine(this.dark)
           }
         ]
       }
