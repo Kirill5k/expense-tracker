@@ -4,7 +4,7 @@ import cats.effect.{Async, Temporal}
 import cats.implicits._
 import expensetracker.Resources
 import expensetracker.auth.user.{UserService, PasswordEncryptor}
-import expensetracker.auth.user.db.AccountRepository
+import expensetracker.auth.user.db.UserRepository
 import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.{Session, SessionAuthMiddleware, SessionService}
 import expensetracker.common.actions.ActionDispatcher
@@ -27,7 +27,7 @@ object Auth {
     for {
       sessRepo <- SessionRepository.make[F](resources.mongo)
       sessSvc  <- SessionService.make[F](sessRepo)
-      accRepo  <- AccountRepository.make[F](resources.mongo)
+      accRepo  <- UserRepository.make[F](resources.mongo)
       encr     <- PasswordEncryptor.make[F](config)
       accSvc   <- UserService.make[F](accRepo, encr)
       authSvc  <- AuthService.make[F](accSvc, sessSvc)

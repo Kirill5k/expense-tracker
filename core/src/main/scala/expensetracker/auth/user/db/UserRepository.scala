@@ -13,7 +13,7 @@ import mongo4cats.circe._
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import org.bson.Document
 
-trait AccountRepository[F[_]] extends Repository[F] {
+trait UserRepository[F[_]] extends Repository[F] {
   def find(aid: UserId): F[User]
   def findBy(email: UserEmail): F[Option[User]]
   def create(details: UserDetails, password: PasswordHash): F[UserId]
@@ -21,9 +21,9 @@ trait AccountRepository[F[_]] extends Repository[F] {
   def updatePassword(aid: UserId)(password: PasswordHash): F[Unit]
 }
 
-final private class LiveAccountRepository[F[_]: Async](
+final private class LiveUserRepository[F[_]: Async](
     private val collection: MongoCollectionF[AccountEntity]
-) extends AccountRepository[F] {
+) extends UserRepository[F] {
 
   override def findBy(email: UserEmail): F[Option[User]] =
     collection
@@ -60,8 +60,8 @@ final private class LiveAccountRepository[F[_]: Async](
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 }
 
-object AccountRepository {
-  def make[F[_]: Async](db: MongoDatabaseF[F]): F[AccountRepository[F]] =
-    db.getCollectionWithCirceCodecs[AccountEntity]("accounts")
-      .map(coll => new LiveAccountRepository[F](coll))
+object UserRepository {
+  def make[F[_]: Async](db: MongoDatabaseF[F]): F[UserRepository[F]] =
+    db.getCollectionWithCirceCodecs[AccountEntity]("users")
+      .map(coll => new LiveUserRepository[F](coll))
 }

@@ -2,7 +2,7 @@ package expensetracker.auth.user
 
 import cats.MonadError
 import cats.implicits._
-import expensetracker.auth.user.db.AccountRepository
+import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
 sealed trait LoginResult
@@ -20,8 +20,8 @@ trait UserService[F[_]] {
 }
 
 final private class LiveUserService[F[_]](
-    private val repository: AccountRepository[F],
-    private val encryptor: PasswordEncryptor[F]
+                                           private val repository: UserRepository[F],
+                                           private val encryptor: PasswordEncryptor[F]
 )(implicit
     F: MonadError[F, Throwable]
 ) extends UserService[F] {
@@ -62,8 +62,8 @@ final private class LiveUserService[F[_]](
 }
 
 object UserService {
-  def make[F[_]](repo: AccountRepository[F], encr: PasswordEncryptor[F])(implicit
-      F: MonadError[F, Throwable]
+  def make[F[_]](repo: UserRepository[F], encr: PasswordEncryptor[F])(implicit
+                                                                      F: MonadError[F, Throwable]
   ): F[UserService[F]] =
     F.pure(new LiveUserService[F](repo, encr))
 

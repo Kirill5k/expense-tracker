@@ -15,7 +15,7 @@ import squants.market.USD
 import java.time.Instant
 import scala.concurrent.Future
 
-class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
+class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
 
   override protected val mongoPort: Int = 12346
 
@@ -25,13 +25,13 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
   val hash       = PasswordHash("hash")
   val accDetails = UserDetails(UserEmail("acc1@et.com"), UserName("John", "Bloggs"))
 
-  "An AccountRepository" when {
+  "An UserRepository" when {
 
     "find" should {
       "find account by id" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             acc  <- repo.find(acc1Id)
           } yield acc
 
@@ -44,7 +44,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       "return error account does not exist" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             acc  <- repo.find(acc2Id)
           } yield acc
 
@@ -59,7 +59,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       "find account by email" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             acc  <- repo.findBy(accDetails.email)
           } yield acc
 
@@ -72,7 +72,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       "return empty option when account does not exist" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             acc  <- repo.findBy(UserEmail("acc2@et.com"))
           } yield acc
 
@@ -87,7 +87,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       "update account settings" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             _    <- repo.updateSettings(acc1Id, UserSettings(USD, false, None))
             acc  <- repo.find(acc1Id)
           } yield acc
@@ -102,7 +102,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
         withEmbeddedMongoDb { client =>
           val id = UserId(new ObjectId().toHexString)
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             acc  <- repo.updateSettings(id, UserSettings.Default)
           } yield acc
 
@@ -118,7 +118,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
         withEmbeddedMongoDb { client =>
           val newpwd = PasswordHash("new-password")
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             _    <- repo.updatePassword(acc1Id)(newpwd)
             acc  <- repo.find(acc1Id)
           } yield acc
@@ -133,7 +133,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
         withEmbeddedMongoDb { client =>
           val id = UserId(new ObjectId().toHexString)
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             acc  <- repo.updatePassword(id)(hash)
           } yield acc
 
@@ -150,7 +150,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           val email = UserEmail("acc2@et.com")
 
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             aid  <- repo.create(accDetails.copy(email = email), hash)
             acc  <- repo.findBy(email)
           } yield (aid, acc)
@@ -166,7 +166,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       "return error when account already exists" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- AccountRepository.make(client)
+            repo <- UserRepository.make(client)
             _    <- repo.create(accDetails, hash)
           } yield ()
 
@@ -185,7 +185,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
         .use { client =>
           for {
             db   <- client.getDatabase("expense-tracker")
-            accs <- db.getCollection("accounts")
+            accs <- db.getCollection("users")
             _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc1@et.com", password = hash.value)))
             res  <- test(db)
           } yield res

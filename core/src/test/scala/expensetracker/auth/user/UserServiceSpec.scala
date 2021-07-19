@@ -3,7 +3,7 @@ package expensetracker.auth.user
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.user.db.AccountRepository
+import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
 class UserServiceSpec extends CatsSpec {
@@ -161,6 +161,6 @@ class UserServiceSpec extends CatsSpec {
     }
   }
 
-  def mocks: (AccountRepository[IO], PasswordEncryptor[IO]) =
-    (mock[AccountRepository[IO]], mock[PasswordEncryptor[IO]])
+  def mocks: (UserRepository[IO], PasswordEncryptor[IO]) =
+    (mock[UserRepository[IO]], mock[PasswordEncryptor[IO]])
 }
