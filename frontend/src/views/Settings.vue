@@ -54,6 +54,7 @@
 import UserDetails from '@/components/settings/UserDetails'
 import InterfaceSettings from '@/components/settings/InterfaceSettings'
 import SecuritySettings from '@/components/settings/SecuritySettings'
+import ActionDispatcher from '@/mixins/dispatcher'
 
 export default {
   name: 'Settings',
@@ -62,8 +63,8 @@ export default {
     InterfaceSettings,
     SecuritySettings
   },
+  mixins: [ActionDispatcher],
   data: () => ({
-    loading: false,
     interfacePanel: undefined,
     securityPanel: undefined
   }),
@@ -81,15 +82,6 @@ export default {
     }
   },
   methods: {
-    dispatch (action, args) {
-      this.loading = true
-      this.$store
-        .dispatch(action, args)
-        .catch(() => {})
-        .then(() => {
-          this.loading = false
-        })
-    },
     updateSettings (newSettings) {
       this.dispatch('updateUserSettings', newSettings)
     },

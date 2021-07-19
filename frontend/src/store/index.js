@@ -24,10 +24,10 @@ const handleError = (commit, { status, message }, rethrow = false) => {
 }
 
 const DEFAULT_STATE = {
-  isOnline: null,
+  isOnline: true,
   isLoading: false,
   isAuthenticated: false,
-  user: null,
+  user: {},
   categories: [],
   transactions: [],
   displayDate: {},
@@ -146,8 +146,8 @@ export default new Vuex.Store({
         .then(() => commit('loaded'))
         .catch(() => commit('logout'))
     },
-    getUser ({ commit, dispatch }) {
-      return Clients.get(true)
+    getUser ({ state, commit, dispatch }) {
+      return Clients.get(state.isOnline)
         .getUser()
         .then(acc => dispatch('loadData', acc))
         .catch(e => {

@@ -60,8 +60,10 @@ export default {
   components: {
     Page
   },
-  created () {
-    this.$store.commit('loading')
+  mounted () {
+    if (!this.userId) {
+      this.$store.commit('loading')
+    }
     this.$store.dispatch('getUser')
   },
   data: () => ({
@@ -78,6 +80,9 @@ export default {
     },
     darkMode () {
       return this.$store.state.user?.settings?.darkMode
+    },
+    userId () {
+      return this.$store.state.user?.id
     }
   },
   watch: {
