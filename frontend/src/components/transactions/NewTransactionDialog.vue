@@ -68,7 +68,8 @@
             <v-text-field
               label="Amount"
               v-model="newTransaction.amount"
-              type="tel"
+              type="number"
+              min="0.01"
               :prepend-icon="'mdi-currency-' + currency.code.toLowerCase()"
               :rules="rules.amount"
             />
