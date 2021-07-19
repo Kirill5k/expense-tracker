@@ -1,6 +1,6 @@
 package expensetracker
 
-import cats.effect.{IO, Async, Resource}
+import cats.effect.{Async, IO, Resource}
 import cats.effect.kernel.Sync
 import cats.implicits._
 import de.flapdoodle.embed.mongo.{MongodExecutable, MongodProcess, MongodStarter}
@@ -19,19 +19,20 @@ import scala.jdk.CollectionConverters._
 object EmbeddedMongo {
   private val starter = MongodStarter.getDefaultInstance
 
-  def prepare[F[_]: Async](config: MongodConfig, attempt: Int = 5): F[MongodExecutable] =
-    if (attempt < 0) Sync[F].raiseError(new RuntimeException("tried to prepare executable far too many times"))
+  def prepare[F[_]: Async](config: MongodConfig, maxAttempts: Int = 5, attempt: Int = 0): F[MongodExecutable] =
+    if (attempt >= maxAttempts)
+      Sync[F].raiseError(new RuntimeException("tried to prepare executable far too many times"))
     else
       Async[F].delay(starter.prepare(config)).handleErrorWith { _ =>
-        Async[F].sleep(5.seconds) *> prepare[F](config, attempt - 1)
+        Async[F].sleep(attempt.seconds) *> prepare[F](config, maxAttempts, attempt + 1)
       }
 
   implicit final class MongodExecutableOps(private val ex: MongodExecutable) extends AnyVal {
-    def startWithRetry[F[_]: Async](attempt: Int = 5): F[MongodProcess] =
+    def startWithRetry[F[_]: Async](maxAttempts: Int = 5, attempt: Int = 0): F[MongodProcess] =
       if (attempt < 0) Sync[F].raiseError(new RuntimeException("tried to prepare executable far too many times"))
       else
         Async[F].delay(ex.start()).handleErrorWith { _ =>
-          Async[F].sleep(5.seconds) *> startWithRetry(attempt-1)
+          Async[F].sleep(attempt.seconds) *> startWithRetry(maxAttempts, attempt + 1)
         }
   }
 }

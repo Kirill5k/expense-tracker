@@ -19,11 +19,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
   override protected val mongoPort: Int = 12346
 
-  val regDate    = Instant.parse("2021-06-01T00:00:00Z")
-  val acc1Id     = UserId(new ObjectId().toHexString)
-  val acc2Id     = UserId(new ObjectId().toHexString)
-  val hash       = PasswordHash("hash")
-  val accDetails = UserDetails(UserEmail("acc1@et.com"), UserName("John", "Bloggs"))
+  val regDate     = Instant.parse("2021-06-01T00:00:00Z")
+  val u1Id        = UserId(new ObjectId().toHexString)
+  val u2Id        = UserId(new ObjectId().toHexString)
+  val hash        = PasswordHash("hash")
+  val userDetails = UserDetails(UserEmail("acc1@et.com"), UserName("John", "Bloggs"))
 
   "An UserRepository" when {
 
@@ -32,11 +32,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- UserRepository.make(client)
-            acc  <- repo.find(acc1Id)
+            acc  <- repo.find(u1Id)
           } yield acc
 
           result.map { acc =>
-            acc mustBe User(acc1Id, accDetails.email, accDetails.name, hash, UserSettings.Default, regDate)
+            acc mustBe User(u1Id, userDetails.email, userDetails.name, hash, UserSettings.Default, regDate)
           }
         }
       }
@@ -45,11 +45,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- UserRepository.make(client)
-            acc  <- repo.find(acc2Id)
+            acc  <- repo.find(u2Id)
           } yield acc
 
           result.attempt.map { res =>
-            res mustBe Left(AccountDoesNotExist(acc2Id))
+            res mustBe Left(AccountDoesNotExist(u2Id))
           }
         }
       }
@@ -60,11 +60,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- UserRepository.make(client)
-            acc  <- repo.findBy(accDetails.email)
+            acc  <- repo.findBy(userDetails.email)
           } yield acc
 
           result.map { acc =>
-            acc mustBe Some(User(acc1Id, accDetails.email, accDetails.name, hash, UserSettings.Default, regDate))
+            acc mustBe Some(User(u1Id, userDetails.email, userDetails.name, hash, UserSettings.Default, regDate))
           }
         }
       }
@@ -88,8 +88,8 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- UserRepository.make(client)
-            _    <- repo.updateSettings(acc1Id, UserSettings(USD, false, None))
-            acc  <- repo.find(acc1Id)
+            _    <- repo.updateSettings(u1Id, UserSettings(USD, false, None))
+            acc  <- repo.find(u1Id)
           } yield acc
 
           result.map { acc =>
@@ -119,8 +119,8 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
           val newpwd = PasswordHash("new-password")
           val result = for {
             repo <- UserRepository.make(client)
-            _    <- repo.updatePassword(acc1Id)(newpwd)
-            acc  <- repo.find(acc1Id)
+            _    <- repo.updatePassword(u1Id)(newpwd)
+            acc  <- repo.find(u1Id)
           } yield acc
 
           result.map { acc =>
@@ -151,13 +151,13 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
           val result = for {
             repo <- UserRepository.make(client)
-            aid  <- repo.create(accDetails.copy(email = email), hash)
+            aid  <- repo.create(userDetails.copy(email = email), hash)
             acc  <- repo.findBy(email)
           } yield (aid, acc)
 
           result.map {
             case (aid, Some(acc)) =>
-              acc mustBe User(aid, email, accDetails.name, hash, UserSettings.Default, acc.registrationDate)
+              acc mustBe User(aid, email, userDetails.name, hash, UserSettings.Default, acc.registrationDate)
             case _ => fail("unmatched case")
           }
         }
@@ -167,11 +167,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- UserRepository.make(client)
-            _    <- repo.create(accDetails, hash)
+            _    <- repo.create(userDetails, hash)
           } yield ()
 
           result.attempt.map { err =>
-            err mustBe Left(AccountAlreadyExists(accDetails.email))
+            err mustBe Left(AccountAlreadyExists(userDetails.email))
           }
         }
       }
@@ -186,7 +186,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
           for {
             db   <- client.getDatabase("expense-tracker")
             accs <- db.getCollection("users")
-            _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc1@et.com", password = hash.value)))
+            _    <- accs.insertMany[IO](List(accDoc(u1Id, "acc1@et.com", password = hash.value)))
             res  <- test(db)
           } yield res
         }
