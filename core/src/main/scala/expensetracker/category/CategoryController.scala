@@ -102,7 +102,7 @@ object CategoryController {
         icon = CategoryIcon(icon.value),
         kind = kind,
         color = CategoryColor(color.value),
-        accountId = aid
+        userId = aid
       )
   }
 

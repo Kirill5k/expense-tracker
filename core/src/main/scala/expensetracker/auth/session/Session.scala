@@ -34,7 +34,7 @@ final case class Session(
 )
 
 final case class CreateSession(
-    accountId: UserId,
+    userId: UserId,
     ipAddress: Option[IpAddress],
     time: Instant
 )

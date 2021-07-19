@@ -95,7 +95,7 @@ object TransactionController {
   ) {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
-        accountId = aid,
+        userId = aid,
         kind = kind,
         categoryId = CategoryId(categoryId.value),
         amount = amount,

@@ -40,5 +40,5 @@ final case class CreateCategory(
     name: CategoryName,
     icon: CategoryIcon,
     color: CategoryColor,
-    accountId: UserId
+    userId: UserId
 )

@@ -30,7 +30,7 @@ final case class Transaction(
 )
 
 final case class CreateTransaction(
-    accountId: UserId,
+    userId: UserId,
     kind: TransactionKind,
     categoryId: CategoryId,
     amount: Money,

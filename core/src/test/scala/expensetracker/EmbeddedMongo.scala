@@ -23,10 +23,11 @@ object EmbeddedMongo {
   implicit final class MongodExecutableOps(private val ex: MongodExecutable) extends AnyVal {
     def startWithRetry(attempt: Int = 5): MongodProcess =
       if (attempt < 0) throw new RuntimeException("failed to start process far too many times")
-      else Try(ex.start()).getOrElse {
-        Thread.sleep(2000)
-        startWithRetry(attempt-1)
-      }
+      else
+        Try(ex.start()).getOrElse {
+          Thread.sleep(2000)
+          startWithRetry(attempt - 1)
+        }
   }
 }
 
@@ -43,7 +44,7 @@ trait EmbeddedMongo {
       .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
       .build
     val mongodExecutable: MongodExecutable = EmbeddedMongo.prepare(mongodConfig)
-    var mongodProcess: MongodProcess = null
+    var mongodProcess: MongodProcess       = null
     try {
       mongodProcess = mongodExecutable.startWithRetry()
       test
@@ -56,22 +57,22 @@ trait EmbeddedMongo {
   def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
     new Document(
       Map[String, Object](
-        "_id"       -> new ObjectId(id.value),
-        "kind"      -> "expense",
-        "name"      -> name,
-        "icon"      -> "icon",
-        "color"     -> "#2962FF",
-        "accountId" -> uid.map(id => new ObjectId(id.value)).orNull
+        "_id"    -> new ObjectId(id.value),
+        "kind"   -> "expense",
+        "name"   -> name,
+        "icon"   -> "icon",
+        "color"  -> "#2962FF",
+        "userId" -> uid.map(id => new ObjectId(id.value)).orNull
       ).asJava
     )
 
   def accDoc(id: UserId, email: String, password: String = "password"): Document =
     new Document(
       Map[String, Object](
-        "_id"      -> new ObjectId(id.value),
-        "email"    -> email,
-        "password" -> password,
-        "name"     -> Document.parse("""{"first":"John","last":"Bloggs"}"""),
+        "_id"              -> new ObjectId(id.value),
+        "email"            -> email,
+        "password"         -> password,
+        "name"             -> Document.parse("""{"first":"John","last":"Bloggs"}"""),
         "registrationDate" -> Instant.parse("2021-06-01T00:00:00Z")
       ).asJava
     )

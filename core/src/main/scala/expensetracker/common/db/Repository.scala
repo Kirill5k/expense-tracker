@@ -12,18 +12,18 @@ import java.time.Instant
 
 trait Repository[F[_]] {
 
-  protected val AccIdField  = "accountId"
-  protected val IdField     = "_id"
-  protected val EmailField  = "email"
-  protected val HiddenField = "hidden"
+  protected val UIdField           = "userId"
+  protected val IdField            = "_id"
+  protected val EmailField         = "email"
+  protected val HiddenField        = "hidden"
   protected val LastUpdatedAtField = "lastUpdatedAt"
 
   protected val notHidden: Bson = Filters.ne(HiddenField, true)
 
   private def idEqFilter(name: String, id: String): Bson = Filters.eq(name, new ObjectId(id))
   protected def idEq(id: String): Bson                   = idEqFilter(IdField, id)
-  protected def accIdEq(aid: Option[UserId]): Bson    = idEqFilter(AccIdField, aid.map(_.value).orNull)
-  protected def accIdEq(aid: UserId): Bson            = idEqFilter(AccIdField, aid.value)
+  protected def userIdEq(aid: Option[UserId]): Bson      = idEqFilter(UIdField, aid.map(_.value).orNull)
+  protected def userIdEq(aid: UserId): Bson              = idEqFilter(UIdField, aid.value)
   protected def isNull(name: String): Bson               = Filters.eq(name, null)
 
   protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =

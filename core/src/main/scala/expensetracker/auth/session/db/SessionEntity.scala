@@ -8,7 +8,7 @@ import java.time.Instant
 
 final case class SessionEntity(
     _id: ObjectId,
-    accountId: ObjectId,
+    userId: ObjectId,
     createdAt: Instant,
     active: Boolean,
     status: SessionStatus,
@@ -17,7 +17,7 @@ final case class SessionEntity(
   def toDomain: Session =
     Session(
       id = SessionId(_id.toHexString),
-      userId = UserId(accountId.toHexString),
+      userId = UserId(userId.toHexString),
       createdAt = createdAt,
       active = active,
       status = status,
@@ -29,7 +29,7 @@ object SessionEntity {
   def create(cs: CreateSession): SessionEntity =
     SessionEntity(
       new ObjectId(),
-      new ObjectId(cs.accountId.value),
+      new ObjectId(cs.userId.value),
       cs.time,
       true,
       SessionStatus.Authenticated,

@@ -1,7 +1,15 @@
 package expensetracker.category.db
 
 import cats.implicits._
-import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
+import expensetracker.category.{
+  Category,
+  CategoryColor,
+  CategoryIcon,
+  CategoryId,
+  CategoryKind,
+  CategoryName,
+  CreateCategory
+}
 import expensetracker.auth.user.UserId
 import org.bson.types.ObjectId
 
@@ -13,7 +21,7 @@ final case class CategoryEntity(
     name: String,
     icon: String,
     color: String,
-    accountId: Option[ObjectId],
+    userId: Option[ObjectId],
     lastUpdatedAt: Option[Instant]
 ) {
   def toDomain: Category =
@@ -23,7 +31,7 @@ final case class CategoryEntity(
       name = CategoryName(name),
       icon = CategoryIcon(icon),
       color = CategoryColor(color),
-      userId = accountId.map(uid => UserId(uid.toHexString))
+      userId = userId.map(uid => UserId(uid.toHexString))
     )
 }
 
@@ -35,7 +43,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      accountId = cat.userId.map(aid => new ObjectId(aid.value)),
+      userId = cat.userId.map(aid => new ObjectId(aid.value)),
       lastUpdatedAt = Some(Instant.now())
     )
 
@@ -46,7 +54,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      accountId = new ObjectId(cat.accountId.value).some,
+      userId = new ObjectId(cat.userId.value).some,
       lastUpdatedAt = None
     )
 }

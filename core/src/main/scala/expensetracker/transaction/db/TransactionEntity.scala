@@ -10,7 +10,7 @@ import java.time.{Instant, LocalDate}
 
 final case class TransactionEntity(
     _id: ObjectId,
-    accountId: ObjectId,
+    userId: ObjectId,
     categoryId: ObjectId,
     kind: TransactionKind,
     amount: Money,
@@ -21,7 +21,7 @@ final case class TransactionEntity(
   def toDomain: Transaction =
     Transaction(
       id = TransactionId(_id.toHexString),
-      userId = UserId(accountId.toHexString),
+      userId = UserId(userId.toHexString),
       categoryId = CategoryId(categoryId.toHexString),
       kind = kind,
       amount = amount,
@@ -47,7 +47,7 @@ object TransactionEntity {
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       new ObjectId(),
-      new ObjectId(tx.accountId.value),
+      new ObjectId(tx.userId.value),
       new ObjectId(tx.categoryId.value),
       tx.kind,
       tx.amount,

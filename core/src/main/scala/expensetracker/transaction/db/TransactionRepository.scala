@@ -35,14 +35,14 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: UserId): F[List[Transaction]] =
     collection
-      .find(Filters.and(accIdEq(aid), notHidden))
+      .find(Filters.and(userIdEq(aid), notHidden))
       .sort(Sorts.descending("date"))
       .all[F]
       .map(_.map(_.toDomain).toList)
 
   override def get(aid: UserId, txid: TransactionId): F[Transaction] =
     collection
-      .find(Filters.and(accIdEq(aid), idEq(txid.value)))
+      .find(Filters.and(userIdEq(aid), idEq(txid.value)))
       .first[F]
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .map(_.toDomain)
@@ -50,7 +50,7 @@ final private class LiveTransactionRepository[F[_]: Async](
   override def update(tx: Transaction): F[Unit] =
     collection
       .findOneAndReplace[F](
-        Filters.and(accIdEq(tx.userId), idEq(tx.id.value)),
+        Filters.and(userIdEq(tx.userId), idEq(tx.id.value)),
         TransactionEntity.from(tx)
       )
       .flatMap(errorIfNull(TransactionDoesNotExist(tx.id)))
@@ -58,18 +58,18 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def delete(aid: UserId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete[F](Filters.and(accIdEq(aid), idEq(txid.value)))
+      .findOneAndDelete[F](Filters.and(userIdEq(aid), idEq(txid.value)))
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .void
 
   override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
-      .updateOne(Filters.and(accIdEq(aid), idEq(txid.value)), updateHidden(hidden))
+      .updateOne(Filters.and(userIdEq(aid), idEq(txid.value)), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
   override def isHidden(aid: UserId, txid: TransactionId): F[Boolean] =
     collection
-      .count(Filters.and(accIdEq(aid), idEq(txid.value), Filters.eq(HiddenField, true)))
+      .count(Filters.and(userIdEq(aid), idEq(txid.value), Filters.eq(HiddenField, true)))
       .map(_ > 0)
 }
 

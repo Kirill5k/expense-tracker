@@ -201,7 +201,7 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
         }
       }
 
-      "return error if accountId doesn't match" in {
+      "return error if userId doesn't match" in {
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)

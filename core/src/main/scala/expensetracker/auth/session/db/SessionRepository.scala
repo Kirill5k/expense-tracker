@@ -47,7 +47,7 @@ final private class LiveSessionRepository[F[_]: Async](
     collection.updateOne(idEq(sid.value), logoutUpdate).void
 
   override def invalidatedAll(aid: UserId): F[Unit] =
-    collection.updateMany(accIdEq(aid), invalidateUpdate).void
+    collection.updateMany(userIdEq(aid), invalidateUpdate).void
 }
 
 object SessionRepository {

@@ -20,21 +20,21 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
 
   override protected val mongoPort: Int = 12349
 
-  val acc1Id = UserId(new ObjectId().toHexString)
-  val acc2Id = UserId(new ObjectId().toHexString)
+  val u1Id   = UserId(new ObjectId().toHexString)
+  val u2Id   = UserId(new ObjectId().toHexString)
   val cat1Id = CategoryId(new ObjectId().toHexString)
   val cat2Id = CategoryId(new ObjectId().toHexString)
 
   "A TransactionRepository" should {
 
-    val create = CreateTransaction(acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None)
+    val create = CreateTransaction(u1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None)
 
     "create new transaction and return id" in {
       withEmbeddedMongoDb { client =>
         val result = for {
           repo <- TransactionRepository.make(client)
           txId <- repo.create(create)
-          txs  <- repo.getAll(acc1Id)
+          txs  <- repo.getAll(u1Id)
         } yield (txId, txs)
 
         result.map { case (txId, txs) =>
@@ -50,8 +50,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         val result = for {
           repo <- TransactionRepository.make(client)
           _    <- repo.create(create)
-          _ <- repo.create(CreateTransaction(acc1Id, TransactionKind.Income, cat2Id, GBP(45.0), LocalDate.now(), None))
-          txs <- repo.getAll(acc1Id)
+          _    <- repo.create(CreateTransaction(u1Id, TransactionKind.Income, cat2Id, GBP(45.0), LocalDate.now(), None))
+          txs  <- repo.getAll(u1Id)
         } yield txs
 
         result.map { txs =>
@@ -68,11 +68,11 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         val result = for {
           repo <- TransactionRepository.make(client)
           id   <- repo.create(create)
-          tx   <- repo.get(acc1Id, id)
+          tx   <- repo.get(u1Id, id)
         } yield tx
 
         result.map { tx =>
-          tx.userId mustBe acc1Id
+          tx.userId mustBe u1Id
         }
       }
     }
@@ -82,7 +82,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         val result = for {
           repo <- TransactionRepository.make(client)
           id   <- repo.create(create)
-          err  <- repo.get(acc2Id, id).attempt
+          err  <- repo.get(u2Id, id).attempt
         } yield (id, err)
 
         result.map { case (id, err) =>
@@ -97,7 +97,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           repo <- TransactionRepository.make(client)
           _    <- repo.create(create)
           _    <- repo.create(create.copy(categoryId = cat2Id, amount = GBP(45.0)))
-          txs  <- repo.getAll(acc2Id)
+          txs  <- repo.getAll(u2Id)
         } yield txs
 
         result.map { txs =>
@@ -112,8 +112,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(client)
             txid <- repo.create(create)
-            _    <- repo.delete(acc1Id, txid)
-            cats <- repo.getAll(acc1Id)
+            _    <- repo.delete(u1Id, txid)
+            cats <- repo.getAll(u1Id)
           } yield cats
 
           result.map { txs =>
@@ -122,12 +122,12 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
         }
       }
 
-      "return error if accountId doesn't match" in {
+      "return error if userId doesn't match" in {
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- TransactionRepository.make(client)
             txid <- repo.create(create)
-            res  <- repo.delete(acc2Id, txid).attempt
+            res  <- repo.delete(u2Id, txid).attempt
           } yield (txid, res)
 
           result.map { case (txid, res) =>
@@ -143,9 +143,9 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(db)
             txid <- repo.create(create)
-            tx   <- repo.get(acc1Id, txid)
+            tx   <- repo.get(u1Id, txid)
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
-            txs  <- repo.getAll(acc1Id)
+            txs  <- repo.getAll(u1Id)
           } yield (tx, txs)
 
           result.map { case (tx, txs) =>
@@ -160,7 +160,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(db)
             res <- repo.update(
-              Transaction(txid, acc1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None)
+              Transaction(txid, u1Id, TransactionKind.Expense, cat1Id, GBP(15.0), LocalDate.now(), None)
             )
           } yield res
 
@@ -177,8 +177,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(client)
             txid <- repo.create(create)
-            _    <- repo.hide(acc1Id, txid)
-            txs  <- repo.getAll(acc1Id)
+            _    <- repo.hide(u1Id, txid)
+            txs  <- repo.getAll(u1Id)
           } yield txs
 
           result.map { res =>
@@ -192,7 +192,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(client)
             txid <- repo.create(create)
-            res  <- repo.hide(acc2Id, txid).attempt
+            res  <- repo.hide(u2Id, txid).attempt
           } yield (txid, res)
 
           result.map { case (txid, res) =>
@@ -208,8 +208,8 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(client)
             txid <- repo.create(create)
-            _    <- repo.hide(acc1Id, txid)
-            txs  <- repo.isHidden(acc1Id, txid)
+            _    <- repo.hide(u1Id, txid)
+            txs  <- repo.isHidden(u1Id, txid)
           } yield txs
 
           result.map { res =>
@@ -223,7 +223,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
           val result = for {
             repo <- TransactionRepository.make(client)
             txid <- repo.create(create)
-            txs  <- repo.isHidden(acc1Id, txid)
+            txs  <- repo.isHidden(u1Id, txid)
           } yield txs
 
           result.map { res =>
@@ -244,7 +244,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             categories <- db.getCollection("categories")
             _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "category-1"), categoryDoc(cat2Id, "category-2")))
             accs <- db.getCollection("accounts")
-            _    <- accs.insertMany[IO](List(accDoc(acc1Id, "acc-1"), accDoc(acc2Id, "acc-2")))
+            _    <- accs.insertMany[IO](List(accDoc(u1Id, "acc-1"), accDoc(u2Id, "acc-2")))
             res  <- test(db)
           } yield res
         }
