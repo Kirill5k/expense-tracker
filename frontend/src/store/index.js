@@ -24,6 +24,7 @@ const handleError = (commit, { status, message }, rethrow = false) => {
 }
 
 const DEFAULT_STATE = {
+  isOnline: null,
   isLoading: false,
   isAuthenticated: false,
   user: null,
@@ -66,6 +67,9 @@ export default new Vuex.Store({
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
   mutations: {
+    setOnline (state, isOnline) {
+      state.isOnline = isOnline
+    },
     sort (state, sortBy) {
       state.sortBy = { ...sortBy }
     },

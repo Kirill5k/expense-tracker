@@ -52,9 +52,11 @@
 
 <script>
 import Page from '@/components/Page'
+import { VueOfflineMixin } from 'vue-offline'
 
 export default {
   name: 'App',
+  mixins: [VueOfflineMixin],
   components: {
     Page
   },
@@ -79,6 +81,9 @@ export default {
     }
   },
   watch: {
+    isOnline (newVal) {
+      this.$store.commit('setOnline', newVal)
+    },
     isAuthenticated (newVal) {
       if (newVal === true) {
         this.$router.push('/')

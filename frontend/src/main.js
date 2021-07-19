@@ -4,6 +4,7 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+import VueOffline from 'vue-offline'
 
 Vue.config.productionTip = false
 
@@ -25,6 +26,8 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
+Vue.use(VueOffline, { mixin: false })
 
 new Vue({
   router,
