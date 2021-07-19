@@ -153,6 +153,6 @@ export default {
 
 <style lang="scss">
 .categories {
-
+  overflow: inherit;
 }
 </style>

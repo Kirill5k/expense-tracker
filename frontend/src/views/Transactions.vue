@@ -184,6 +184,7 @@ export default {
 
 <style lang="scss">
 .transactions {
+  overflow: inherit;
 
   &__summary {
     width: 100%;
