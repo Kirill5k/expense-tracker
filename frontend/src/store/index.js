@@ -147,71 +147,93 @@ export default new Vuex.Store({
         .catch(() => commit('logout'))
     },
     getUser ({ commit, dispatch }) {
-      return Clients.online.getUser()
+      return Clients.get(true)
+        .getUser()
         .then(acc => dispatch('loadData', acc))
-        .catch(() => commit('loaded'))
+        .catch(e => {
+          commit('loaded')
+          return handleError(commit, e, true)
+        })
     },
-    login ({ commit, dispatch }, requestBody) {
+    login ({ state, commit, dispatch }, requestBody) {
       commit('loading')
-      return Clients.online
+      return Clients.get(state.isOnline)
         .login(requestBody)
         .then(acc => dispatch('loadData', acc))
         .catch(e => {
           commit('loaded')
-          handleError(commit, e)
+          return handleError(commit, e, true)
         })
     },
-    createUser ({ commit }, requestBody) {
-      return Clients.online.createUser(requestBody)
+    createUser ({ state, commit }, requestBody) {
+      return Clients.get(state.isOnline)
+        .createUser(requestBody)
         .then(() => commit('setAlert', Alerts.REGISTRATION_SUCCESS))
         .catch(e => handleError(commit, e, true))
     },
     updateUserSettings ({ commit, state }, requestBody) {
-      return Clients.online
+      return Clients.get(state.isOnline)
         .updateUserSettings(state.user.id, requestBody)
         .then(() => commit('setSettings', requestBody))
         .catch(e => handleError(commit, e))
     },
     changeUserPassword ({ commit, state }, requestBody) {
-      return Clients.online
+      return Clients.get(state.isOnline)
         .changeUserPassword(state.user.id, requestBody)
         .then(() => commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS))
         .catch(e => handleError(commit, e))
     },
-    logout ({ commit }) {
-      return Clients.online.logout()
+    logout ({ state, commit }) {
+      return Clients.get(state.isOnline)
+        .logout()
         .then(() => commit('logout'))
         .catch(e => handleError(commit, e))
     },
-    createCategory ({ commit, dispatch }, requestBody) {
-      return Clients.online.createCategory(requestBody)
+    createCategory ({ state, commit, dispatch }, requestBody) {
+      return Clients.get(state.isOnline)
+        .createCategory(requestBody)
         .then(cat => commit('addCategory', cat))
         .catch(e => handleError(commit, e))
     },
-    getCategories ({ commit }) {
-      return Clients.online.getCategories().then(cats => commit('setCategories', cats))
+    getCategories ({ state, commit }) {
+      return Clients.get(state.isOnline)
+        .getCategories()
+        .then(cats => commit('setCategories', cats))
     },
-    hideCategory ({ commit }, { id, hidden }) {
-      return Clients.online.hideCategory({ id, hidden })
+    hideCategory ({ state, commit }, { id, hidden }) {
+      return Clients.get(state.isOnline)
+        .hideCategory({ id, hidden })
         .then(() => commit('hideCategory', { id, hidden }))
+        .catch(e => handleError(commit, e, true))
     },
-    updateCategory ({ commit }, requestBody) {
-      return Clients.online
+    updateCategory ({ state, commit }, requestBody) {
+      return Clients.get(state.isOnline)
         .updateCategory(requestBody)
         .then(res => commit('updateCategory', res))
         .catch(e => handleError(commit, e))
     },
-    getTransactions ({ commit }) {
-      return Clients.online.getTransactions().then(txs => commit('setTransactions', txs))
+    getTransactions ({ state, commit }) {
+      return Clients.get(state.isOnline)
+        .getTransactions()
+        .then(txs => commit('setTransactions', txs))
     },
-    createTransaction ({ commit, dispatch }, requestBody) {
-      return Clients.online.createTransaction(requestBody).then(tx => commit('addTransaction', tx))
+    createTransaction ({ state, commit, dispatch }, requestBody) {
+      return Clients.get(state.isOnline)
+        .createTransaction(requestBody)
+        .then(tx => commit('addTransaction', tx))
+        .catch(e => handleError(commit, e))
     },
-    hideTransaction ({ commit }, { id, hidden }) {
-      return Clients.online.hideTransaction({ id, hidden }).then(() => commit('hideTransaction', { id, hidden }))
+    hideTransaction ({ state, commit }, { id, hidden }) {
+      return Clients.get(state.isOnline)
+        .hideTransaction({ id, hidden })
+        .then(() => commit('hideTransaction', { id, hidden }))
+        .catch(e => handleError(commit, e, true))
     },
-    updateTransaction ({ commit }, requestBody) {
-      return Clients.online.updateTransaction(requestBody).then(() => commit('updateTransaction', requestBody))
+    updateTransaction ({ state, commit }, requestBody) {
+      return Clients.get(state.isOnline)
+        .updateTransaction(requestBody)
+        .then(() => commit('updateTransaction', requestBody))
+        .catch(e => handleError(commit, e))
     }
   },
   modules: {

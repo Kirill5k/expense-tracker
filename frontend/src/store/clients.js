@@ -6,10 +6,82 @@ const DEFAULT_REQUEST_PARAMS = {
   headers: { 'Content-Type': 'application/json' }
 }
 
+// eslint-disable-next-line
+const notConnectedToTheInternet = () => Promise.reject({
+  message: 'Unable to complete the action - no internet connection',
+  status: 500
+})
+
 const reject = (res) => res.json().then(e => {
   // eslint-disable-next-line
   return Promise.reject({ message: e.message, status: res.status })
 })
+
+class StubClient {
+  getUser () {
+    return notConnectedToTheInternet()
+  }
+
+  login () {
+    return notConnectedToTheInternet()
+  }
+
+  createUser () {
+    return notConnectedToTheInternet()
+  }
+
+  updateUserSettings () {
+    return notConnectedToTheInternet()
+  }
+
+  changeUserPassword () {
+    return notConnectedToTheInternet()
+  }
+
+  logout () {
+    return notConnectedToTheInternet()
+  }
+
+  getCategories () {
+    return notConnectedToTheInternet()
+  }
+
+  createCategory () {
+    return notConnectedToTheInternet()
+  }
+
+  getCategory () {
+    return notConnectedToTheInternet()
+  }
+
+  hideCategory () {
+    return notConnectedToTheInternet()
+  }
+
+  updateCategory () {
+    return notConnectedToTheInternet()
+  }
+
+  getTransactions () {
+    return notConnectedToTheInternet()
+  }
+
+  createTransaction () {
+    return notConnectedToTheInternet()
+  }
+
+  getTransaction () {
+    return notConnectedToTheInternet()
+  }
+
+  hideTransaction () {
+    return notConnectedToTheInternet()
+  }
+
+  updateTransaction () {
+    return notConnectedToTheInternet()
+  }
+}
 
 class BackendClient {
   getUser () {
@@ -138,6 +210,8 @@ class BackendClient {
   }
 }
 
-const clients = { online: new BackendClient() }
+const onlineClient = new BackendClient()
+const stubClient = new StubClient()
+const clients = { get: isOnline => isOnline ? onlineClient : stubClient }
 
 export default clients

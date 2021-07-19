@@ -86,6 +86,7 @@
 <script>
 import CategoryList from '@/components/categories/CategoryList'
 import NewCategoryDialog from '@/components/categories/NewCategoryDialog'
+import ActionDispatcher from '@/mixins/dispatcher'
 
 export default {
   name: 'Categories',
@@ -93,10 +94,9 @@ export default {
     CategoryList,
     NewCategoryDialog
   },
+  mixins: [ActionDispatcher],
   data: () => ({
     lastDeletedId: null,
-    undoOp: false,
-    loading: false,
     editable: false,
     kind: 'expense'
   }),
@@ -115,16 +115,6 @@ export default {
     }
   },
   methods: {
-    dispatchAction (name, arg) {
-      this.undoOp = false
-      this.loading = true
-      return this.$store
-        .dispatch(name, arg)
-        .catch(() => {})
-        .then(() => {
-          this.loading = false
-        })
-    },
     create (newCategory) {
       this.dispatchAction('createCategory', newCategory)
     },

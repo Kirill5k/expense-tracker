@@ -122,6 +122,7 @@ import TransactionsSorter from '@/components/transactions/TransactionsSorter'
 import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import DatePeriodSelector from '@/components/DatePeriodSelector'
+import ActionDispatcher from '@/mixins/dispatcher'
 
 export default {
   name: 'Transactions',
@@ -132,10 +133,9 @@ export default {
     DatePeriodSelector,
     TransactionsFilter
   },
+  mixins: [ActionDispatcher],
   data: () => ({
     lastDeletedId: null,
-    undoOp: false,
-    loading: false,
     editable: false
   }),
   computed: {
@@ -147,16 +147,6 @@ export default {
     }
   },
   methods: {
-    dispatchAction (name, arg) {
-      this.undoOp = false
-      this.loading = true
-      return this.$store
-        .dispatch(name, arg)
-        .catch(() => {})
-        .then(() => {
-          this.loading = false
-        })
-    },
     remove (id) {
       this
         .dispatchAction('hideTransaction', { id, hidden: true })
