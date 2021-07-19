@@ -11,12 +11,13 @@ import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
 
 import java.time.LocalDate
+import scala.concurrent.Future
 
-class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matchers {
+class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers {
 
   override protected val mongoPort: Int = 12349
 
@@ -234,7 +235,7 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo {
       MongoClientF
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
@@ -248,6 +249,5 @@ class TransactionRepositorySpec extends AnyWordSpec with EmbeddedMongo with Matc
             res  <- test(db)
           } yield res
         }
-        .unsafeRunSync()
-    }
+    }.unsafeToFuture()
 }

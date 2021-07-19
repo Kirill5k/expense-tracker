@@ -3,26 +3,19 @@ package expensetracker.auth.user.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.auth.user.{
-  User,
-  UserDetails,
-  UserEmail,
-  UserId,
-  UserName,
-  UserSettings,
-  PasswordHash
-}
+import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.USD
 
 import java.time.Instant
+import scala.concurrent.Future
 
-class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
+class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
 
   override protected val mongoPort: Int = 12346
 
@@ -185,7 +178,7 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo {
       MongoClientF
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
@@ -197,6 +190,5 @@ class AccountRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
             res  <- test(db)
           } yield res
         }
-        .unsafeRunSync()
-    }
+    }.unsafeToFuture()
 }

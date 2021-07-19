@@ -5,18 +5,19 @@ import cats.effect.unsafe.implicits.global
 import cats.implicits._
 import com.comcast.ip4s.IpAddress
 import expensetracker.EmbeddedMongo
+import expensetracker.auth.session._
 import expensetracker.auth.user.UserId
-import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.wordspec.AsyncWordSpec
 
 import java.time.Instant
 import java.time.temporal.ChronoField
+import scala.concurrent.Future
 
-class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
+class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
 
   override protected val mongoPort: Int = 12347
 
@@ -114,7 +115,7 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo {
       MongoClientF
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
@@ -124,6 +125,5 @@ class SessionRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo
             res <- test(db)
           } yield res
         }
-        .unsafeRunSync()
-    }
+    }.unsafeToFuture()
 }

@@ -3,24 +3,18 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.EmbeddedMongo
-import expensetracker.category.{
-  Category,
-  CategoryColor,
-  CategoryIcon,
-  CategoryId,
-  CategoryKind,
-  CategoryName,
-  CreateCategory
-}
 import expensetracker.auth.user.UserId
+import expensetracker.category._
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
 import org.bson.types.ObjectId
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.wordspec.AsyncWordSpec
 
-class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMongo {
+import scala.concurrent.Future
+
+class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
 
   override protected val mongoPort: Int = 12348
 
@@ -262,8 +256,8 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): A =
-    withRunningEmbeddedMongo {
+  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
+    withRunningEmbeddedMongo[A] {
       MongoClientF
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
@@ -276,6 +270,5 @@ class CategoryRepositorySpec extends AnyWordSpec with Matchers with EmbeddedMong
             res      <- test(db)
           } yield res
         }
-        .unsafeRunSync()
-    }
+    }.unsafeToFuture()
 }
