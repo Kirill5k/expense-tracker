@@ -6,6 +6,10 @@ const ALERTS = {
   PASSWORD_CHANGE_SUCCESS: {
     type: 'success',
     message: 'Your password has been updated'
+  },
+  SESSION_EXPIRED: {
+    type: 'error',
+    message: 'Your session has expired. Please re-signin'
   }
 }
 

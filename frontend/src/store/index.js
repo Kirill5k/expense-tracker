@@ -149,7 +149,14 @@ export default new Vuex.Store({
     getUser ({ state, commit, dispatch }) {
       return Clients.get(state.isOnline)
         .getUser()
-        .then(acc => dispatch('loadData', acc))
+        .then(acc => {
+          if (!state.user.id || acc.id === state.user.id) {
+            return dispatch('loadData', acc)
+          } else {
+            commit('logout')
+            commit('setAlert', Alerts.SESSION_EXPIRED)
+          }
+        })
         .catch(e => {
           commit('loaded')
           return handleError(commit, e, true)
