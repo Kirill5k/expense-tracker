@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Analytics from '@/views/Analytics'
+import Home from '@/views/Home'
 
 Vue.use(VueRouter)
 
@@ -8,8 +8,19 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Analytics,
+    component: Home,
     meta: {
+      wide: true,
+      authAccess: false,
+      unAuthAccess: true
+    }
+  },
+  {
+    path: '/analytics',
+    name: 'analytics',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Analytics.vue'),
+    meta: {
+      navbar: true,
       slim: false,
       authAccess: true,
       unAuthAccess: false
@@ -20,6 +31,7 @@ const routes = [
     name: 'transactions',
     component: () => import(/* webpackChunkName: "about" */ '../views/Transactions.vue'),
     meta: {
+      navbar: true,
       slim: false,
       authAccess: true,
       unAuthAccess: false
@@ -30,6 +42,7 @@ const routes = [
     name: 'categories',
     component: () => import(/* webpackChunkName: "about" */ '../views/Categories.vue'),
     meta: {
+      navbar: true,
       slim: false,
       authAccess: true,
       unAuthAccess: false
@@ -40,6 +53,7 @@ const routes = [
     name: 'settings',
     component: () => import(/* webpackChunkName: "about" */ '../views/Settings.vue'),
     meta: {
+      navbar: true,
       slim: false,
       authAccess: true,
       unAuthAccess: false

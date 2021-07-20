@@ -12,13 +12,13 @@ router.beforeEach((to, from, next) => {
   store.commit('clearAlert')
   if (to.matched.some(record => record.meta.authAccess)) {
     if (!store.state.isAuthenticated) {
-      next({ path: '/login' })
+      next({ path: '/' })
     } else {
       next()
     }
   } else if (to.matched.some(record => record.meta.unAuthAccess)) {
     if (store.state.isAuthenticated) {
-      next({ path: '/' })
+      next({ path: '/analytics' })
     } else {
       next()
     }

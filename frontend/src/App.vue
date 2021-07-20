@@ -1,26 +1,47 @@
 <template>
   <v-app>
     <v-app-bar
+      v-if="!isAuthenticated || !$vuetify.breakpoint.xsOnly"
       clipped-left
-      class="d-none d-sm-block"
       app
       dense
     >
-      <v-app-bar-title>Expense-tracker</v-app-bar-title>
+      <v-btn to="/" text>
+        <v-app-bar-title>Expense-tracker</v-app-bar-title>
+      </v-btn>
       <v-spacer/>
 
       <v-btn
+        v-if="isAuthenticated"
         icon
         class="mr-2"
         @click="logout"
       >
         <v-icon>mdi-logout</v-icon>
       </v-btn>
+      <template v-else>
+        <v-btn
+          icon
+          class="mr-2"
+          to="/register"
+        >
+          <v-icon>mdi-account-plus</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          class="mr-2"
+          to="/login"
+        >
+          <v-icon>mdi-login</v-icon>
+        </v-btn>
+      </template>
     </v-app-bar>
 
-    <v-main class="pt-0 pt-sm-12">
+    <v-main>
       <page
+        :navbar="$route.meta.navbar"
         :loading="$store.state.isLoading"
+        :wide="$route.meta.wide"
         :slim="$route.meta.slim"
         :alert="$store.state.alert"
         :nav-links="navLinks"
@@ -69,7 +90,7 @@ export default {
   },
   data: () => ({
     navLinks: [
-      { to: '/', name: 'Analytics', icon: 'mdi-chart-bar' },
+      { to: '/analytics', name: 'Analytics', icon: 'mdi-chart-bar' },
       { to: '/transactions', name: 'Transactions', icon: 'mdi-bank-transfer' },
       { to: '/categories', name: 'Categories', icon: 'mdi-shape' },
       { to: '/settings', name: 'Settings', icon: 'mdi-account-cog' }
@@ -92,7 +113,7 @@ export default {
     },
     isAuthenticated (newVal) {
       if (newVal === true) {
-        this.$router.push('/')
+        this.$router.push('/analytics')
       }
       if (newVal === false) {
         this.$router.push('/login')

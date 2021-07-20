@@ -58,7 +58,7 @@ export default {
       this.$store.commit('clearAlert')
       this.$store
         .dispatch('login', credentials)
-        .then(() => this.$router.push('/'))
+        .then(() => this.$router.push('/analytics'))
         .catch(() => {
           this.loading = false
         })
