@@ -6,9 +6,7 @@
       app
       dense
     >
-      <v-btn to="/" text>
-        <v-app-bar-title>Expense-tracker</v-app-bar-title>
-      </v-btn>
+      <v-app-bar-title>Expense-tracker</v-app-bar-title>
       <v-spacer/>
 
       <v-btn
