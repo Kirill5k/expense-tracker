@@ -61,6 +61,7 @@ export default {
     Page
   },
   mounted () {
+    this.setTheme(this.darkMode)
     if (!this.userId) {
       this.$store.commit('loading')
     }
@@ -98,16 +99,19 @@ export default {
       }
     },
     darkMode (newVal) {
-      if (typeof newVal === 'boolean') {
-        this.$vuetify.theme.dark = newVal
-      } else {
-        this.$vuetify.theme.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      }
+      this.setTheme(newVal)
     }
   },
   methods: {
     logout () {
       this.$store.dispatch('logout')
+    },
+    setTheme (newVal) {
+      if (typeof newVal === 'boolean') {
+        this.$vuetify.theme.dark = newVal
+      } else {
+        this.$vuetify.theme.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      }
     }
   }
 }

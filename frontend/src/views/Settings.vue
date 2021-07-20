@@ -83,10 +83,10 @@ export default {
   },
   methods: {
     updateSettings (newSettings) {
-      this.dispatch('updateUserSettings', newSettings)
+      this.dispatchAction('updateUserSettings', newSettings)
     },
     changePassword (newPassword) {
-      this.dispatch('changeUserPassword', newPassword)
+      this.dispatchAction('changeUserPassword', newPassword)
     }
   }
 }
