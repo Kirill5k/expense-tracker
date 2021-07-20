@@ -54,6 +54,7 @@ trait EmbeddedMongo {
       .make(EmbeddedMongo.prepare[IO](mongodConfig))(ex => IO(ex.stop()))
       .flatMap(ex => Resource.make(ex.startWithRetry[IO]())(pr => IO(pr.stop())))
       .use(_ => test)
+      .timeout(5.minutes)
   }
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =

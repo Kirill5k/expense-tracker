@@ -13,12 +13,14 @@
         v-if="isAuthenticated"
         icon
         class="mr-2"
+        small
         @click="logout"
       >
         <v-icon>mdi-logout</v-icon>
       </v-btn>
       <template v-else>
         <v-btn
+          small
           icon
           class="mr-2"
           to="/register"
@@ -26,6 +28,7 @@
           <v-icon>mdi-account-plus</v-icon>
         </v-btn>
         <v-btn
+          small
           icon
           class="mr-2"
           to="/login"
