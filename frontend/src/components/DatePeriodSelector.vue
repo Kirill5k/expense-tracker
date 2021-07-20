@@ -57,7 +57,7 @@ export default {
     }
   },
   created () {
-    if (!this.displayDate.text) {
+    if (!this.displayDate.text || typeof this.displayDate.start === 'string') {
       this.resetDate('monthly')
     }
   },

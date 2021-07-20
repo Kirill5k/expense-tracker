@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Alerts from './alerts'
 import Clients from './clients'
+import vuexLocal from '@/plugins/vuexpersist'
 
 Vue.use(Vuex)
 
@@ -44,6 +45,7 @@ const DEFAULT_STATE = {
 }
 
 export default new Vuex.Store({
+  plugins: [vuexLocal.plugin],
   state: {
     ...DEFAULT_STATE
   },
