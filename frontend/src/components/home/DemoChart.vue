@@ -1,5 +1,5 @@
 <template>
-  <div class="categories-chart">
+  <div class="demo-chart">
     <figure>
       <v-chart
         :init-options="initOptions"
@@ -16,18 +16,79 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { PieChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+import { LegendComponent } from 'echarts/components'
 
 use([
   CanvasRenderer,
   PieChart,
-  TitleComponent,
-  TooltipComponent,
   LegendComponent
 ])
 
+const TEST_DATA = [
+  {
+    value: 1009.99,
+    name: 'General',
+    icon: 'mdi-cash',
+    color: '#AA00FF'
+  },
+  {
+    value: 1000,
+    name: 'Restaraunts',
+    icon: 'mdi-silverware',
+    color: '#FFC400'
+  },
+  {
+    value: 251,
+    name: 'Transfer',
+    icon: 'mdi-send',
+    color: '#6200EA'
+  },
+  {
+    value: 200,
+    name: 'Fuel',
+    icon: 'mdi-gas-station',
+    color: '#D50000'
+  },
+  {
+    value: 99.99,
+    name: 'Kids',
+    icon: 'mdi-baby-carriage',
+    color: '#64DD17'
+  },
+  {
+    value: 99.9,
+    name: 'Groceries',
+    icon: 'mdi-cart',
+    color: '#304FFE'
+  },
+  {
+    value: 18.75,
+    name: 'Health',
+    icon: 'mdi-pill',
+    color: '#00E5FF'
+  },
+  {
+    value: 11,
+    name: 'Shopping',
+    icon: 'mdi-shopping',
+    color: '#C51162'
+  },
+  {
+    value: 10.14,
+    name: 'Transport',
+    icon: 'mdi-bus',
+    color: '#FF6D00'
+  },
+  {
+    value: 8.88,
+    name: 'Utilities',
+    icon: 'mdi-home',
+    color: '#AEEA00'
+  }
+]
+
 export default {
-  name: 'CategoriesChart',
+  name: 'Demo',
   components: {
     VChart
   },
@@ -42,14 +103,6 @@ export default {
     windowHeight: {
       type: Number,
       required: true
-    },
-    categoryBreakdown: {
-      type: Array,
-      required: true
-    },
-    currency: {
-      type: Object,
-      required: true
     }
   },
   data: () => ({
@@ -60,31 +113,23 @@ export default {
   computed: {
     canvasHeight () {
       if (this.windowHeight < 600) {
-        return 120
-      } else if (this.windowHeight < 700) {
         return 200
+      } else if (this.windowHeight < 700) {
+        return 300
       } else {
-        return 240
+        return 400
       }
     },
     option () {
       return {
-        tooltip: {
-          trigger: 'item',
-          formatter: `{b}: ${this.currency.symbol}{c} ({d}%)`,
-          confine: true,
-          borderWidth: 0,
-          padding: 4,
-          className: 'text-subtitle-2'
-        },
         series: [
           {
             zlevel: 10,
-            name: 'Categories Breakdown',
+            name: 'Demo Breakdown',
             type: 'pie',
             radius: '75%',
             center: ['50%', '50%'],
-            data: this.categoryBreakdown.map(c => ({ value: c.total, name: c.name, icon: c.icon, color: c.color })),
+            data: TEST_DATA,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -112,7 +157,7 @@ export default {
 </script>
 
 <style lang="scss">
-.categories-chart {
+.demo-chart {
 
 }
 </style>
