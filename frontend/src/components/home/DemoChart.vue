@@ -127,7 +127,7 @@ export default {
             zlevel: 10,
             name: 'Demo Breakdown',
             type: 'pie',
-            radius: '75%',
+            radius: ['12.5%', '75%'],
             center: ['50%', '50%'],
             data: TEST_DATA,
             emphasis: {
@@ -143,9 +143,12 @@ export default {
               position: 'outer',
               alignTo: 'none',
               edgeDistance: '0%',
-              bleedMargin: 0
+              bleedMargin: 0,
+              align: 'center',
+              avoidLabelOverlap: 0
             },
             itemStyle: {
+              borderRadius: 3,
               color: ({ data }) => data.color
             }
           }

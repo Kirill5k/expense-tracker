@@ -82,7 +82,7 @@ export default {
             zlevel: 10,
             name: 'Categories Breakdown',
             type: 'pie',
-            radius: '75%',
+            radius: ['5%', '75%'],
             center: ['50%', '50%'],
             data: this.categoryBreakdown.map(c => ({ value: c.total, name: c.name, icon: c.icon, color: c.color })),
             emphasis: {
@@ -101,6 +101,7 @@ export default {
               bleedMargin: 0
             },
             itemStyle: {
+              borderRadius: 3,
               color: ({ data }) => data.color
             }
           }
