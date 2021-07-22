@@ -1,15 +1,26 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="8">
-      <p class="text-h2">Hello, World!</p>
-    </v-col>
-    <v-col cols="4">
+  <div
+    class="home flex-column-reverse flex-sm-row py-0 py-sm-12"
+  >
+    <div
+      class="home__column text-center text-sm-right"
+    >
+      <p class="text-h2">Expense-tracker</p>
+      <p class="text-subtitle">Keep your finances under control!</p>
+      <v-btn rounded outlined @click="register">
+        get started
+      </v-btn>
+    </div>
+    <div
+      class="home__column"
+      :style="{width: $vuetify.breakpoint.xsOnly ? '100%' : '50%'}"
+    >
       <demo-chart
         :window-height="$vuetify.breakpoint.height"
         :dark="$vuetify.theme.dark"
       />
-    </v-col>
-  </v-row>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -27,7 +38,14 @@ export default {
 </script>
 
 <style lang="scss">
-.login {
+.home {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  &__column {
+    height: 100%;
+  }
 }
 </style>

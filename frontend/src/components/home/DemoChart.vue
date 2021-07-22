@@ -26,61 +26,61 @@ use([
 
 const TEST_DATA = [
   {
-    value: 1009.99,
+    value: 22,
     name: 'General',
     icon: 'mdi-cash',
     color: '#AA00FF'
   },
   {
-    value: 1000,
+    value: 20,
     name: 'Restaraunts',
     icon: 'mdi-silverware',
     color: '#FFC400'
   },
   {
-    value: 251,
+    value: 10,
     name: 'Transfer',
     icon: 'mdi-send',
     color: '#6200EA'
   },
   {
-    value: 200,
+    value: 20,
     name: 'Fuel',
     icon: 'mdi-gas-station',
     color: '#D50000'
   },
   {
-    value: 99.99,
+    value: 15,
     name: 'Kids',
     icon: 'mdi-baby-carriage',
     color: '#64DD17'
   },
   {
-    value: 99.9,
+    value: 30,
     name: 'Groceries',
     icon: 'mdi-cart',
     color: '#304FFE'
   },
   {
-    value: 18.75,
+    value: 7,
     name: 'Health',
     icon: 'mdi-pill',
     color: '#00E5FF'
   },
   {
-    value: 11,
+    value: 15,
     name: 'Shopping',
     icon: 'mdi-shopping',
     color: '#C51162'
   },
   {
-    value: 10.14,
+    value: 10,
     name: 'Transport',
     icon: 'mdi-bus',
     color: '#FF6D00'
   },
   {
-    value: 8.88,
+    value: 20,
     name: 'Utilities',
     icon: 'mdi-home',
     color: '#AEEA00'
@@ -139,7 +139,7 @@ export default {
             },
             label: {
               color: this.dark ? 'white' : '#424242',
-              fontSize: 10,
+              fontSize: 14,
               position: 'outer',
               alignTo: 'none',
               edgeDistance: '0%',
