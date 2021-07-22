@@ -30,13 +30,13 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
   ): F[Response[F]] =
     response.handleErrorWith {
       case err: AppError.Conflict =>
-        logger.error(err)(err.getMessage) *>
+        logger.error(err.getMessage) *>
           Conflict(ErrorResponse(err.getMessage))
       case err: AppError.BadReq =>
-        logger.error(err)(err.getMessage) *>
+        logger.error(err.getMessage) *>
           BadRequest(ErrorResponse(err.getMessage))
       case err: AppError.NotFound =>
-        logger.error(err)(err.getMessage) *>
+        logger.error(err.getMessage) *>
           NotFound(ErrorResponse(err.getMessage))
       case err: AppError.Forbidden =>
         logger.error(err.getMessage) *>
