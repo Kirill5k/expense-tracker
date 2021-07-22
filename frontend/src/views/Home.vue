@@ -45,7 +45,6 @@ export default {
   justify-content: center;
 
   &__column {
-    height: 100%;
   }
 }
 </style>
