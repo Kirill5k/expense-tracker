@@ -39,7 +39,7 @@ export default {
 
 <style lang="scss">
 .home {
-  height: 100%;
+  height: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
