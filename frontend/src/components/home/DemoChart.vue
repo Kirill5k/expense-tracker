@@ -131,6 +131,7 @@ export default {
             center: ['50%', '50%'],
             data: TEST_DATA,
             emphasis: {
+              scaleSize: 25,
               itemStyle: {
                 shadowBlur: 10,
                 shadowOffsetX: 0,
