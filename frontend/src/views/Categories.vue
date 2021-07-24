@@ -119,6 +119,8 @@ export default {
       this.dispatchAction('createCategory', newCategory)
     },
     remove (id) {
+      const usedCount = this.$store.getters.transactionsByCatsCount[id] || 0
+      console.log(usedCount)
       this.dispatchAction('hideCategory', { id, hidden: true })
         .then(() => {
           this.lastDeletedId = id
