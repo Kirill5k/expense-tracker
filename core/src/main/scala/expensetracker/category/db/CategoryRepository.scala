@@ -91,6 +91,6 @@ object CategoryRepository {
 
   def make[F[_]: Async](db: MongoDatabaseF[F]): F[CategoryRepository[F]] =
     db
-      .getCollectionWithCirceCodecs[CategoryEntity]("categories")
+      .getCollectionWithCodec[CategoryEntity]("categories")
       .map(coll => new LiveCategoryRepository[F](coll))
 }

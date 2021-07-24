@@ -52,5 +52,5 @@ final private class LiveSessionRepository[F[_]: Async](
 
 object SessionRepository {
   def make[F[_]: Async](db: MongoDatabaseF[F]): F[SessionRepository[F]] =
-    db.getCollectionWithCirceCodecs[SessionEntity]("sessions").map(coll => new LiveSessionRepository[F](coll))
+    db.getCollectionWithCodec[SessionEntity]("sessions").map(coll => new LiveSessionRepository[F](coll))
 }
