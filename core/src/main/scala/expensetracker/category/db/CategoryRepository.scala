@@ -2,7 +2,6 @@ package expensetracker.category.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Sorts}
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
@@ -10,6 +9,7 @@ import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoe
 import io.circe.generic.auto._
 import expensetracker.common.json._
 import mongo4cats.circe._
+import mongo4cats.database.operations.Filter
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
 import org.bson.types.ObjectId
 
@@ -30,28 +30,28 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def getAll(aid: UserId): F[List[Category]] =
     collection
-      .find(Filters.and(userIdEq(aid), notHidden))
-      .sort(Sorts.ascending("name"))
+      .find(userIdEq(aid) and notHidden)
+      .sortBy("name")
       .all[F]
       .map(_.toList.map(_.toDomain))
 
   override def get(aid: UserId, cid: CategoryId): F[Category] =
     collection
-      .find(Filters.and(userIdEq(aid), idEq(cid.value)))
+      .find(userIdEq(aid) and idEq(cid.value))
       .first[F]
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .map(_.toDomain)
 
   override def delete(aid: UserId, cid: CategoryId): F[Unit] =
     collection
-      .findOneAndDelete[F](Filters.and(userIdEq(aid), idEq(cid.value)))
+      .findOneAndDelete[F](userIdEq(aid) and idEq(cid.value))
       .flatMap(errorIfNull(CategoryDoesNotExist(cid)))
       .void
 
   override def create(cat: CreateCategory): F[CategoryId] = {
     val newCat = CategoryEntity.from(cat)
     collection
-      .count(Filters.and(userIdEq(cat.userId), Filters.regex("name", "(?i)^" + newCat.name  + "$"), notHidden))
+      .count(userIdEq(cat.userId) and notHidden and Filter.regex("name", "(?i)^" + newCat.name  + "$"))
       .flatMap {
         case 0 => collection.insertOne[F](newCat).as(CategoryId(newCat._id.toHexString))
         case _ => CategoryAlreadyExists(cat.name).raiseError[F, CategoryId]
@@ -60,15 +60,12 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def update(cat: Category): F[Unit] =
     collection
-      .findOneAndReplace[F](
-        Filters.and(userIdEq(cat.userId), idEq(cat.id.value)),
-        CategoryEntity.from(cat)
-      )
+      .findOneAndReplace[F](userIdEq(cat.userId) and idEq(cat.id.value), CategoryEntity.from(cat))
       .flatMap(r => errorIfNull(CategoryDoesNotExist(cat.id))(r).void)
 
   override def assignDefault(aid: UserId): F[Unit] =
     collection
-      .find(Filters.or(Filters.exists(UIdField, false), isNull(UIdField)))
+      .find(Filter.notExists(UIdField) or isNull(UIdField))
       .all[F]
       .map(_.map(_.copy(_id = new ObjectId(), userId = Some(new ObjectId(aid.value)))).toList)
       .flatMap { cats =>
@@ -78,12 +75,12 @@ final private class LiveCategoryRepository[F[_]: Async](
 
   override def hide(aid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit] =
     collection
-      .updateOne(Filters.and(userIdEq(aid), idEq(cid.value)), updateHidden(hidden))
+      .updateOne(userIdEq(aid) and idEq(cid.value), updateHidden(hidden))
       .flatMap(errorIfNoMatches(CategoryDoesNotExist(cid)))
 
   override def isHidden(aid: UserId, cid: CategoryId): F[Boolean] =
     collection
-      .count(Filters.and(userIdEq(aid), idEq(cid.value), Filters.eq(HiddenField, true)))
+      .count[F](userIdEq(aid) and idEq(cid.value) and Filter.eq(HiddenField, true))
       .map(_ > 0)
 }
 
@@ -91,6 +88,6 @@ object CategoryRepository {
 
   def make[F[_]: Async](db: MongoDatabaseF[F]): F[CategoryRepository[F]] =
     db
-      .getCollectionWithCirceCodecs[CategoryEntity]("categories")
+      .getCollectionWithCodec[CategoryEntity]("categories")
       .map(coll => new LiveCategoryRepository[F](coll))
 }

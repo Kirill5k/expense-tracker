@@ -82,7 +82,7 @@ export default {
       }
     },
     balance () {
-      return Math.abs(Number(this.totalEarned) - Number(this.totalSpent))
+      return (Math.abs(Number(this.totalEarned) - Number(this.totalSpent))).toFixed(2)
     }
   }
 }

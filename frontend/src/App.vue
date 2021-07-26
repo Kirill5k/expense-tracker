@@ -6,7 +6,11 @@
       app
       dense
     >
-      <v-app-bar-title>Expense-tracker</v-app-bar-title>
+      <a @click="home">
+        <v-app-bar-title>
+          Expense-tracker
+        </v-app-bar-title>
+      </a>
       <v-spacer/>
 
       <v-btn
@@ -127,6 +131,11 @@ export default {
   methods: {
     logout () {
       this.$store.dispatch('logout')
+    },
+    home () {
+      if (this.$route.meta.unAuthAccess && this.$route.name !== 'home') {
+        this.$router.push('/')
+      }
     },
     setTheme (newVal) {
       if (typeof newVal === 'boolean') {

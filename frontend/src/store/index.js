@@ -50,6 +50,15 @@ export default new Vuex.Store({
     ...DEFAULT_STATE
   },
   getters: {
+    transactionsByCatsCount: state => state.transactions
+      .filter(t => t.hidden !== true)
+      .reduce((acc, tx) => {
+        if (!acc[tx.categoryId]) {
+          acc[tx.categoryId] = 0
+        }
+        acc[tx.categoryId] = acc[tx.categoryId] + 1
+        return acc
+      }, {}),
     filteredCats: state => state.categories.filter(c => c.hidden !== true),
     incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
     expenseCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'expense'),

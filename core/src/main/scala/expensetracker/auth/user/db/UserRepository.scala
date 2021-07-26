@@ -2,16 +2,14 @@ package expensetracker.auth.user.db
 
 import cats.effect.Async
 import cats.implicits._
-import com.mongodb.client.model.{Filters, Updates}
-import expensetracker.auth.user.{User, UserDetails, UserEmail, UserId, UserSettings, PasswordHash}
+import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserSettings}
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.common.json._
 import io.circe.generic.auto._
-import io.circe.syntax._
 import mongo4cats.circe._
+import mongo4cats.database.operations.{Filter, Update}
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
-import org.bson.Document
 
 trait UserRepository[F[_]] extends Repository[F] {
   def find(aid: UserId): F[User]
@@ -27,13 +25,13 @@ final private class LiveUserRepository[F[_]: Async](
 
   override def findBy(email: UserEmail): F[Option[User]] =
     collection
-      .find(Filters.eq(EmailField, email.value))
+      .find(Filter.eq(EmailField, email.value))
       .first[F]
       .map(ue => Option(ue).map(_.toDomain))
 
   override def create(details: UserDetails, password: PasswordHash): F[UserId] =
     collection
-      .count[F](Filters.eq(EmailField, details.email.value))
+      .count[F](Filter.eq(EmailField, details.email.value))
       .flatMap {
         case 0 =>
           val createAcc = AccountEntity.create(details, password)
@@ -51,17 +49,18 @@ final private class LiveUserRepository[F[_]: Async](
 
   override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
     collection
-      .updateOne(idEq(aid.value), Updates.set("settings", Document.parse(settings.asJson.noSpaces)))
+      .updateOne(idEq(aid.value), Update.set("settings", settings))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 
   override def updatePassword(aid: UserId)(password: PasswordHash): F[Unit] =
     collection
-      .updateOne(idEq(aid.value), Updates.set("password", password.value))
+      .updateOne(idEq(aid.value), Update.set("password", password.value))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 }
 
 object UserRepository {
   def make[F[_]: Async](db: MongoDatabaseF[F]): F[UserRepository[F]] =
     db.getCollectionWithCodec[AccountEntity]("users")
+      .map(_.withAddedCodec[UserSettings])
       .map(coll => new LiveUserRepository[F](coll))
 }

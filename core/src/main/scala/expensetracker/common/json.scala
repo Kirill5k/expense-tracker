@@ -17,10 +17,10 @@ trait JsonCodecs {
     IpAddress.fromString(ip).toRight(s"invalid ip address $ip")
   }
 
+  implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
+
   implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
   implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap(_.value)
-
-  implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 
   implicit val decodeCurrency: Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for {

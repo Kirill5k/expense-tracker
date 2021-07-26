@@ -29,7 +29,7 @@
         :items="kind === 'expense' ? expenseCats : incomeCats"
         :editable="editable"
         :window-height="windowHeight"
-        @delete="remove"
+        @delete="removeWithWarning"
         @edit="edit"
       />
       <v-divider/>
@@ -80,19 +80,25 @@
         </v-btn>
       </template>
     </v-snackbar>
+    <remove-category-dialog
+      ref="removeCategoryDialog"
+      @delete="remove"
+    />
   </v-card>
 </template>
 
 <script>
 import CategoryList from '@/components/categories/CategoryList'
 import NewCategoryDialog from '@/components/categories/NewCategoryDialog'
+import RemoveCategoryDialog from '@/components/categories/RemoveCategoryDialog'
 import ActionDispatcher from '@/mixins/dispatcher'
 
 export default {
   name: 'Categories',
   components: {
     CategoryList,
-    NewCategoryDialog
+    NewCategoryDialog,
+    RemoveCategoryDialog
   },
   mixins: [ActionDispatcher],
   data: () => ({
@@ -118,6 +124,14 @@ export default {
     create (newCategory) {
       this.dispatchAction('createCategory', newCategory)
     },
+    removeWithWarning (id) {
+      const numberOfUses = this.getNumberOfUses(id)
+      if (numberOfUses > 0) {
+        this.$refs.removeCategoryDialog.open(id, numberOfUses)
+      } else {
+        this.remove(id)
+      }
+    },
     remove (id) {
       this.dispatchAction('hideCategory', { id, hidden: true })
         .then(() => {
@@ -136,6 +150,9 @@ export default {
     },
     edit (category) {
       this.$refs.newCategoryDialog.update(category)
+    },
+    getNumberOfUses (catId) {
+      return this.$store.getters.transactionsByCatsCount[catId] || 0
     }
   }
 }
