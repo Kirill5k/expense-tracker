@@ -62,6 +62,6 @@ final private class LiveUserRepository[F[_]: Async](
 
 object UserRepository {
   def make[F[_]: Async](db: MongoDatabaseF[F]): F[UserRepository[F]] =
-    db.getCollectionWithCirceCodecs[AccountEntity]("users")
+    db.getCollectionWithCodec[AccountEntity]("users")
       .map(coll => new LiveUserRepository[F](coll))
 }
