@@ -1,52 +1,46 @@
 package expensetracker
 
 import cats.effect.{Async, IO, Resource}
-import cats.effect.kernel.Sync
 import cats.implicits._
-import de.flapdoodle.embed.mongo.{MongodExecutable, MongodProcess, MongodStarter}
 import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
+import de.flapdoodle.embed.mongo.{MongodProcess, MongodStarter}
 import de.flapdoodle.embed.process.runtime.Network
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import mongo4cats.bson.Document
 import org.bson.types.ObjectId
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.slf4j.LoggerFactory
 
 import java.time.Instant
 import scala.concurrent.duration._
 
 object EmbeddedMongo {
 
-  private val starter             = MongodStarter.getDefaultInstance
-  implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
+  private val starter = MongodStarter.getDefaultInstance
+  private val logger  = LoggerFactory.getLogger("EmbeddedMongo")
 
-  def prepare[F[_]: Async: Logger](config: MongodConfig, maxAttempts: Int = 10, attempt: Int = 0): F[MongodExecutable] =
-    if (attempt >= maxAttempts)
-      Sync[F].raiseError(new RuntimeException("tried to prepare executable far too many times"))
-    else
-      Async[F].delay(starter.prepare(config)).handleErrorWith { e =>
-        Logger[F].error(e)(e.getMessage) *>
-          Async[F].sleep(attempt.seconds) *>
-          prepare[F](config, maxAttempts, attempt + 1)
+  def start[F[_]: Async](
+      config: MongodConfig,
+      maxAttempts: Int = 10,
+      attempt: Int = 0
+  ): Resource[F, MongodProcess] =
+    if (attempt >= maxAttempts) {
+      Resource.eval(new RuntimeException("Failed to start embedded mongo too many times").raiseError[F, MongodProcess])
+    } else {
+      val process = for {
+        ex <- Resource.make(Async[F].delay(starter.prepare(config)))(ex => Async[F].delay(ex.stop()))
+        p  <- Resource.make(Async[F].delay(ex.start()))(p => Async[F].delay(p.stop()))
+      } yield p
+
+      process.handleErrorWith { e =>
+        Resource.eval(Async[F].delay(logger.error(e.getMessage, e)) *> Async[F].sleep(attempt.seconds)) *>
+          start[F](config, maxAttempts, attempt + 1)
       }
-
-  implicit final class MongodExecutableOps(private val ex: MongodExecutable) extends AnyVal {
-    def startWithRetry[F[_]: Async: Logger](maxAttempts: Int = 10, attempt: Int = 0): F[MongodProcess] =
-      if (attempt >= maxAttempts)
-        Sync[F].raiseError(new RuntimeException("tried to start executable far too many times"))
-      else
-        Async[F].delay(ex.start()).handleErrorWith { e =>
-          Logger[F].error(e)(e.getMessage) *>
-            Async[F].sleep(attempt.seconds) *>
-            startWithRetry(maxAttempts, attempt + 1)
-        }
-  }
+    }
 }
 
 trait EmbeddedMongo {
-  import EmbeddedMongo._
 
   protected val mongoHost = "localhost"
   protected val mongoPort = 12343
@@ -58,9 +52,8 @@ trait EmbeddedMongo {
       .net(new Net(mongoHost, mongoPort, Network.localhostIsIPv6))
       .build
 
-    Resource
-      .make(EmbeddedMongo.prepare[IO](mongodConfig))(ex => IO(ex.stop()))
-      .flatMap(ex => Resource.make(ex.startWithRetry[IO]())(pr => IO(pr.stop())))
+    EmbeddedMongo
+      .start[IO](mongodConfig)
       .use(_ => test)
       .timeout(5.minutes)
   }
