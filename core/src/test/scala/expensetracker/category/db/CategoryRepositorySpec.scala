@@ -257,7 +257,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
-    withRunningEmbeddedMongo[A] {
+    withRunningEmbeddedMongo[IO, A] {
       MongoClientF
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>

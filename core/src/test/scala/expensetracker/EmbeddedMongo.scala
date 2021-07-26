@@ -1,6 +1,6 @@
 package expensetracker
 
-import cats.effect.{Async, IO, Resource}
+import cats.effect.{Async, Resource}
 import cats.implicits._
 import de.flapdoodle.embed.mongo.config.{MongodConfig, Net}
 import de.flapdoodle.embed.mongo.distribution.Version
@@ -25,19 +25,16 @@ object EmbeddedMongo {
       maxAttempts: Int = 10,
       attempt: Int = 0
   ): Resource[F, MongodProcess] =
-    if (attempt >= maxAttempts) {
+    if (attempt >= maxAttempts)
       Resource.eval(new RuntimeException("Failed to start embedded mongo too many times").raiseError[F, MongodProcess])
-    } else {
-      val process = for {
-        ex <- Resource.make(Async[F].delay(starter.prepare(config)))(ex => Async[F].delay(ex.stop()))
-        p  <- Resource.make(Async[F].delay(ex.start()))(p => Async[F].delay(p.stop()))
-      } yield p
-
-      process.handleErrorWith { e =>
-        Resource.eval(Async[F].delay(logger.error(e.getMessage, e)) *> Async[F].sleep(attempt.seconds)) *>
-          start[F](config, maxAttempts, attempt + 1)
-      }
-    }
+    else
+      Resource
+        .make(Async[F].delay(starter.prepare(config)))(ex => Async[F].delay(ex.stop()))
+        .flatMap(ex => Resource.make(Async[F].delay(ex.start()))(p => Async[F].delay(p.stop())))
+        .handleErrorWith { e =>
+          Resource.eval(Async[F].delay(logger.error(e.getMessage, e)) *> Async[F].sleep(attempt.seconds)) *>
+            start[F](config, maxAttempts, attempt + 1)
+        }
 }
 
 trait EmbeddedMongo {
@@ -45,7 +42,7 @@ trait EmbeddedMongo {
   protected val mongoHost = "localhost"
   protected val mongoPort = 12343
 
-  def withRunningEmbeddedMongo[A](test: => IO[A]): IO[A] = {
+  def withRunningEmbeddedMongo[F[_]: Async, A](test: => F[A]): F[A] = {
     val mongodConfig = MongodConfig
       .builder()
       .version(Version.Main.PRODUCTION)
@@ -53,9 +50,8 @@ trait EmbeddedMongo {
       .build
 
     EmbeddedMongo
-      .start[IO](mongodConfig)
+      .start[F](mongodConfig)
       .use(_ => test)
-      .timeout(5.minutes)
   }
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
