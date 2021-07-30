@@ -2,12 +2,13 @@ package expensetracker.auth.user.db
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.EmbeddedMongo
+import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
-import org.bson.types.ObjectId
+import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.USD
@@ -15,13 +16,13 @@ import squants.market.USD
 import java.time.Instant
 import scala.concurrent.Future
 
-class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
+class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
   override protected val mongoPort: Int = 12346
 
   val regDate     = Instant.parse("2021-06-01T00:00:00Z")
-  val u1Id        = UserId(new ObjectId().toHexString)
-  val u2Id        = UserId(new ObjectId().toHexString)
+  val u1Id        = UserId(ObjectId().toHexString)
+  val u2Id        = UserId(ObjectId().toHexString)
   val hash        = PasswordHash("hash")
   val userDetails = UserDetails(UserEmail("acc1@et.com"), UserName("John", "Bloggs"))
 
@@ -100,7 +101,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
       "return error when account does not exist" in {
         withEmbeddedMongoDb { client =>
-          val id = UserId(new ObjectId().toHexString)
+          val id = UserId(ObjectId().toHexString)
           val result = for {
             repo <- UserRepository.make(client)
             acc  <- repo.updateSettings(id, UserSettings.Default)
@@ -131,7 +132,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
       "return error when account does not exist" in {
         withEmbeddedMongoDb { client =>
-          val id = UserId(new ObjectId().toHexString)
+          val id = UserId(ObjectId().toHexString)
           val result = for {
             repo <- UserRepository.make(client)
             acc  <- repo.updatePassword(id)(hash)

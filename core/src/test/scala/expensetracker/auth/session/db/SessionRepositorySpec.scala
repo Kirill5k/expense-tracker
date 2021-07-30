@@ -4,12 +4,13 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import cats.implicits._
 import com.comcast.ip4s.IpAddress
-import expensetracker.EmbeddedMongo
+import expensetracker.MongoOps
 import expensetracker.auth.session._
 import expensetracker.auth.user.UserId
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
-import org.bson.types.ObjectId
+import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 
@@ -17,11 +18,11 @@ import java.time.Instant
 import java.time.temporal.ChronoField
 import scala.concurrent.Future
 
-class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
+class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
   override protected val mongoPort: Int = 12347
 
-  val aid = UserId(new ObjectId().toHexString)
+  val aid = UserId(ObjectId().toHexString)
   val ts = Instant.now().`with`(ChronoField.MILLI_OF_SECOND, 0)
 
   "A SessionRepository" should {
@@ -52,7 +53,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       withEmbeddedMongoDb { db =>
         val result = for {
           repo <- SessionRepository.make(db)
-          res  <- repo.find(SessionId(new ObjectId().toHexString), None)
+          res  <- repo.find(SessionId(ObjectId().toHexString), None)
         } yield res
 
         result.map(_ mustBe None)

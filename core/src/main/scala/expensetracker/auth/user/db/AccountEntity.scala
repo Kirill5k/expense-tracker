@@ -1,17 +1,17 @@
 package expensetracker.auth.user.db
 
 import expensetracker.auth.user._
-import org.bson.types.ObjectId
+import mongo4cats.bson.ObjectId
 
 import java.time.Instant
 
 final case class AccountEntity(
-                                _id: ObjectId,
-                                email: String,
-                                name: UserName,
-                                password: String,
-                                settings: Option[UserSettings],
-                                registrationDate: Instant
+    _id: ObjectId,
+    email: String,
+    name: UserName,
+    password: String,
+    settings: Option[UserSettings],
+    registrationDate: Instant
 ) {
   def toDomain: User =
     User(
@@ -27,7 +27,7 @@ final case class AccountEntity(
 object AccountEntity {
   def create(details: UserDetails, password: PasswordHash): AccountEntity =
     AccountEntity(
-      new ObjectId(),
+      ObjectId(),
       details.email.value,
       details.name,
       password.value,

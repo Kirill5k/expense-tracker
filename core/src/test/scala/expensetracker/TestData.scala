@@ -5,7 +5,7 @@ import expensetracker.auth.user._
 import expensetracker.auth.session.{Session, SessionActivity, SessionId, SessionStatus}
 import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName}
 import expensetracker.transaction.{Transaction, TransactionId, TransactionKind}
-import org.bson.types.ObjectId
+import mongo4cats.bson.ObjectId
 import org.http4s.RequestCookie
 import squants.market.GBP
 
@@ -30,8 +30,8 @@ trait TestData {
   val tx =
     Transaction(txid, uid, TransactionKind.Expense, cid, GBP(10.99), LocalDate.parse("2021-06-06"), Some("test tx"))
 
-  val sid          = SessionId(new ObjectId().toHexString)
-  val sid2         = SessionId(new ObjectId().toHexString)
+  val sid          = SessionId(ObjectId().toHexString)
+  val sid2         = SessionId(ObjectId().toHexString)
   val sa           = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))
   val sess         = Session(sid, uid, Instant.now(), true, SessionStatus.Authenticated, sa)
   val sessIdCookie = RequestCookie("session-id", sid.value)

@@ -2,26 +2,27 @@ package expensetracker.category.db
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.EmbeddedMongo
+import expensetracker.MongoOps
 import expensetracker.auth.user.UserId
 import expensetracker.category._
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
-import org.bson.types.ObjectId
+import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 
 import scala.concurrent.Future
 
-class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
+class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
   override protected val mongoPort: Int = 12348
 
-  val acc1Id = UserId(new ObjectId().toHexString)
-  val acc2Id = UserId(new ObjectId().toHexString)
-  val cat1Id = CategoryId(new ObjectId().toHexString)
-  val cat2Id = CategoryId(new ObjectId().toHexString)
+  val acc1Id = UserId(ObjectId().toHexString)
+  val acc2Id = UserId(ObjectId().toHexString)
+  val cat1Id = CategoryId(ObjectId().toHexString)
+  val cat2Id = CategoryId(ObjectId().toHexString)
 
   "A CategoryRepository" when {
 

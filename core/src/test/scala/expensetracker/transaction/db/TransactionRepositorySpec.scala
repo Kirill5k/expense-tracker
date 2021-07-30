@@ -2,14 +2,15 @@ package expensetracker.transaction.db
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.EmbeddedMongo
+import expensetracker.MongoOps
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClientF
 import mongo4cats.database.MongoDatabaseF
-import org.bson.types.ObjectId
+import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
@@ -17,14 +18,14 @@ import squants.market.GBP
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers {
+class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers with MongoOps {
 
   override protected val mongoPort: Int = 12349
 
-  val u1Id   = UserId(new ObjectId().toHexString)
-  val u2Id   = UserId(new ObjectId().toHexString)
-  val cat1Id = CategoryId(new ObjectId().toHexString)
-  val cat2Id = CategoryId(new ObjectId().toHexString)
+  val u1Id   = UserId(ObjectId().toHexString)
+  val u2Id   = UserId(ObjectId().toHexString)
+  val cat1Id = CategoryId(ObjectId().toHexString)
+  val cat2Id = CategoryId(ObjectId().toHexString)
 
   "A TransactionRepository" should {
 
@@ -157,7 +158,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
 
       "return error when tx does not exist" in {
         withEmbeddedMongoDb { db =>
-          val txid = TransactionId(new ObjectId().toHexString)
+          val txid = TransactionId(ObjectId().toHexString)
           val result = for {
             repo <- TransactionRepository.make(db)
             res <- repo.update(

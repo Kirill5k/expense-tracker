@@ -4,8 +4,8 @@ import cats.MonadError
 import cats.implicits._
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
+import mongo4cats.bson.ObjectId
 import mongo4cats.database.operations.{Filter, Update}
-import org.bson.types.ObjectId
 
 trait Repository[F[_]] {
 
@@ -17,7 +17,7 @@ trait Repository[F[_]] {
 
   protected val notHidden: Filter = Filter.ne(HiddenField, true)
 
-  private def idEqFilter(name: String, id: String): Filter = Filter.eq(name, new ObjectId(id))
+  private def idEqFilter(name: String, id: String): Filter = Filter.eq(name, ObjectId(id))
   protected def idEq(id: String): Filter                   = idEqFilter(IdField, id)
   protected def userIdEq(aid: Option[UserId]): Filter      = idEqFilter(UIdField, aid.map(_.value).orNull)
   protected def userIdEq(aid: UserId): Filter              = idEqFilter(UIdField, aid.value)

@@ -8,10 +8,10 @@ import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import io.circe.generic.auto._
 import expensetracker.common.json._
+import mongo4cats.bson.ObjectId
 import mongo4cats.circe._
 import mongo4cats.database.operations.Filter
 import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
-import org.bson.types.ObjectId
 
 trait CategoryRepository[F[_]] extends Repository[F] {
   def create(cat: CreateCategory): F[CategoryId]
@@ -67,7 +67,7 @@ final private class LiveCategoryRepository[F[_]: Async](
     collection
       .find(Filter.notExists(UIdField) or isNull(UIdField))
       .all[F]
-      .map(_.map(_.copy(_id = new ObjectId(), userId = Some(new ObjectId(aid.value)))).toList)
+      .map(_.map(_.copy(_id = ObjectId(), userId = Some(ObjectId(aid.value)))).toList)
       .flatMap { cats =>
         collection.insertMany(cats)
       }

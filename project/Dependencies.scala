@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val mongo4cats = "0.2.15"
+    val mongo4cats = "0.2.16"
     val pureConfig = "0.16.0"
     val circe      = "0.14.1"
     val http4s     = "1.0.0-M23"
@@ -12,9 +12,8 @@ object Dependencies {
     val bcrypt     = "4.3.0"
     val refined    = "0.9.26"
 
-    val scalaTest     = "3.2.9"
-    val mockito       = "1.16.37"
-    val embeddedMongo = "3.0.0"
+    val scalaTest = "3.2.9"
+    val mockito   = "1.16.37"
   }
 
   object Libraries {
@@ -22,8 +21,9 @@ object Dependencies {
     val bcrypt  = "com.github.t3hnar" %% "scala-bcrypt" % Versions.bcrypt
 
     object mongo4cats {
-      val core  = "io.github.kirill5k" %% "mongo4cats-core"  % Versions.mongo4cats
-      val circe = "io.github.kirill5k" %% "mongo4cats-circe" % Versions.mongo4cats
+      val core     = "io.github.kirill5k" %% "mongo4cats-core"     % Versions.mongo4cats
+      val circe    = "io.github.kirill5k" %% "mongo4cats-circe"    % Versions.mongo4cats
+      val embedded = "io.github.kirill5k" %% "mongo4cats-embedded" % Versions.mongo4cats
     }
 
     object pureconfig {
@@ -63,10 +63,9 @@ object Dependencies {
       val all = Seq(core, dsl, server, blaze, circe)
     }
 
-    val scalaTest        = "org.scalatest"      %% "scalatest"                 % Versions.scalaTest
-    val mockitoCore      = "org.mockito"        %% "mockito-scala"             % Versions.mockito
-    val mockitoScalatest = "org.mockito"        %% "mockito-scala-scalatest"   % Versions.mockito
-    val embeddedMongo    = "de.flapdoodle.embed" % "de.flapdoodle.embed.mongo" % Versions.embeddedMongo
+    val scalaTest        = "org.scalatest" %% "scalatest"               % Versions.scalaTest
+    val mockitoCore      = "org.mockito"   %% "mockito-scala"           % Versions.mockito
+    val mockitoScalatest = "org.mockito"   %% "mockito-scala-scalatest" % Versions.mockito
   }
 
   lazy val core = Seq(
@@ -82,9 +81,9 @@ object Dependencies {
     Libraries.refined.all
 
   lazy val test = Seq(
-    Libraries.scalaTest        % Test,
-    Libraries.mockitoCore      % Test,
-    Libraries.mockitoScalatest % Test,
-    Libraries.embeddedMongo    % Test
+    Libraries.scalaTest           % Test,
+    Libraries.mockitoCore         % Test,
+    Libraries.mockitoScalatest    % Test,
+    Libraries.mongo4cats.embedded % Test
   )
 }

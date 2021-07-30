@@ -2,7 +2,7 @@ package expensetracker.auth.session.db
 
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
-import org.bson.types.ObjectId
+import mongo4cats.bson.ObjectId
 
 import java.time.Instant
 
@@ -28,8 +28,8 @@ final case class SessionEntity(
 object SessionEntity {
   def create(cs: CreateSession): SessionEntity =
     SessionEntity(
-      new ObjectId(),
-      new ObjectId(cs.userId.value),
+      ObjectId(),
+      ObjectId(cs.userId.value),
       cs.time,
       true,
       SessionStatus.Authenticated,

@@ -1,17 +1,9 @@
 package expensetracker.category.db
 
 import cats.implicits._
-import expensetracker.category.{
-  Category,
-  CategoryColor,
-  CategoryIcon,
-  CategoryId,
-  CategoryKind,
-  CategoryName,
-  CreateCategory
-}
+import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
 import expensetracker.auth.user.UserId
-import org.bson.types.ObjectId
+import mongo4cats.bson.ObjectId
 
 import java.time.Instant
 
@@ -38,23 +30,23 @@ final case class CategoryEntity(
 object CategoryEntity {
   def from(cat: Category): CategoryEntity =
     CategoryEntity(
-      _id = new ObjectId(cat.id.value),
+      _id = ObjectId(cat.id.value),
       kind = cat.kind,
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      userId = cat.userId.map(aid => new ObjectId(aid.value)),
+      userId = cat.userId.map(aid => ObjectId(aid.value)),
       lastUpdatedAt = Some(Instant.now())
     )
 
   def from(cat: CreateCategory): CategoryEntity =
     CategoryEntity(
-      _id = new ObjectId(),
+      _id = ObjectId(),
       kind = cat.kind,
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      userId = new ObjectId(cat.userId.value).some,
+      userId = ObjectId(cat.userId.value).some,
       lastUpdatedAt = None
     )
 }

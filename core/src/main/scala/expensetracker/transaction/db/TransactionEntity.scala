@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
-import org.bson.types.ObjectId
+import mongo4cats.bson.ObjectId
 import squants.market._
 
 import java.time.{Instant, LocalDate}
@@ -34,9 +34,9 @@ object TransactionEntity {
 
   def from(tx: Transaction): TransactionEntity =
     TransactionEntity(
-      new ObjectId(tx.id.value),
-      new ObjectId(tx.userId.value),
-      new ObjectId(tx.categoryId.value),
+      ObjectId(tx.id.value),
+      ObjectId(tx.userId.value),
+      ObjectId(tx.categoryId.value),
       tx.kind,
       tx.amount,
       tx.date,
@@ -46,9 +46,9 @@ object TransactionEntity {
 
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
-      new ObjectId(),
-      new ObjectId(tx.userId.value),
-      new ObjectId(tx.categoryId.value),
+      ObjectId(),
+      ObjectId(tx.userId.value),
+      ObjectId(tx.categoryId.value),
       tx.kind,
       tx.amount,
       tx.date,
