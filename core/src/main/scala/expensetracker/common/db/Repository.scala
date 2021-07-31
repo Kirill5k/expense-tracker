@@ -7,6 +7,8 @@ import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
 import mongo4cats.database.operations.{Filter, Update}
 
+import java.time.Instant
+
 trait Repository[F[_]] {
 
   protected val UIdField           = "userId"
@@ -30,5 +32,5 @@ trait Repository[F[_]] {
     if (res.getMatchedCount > 0) F.unit else error.raiseError[F, Unit]
 
   protected def updateHidden(hidden: Boolean): Update =
-    Update.set(HiddenField, hidden).currentTimestamp(LastUpdatedAtField)
+    Update.set(HiddenField, hidden).set(LastUpdatedAtField, Instant.now())
 }
