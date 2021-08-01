@@ -1,7 +1,8 @@
 <template>
   <v-row justify="center">
     <v-dialog
-      transition="dialog-top-transition"
+      bottom
+      transition="dialog-bottom-transition"
       v-model="dialog"
       max-width="400px"
       @click:outside="reset"

@@ -1,7 +1,8 @@
 <template>
   <v-row justify="center">
     <v-dialog
-      transition="dialog-top-transition"
+      bottom
+      transition="dialog-bottom-transition"
       v-model="dialog"
       max-width="400px"
       @click:outside="reset"
@@ -198,7 +199,7 @@ export default {
   },
   methods: {
     reset () {
-      this.newTransaction = { ...DEFAULT_TRANSACTION }
+      this.newTransaction = { ...DEFAULT_TRANSACTION, date: new Date().toISOString().slice(0, 10) }
       this.valid = true
       this.$refs.newTransactionForm.resetValidation()
     },
