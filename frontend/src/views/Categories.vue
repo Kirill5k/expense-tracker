@@ -35,7 +35,7 @@
       <v-divider/>
     </v-card-text>
 
-    <v-card-actions class="categories__actions">
+    <v-card-actions class="categories__actions py-0">
       <v-btn
         v-if="categories.length"
         color="primary"
