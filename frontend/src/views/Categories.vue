@@ -35,7 +35,7 @@
       <v-divider/>
     </v-card-text>
 
-    <v-card-actions>
+    <v-card-actions class="categories__actions">
       <v-btn
         v-if="categories.length"
         color="primary"
@@ -161,5 +161,9 @@ export default {
 <style lang="scss">
 .categories {
   overflow: inherit;
+
+  &__actions {
+    height: 34px
+  }
 }
 </style>
