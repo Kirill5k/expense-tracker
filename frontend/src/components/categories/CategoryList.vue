@@ -119,8 +119,7 @@ export default {
       }))
     },
     height () {
-      const h = this.windowHeight - 170
-      return h > 605 ? 605 : h
+      return this.windowHeight - 157
     }
   },
   methods: {

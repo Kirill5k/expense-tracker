@@ -138,12 +138,8 @@ export default {
       }))
     },
     height () {
-      if (this.items.length === 0) {
-        return 130
-      } else {
-        const h = this.windowHeight - 210
-        return h > 550 ? 550 : h
-      }
+      const extra = this.items.length === 0 ? 40 : 0
+      return this.windowHeight - 210 + extra
     }
   },
   methods: {

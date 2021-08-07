@@ -17,7 +17,6 @@
         @filter="(filters) => $store.commit('filter', filters)"
       />
     </v-card-title>
-
     <v-card-text class="pb-0">
       <date-period-selector
         :display-date="$store.state.displayDate"

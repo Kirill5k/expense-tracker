@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="expense-tracker">
     <v-app-bar
       v-if="!isAuthenticated || !$vuetify.breakpoint.xsOnly"
       clipped-left
@@ -147,3 +147,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.expense-tracker {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+</style>
