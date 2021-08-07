@@ -26,16 +26,16 @@
     <v-card-text>
       <v-divider/>
       <category-list
-        :items="kind === 'expense' ? expenseCats : incomeCats"
+        :items="categories"
         :editable="editable"
         :window-height="windowHeight"
         @delete="removeWithWarning"
         @edit="edit"
       />
-      <v-divider/>
+      <v-divider v-if="categories.length" />
     </v-card-text>
 
-    <v-card-actions class="categories__actions py-0">
+    <v-card-actions class="categories__actions">
       <v-btn
         v-if="categories.length"
         color="primary"
@@ -108,7 +108,7 @@ export default {
   }),
   computed: {
     categories () {
-      return this.$store.state.categories
+      return this.kind === 'expense' ? this.expenseCats : this.incomeCats
     },
     expenseCats () {
       return this.$store.getters.expenseCats
@@ -163,7 +163,6 @@ export default {
   overflow: inherit;
 
   &__actions {
-    height: 34px
   }
 }
 </style>
