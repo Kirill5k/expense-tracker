@@ -1,62 +1,63 @@
 <template>
-  <v-card
-    :loading="loading"
-    class="categories mx-auto"
-    elevation="8"
-  >
-    <v-card-title class="py-1">
-      Categories
-      <v-spacer></v-spacer>
-      <v-btn-toggle
-        borderless
-        dense
-        tile
-        v-model="kind"
-        mandatory
-      >
-        <v-btn x-small value="expense">
-          Expense
+  <div>
+    <v-card
+      :loading="loading"
+      class="categories mx-auto"
+      elevation="8"
+    >
+      <v-card-title class="py-1">
+        Categories
+        <v-spacer></v-spacer>
+        <v-btn-toggle
+          borderless
+          dense
+          tile
+          v-model="kind"
+          mandatory
+        >
+          <v-btn x-small value="expense">
+            Expense
+          </v-btn>
+          <v-btn x-small value="income">
+            Income
+          </v-btn>
+        </v-btn-toggle>
+      </v-card-title>
+
+      <v-card-text>
+        <v-divider/>
+        <category-list
+          :items="categories"
+          :editable="editable"
+          :window-height="windowHeight"
+          @delete="removeWithWarning"
+          @edit="edit"
+        />
+        <v-divider v-if="categories.length" />
+      </v-card-text>
+
+      <v-card-actions class="categories__actions">
+        <v-btn
+          v-if="categories.length"
+          color="primary"
+          x-small
+          absolute
+          bottom
+          left
+          fab
+          @click="editable = !editable"
+        >
+          <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
         </v-btn>
-        <v-btn x-small value="income">
-          Income
-        </v-btn>
-      </v-btn-toggle>
-    </v-card-title>
 
-    <v-card-text>
-      <v-divider/>
-      <category-list
-        :items="categories"
-        :editable="editable"
-        :window-height="windowHeight"
-        @delete="removeWithWarning"
-        @edit="edit"
-      />
-      <v-divider v-if="categories.length" />
-    </v-card-text>
-
-    <v-card-actions class="categories__actions">
-      <v-btn
-        v-if="categories.length"
-        color="primary"
-        x-small
-        absolute
-        bottom
-        left
-        fab
-        @click="editable = !editable"
-      >
-        <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
-      </v-btn>
-
-      <v-spacer></v-spacer>
-      <new-category-dialog
-        ref="newCategoryDialog"
-        @update="update"
-        @save="create"
-      />
-    </v-card-actions>
-
+        <v-spacer></v-spacer>
+        <new-category-dialog
+          ref="newCategoryDialog"
+          @update="update"
+          @save="create"
+        />
+      </v-card-actions>
+    </v-card>
     <v-snackbar
       v-model="undoOp"
     >
@@ -84,7 +85,7 @@
       ref="removeCategoryDialog"
       @delete="remove"
     />
-  </v-card>
+  </div>
 </template>
 
 <script>
@@ -163,6 +164,7 @@ export default {
   overflow: inherit;
 
   &__actions {
+    height: 22px;
   }
 }
 </style>

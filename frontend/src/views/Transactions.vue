@@ -1,118 +1,119 @@
 <template>
-  <v-card
-    :loading="loading"
-    class="transactions mx-auto"
-    elevation="8"
-  >
-    <v-card-title class="py-1">
-      Transactions
-      <v-spacer></v-spacer>
-      <transactions-sorter
-        @sort="(sortBy) => $store.commit('sort', sortBy)"
-      />
-      <transactions-filter
-        v-if="$store.getters.filteredCats.length"
-        :categories="$store.getters.filteredCats"
-        :filters="$store.state.filterBy"
-        @filter="(filters) => $store.commit('filter', filters)"
-      />
-    </v-card-title>
-    <v-card-text class="pb-0">
-      <date-period-selector
-        :display-date="$store.state.displayDate"
-        @update="updateDisplayDate"
-      />
-
-      <transaction-list
-        :categories="$store.getters.catsByIds"
-        :sort-by="$store.state.sortBy"
-        :items="transactions"
-        :editable="editable"
-        :window-height="$vuetify.breakpoint.height"
-        @edit="edit"
-        @delete="remove"
-      />
-      <v-divider v-if="transactions.length"></v-divider>
-    </v-card-text>
-
-    <v-card-actions class="py-0">
-      <v-btn
-        v-if="transactions.length"
-        color="primary"
-        x-small
-        absolute
-        bottom
-        left
-        fab
-        @click="editable = !editable"
+  <div>
+      <v-card
+        :loading="loading"
+        class="transactions mx-auto"
+        elevation="8"
       >
-        <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
-      </v-btn>
+        <v-card-title class="py-1">
+          Transactions
+          <v-spacer></v-spacer>
+          <transactions-sorter
+            @sort="(sortBy) => $store.commit('sort', sortBy)"
+          />
+          <transactions-filter
+            v-if="$store.getters.filteredCats.length"
+            :categories="$store.getters.filteredCats"
+            :filters="$store.state.filterBy"
+            @filter="(filters) => $store.commit('filter', filters)"
+          />
+        </v-card-title>
+        <v-card-text class="pb-0">
+          <date-period-selector
+            :display-date="$store.state.displayDate"
+            @update="updateDisplayDate"
+          />
 
-      <div
-        v-if="transactions.length"
-        class="transactions__summary"
+          <transaction-list
+            :categories="$store.getters.catsByIds"
+            :sort-by="$store.state.sortBy"
+            :items="transactions"
+            :editable="editable"
+            :window-height="$vuetify.breakpoint.height"
+            @edit="edit"
+            @delete="remove"
+          />
+          <v-divider v-if="transactions.length"></v-divider>
+        </v-card-text>
+
+        <v-card-actions class="py-0">
+          <v-btn
+            v-if="transactions.length"
+            color="primary"
+            x-small
+            absolute
+            bottom
+            left
+            fab
+            @click="editable = !editable"
+          >
+            <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
+          </v-btn>
+
+          <div
+            v-if="transactions.length"
+            class="transactions__summary"
+          >
+            <v-chip
+              small
+              class="ma-2 px-4"
+              color="success"
+              outlined
+            >
+              <v-icon>
+                mdi-currency-{{currency.code.toLowerCase()}}
+              </v-icon>
+              <span>{{ $store.getters.totalEarned }}</span>
+            </v-chip>
+
+            <v-chip
+              small
+              class="ma-2 px-4"
+              color="error"
+              outlined
+            >
+              <v-icon>
+                mdi-currency-{{currency.code.toLowerCase()}}
+              </v-icon>
+              <span>{{ $store.getters.totalSpent }}</span>
+            </v-chip>
+
+          </div>
+          <v-spacer></v-spacer>
+          <new-transaction-dialog
+            ref="newTransactionDialog"
+            :currency="currency"
+            :expense-cats="$store.getters.expenseCats"
+            :income-cats="$store.getters.incomeCats"
+            @save="(newTx) => dispatchAction('createTransaction', newTx)"
+            @update="(tx) => dispatchAction('updateTransaction', tx)"
+          />
+        </v-card-actions>
+      </v-card>
+      <v-snackbar
+        v-model="undoOp"
       >
-        <v-chip
-          small
-          class="ma-2 px-4"
-          color="success"
-          outlined
-        >
-          <v-icon>
-            mdi-currency-{{currency.code.toLowerCase()}}
-          </v-icon>
-          <span>{{ $store.getters.totalEarned }}</span>
-        </v-chip>
-
-        <v-chip
-          small
-          class="ma-2 px-4"
-          color="error"
-          outlined
-        >
-          <v-icon>
-            mdi-currency-{{currency.code.toLowerCase()}}
-          </v-icon>
-          <span>{{ $store.getters.totalSpent }}</span>
-        </v-chip>
-
-      </div>
-      <v-spacer></v-spacer>
-      <new-transaction-dialog
-        ref="newTransactionDialog"
-        :currency="currency"
-        :expense-cats="$store.getters.expenseCats"
-        :income-cats="$store.getters.incomeCats"
-        @save="(newTx) => dispatchAction('createTransaction', newTx)"
-        @update="(tx) => dispatchAction('updateTransaction', tx)"
-      />
-    </v-card-actions>
-
-    <v-snackbar
-      v-model="undoOp"
-    >
-      The transaction has been deleted
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="primary"
-          text
-          v-bind="attrs"
-          @click="undoRemove"
-        >
-          Undo
-        </v-btn>
-        <v-btn
-          color="success"
-          text
-          v-bind="attrs"
-          @click="undoOp = null"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-  </v-card>
+        The transaction has been deleted
+        <template v-slot:action="{ attrs }">
+          <v-btn
+            color="primary"
+            text
+            v-bind="attrs"
+            @click="undoRemove"
+          >
+            Undo
+          </v-btn>
+          <v-btn
+            color="success"
+            text
+            v-bind="attrs"
+            @click="undoOp = null"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+  </div>
 </template>
 
 <script>
