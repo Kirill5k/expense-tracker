@@ -134,14 +134,14 @@
 </template>
 
 <script>
-const DEFAULT_TRANSACTION = {
+const DEFAULT_TRANSACTION = () => ({
   id: undefined,
   categoryId: null,
   amount: null,
   date: new Date().toISOString().slice(0, 10),
   kind: 'expense',
   note: null
-}
+})
 
 export default {
   name: 'NewTransactionDialog',
@@ -163,7 +163,7 @@ export default {
     dialog: false,
     datePicker: false,
     valid: true,
-    newTransaction: { ...DEFAULT_TRANSACTION },
+    newTransaction: { ...DEFAULT_TRANSACTION() },
     rules: {
       category: [v => !!v || 'Please select a category'],
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
@@ -195,11 +195,16 @@ export default {
       if (catId !== null && this.selectItems.find(i => i.value === catId) === undefined) {
         this.newTransaction.categoryId = null
       }
+    },
+    dialog (newValue) {
+      if (newValue === true && !this.newTransaction.id) {
+        this.newTransaction = { ...DEFAULT_TRANSACTION() }
+      }
     }
   },
   methods: {
     reset () {
-      this.newTransaction = { ...DEFAULT_TRANSACTION, date: new Date().toISOString().slice(0, 10) }
+      this.newTransaction = { ...DEFAULT_TRANSACTION() }
       this.valid = true
       this.$refs.newTransactionForm.resetValidation()
     },

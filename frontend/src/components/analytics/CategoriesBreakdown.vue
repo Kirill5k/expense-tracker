@@ -44,7 +44,7 @@
           <v-icon>
             mdi-currency-{{currency.code.toLowerCase()}}
           </v-icon>
-          {{item.total}}
+          {{item.total.toFixed(2)}}
         </v-chip>
         <small class="text-caption mb-0 font-weight-light mt-0 mr-1">{{ percentage(item.total) }}%</small>
       </div>
