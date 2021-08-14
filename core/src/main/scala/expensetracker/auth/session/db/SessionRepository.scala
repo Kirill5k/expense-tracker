@@ -7,9 +7,10 @@ import io.circe.generic.auto._
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
 import expensetracker.common.db.Repository
 import expensetracker.common.json._
-import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
+import mongo4cats.database.MongoDatabase
 import mongo4cats.circe._
-import mongo4cats.database.operations.Update
+import mongo4cats.collection.operations.Update
+import mongo4cats.collection.MongoCollection
 
 trait SessionRepository[F[_]] extends Repository[F] {
   def create(cs: CreateSession): F[SessionId]
@@ -19,7 +20,7 @@ trait SessionRepository[F[_]] extends Repository[F] {
 }
 
 final private class LiveSessionRepository[F[_]: Async](
-    private val collection: MongoCollectionF[SessionEntity]
+    private val collection: MongoCollection[F, SessionEntity]
 ) extends SessionRepository[F] {
 
   private val logoutUpdate     = Update.set("status", "logged-out").set("active", false)
@@ -27,15 +28,15 @@ final private class LiveSessionRepository[F[_]: Async](
 
   override def create(cs: CreateSession): F[SessionId] = {
     val createSession = SessionEntity.create(cs)
-    collection.insertOne[F](createSession).as(SessionId(createSession._id.toHexString))
+    collection.insertOne(createSession).as(SessionId(createSession._id.toHexString))
   }
 
   override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] = {
     val idFilter = idEq(sid.value)
     activity
-      .map(sa => collection.findOneAndUpdate(idFilter, Update.set("lastRecordedActivity", sa)))
-      .getOrElse(collection.find(idFilter).first[F])
-      .map(res => Option(res).map(_.toDomain))
+      .map(sa => collection.findOneAndUpdate(idFilter, Update.set("lastRecordedActivity", sa)).map(Option.apply))
+      .getOrElse(collection.find(idFilter).first)
+      .map(_.map(_.toDomain))
   }
 
   override def unauth(sid: SessionId): F[Unit] =
@@ -46,7 +47,7 @@ final private class LiveSessionRepository[F[_]: Async](
 }
 
 object SessionRepository {
-  def make[F[_]: Async](db: MongoDatabaseF[F]): F[SessionRepository[F]] =
+  def make[F[_]: Async](db: MongoDatabase[F]): F[SessionRepository[F]] =
     db
       .getCollectionWithCodec[SessionEntity]("sessions")
       .map(_.withAddedCodec[SessionActivity])

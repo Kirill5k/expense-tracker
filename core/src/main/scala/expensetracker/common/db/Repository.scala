@@ -5,7 +5,7 @@ import cats.implicits._
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
-import mongo4cats.database.operations.{Filter, Update}
+import mongo4cats.collection.operations.{Filter, Update}
 
 import java.time.Instant
 
@@ -23,7 +23,6 @@ trait Repository[F[_]] {
   protected def idEq(id: String): Filter                   = idEqFilter(IdField, id)
   protected def userIdEq(aid: Option[UserId]): Filter      = idEqFilter(UIdField, aid.map(_.value).orNull)
   protected def userIdEq(aid: UserId): Filter              = idEqFilter(UIdField, aid.value)
-  protected def isNull(name: String): Filter               = Filter.eq(name, null)
 
   protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =
     Option(res).map(_.pure[F]).getOrElse(error.raiseError[F, A])

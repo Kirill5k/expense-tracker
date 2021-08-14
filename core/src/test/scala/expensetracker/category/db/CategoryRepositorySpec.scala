@@ -7,8 +7,8 @@ import expensetracker.auth.user.UserId
 import expensetracker.category._
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import mongo4cats.bson.ObjectId
-import mongo4cats.client.MongoClientF
-import mongo4cats.database.MongoDatabaseF
+import mongo4cats.client.MongoClient
+import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
@@ -257,17 +257,17 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
+  def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo[IO, A] {
-      MongoClientF
+      MongoClient
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for {
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
-            _ <- categories.insertMany[IO](List(categoryDoc(cat1Id, "c1"), categoryDoc(cat2Id, "c2", Some(acc2Id))))
+            _ <- categories.insertMany(List(categoryDoc(cat1Id, "c1"), categoryDoc(cat2Id, "c2", Some(acc2Id))))
             accounts <- db.getCollection("accounts")
-            _        <- accounts.insertMany[IO](List(accDoc(acc1Id, "acc1"), accDoc(acc2Id, "acc2")))
+            _        <- accounts.insertMany(List(accDoc(acc1Id, "acc1"), accDoc(acc2Id, "acc2")))
             res      <- test(db)
           } yield res
         }

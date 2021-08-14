@@ -8,8 +8,9 @@ import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesN
 import expensetracker.common.json._
 import io.circe.generic.auto._
 import mongo4cats.circe._
-import mongo4cats.database.operations.{Filter, Update}
-import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
+import mongo4cats.collection.operations.{Filter, Update}
+import mongo4cats.collection.MongoCollection
+import mongo4cats.database.MongoDatabase
 
 trait UserRepository[F[_]] extends Repository[F] {
   def find(aid: UserId): F[User]
@@ -20,22 +21,22 @@ trait UserRepository[F[_]] extends Repository[F] {
 }
 
 final private class LiveUserRepository[F[_]: Async](
-    private val collection: MongoCollectionF[AccountEntity]
+    private val collection: MongoCollection[F, AccountEntity]
 ) extends UserRepository[F] {
 
   override def findBy(email: UserEmail): F[Option[User]] =
     collection
       .find(Filter.eq(EmailField, email.value))
-      .first[F]
-      .map(ue => Option(ue).map(_.toDomain))
+      .first
+      .map(_.map(_.toDomain))
 
   override def create(details: UserDetails, password: PasswordHash): F[UserId] =
     collection
-      .count[F](Filter.eq(EmailField, details.email.value))
+      .count(Filter.eq(EmailField, details.email.value))
       .flatMap {
         case 0 =>
           val createAcc = AccountEntity.create(details, password)
-          collection.insertOne[F](createAcc).as(UserId(createAcc._id.toHexString))
+          collection.insertOne(createAcc).as(UserId(createAcc._id.toHexString))
         case _ =>
           AccountAlreadyExists(details.email).raiseError[F, UserId]
       }
@@ -43,9 +44,11 @@ final private class LiveUserRepository[F[_]: Async](
   override def find(aid: UserId): F[User] =
     collection
       .find(idEq(aid.value))
-      .first[F]
-      .flatMap(errorIfNull[AccountEntity](AccountDoesNotExist(aid)))
-      .map(_.toDomain)
+      .first
+      .flatMap {
+        case Some(user) => user.toDomain.pure[F]
+        case None => AccountDoesNotExist(aid).raiseError[F, User]
+      }
 
   override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
     collection
@@ -59,7 +62,7 @@ final private class LiveUserRepository[F[_]: Async](
 }
 
 object UserRepository {
-  def make[F[_]: Async](db: MongoDatabaseF[F]): F[UserRepository[F]] =
+  def make[F[_]: Async](db: MongoDatabase[F]): F[UserRepository[F]] =
     db.getCollectionWithCodec[AccountEntity]("users")
       .map(_.withAddedCodec[UserSettings])
       .map(coll => new LiveUserRepository[F](coll))

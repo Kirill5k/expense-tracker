@@ -8,8 +8,8 @@ import expensetracker.MongoOps
 import expensetracker.auth.session._
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
-import mongo4cats.client.MongoClientF
-import mongo4cats.database.MongoDatabaseF
+import mongo4cats.client.MongoClient
+import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
@@ -116,9 +116,9 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
+  def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo {
-      MongoClientF
+      MongoClient
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for {

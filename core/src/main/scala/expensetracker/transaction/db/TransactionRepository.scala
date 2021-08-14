@@ -9,8 +9,9 @@ import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import io.circe.generic.auto._
 import mongo4cats.circe._
-import mongo4cats.database.operations.Filter
-import mongo4cats.database.{MongoCollectionF, MongoDatabaseF}
+import mongo4cats.collection.operations.Filter
+import mongo4cats.collection.MongoCollection
+import mongo4cats.database.MongoDatabase
 
 trait TransactionRepository[F[_]] extends Repository[F] {
   def create(tx: CreateTransaction): F[TransactionId]
@@ -23,13 +24,13 @@ trait TransactionRepository[F[_]] extends Repository[F] {
 }
 
 final private class LiveTransactionRepository[F[_]: Async](
-    private val collection: MongoCollectionF[TransactionEntity]
+    private val collection: MongoCollection[F, TransactionEntity]
 ) extends TransactionRepository[F] {
 
   override def create(tx: CreateTransaction): F[TransactionId] = {
     val create = TransactionEntity.create(tx)
     collection
-      .insertOne[F](create)
+      .insertOne(create)
       .as(TransactionId(create._id.toHexString))
   }
 
@@ -37,19 +38,21 @@ final private class LiveTransactionRepository[F[_]: Async](
     collection
       .find(userIdEq(aid) and notHidden)
       .sortByDesc("date")
-      .all[F]
+      .all
       .map(_.map(_.toDomain).toList)
 
   override def get(aid: UserId, txid: TransactionId): F[Transaction] =
     collection
       .find(userIdEq(aid) and idEq(txid.value))
-      .first[F]
-      .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
-      .map(_.toDomain)
+      .first
+      .flatMap {
+        case Some(tx) => tx.toDomain.pure[F]
+        case None => TransactionDoesNotExist(txid).raiseError[F, Transaction]
+      }
 
   override def update(tx: Transaction): F[Unit] =
     collection
-      .findOneAndReplace[F](
+      .findOneAndReplace(
         userIdEq(tx.userId) and idEq(tx.id.value),
         TransactionEntity.from(tx)
       )
@@ -58,7 +61,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def delete(aid: UserId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete[F](userIdEq(aid) and idEq(txid.value))
+      .findOneAndDelete(userIdEq(aid) and idEq(txid.value))
       .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
       .void
 
@@ -75,7 +78,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
 object TransactionRepository {
 
-  def make[F[_]: Async](db: MongoDatabaseF[F]): F[TransactionRepository[F]] =
+  def make[F[_]: Async](db: MongoDatabase[F]): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
       .map(coll => new LiveTransactionRepository[F](coll))
 }

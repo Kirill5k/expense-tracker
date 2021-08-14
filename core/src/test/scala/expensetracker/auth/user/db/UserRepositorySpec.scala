@@ -6,8 +6,8 @@ import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import mongo4cats.bson.ObjectId
-import mongo4cats.client.MongoClientF
-import mongo4cats.database.MongoDatabaseF
+import mongo4cats.client.MongoClient
+import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
@@ -179,15 +179,15 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
     }
   }
 
-  def withEmbeddedMongoDb[A](test: MongoDatabaseF[IO] => IO[A]): Future[A] =
+  def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo {
-      MongoClientF
+      MongoClient
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for {
             db   <- client.getDatabase("expense-tracker")
             accs <- db.getCollection("users")
-            _    <- accs.insertMany[IO](List(accDoc(u1Id, "acc1@et.com", password = hash.value)))
+            _    <- accs.insertMany(List(accDoc(u1Id, "acc1@et.com", password = hash.value)))
             res  <- test(db)
           } yield res
         }
