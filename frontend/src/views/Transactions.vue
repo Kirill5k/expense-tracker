@@ -3,7 +3,7 @@
       <v-card
         :loading="loading"
         class="transactions mx-auto"
-        elevation="8"
+        elevation="2"
       >
         <v-card-title class="py-1">
           Transactions

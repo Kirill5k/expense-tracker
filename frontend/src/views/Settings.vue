@@ -2,7 +2,7 @@
   <v-card
     :loading="loading"
     class="settings mx-auto"
-    elevation="8"
+    elevation="2"
   >
     <v-card-title class="pt-1 pb-1">
       Settings

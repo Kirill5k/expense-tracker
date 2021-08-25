@@ -51,7 +51,7 @@
         class="d-none d-sm-block"
       >
         <v-card
-          elevation="8"
+          elevation="2"
           width="256"
         >
           <v-navigation-drawer

@@ -2,7 +2,7 @@
   <v-card
     :loading="loading"
     class="mx-auto"
-    elevation="8"
+    elevation="2"
   >
     <v-card-title>
       Sign in into your account

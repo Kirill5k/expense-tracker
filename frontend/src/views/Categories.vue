@@ -3,7 +3,7 @@
     <v-card
       :loading="loading"
       class="categories mx-auto"
-      elevation="8"
+      elevation="2"
     >
       <v-card-title class="py-1">
         Categories

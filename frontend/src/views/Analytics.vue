@@ -2,7 +2,7 @@
   <v-card
     :loading="loading"
     class="analytics mx-auto"
-    elevation="8"
+    elevation="2"
   >
     <v-card-title class="py-1">
       Analytics
