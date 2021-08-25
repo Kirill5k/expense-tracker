@@ -34,7 +34,7 @@ final private class LiveSessionRepository[F[_]: Async](
   override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] = {
     val idFilter = idEq(sid.value)
     activity
-      .map(sa => collection.findOneAndUpdate(idFilter, Update.set("lastRecordedActivity", sa)).map(Option.apply))
+      .map(sa => collection.findOneAndUpdate(idFilter, Update.set("lastRecordedActivity", sa)))
       .getOrElse(collection.find(idFilter).first)
       .map(_.map(_.toDomain))
   }

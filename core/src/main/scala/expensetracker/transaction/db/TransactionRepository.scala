@@ -36,43 +36,47 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def getAll(aid: UserId): F[List[Transaction]] =
     collection
-      .find(userIdEq(aid) and notHidden)
+      .find(userIdEq(aid).and(notHidden))
       .sortByDesc("date")
       .all
       .map(_.map(_.toDomain).toList)
 
   override def get(aid: UserId, txid: TransactionId): F[Transaction] =
     collection
-      .find(userIdEq(aid) and idEq(txid.value))
+      .find(userIdEq(aid).and(idEq(txid.value)))
       .first
       .flatMap {
         case Some(tx) => tx.toDomain.pure[F]
-        case None => TransactionDoesNotExist(txid).raiseError[F, Transaction]
+        case None     => TransactionDoesNotExist(txid).raiseError[F, Transaction]
       }
 
   override def update(tx: Transaction): F[Unit] =
     collection
       .findOneAndReplace(
-        userIdEq(tx.userId) and idEq(tx.id.value),
+        userIdEq(tx.userId).and(idEq(tx.id.value)),
         TransactionEntity.from(tx)
       )
-      .flatMap(errorIfNull(TransactionDoesNotExist(tx.id)))
-      .void
+      .flatMap {
+        case Some(_) => ().pure[F]
+        case None    => TransactionDoesNotExist(tx.id).raiseError[F, Unit]
+      }
 
   override def delete(aid: UserId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete(userIdEq(aid) and idEq(txid.value))
-      .flatMap(errorIfNull(TransactionDoesNotExist(txid)))
-      .void
+      .findOneAndDelete(userIdEq(aid).and(idEq(txid.value)))
+      .flatMap {
+        case Some(_) => ().pure[F]
+        case None    => TransactionDoesNotExist(txid).raiseError[F, Unit]
+      }
 
   override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
-      .updateOne(userIdEq(aid) and idEq(txid.value), updateHidden(hidden))
+      .updateOne(userIdEq(aid).and(idEq(txid.value)), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
   override def isHidden(aid: UserId, txid: TransactionId): F[Boolean] =
     collection
-      .count(userIdEq(aid) and idEq(txid.value) and Filter.eq(HiddenField, true))
+      .count(userIdEq(aid).and(idEq(txid.value)).and(Filter.eq(HiddenField, true)))
       .map(_ > 0)
 }
 
