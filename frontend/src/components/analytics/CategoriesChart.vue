@@ -84,7 +84,7 @@ export default {
             type: 'pie',
             radius: ['5%', '75%'],
             center: ['50%', '50%'],
-            data: this.categoryBreakdown.map(c => ({ value: c.total, name: c.name, icon: c.icon, color: c.color })),
+            data: this.categoryBreakdown.map(c => ({ value: Math.floor(c.total), name: c.name, icon: c.icon, color: c.color })),
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
