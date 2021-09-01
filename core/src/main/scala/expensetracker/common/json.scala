@@ -41,13 +41,13 @@ trait JsonCodecs {
       rawValue    <- json("value").flatMap(_.asNumber).toRight("missing the actual amount")
       rawCurrency <- json("currency").toRight("missing currency")
       currency    <- d.decodeJson(rawCurrency).leftMap(_.message)
-      value       <- Try(rawValue.toDouble).toEither.leftMap(_.getMessage)
+      value       <- Try(rawValue.toDouble).map(roundUp).toEither.leftMap(_.getMessage)
     } yield Money(value, currency)
   }
 
   implicit def encodeMoney(implicit e: Encoder[Currency]): Encoder[Money] = Encoder[JsonObject].contramap { m =>
     JsonObject(
-      "value"    -> Json.fromBigDecimal(m.amount),
+      "value"    -> Json.fromBigDecimal(roundUp(m.amount)),
       "currency" -> e(m.currency)
     )
   }
@@ -57,4 +57,7 @@ trait JsonCodecs {
 
   implicit val decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap(CategoryKind.from)
   implicit val encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap(_.value)
+
+  private def roundUp(value: BigDecimal): BigDecimal = value.setScale(2, BigDecimal.RoundingMode.HALF_UP)
+  private def roundUp(value: Double): BigDecimal     = roundUp(BigDecimal(value))
 }
