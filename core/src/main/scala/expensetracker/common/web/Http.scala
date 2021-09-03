@@ -32,7 +32,10 @@ final class Http[F[_]: Async] private (
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { http: HttpRoutes[F] =>
     AutoSlash(http)
   }.andThen { http: HttpRoutes[F] =>
-    CORS(http)
+    CORS.policy
+      .withAllowOriginAll
+      .withAllowCredentials(false)
+      .apply(http)
   }.andThen { http: HttpRoutes[F] =>
     Timeout(60.seconds)(http)
   }
