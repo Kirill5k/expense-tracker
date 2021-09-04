@@ -1,133 +1,131 @@
 <template>
-  <v-row justify="center">
-    <v-dialog
-      bottom
-      transition="dialog-bottom-transition"
-      v-model="dialog"
-      max-width="400px"
-      @click:outside="reset"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="primary"
-          x-small
-          absolute
-          bottom
-          right
-          fab
-          v-bind="attrs"
-          v-on="on"
+  <v-dialog
+    bottom
+    transition="dialog-bottom-transition"
+    v-model="dialog"
+    max-width="400px"
+    @click:outside="reset"
+  >
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn
+        class="float-right mx-2 my-1"
+        color="primary"
+        x-small
+        bottom
+        right
+        fab
+        v-bind="attrs"
+        v-on="on"
+      >
+        <v-icon dark>mdi-plus</v-icon>
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-title>
+        {{newCategory.id ? 'Edit category' : 'New category'}}
+      </v-card-title>
+      <v-card-text class="pb-0">
+        <v-form
+          ref="newCategoryForm"
+          v-model="valid"
+          lazy-validation
         >
-          <v-icon dark>mdi-plus</v-icon>
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title>
-          {{newCategory.id ? 'Edit category' : 'New category'}}
-        </v-card-title>
-        <v-card-text class="pb-0">
-          <v-form
-            ref="newCategoryForm"
-            v-model="valid"
-            lazy-validation
+          <v-btn-toggle
+            borderless
+            dense
+            tile
+            v-model="newCategory.kind"
+            mandatory
           >
-            <v-btn-toggle
-              borderless
-              dense
-              tile
-              v-model="newCategory.kind"
-              mandatory
+            <v-btn small value="expense">
+              Expense
+            </v-btn>
+            <v-btn small value="income">
+              Income
+            </v-btn>
+          </v-btn-toggle>
+          <v-text-field
+            name="name"
+            v-model="newCategory.name"
+            :rules="rules.name"
+            label="Name"
+            required
+            counter
+          />
+          <v-color-picker
+            v-model="newCategory.color"
+            width="100%"
+            dot-size="22"
+            hide-inputs
+            hide-canvas
+            hide-mode-switch
+            mode="hexa"
+            swatches-max-height="250"
+          />
+          <v-input
+            :value="newCategory.icon"
+            class="pt-2"
+            :rules="rules.icon"
+          >
+            <v-virtual-scroll
+              :bench="1"
+              :items="groupedIcons"
+              height="120"
+              item-height="40"
             >
-              <v-btn small value="expense">
-                Expense
-              </v-btn>
-              <v-btn small value="income">
-                Income
-              </v-btn>
-            </v-btn-toggle>
-            <v-text-field
-              name="name"
-              v-model="newCategory.name"
-              :rules="rules.name"
-              label="Name"
-              required
-              counter
-            />
-            <v-color-picker
-              v-model="newCategory.color"
-              width="100%"
-              dot-size="22"
-              hide-inputs
-              hide-canvas
-              hide-mode-switch
-              mode="hexa"
-              swatches-max-height="250"
-            />
-            <v-input
-              :value="newCategory.icon"
-              class="pt-2"
-              :rules="rules.icon"
-            >
-              <v-virtual-scroll
-                :bench="1"
-                :items="groupedIcons"
-                height="120"
-                item-height="40"
-              >
-                <template v-slot:default="{ item }">
-                  <v-row v-if="item.length" class="text-center" no-gutters>
-                    <v-col
-                      v-for="icon in item"
-                      :key="icon.value"
-                      cols="2"
+              <template v-slot:default="{ item }">
+                <v-row v-if="item.length" class="text-center" no-gutters>
+                  <v-col
+                    v-for="icon in item"
+                    :key="icon.value"
+                    cols="2"
+                  >
+                    <v-btn
+                      :color="newCategory.icon === icon.value ? newCategory.color : ''"
+                      :dark="newCategory.icon === icon.value"
+                      :light="newCategory.icon !== icon.value"
+                      elevation="2"
+                      fab
+                      x-small
+                      :value="newCategory.icon"
+                      @click="newCategory.icon = icon.value"
                     >
-                      <v-btn
-                        :color="newCategory.icon === icon.value ? newCategory.color : ''"
-                        :dark="newCategory.icon === icon.value"
-                        :light="newCategory.icon !== icon.value"
-                        elevation="2"
-                        fab
-                        x-small
-                        :value="newCategory.icon"
-                        @click="newCategory.icon = icon.value"
-                      >
-                        <v-icon>
-                          {{ icon.value }}
-                        </v-icon>
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                  <v-row v-else no-gutters>
-                    <v-card-text class="py-1">
-                      <p class="text-subtitle-2 mb-0">{{ item.header }}</p>
-                      <v-divider class="my-1"></v-divider>
-                    </v-card-text>
-                  </v-row>
-                </template>
-              </v-virtual-scroll>
-            </v-input>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="close"
-          >
-            Close
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="save"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-row>
+                      <v-icon>
+                        {{ icon.value }}
+                      </v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+                <v-row v-else no-gutters>
+                  <v-card-text class="py-1">
+                    <p class="text-subtitle-2 mb-0">{{ item.header }}</p>
+                    <v-divider class="my-1"></v-divider>
+                  </v-card-text>
+                </v-row>
+              </template>
+            </v-virtual-scroll>
+          </v-input>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="close"
+        >
+          Close
+        </v-btn>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="save"
+        >
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>

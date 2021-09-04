@@ -1,136 +1,134 @@
 <template>
-  <v-row justify="center">
-    <v-dialog
-      bottom
-      transition="dialog-bottom-transition"
-      v-model="dialog"
-      max-width="400px"
-      @click:outside="reset"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="primary"
-          x-small
-          absolute
-          bottom
-          right
-          fab
-          v-bind="attrs"
-          v-on="on"
+  <v-dialog
+    bottom
+    transition="dialog-bottom-transition"
+    v-model="dialog"
+    max-width="400px"
+    @click:outside="reset"
+  >
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn
+        class="float-right mx-2 my-1"
+        color="primary"
+        x-small
+        bottom
+        right
+        fab
+        v-bind="attrs"
+        v-on="on"
+      >
+        <v-icon dark>mdi-plus</v-icon>
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-title>
+        {{newTransaction.id ? 'Edit transaction' : 'New transaction'}}
+      </v-card-title>
+      <v-card-text>
+        <v-form
+          ref="newTransactionForm"
+          v-model="valid"
+          lazy-validation
         >
-          <v-icon dark>mdi-plus</v-icon>
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title>
-          {{newTransaction.id ? 'Edit transaction' : 'New transaction'}}
-        </v-card-title>
-        <v-card-text>
-          <v-form
-            ref="newTransactionForm"
-            v-model="valid"
-            lazy-validation
+          <v-btn-toggle
+            borderless
+            dense
+            tile
+            v-model="newTransaction.kind"
+            mandatory
           >
-            <v-btn-toggle
-              borderless
-              dense
-              tile
-              v-model="newTransaction.kind"
-              mandatory
-            >
-              <v-btn small value="expense">
-                Expense
-              </v-btn>
-              <v-btn small value="income">
-                Income
-              </v-btn>
-            </v-btn-toggle>
+            <v-btn small value="expense">
+              Expense
+            </v-btn>
+            <v-btn small value="income">
+              Income
+            </v-btn>
+          </v-btn-toggle>
 
-            <v-select
-              name="category"
-              v-model="newTransaction.categoryId"
-              :rules="rules.category"
-              :items="selectItems"
-              label="Category"
-              required
-            >
-              <template slot="selection" slot-scope="data">
-                <span class="mt-1 mb-1">
-                  <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
-                </span>
-              </template>
-              <template slot="item" slot-scope="data">
-                <span>
-                  <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
-                </span>
-              </template>
-            </v-select>
+          <v-select
+            name="category"
+            v-model="newTransaction.categoryId"
+            :rules="rules.category"
+            :items="selectItems"
+            label="Category"
+            required
+          >
+            <template slot="selection" slot-scope="data">
+              <span class="mt-1 mb-1">
+                <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
+              </span>
+            </template>
+            <template slot="item" slot-scope="data">
+              <span>
+                <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
+              </span>
+            </template>
+          </v-select>
 
-            <v-text-field
-              label="Amount"
-              v-model="newTransaction.amount"
-              type="number"
-              min="0.01"
-              :prepend-icon="'mdi-currency-' + currency.code.toLowerCase()"
-              :rules="rules.amount"
-            />
+          <v-text-field
+            label="Amount"
+            v-model="newTransaction.amount"
+            type="number"
+            min="0.01"
+            :prepend-icon="'mdi-currency-' + currency.code.toLowerCase()"
+            :rules="rules.amount"
+          />
 
-            <v-menu
-              v-model="datePicker"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  name="date"
-                  v-model="formattedDate"
-                  :rules="rules.date"
-                  label="Date"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-              <v-date-picker
-                v-model="newTransaction.date"
-                @input="datePicker = false"
-                min="2000-01-01"
+          <v-menu
+            v-model="datePicker"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                name="date"
+                v-model="formattedDate"
+                :rules="rules.date"
+                label="Date"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
               />
-            </v-menu>
+            </template>
+            <v-date-picker
+              v-model="newTransaction.date"
+              @input="datePicker = false"
+              min="2000-01-01"
+            />
+          </v-menu>
 
-            <v-textarea
-              rows="2"
-              counter
-              label="Note"
-              v-model="newTransaction.note"
-              :rules="rules.note"
-            ></v-textarea>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="close"
-          >
-            Close
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="save"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-row>
+          <v-textarea
+            rows="2"
+            counter
+            label="Note"
+            v-model="newTransaction.note"
+            :rules="rules.note"
+          ></v-textarea>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="close"
+        >
+          Close
+        </v-btn>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="save"
+        >
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>

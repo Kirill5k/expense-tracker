@@ -15,7 +15,7 @@
       :currency="currency"
       :dark="dark"
     />
-    <v-card-text class="pt-0">
+    <v-card-text class="py-0">
       <p class="text-subtitle-2 ml-2 mb-0 mt-1 text-capitalize">{{ kind }} breakdown</p>
       <v-divider></v-divider>
       <categories-breakdown

@@ -39,9 +39,9 @@
         <v-card-actions class="py-0">
           <v-btn
             v-if="transactions.length"
+            class="float-left mx-2 my-1"
             color="primary"
             x-small
-            absolute
             bottom
             left
             fab
@@ -49,14 +49,13 @@
           >
             <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
           </v-btn>
-
           <div
             v-if="transactions.length"
             class="transactions__summary"
           >
             <v-chip
               small
-              class="ma-2 px-4"
+              class="mx-2 px-4"
               color="success"
               outlined
             >
@@ -68,7 +67,7 @@
 
             <v-chip
               small
-              class="ma-2 px-4"
+              class="mx-2 px-4"
               color="error"
               outlined
             >
@@ -77,9 +76,7 @@
               </v-icon>
               <span>{{ $store.getters.totalSpent }}</span>
             </v-chip>
-
           </div>
-          <v-spacer></v-spacer>
           <new-transaction-dialog
             ref="newTransactionDialog"
             :currency="currency"

@@ -88,7 +88,7 @@
       </v-tab-item>
     </v-tabs-items>
 
-    <v-card-actions>
+    <v-card-actions class="py-0">
       <v-spacer></v-spacer>
       <new-transaction-dialog
         :currency="$store.state.user.settings.currency"

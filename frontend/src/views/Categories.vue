@@ -24,7 +24,7 @@
         </v-btn-toggle>
       </v-card-title>
 
-      <v-card-text>
+      <v-card-text class="pb-0">
         <v-divider/>
         <category-list
           :items="categories"
@@ -36,12 +36,12 @@
         <v-divider v-if="categories.length" />
       </v-card-text>
 
-      <v-card-actions class="categories__actions">
+      <v-card-actions class="py-0">
         <v-btn
           v-if="categories.length"
+          class="float-left mx-2 my-1"
           color="primary"
           x-small
-          absolute
           bottom
           left
           fab
@@ -49,8 +49,7 @@
         >
           <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
         </v-btn>
-
-        <v-spacer></v-spacer>
+        <v-spacer/>
         <new-category-dialog
           ref="newCategoryDialog"
           @update="update"
@@ -164,7 +163,7 @@ export default {
   overflow: inherit;
 
   &__actions {
-    height: 22px;
+    height: 38px;
   }
 }
 </style>
