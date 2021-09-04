@@ -161,9 +161,5 @@ export default {
 <style lang="scss">
 .categories {
   overflow: inherit;
-
-  &__actions {
-    height: 38px;
-  }
 }
 </style>
