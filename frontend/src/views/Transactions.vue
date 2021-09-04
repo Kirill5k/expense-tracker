@@ -29,7 +29,7 @@
             :sort-by="$store.state.sortBy"
             :items="transactions"
             :editable="editable"
-            :window-height="$vuetify.breakpoint.height"
+            :window-height="windowHeight"
             @edit="edit"
             @delete="remove"
           />
@@ -141,6 +141,10 @@ export default {
     },
     currency () {
       return this.$store.state.user.settings.currency
+    },
+    windowHeight () {
+      const height = this.$vuetify.breakpoint.height
+      return this.$vuetify.breakpoint.xs ? height : (height - 100)
     }
   },
   methods: {

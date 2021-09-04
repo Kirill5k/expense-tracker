@@ -78,7 +78,7 @@
         </v-card>
       </v-col>
       <v-col
-        class="mb-5 pa-0 pa-sm-4"
+        class="mb-0 pa-0 pa-sm-4"
         :cols="dimensions.cols"
         :xs="dimensions.xs"
         :sm="dimensions.sm"

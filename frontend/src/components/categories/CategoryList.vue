@@ -119,7 +119,7 @@ export default {
       }))
     },
     height () {
-      return this.windowHeight - 175
+      return this.windowHeight - 138
     }
   },
   methods: {

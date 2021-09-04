@@ -139,7 +139,7 @@ export default {
     },
     height () {
       const extra = this.items.length === 0 ? 40 : 0
-      return this.windowHeight - 210 + extra
+      return this.windowHeight - 171 + extra
     }
   },
   methods: {
