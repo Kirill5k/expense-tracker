@@ -46,7 +46,7 @@
       >
         <balance-analysis
           :key="$store.state.displayDate.text"
-          :window-height="$vuetify.breakpoint.height"
+          :window-height="windowHeight"
           :dark="$vuetify.theme.dark"
           :display-date="$store.state.displayDate"
           :currency="$store.state.user.settings.currency"
@@ -64,7 +64,7 @@
           :key="$store.state.displayDate.text"
           kind="income"
           :currency="$store.state.user.settings.currency"
-          :window-height="$vuetify.breakpoint.height"
+          :window-height="windowHeight"
           :categories="$store.getters.catsByIds"
           :total-amount="$store.getters.totalEarned"
           :transactions="$store.getters.incomeTransactions"
@@ -79,7 +79,7 @@
           :key="$store.state.displayDate.text"
           kind="expense"
           :currency="$store.state.user.settings.currency"
-          :window-height="$vuetify.breakpoint.height"
+          :window-height="windowHeight"
           :categories="$store.getters.catsByIds"
           :total-amount="$store.getters.totalSpent"
           :transactions="$store.getters.expenseTransactions"
@@ -120,6 +120,12 @@ export default {
     loading: false,
     tab: 0
   }),
+  computed: {
+    windowHeight () {
+      const height = this.$vuetify.breakpoint.height
+      return this.$vuetify.breakpoint.xs ? height : (height - 100)
+    }
+  },
   methods: {
     dispatchAction (name, arg) {
       this.loading = true
