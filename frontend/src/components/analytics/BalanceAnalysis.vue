@@ -17,7 +17,7 @@
     <v-card-subtitle class="text-subtitle-2 font-weight-light pb-1 pt-2">
       Balance for this period
     </v-card-subtitle>
-    <v-card-text class="py-1">
+    <v-card-text class="py-1 px-0 px-sm-4">
       <v-divider></v-divider>
     </v-card-text>
     <div class="d-flex justify-space-between align-content-end">

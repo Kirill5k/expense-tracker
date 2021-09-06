@@ -24,7 +24,7 @@
         </v-btn-toggle>
       </v-card-title>
 
-      <v-card-text class="pb-0">
+      <v-card-text class="pb-0 px-0 px-sm-4">
         <v-divider/>
         <category-list
           :items="categories"

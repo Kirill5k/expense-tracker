@@ -1,7 +1,7 @@
 <template>
   <div class="date-period-selector d-flex mb-1" style="width: 100%">
     <v-btn
-      class="ml-0 mr-3"
+      class="mx-3"
       depressed
       small
       icon
@@ -28,7 +28,7 @@
       </template>
     </v-overflow-btn>
     <v-btn
-      class="ml-3 mr-0"
+      class="mx-3 mr-0"
       depressed
       small
       icon
