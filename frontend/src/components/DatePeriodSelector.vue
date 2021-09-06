@@ -28,7 +28,7 @@
       </template>
     </v-overflow-btn>
     <v-btn
-      class="mx-3 mr-0"
+      class="mx-3"
       depressed
       small
       icon
