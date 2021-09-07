@@ -27,6 +27,7 @@
           <v-list-item-subtitle v-text="item.kind" class="text-right font-weight-light text-capitalize"/>
         </v-list-item-action>
       </v-list-item>
+      <v-divider v-if="!item.last" />
     </template>
   </v-virtual-scroll>
 </template>
@@ -50,13 +51,14 @@ export default {
   },
   computed: {
     tableData () {
-      return this.items.map(i => ({
-        id: i.id,
-        color: i.color,
-        icon: i.icon,
-        name: i.name,
-        kind: i.kind,
-        original: i
+      return this.items.map((item, i) => ({
+        id: item.id,
+        color: item.color,
+        icon: item.icon,
+        name: item.name,
+        kind: item.kind,
+        original: item,
+        last: i === this.items.length - 1
       }))
     },
     height () {
