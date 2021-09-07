@@ -34,9 +34,9 @@
 
     <template v-slot:[`item.tx`]="{ item }">
       <v-list-item-content class="py-2 px-1">
-        <p class="text-subtitle-2 mb-0">{{ item.tx.name }}</p>
+        <p class="text-subtitle-2 mb-0" :class="item.tx.note ? '' : 'mt-2 mb-1'">{{ item.tx.name }}</p>
         <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
-        <p class="text-caption mb-0 font-weight-light">{{ item.tx.displayDate }}</p>
+        <p class="text-caption mb-0 font-weight-light" :class="item.tx.note ? '' : 'mb-2'">{{ item.tx.displayDate }}</p>
       </v-list-item-content>
     </template>
 
