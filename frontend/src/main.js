@@ -5,6 +5,8 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import VueOffline from 'vue-offline'
+import VueAwesomeSwiper from 'vue-awesome-swiper'
+import 'swiper/css/swiper.css'
 
 Vue.config.productionTip = false
 
@@ -28,6 +30,7 @@ router.beforeEach((to, from, next) => {
 })
 
 Vue.use(VueOffline, { mixin: false })
+Vue.use(VueAwesomeSwiper, {})
 
 new Vue({
   router,

@@ -27,7 +27,6 @@
       <v-card-text class="pb-0 px-0 px-sm-4">
         <category-list-2
           :items="categories"
-          :editable="editable"
           :window-height="windowHeight"
           @delete="removeWithWarning"
           @edit="edit"
@@ -36,18 +35,6 @@
       </v-card-text>
 
       <v-card-actions class="py-0">
-        <v-btn
-          v-if="categories.length"
-          class="float-left mx-2 my-1"
-          color="primary"
-          x-small
-          bottom
-          left
-          fab
-          @click="editable = !editable"
-        >
-          <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
-        </v-btn>
         <v-spacer/>
         <new-category-dialog
           ref="newCategoryDialog"
