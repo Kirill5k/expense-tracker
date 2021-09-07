@@ -31,7 +31,7 @@
     </template>
 
     <template v-slot:[`item.name`]="{ item }">
-      <v-list-item-content class="py-2 px-1">
+      <v-list-item-content class="py-3 px-1">
         <p class="text-subtitle-2 mb-0">{{ item.name }}</p>
       </v-list-item-content>
     </template>
