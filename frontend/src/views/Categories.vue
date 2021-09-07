@@ -25,7 +25,7 @@
       </v-card-title>
 
       <v-card-text class="pb-0 px-0 px-sm-4">
-        <category-list-2
+        <category-list
           :items="categories"
           :window-height="windowHeight"
           @delete="removeWithWarning"
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import CategoryList2 from '@/components/categories/CategoryList2'
+import CategoryList from '@/components/categories/CategoryList'
 import NewCategoryDialog from '@/components/categories/NewCategoryDialog'
 import RemoveCategoryDialog from '@/components/categories/RemoveCategoryDialog'
 import ActionDispatcher from '@/mixins/dispatcher'
@@ -82,7 +82,7 @@ import ActionDispatcher from '@/mixins/dispatcher'
 export default {
   name: 'Categories',
   components: {
-    CategoryList2,
+    CategoryList,
     NewCategoryDialog,
     RemoveCategoryDialog
   },
