@@ -122,7 +122,7 @@ export default {
 .date-period-selector {
   &__select {
     * {
-      align-self: center
+      align-self: flex-start;
     }
   }
 }
