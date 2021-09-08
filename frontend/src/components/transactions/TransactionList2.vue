@@ -64,14 +64,6 @@
 </template>
 
 <script>
-// const DEFAULT_HEADERS = [
-//   { text: '', value: 'delete', align: 'start', cellClass: 'pa-0 px-1', sortable: false },
-//   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
-//   { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sort: (a, b) => a.date.localeCompare(b.date) },
-//   { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sort: (a, b) => b.value - a.value },
-//   { text: '', value: 'edit', align: 'end', cellClass: 'pa-0 px-1', sortable: false }
-// ]
-
 export default {
   name: 'NewTransactionList',
   props: {
