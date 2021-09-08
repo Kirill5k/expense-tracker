@@ -6,6 +6,11 @@ import vuexLocal from '@/plugins/vuexpersist'
 
 Vue.use(Vuex)
 
+const txSorts = {
+  date: (desc) => (a, b) => desc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date),
+  amount: (desc) => (a, b) => desc ? a.amount.value - b.amount.value : b.amount.value - a.amount.value
+}
+
 const withinDates = (txs, { start, end }) => txs.filter(tx => {
   const txdate = new Date(tx.date)
   return start <= txdate && txdate <= end
@@ -36,10 +41,6 @@ const DEFAULT_STATE = {
     type: 'error',
     message: null,
     show: false
-  },
-  sortBy: {
-    field: 'tx',
-    desc: true
   },
   filterBy: []
 }
@@ -81,8 +82,8 @@ export default new Vuex.Store({
     setOnline (state, isOnline) {
       state.isOnline = isOnline
     },
-    sort (state, sortBy) {
-      state.sortBy = { ...sortBy }
+    sort (state, { field, desc }) {
+      state.transactions = state.transactions.sort(txSorts[field](desc))
     },
     filter (state, filters) {
       state.filterBy = filters

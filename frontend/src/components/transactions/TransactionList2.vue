@@ -1,9 +1,9 @@
 <template>
   <v-virtual-scroll
-    class="category-list"
+    class="transaction-list"
     :height="height"
     :items="tableData"
-    item-height="46"
+    item-height="78"
     bench="1000"
   >
     <template v-slot:default="{ item }">
@@ -23,17 +23,29 @@
                 {{ item.icon }}
               </v-icon>
             </v-list-item-avatar>
-            <v-list-item-content class="py-3 px-1">
-              <p class="text-subtitle-2 mb-0">{{ item.name }}</p>
+            <v-list-item-content class="py-2 px-1">
+              <p class="text-subtitle-2 mb-0" :class="item.tx.note ? '' : 'mt-2 mb-1'">{{ item.tx.name }}</p>
+              <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
+              <p class="text-caption mb-0 font-weight-light" :class="item.tx.note ? '' : 'mb-2'">{{ item.tx.displayDate }}</p>
             </v-list-item-content>
             <v-list-item-action>
-              <v-list-item-subtitle v-text="item.kind" class="text-right font-weight-light text-capitalize"/>
+              <v-chip
+                small
+                outlined
+                :color="item.amount.kind === 'expense' ? 'error' : 'success'"
+              >
+                {{ item.amount.kind === 'expense' ? '-' : '+' }}
+                <v-icon>
+                  mdi-currency-{{item.amount.currency.toLowerCase()}}
+                </v-icon>
+                {{item.amount.value}}
+              </v-chip>
             </v-list-item-action>
           </v-list-item>
         </swiper-slide>
-        <swiper-slide class="category-list__menu">
+        <swiper-slide class="transaction-list__menu">
           <v-btn
-            class="category-list__icon ml-2 mr-2"
+            class="transaction-list__icon ml-2 mr-2"
             icon
             dark
             color="red"
@@ -52,11 +64,31 @@
 </template>
 
 <script>
+// const DEFAULT_HEADERS = [
+//   { text: '', value: 'delete', align: 'start', cellClass: 'pa-0 px-1', sortable: false },
+//   { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
+//   { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sort: (a, b) => a.date.localeCompare(b.date) },
+//   { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sort: (a, b) => b.value - a.value },
+//   { text: '', value: 'edit', align: 'end', cellClass: 'pa-0 px-1', sortable: false }
+// ]
+
 export default {
-  name: 'CategoryList',
+  name: 'NewTransactionList',
   props: {
     items: {
       type: Array,
+      required: true
+    },
+    editable: {
+      type: Boolean,
+      default: false
+    },
+    categories: {
+      type: Object,
+      required: true
+    },
+    sortBy: {
+      type: Object,
       required: true
     },
     windowHeight: {
@@ -71,24 +103,28 @@ export default {
     tableData () {
       return this.items.map((item, i) => ({
         id: item.id,
-        color: item.color,
-        icon: item.icon,
-        name: item.name,
-        kind: item.kind,
+        color: this.categories[item.categoryId].color,
+        icon: this.categories[item.categoryId].icon,
+        tx: { name: this.categories[item.categoryId].name, note: item.note, displayDate: this.formatTxDate(item), date: item.date },
+        amount: { value: item.amount.value, kind: item.kind, currency: item.amount.currency.code },
         original: item,
         last: i === this.items.length - 1
       }))
     },
     height () {
-      return this.windowHeight - 137
+      const extra = this.items.length === 0 ? 40 : 0
+      return this.windowHeight - 171 + extra
     }
   },
   methods: {
+    formatTxDate (tx) {
+      const date = new Date(tx.date)
+      return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    },
     swiper (id) {
       return this.$refs[id].$swiper
     },
     editItem (item) {
-      this.closeAll(this.ids)
       this.$emit('edit', item.original)
     },
     deleteItem (id) {
@@ -119,17 +155,13 @@ export default {
 </script>
 
 <style lang="scss">
-.category-list {
+.transaction-list {
   &__icon {
     width: 20px;
   }
 
-  &__small-icon {
-    width: 10px;
-  }
-
   &__menu {
-    height: 46px;
+    height: 78px;
     display: flex;
     align-items: center;
     justify-content: center;
