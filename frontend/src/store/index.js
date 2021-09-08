@@ -42,7 +42,11 @@ const DEFAULT_STATE = {
     message: null,
     show: false
   },
-  filterBy: []
+  filterBy: [],
+  sortBy: {
+    field: 'date',
+    desc: true
+  }
 }
 
 export default new Vuex.Store({
@@ -84,6 +88,7 @@ export default new Vuex.Store({
     },
     sort (state, { field, desc }) {
       state.transactions = state.transactions.sort(txSorts[field](desc))
+      state.sortBy = { field, desc }
     },
     filter (state, filters) {
       state.filterBy = filters
