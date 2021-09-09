@@ -26,7 +26,7 @@
             @update="updateDisplayDate"
           />
 
-          <transaction-list-2
+          <transaction-list
             :categories="$store.getters.catsByIds"
             :sort-by="$store.state.sortBy"
             :items="transactions"
@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import TransactionList2 from '@/components/transactions/TransactionList2'
+import TransactionList from '@/components/transactions/TransactionList'
 import TransactionsSorter from '@/components/transactions/TransactionsSorter'
 import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
@@ -114,7 +114,7 @@ import ActionDispatcher from '@/mixins/dispatcher'
 export default {
   name: 'Transactions',
   components: {
-    TransactionList2,
+    TransactionList,
     TransactionsSorter,
     NewTransactionDialog,
     DatePeriodSelector,

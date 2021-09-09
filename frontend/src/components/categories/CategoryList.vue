@@ -1,5 +1,6 @@
 <template>
   <v-virtual-scroll
+    v-if="items.length"
     class="category-list"
     :height="height"
     :items="tableData"
@@ -49,6 +50,9 @@
       <v-divider v-if="!item.last" />
     </template>
   </v-virtual-scroll>
+  <p class="py-4 px-2 text-center text-subtitle-2" v-else>
+    No categories of this kind
+  </p>
 </template>
 
 <script>

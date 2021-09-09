@@ -1,104 +1,73 @@
 <template>
-  <v-data-table
+  <v-virtual-scroll
+    v-if="items.length"
     class="transaction-list"
-    :sort-by.sync="sortBy.field"
-    :sort-desc.sync="sortBy.desc"
-    :headers="headers"
-    :items="tableData"
-    hide-default-header
-    hide-default-footer
-    dense
-    :items-per-page="-1"
-    no-data-text="No transactions for this period"
     :height="height"
-    :headers-length="2"
-    disable-pagination
-    mobile-breakpoint="100"
-    @click:row="rowClick"
+    :items="tableData"
+    item-height="78"
+    bench="1000"
   >
-    <template v-slot:[`item.icon`]="{ item }">
-      <v-list-item-avatar
-        size="26"
-        :color="item.color"
-      >
-        <v-icon
-          small
-          outline
-          class="lighten-10"
-          dark
-        >
-          {{ item.icon }}
-        </v-icon>
-      </v-list-item-avatar>
+    <template v-slot:default="{ item }">
+      <swiper :ref="item.id" :options="swiperOptions(item.id)" :key="item.id">
+        <swiper-slide>
+          <v-list-item @click="editItem(item)">
+            <v-list-item-avatar
+              size="26"
+              :color="item.color"
+            >
+              <v-icon
+                small
+                outline
+                class="lighten-10"
+                dark
+              >
+                {{ item.icon }}
+              </v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content class="py-2 px-1">
+              <p class="text-subtitle-2 mb-0" :class="item.tx.note ? '' : 'mt-2 mb-1'">{{ item.tx.name }}</p>
+              <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
+              <p class="text-caption mb-0 font-weight-light" :class="item.tx.note ? '' : 'mb-2'">{{ item.tx.displayDate }}</p>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-chip
+                small
+                outlined
+                :color="item.amount.kind === 'expense' ? 'error' : 'success'"
+              >
+                {{ item.amount.kind === 'expense' ? '-' : '+' }}
+                <v-icon>
+                  mdi-currency-{{item.amount.currency.toLowerCase()}}
+                </v-icon>
+                {{item.amount.value}}
+              </v-chip>
+            </v-list-item-action>
+          </v-list-item>
+        </swiper-slide>
+        <swiper-slide class="transaction-list__menu">
+          <v-btn
+            class="transaction-list__icon ml-2 mr-2"
+            icon
+            dark
+            color="red"
+            x-small
+            @click="deleteItem(item.id)"
+          >
+            <v-icon dark>
+              mdi-trash-can-outline
+            </v-icon>
+          </v-btn>
+        </swiper-slide>
+      </swiper>
+      <v-divider v-if="!item.last" />
     </template>
-
-    <template v-slot:[`item.tx`]="{ item }">
-      <v-list-item-content class="py-2 px-1">
-        <p class="text-subtitle-2 mb-0" :class="item.tx.note ? '' : 'mt-2 mb-1'">{{ item.tx.name }}</p>
-        <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
-        <p class="text-caption mb-0 font-weight-light" :class="item.tx.note ? '' : 'mb-2'">{{ item.tx.displayDate }}</p>
-      </v-list-item-content>
-    </template>
-
-    <template v-slot:[`item.amount`]="{ item }">
-      <v-chip
-        small
-        outlined
-        :color="item.amount.kind === 'expense' ? 'error' : 'success'"
-      >
-        {{ item.amount.kind === 'expense' ? '-' : '+' }}
-        <v-icon>
-          mdi-currency-{{item.amount.currency.toLowerCase()}}
-        </v-icon>
-        {{item.amount.value}}
-      </v-chip>
-    </template>
-
-    <template v-slot:[`item.delete`]="{ item }">
-      <v-slide-x-transition>
-        <v-btn
-          v-if="editable"
-          icon
-          dark
-          color="red"
-          x-small
-          @click="$emit('delete', item.id)"
-        >
-          <v-icon dark>
-            mdi-trash-can-outline
-          </v-icon>
-        </v-btn>
-      </v-slide-x-transition>
-    </template>
-
-    <template v-slot:[`item.edit`]="{ item }">
-      <v-slide-x-reverse-transition>
-        <v-btn
-          v-if="editable"
-          icon
-          dark
-          color="secondary"
-          x-small
-          @click="$emit('edit', item.original)"
-        >
-          <v-icon dark>
-            mdi-chevron-right
-          </v-icon>
-        </v-btn>
-      </v-slide-x-reverse-transition>
-    </template>
-  </v-data-table>
+  </v-virtual-scroll>
+  <p class="py-4 px-2 text-center text-subtitle-2" v-else>
+    No transactions for this period
+  </p>
 </template>
 
 <script>
-const DEFAULT_HEADERS = [
-  { text: '', value: 'delete', align: 'start', cellClass: 'pa-0 px-1', sortable: false },
-  { text: 'Icon', value: 'icon', align: 'start', cellClass: 'pt-0 pr-0 pl-1', sortable: false },
-  { text: 'Transaction', value: 'tx', align: 'start', cellClass: 'px-0', sort: (a, b) => a.date.localeCompare(b.date) },
-  { text: 'Amount', value: 'amount', align: 'end', cellClass: 'pt-0 pr-1 pl-0', sort: (a, b) => b.value - a.value },
-  { text: '', value: 'edit', align: 'end', cellClass: 'pa-0 px-1', sortable: false }
-]
-
 export default {
   name: 'TransactionList',
   props: {
@@ -123,18 +92,19 @@ export default {
       required: true
     }
   },
-  data: () => ({
-    headers: DEFAULT_HEADERS
-  }),
   computed: {
+    ids () {
+      return this.items.map(i => i.id)
+    },
     tableData () {
-      return this.items.map(i => ({
-        id: i.id,
-        color: this.categories[i.categoryId].color,
-        icon: this.categories[i.categoryId].icon,
-        tx: { name: this.categories[i.categoryId].name, note: i.note, displayDate: this.formatTxDate(i), date: i.date },
-        amount: { value: i.amount.value, kind: i.kind, currency: i.amount.currency.code },
-        original: i
+      return this.items.map((item, i) => ({
+        id: item.id,
+        color: this.categories[item.categoryId].color,
+        icon: this.categories[item.categoryId].icon,
+        tx: { name: this.categories[item.categoryId].name, note: item.note, displayDate: this.formatTxDate(item), date: item.date },
+        amount: { value: item.amount.value, kind: item.kind, currency: item.amount.currency.code },
+        original: item,
+        last: i === this.items.length - 1
       }))
     },
     height () {
@@ -147,9 +117,33 @@ export default {
       const date = new Date(tx.date)
       return date.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     },
-    rowClick (clickedItem, rowData) {
-      if (!this.editable) {
-        this.$emit('edit', rowData.item.original)
+    swiper (id) {
+      return this.$refs[id].$swiper
+    },
+    editItem (item) {
+      this.$emit('edit', item.original)
+    },
+    deleteItem (id) {
+      this.closeAll(this.ids)
+      this.$emit('delete', id)
+    },
+    closeAll (ids) {
+      ids.forEach(id => this.swiper(id).slidePrev())
+    },
+    swiperOptions (id) {
+      return {
+        initialSlide: 0,
+        resistance: false,
+        speed: 100,
+        slidesPerView: 'auto',
+        watchSlidesProgress: true,
+        on: {
+          snapIndexChange: () => {
+            if (this.swiper(id) && this.swiper(id).snapIndex === 1) {
+              this.closeAll(this.ids.filter(i => i !== id))
+            }
+          }
+        }
       }
     }
   }
@@ -158,6 +152,18 @@ export default {
 
 <style lang="scss">
 .transaction-list {
+  &__icon {
+    width: 20px;
+  }
 
+  &__menu {
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    width: 16%;
+    max-width: 100px;
+  }
 }
 </style>

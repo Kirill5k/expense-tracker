@@ -22,7 +22,7 @@
       :height="30"
     >
       <template v-slot:selection="{ }">
-        <p class="ma-0 text-center text-subtitle-2" style="width: 100%">
+        <p class="ma-0 mt-1 text-center text-subtitle-2" style="width: 100%">
           {{ displayDate.text }}
         </p>
       </template>
