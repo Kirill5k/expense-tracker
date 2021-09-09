@@ -40,7 +40,7 @@
         <v-card-actions class="py-0">
           <div
             v-if="transactions.length"
-            class="transactions__summary"
+            class="transactions__summary ml-16"
           >
             <v-chip
               small
@@ -66,6 +66,7 @@
               <span>{{ $store.getters.totalSpent }}</span>
             </v-chip>
           </div>
+
           <new-transaction-dialog
             ref="newTransactionDialog"
             :currency="currency"
