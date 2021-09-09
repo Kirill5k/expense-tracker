@@ -43,10 +43,7 @@ const DEFAULT_STATE = {
     show: false
   },
   filterBy: [],
-  sortBy: {
-    field: 'date',
-    desc: true
-  }
+  sortBy: {}
 }
 
 export default new Vuex.Store({
@@ -86,9 +83,9 @@ export default new Vuex.Store({
     setOnline (state, isOnline) {
       state.isOnline = isOnline
     },
-    sort (state, { field, desc }) {
+    sort (state, { field, desc, index }) {
       state.transactions = state.transactions.sort(txSorts[field](desc))
-      state.sortBy = { field, desc }
+      state.sortBy = { field, desc, index }
     },
     filter (state, filters) {
       state.filterBy = filters

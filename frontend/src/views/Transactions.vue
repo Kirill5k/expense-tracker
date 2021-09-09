@@ -9,6 +9,7 @@
           Transactions
           <v-spacer></v-spacer>
           <transactions-sorter
+            :sort-by="$store.state.sortBy"
             @sort="(sortBy) => $store.commit('sort', sortBy)"
           />
           <transactions-filter
@@ -29,7 +30,6 @@
             :categories="$store.getters.catsByIds"
             :sort-by="$store.state.sortBy"
             :items="transactions"
-            :editable="editable"
             :window-height="windowHeight"
             @edit="edit"
             @delete="remove"
@@ -38,18 +38,6 @@
         </v-card-text>
 
         <v-card-actions class="py-0">
-          <v-btn
-            v-if="transactions.length"
-            class="float-left mx-2 my-1"
-            color="primary"
-            x-small
-            bottom
-            left
-            fab
-            @click="editable = !editable"
-          >
-            <v-icon dark>{{ editable ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
-          </v-btn>
           <div
             v-if="transactions.length"
             class="transactions__summary"
@@ -133,8 +121,7 @@ export default {
   },
   mixins: [ActionDispatcher],
   data: () => ({
-    lastDeletedId: null,
-    editable: false
+    lastDeletedId: null
   }),
   computed: {
     transactions () {
@@ -167,7 +154,6 @@ export default {
       this.$refs.newTransactionDialog.update(transaction)
     },
     updateDisplayDate (newRange) {
-      this.editable = false
       this.$store.commit('setDisplayDate', newRange)
     }
   }
