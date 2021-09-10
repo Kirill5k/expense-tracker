@@ -134,7 +134,6 @@ export default new Vuex.Store({
       state.transactions = txs
     },
     addTransaction (state, tx) {
-      console.log(state.sortBy.field, state.sortBy.desc)
       state.transactions = [...state.transactions, tx].sort(txSorts[state.sortBy.field](state.sortBy.desc))
     },
     setDisplayDate (state, newDate) {
