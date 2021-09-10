@@ -193,11 +193,6 @@ export default {
       if (catId !== null && this.selectItems.find(i => i.value === catId) === undefined) {
         this.newTransaction.categoryId = null
       }
-    },
-    dialog (newValue) {
-      if (newValue === true && !this.newTransaction.id) {
-        this.newTransaction = { ...DEFAULT_TRANSACTION() }
-      }
     }
   },
   methods: {

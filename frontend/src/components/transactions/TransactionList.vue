@@ -49,6 +49,18 @@
             class="transaction-list__icon ml-2 mr-2"
             icon
             dark
+            color="primary"
+            x-small
+            @click="copyItem(item)"
+          >
+            <v-icon dark>
+              mdi-content-copy
+            </v-icon>
+          </v-btn>
+          <v-btn
+            class="transaction-list__icon ml-2 mr-2"
+            icon
+            dark
             color="red"
             x-small
             @click="deleteItem(item.id)"
@@ -127,6 +139,9 @@ export default {
       this.closeAll(this.ids)
       this.$emit('delete', id)
     },
+    copyItem (item) {
+      this.$emit('copy', item.original)
+    },
     closeAll (ids) {
       ids.forEach(id => this.swiper(id).slidePrev())
     },
@@ -161,8 +176,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    width: 16%;
+    min-width: 56px;
+    width: 24%;
     max-width: 100px;
   }
 }

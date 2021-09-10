@@ -33,6 +33,7 @@
             :window-height="windowHeight"
             @edit="edit"
             @delete="remove"
+            @copy="copy"
           />
           <v-divider v-if="transactions.length"></v-divider>
         </v-card-text>
@@ -153,6 +154,9 @@ export default {
     },
     edit (transaction) {
       this.$refs.newTransactionDialog.update(transaction)
+    },
+    copy (transaction) {
+      this.edit({ ...transaction, id: undefined })
     },
     updateDisplayDate (newRange) {
       this.$store.commit('setDisplayDate', newRange)
