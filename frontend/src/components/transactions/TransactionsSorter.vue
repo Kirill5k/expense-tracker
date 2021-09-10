@@ -32,11 +32,6 @@ export default {
       required: true
     }
   },
-  created () {
-    if (!this.sortBy.field) {
-      this.$emit('sort', this.sortOptions[0])
-    }
-  },
   data: () => ({
     sortOptions: [
       { text: 'Date (Newest First)', value: { field: 'date', desc: true, index: 0 } },

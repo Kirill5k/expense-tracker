@@ -43,7 +43,11 @@ const DEFAULT_STATE = {
     show: false
   },
   filterBy: [],
-  sortBy: {}
+  sortBy: {
+    field: 'date',
+    desc: true,
+    index: 0
+  }
 }
 
 export default new Vuex.Store({
