@@ -5,15 +5,15 @@ object Dependencies {
     val mongo4cats = "0.4.0"
     val pureConfig = "0.16.0"
     val circe      = "0.14.1"
-    val http4s     = "1.0.0-M25"
-    val logback    = "1.2.5"
+    val http4s     = "1.0.0-M27"
+    val logback    = "1.2.6"
     val log4cats   = "2.1.1"
-    val squants    = "1.8.2"
+    val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.9.27"
 
-    val scalaTest = "3.2.9"
-    val mockito   = "1.16.39"
+    val scalaTest = "3.2.10"
+    val mockito   = "1.16.42"
   }
 
   object Libraries {
