@@ -48,9 +48,8 @@ object Dependencies {
 
     object refined {
       val core = "eu.timepit" %% "refined"      % Versions.refined
-      val cats = "eu.timepit" %% "refined-cats" % Versions.refined
 
-      val all = Seq(core, cats)
+      val all = Seq(core)
     }
 
     object http4s {
