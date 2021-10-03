@@ -6,6 +6,8 @@ import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.transaction.db.TransactionRepository
 import squants.market.GBP
+import org.mockito.ArgumentMatchers.{any, anyBoolean}
+import org.mockito.Mockito.{verify, when}
 
 import java.time.LocalDate
 
@@ -14,7 +16,7 @@ class TransactionServiceSpec extends CatsSpec {
   "A TransactionService" should {
     "delete tx from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.delete(any[UserId], any[TransactionId])).thenReturn(IO.unit)
+      when(repo.delete(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
@@ -44,7 +46,7 @@ class TransactionServiceSpec extends CatsSpec {
 
     "retrieve tx by id from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.get(any[UserId], any[TransactionId])).thenReturn(IO.pure(tx))
+      when(repo.get(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId])).thenReturn(IO.pure(tx))
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
@@ -59,7 +61,7 @@ class TransactionServiceSpec extends CatsSpec {
 
     "retrieve all txs from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.getAll(any[UserId])).thenReturn(IO.pure(List(tx)))
+      when(repo.getAll(any[String].asInstanceOf[UserId])).thenReturn(IO.pure(List(tx)))
 
       val result = for {
         svc <- TransactionService.make[IO](repo)
@@ -90,7 +92,7 @@ class TransactionServiceSpec extends CatsSpec {
 
     "hide a tx in db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+      when(repo.hide(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId], anyBoolean)).thenReturn(IO.unit)
 
       val result = for {
         svc <- TransactionService.make[IO](repo)

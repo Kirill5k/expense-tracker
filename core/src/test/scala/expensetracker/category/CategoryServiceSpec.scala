@@ -5,13 +5,15 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
+import org.mockito.ArgumentMatchers.{any, anyBoolean}
+import org.mockito.Mockito.{verify, when}
 
 class CategoryServiceSpec extends CatsSpec {
 
   "A CategoryService" should {
     "delete category from db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.delete(any[UserId], any[CategoryId])).thenReturn(IO.unit)
+      when(repo.delete(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
@@ -26,7 +28,7 @@ class CategoryServiceSpec extends CatsSpec {
 
     "retrieve categories from db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.getAll(any[UserId])).thenReturn(IO.pure(List(cat)))
+      when(repo.getAll(any[String].asInstanceOf[UserId])).thenReturn(IO.pure(List(cat)))
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
@@ -41,7 +43,7 @@ class CategoryServiceSpec extends CatsSpec {
 
     "retrieve category from db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.get(any[UserId], any[CategoryId])).thenReturn(IO.pure(cat))
+      when(repo.get(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId])).thenReturn(IO.pure(cat))
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
@@ -87,7 +89,7 @@ class CategoryServiceSpec extends CatsSpec {
 
     "assign default categories to a user" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.assignDefault(any[UserId])).thenReturn(IO.unit)
+      when(repo.assignDefault(any[String].asInstanceOf[UserId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
@@ -102,7 +104,7 @@ class CategoryServiceSpec extends CatsSpec {
 
     "hide a category" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+      when(repo.hide(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
       val result = for {
         svc <- CategoryService.make[IO](repo)

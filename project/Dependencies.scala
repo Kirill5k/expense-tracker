@@ -13,7 +13,7 @@ object Dependencies {
     val refined    = "0.9.27"
 
     val scalaTest = "3.2.10"
-    val mockito   = "1.16.42"
+    val mockito   = "3.2.10.0"
   }
 
   object Libraries {
@@ -63,9 +63,8 @@ object Dependencies {
       val all = Seq(core, dsl, server, blaze, circe)
     }
 
-    val scalaTest        = "org.scalatest" %% "scalatest"               % Versions.scalaTest
-    val mockitoCore      = "org.mockito"   %% "mockito-scala"           % Versions.mockito
-    val mockitoScalatest = "org.mockito"   %% "mockito-scala-scalatest" % Versions.mockito
+    val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
+    val mockito   = "org.scalatestplus" %% "mockito-3-4" % Versions.mockito
   }
 
   lazy val core = Seq(
@@ -82,8 +81,7 @@ object Dependencies {
 
   lazy val test = Seq(
     Libraries.scalaTest           % Test,
-    Libraries.mockitoCore         % Test,
-    Libraries.mockitoScalatest    % Test,
+    Libraries.mockito             % Test,
     Libraries.mongo4cats.embedded % Test
   )
 }

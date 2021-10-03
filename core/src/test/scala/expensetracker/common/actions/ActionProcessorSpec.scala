@@ -5,6 +5,8 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryService
+import org.mockito.ArgumentMatchers.{any}
+import org.mockito.Mockito.{when, verify}
 
 import scala.concurrent.duration._
 
@@ -14,7 +16,7 @@ class ActionProcessorSpec extends CatsSpec {
 
     "setup new account" in {
       val catSvc = mocks
-      when(catSvc.assignDefault(any[UserId])).thenReturn(IO.unit)
+      when(catSvc.assignDefault(any[String].asInstanceOf[UserId])).thenReturn(IO.unit)
 
       val result = for {
         dispatcher <- ActionDispatcher.make[IO]

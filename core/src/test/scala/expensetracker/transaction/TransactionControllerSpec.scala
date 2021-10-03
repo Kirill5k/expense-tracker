@@ -8,6 +8,8 @@ import org.http4s.circe.CirceEntityCodec._
 import org.http4s.implicits._
 import org.http4s.{Method, Request, Status}
 import squants.market.GBP
+import org.mockito.ArgumentMatchers.{any, anyBoolean}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 import java.time.LocalDate
 
@@ -47,7 +49,7 @@ class TransactionControllerSpec extends ControllerSpec {
           Status.UnprocessableEntity,
           Some(s"""{"message":"Invalid transaction kind foo"}""")
         )
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
 
       "return 422 when invalid category id passed" in {
@@ -68,14 +70,14 @@ class TransactionControllerSpec extends ControllerSpec {
           Status.UnprocessableEntity,
           Some(s"""{"message":"FOO is not a valid categoryId"}""")
         )
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
     }
 
     "GET /transactions" should {
       "return user's txs" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(tx)))
+        when(svc.getAll(any[String].asInstanceOf[UserId])).thenReturn(IO.pure(List(tx)))
 
         val req = Request[IO](uri = uri"/transactions", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -102,7 +104,7 @@ class TransactionControllerSpec extends ControllerSpec {
     "GET /transactions/:id" should {
       "find user's tx by id" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.get(any[UserId], any[TransactionId])).thenReturn(IO.pure(tx))
+        when(svc.get(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId])).thenReturn(IO.pure(tx))
 
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -125,7 +127,8 @@ class TransactionControllerSpec extends ControllerSpec {
 
       "return 404 when tx does not exist" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.get(any[UserId], any[TransactionId])).thenReturn(IO.raiseError(TransactionDoesNotExist(txid)))
+        when(svc.get(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId]))
+          .thenReturn(IO.raiseError(TransactionDoesNotExist(txid)))
 
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -138,7 +141,7 @@ class TransactionControllerSpec extends ControllerSpec {
     "PUT /transactions/:id/hidden" should {
       "update user's category hidden status" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+        when(svc.hide(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId], anyBoolean)).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"hidden":true}""")
         val req = Request[IO](uri = uri"/transactions/BC0C5342AB0C5342AB0C5342/hidden", method = Method.PUT)
@@ -190,7 +193,7 @@ class TransactionControllerSpec extends ControllerSpec {
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
         verifyJsonResponse(res, Status.BadRequest, Some(resBody))
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
 
       "return 422 when request has validation errors" in {
@@ -204,7 +207,7 @@ class TransactionControllerSpec extends ControllerSpec {
 
         val resBody = """{"message":"Kind is required"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(resBody))
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
 
       "return 404 when category does not exist" in {
@@ -226,7 +229,7 @@ class TransactionControllerSpec extends ControllerSpec {
     "DELETE /transactions/:id" should {
       "delete tx by id" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.delete(any[UserId], any[TransactionId])).thenReturn(IO.unit)
+        when(svc.delete(any[String].asInstanceOf[UserId], any[String].asInstanceOf[TransactionId])).thenReturn(IO.unit)
 
         val req = Request[IO](uri = uri"/transactions/AB0C5342AB0C5342AB0C5342", method = Method.DELETE)
           .addCookie(sessIdCookie)

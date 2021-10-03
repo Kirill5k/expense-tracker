@@ -5,6 +5,8 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
+import org.mockito.ArgumentMatchers.{any}
+import org.mockito.Mockito.{when, verify}
 
 import java.time.Instant
 
@@ -30,7 +32,7 @@ class SessionServiceSpec extends CatsSpec {
 
     "return existing session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.find(any[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(sess)))
+      when(repo.find(any[String].asInstanceOf[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(sess)))
 
       val result = for {
         svc  <- SessionService.make(repo)
@@ -60,7 +62,7 @@ class SessionServiceSpec extends CatsSpec {
 
     "invalidate all sessions" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.invalidatedAll(any[UserId])).thenReturn(IO.unit)
+      when(repo.invalidatedAll(any[String].asInstanceOf[UserId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- SessionService.make(repo)

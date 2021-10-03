@@ -7,6 +7,8 @@ import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoe
 import org.http4s.{Method, Request, Status}
 import org.http4s.implicits._
 import org.http4s.circe.CirceEntityCodec._
+import org.mockito.ArgumentMatchers.{any, anyBoolean}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 class CategoryControllerSpec extends ControllerSpec {
 
@@ -67,7 +69,7 @@ class CategoryControllerSpec extends ControllerSpec {
           Status.UnprocessableEntity,
           Some(s"""{"message":"Invalid category kind foo"}""")
         )
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
 
       "return 422 when invalid color passed" in {
@@ -83,14 +85,14 @@ class CategoryControllerSpec extends ControllerSpec {
           Status.UnprocessableEntity,
           Some("""{"message":"blue is not a valid color"}""")
         )
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
     }
 
     "GET /categories" should {
       "return user's categories" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(cat)))
+        when(svc.getAll(any[String].asInstanceOf[UserId])).thenReturn(IO.pure(List(cat)))
 
         val req = Request[IO](uri = uri"/categories", method = Method.GET).addCookie(sessIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -107,7 +109,7 @@ class CategoryControllerSpec extends ControllerSpec {
     "GET /categories/:id" should {
       "return user's category by id" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.get(any[UserId], any[CategoryId])).thenReturn(IO.pure(cat))
+        when(svc.get(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId])).thenReturn(IO.pure(cat))
 
         val req =
           Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
@@ -125,7 +127,7 @@ class CategoryControllerSpec extends ControllerSpec {
     "PUT /categories/:id/hidden" should {
       "update user's category hidden status" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+        when(svc.hide(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"hidden":true}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342/hidden", method = Method.PUT)
@@ -177,7 +179,7 @@ class CategoryControllerSpec extends ControllerSpec {
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
         verifyJsonResponse(res, Status.BadRequest, Some(resBody))
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
 
       "return 422 when request has validation errors" in {
@@ -191,7 +193,7 @@ class CategoryControllerSpec extends ControllerSpec {
 
         val resBody = """{"message":"Name must not be empty"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(resBody))
-        verifyZeroInteractions(svc)
+        verifyNoInteractions(svc)
       }
 
       "return 404 when category does not exist" in {
@@ -224,7 +226,7 @@ class CategoryControllerSpec extends ControllerSpec {
     "DELETE /categories/:id" should {
       "delete category by id" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.delete(any[UserId], any[CategoryId])).thenReturn(IO.unit)
+        when(svc.delete(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId])).thenReturn(IO.unit)
 
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.DELETE)
           .addCookie(sessIdCookie)

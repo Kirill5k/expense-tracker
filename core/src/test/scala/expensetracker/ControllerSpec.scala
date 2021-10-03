@@ -8,16 +8,16 @@ import io.circe.{Json, JsonObject}
 import org.http4s.circe._
 import org.http4s.server.AuthMiddleware
 import org.http4s.{Response, ResponseCookie, Status}
-import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.Assertion
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.io.Source
 
-trait ControllerSpec extends AnyWordSpec with MockitoSugar with ArgumentMatchersSugar with Matchers with TestData {
+trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers with TestData {
 
   implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
