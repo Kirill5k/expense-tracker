@@ -46,7 +46,7 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
           Unauthorized(WWWAuthHeader, ErrorResponse(err.getMessage))
       case err: InvalidMessageBodyFailure =>
         logger.error(err.getCause())(err.getMessage()) *>
-          UnprocessableEntity(ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.getCause().getMessage)))
+          UnprocessableEntity(ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.message)))
       case err =>
         logger.error(err)(s"unexpected error: ${err.getMessage}") *>
           InternalServerError(ErrorResponse(err.getMessage))

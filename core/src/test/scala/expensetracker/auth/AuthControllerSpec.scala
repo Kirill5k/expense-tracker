@@ -192,18 +192,16 @@ class AuthControllerSpec extends ControllerSpec {
 
     "POST /auth/login" should {
 
-      "return bad request on invalid json" in {
+      "return 422 on invalid json" in {
         val svc = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
-
 
         val req = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity("""{foo}""")
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        val responseBody = """{"message":"Email is required"}"""
+        val responseBody = """{"message":"Invalid message body: Could not decode JSON: \"{foo}\""}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
-        verifyNoInteractions(svc)
-        verifyNoInteractions(disp)
+        verifyNoInteractions(svc, disp)
       }
 
       "return bad req on parsing error" in {

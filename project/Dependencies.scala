@@ -27,7 +27,7 @@ object Dependencies {
     }
 
     object pureconfig {
-      val core = "com.github.pureconfig" %% "pureconfig" % Versions.pureConfig
+      val core = "com.github.pureconfig" %% "pureconfig-core" % Versions.pureConfig
     }
 
     object logging {
@@ -71,7 +71,7 @@ object Dependencies {
     Libraries.mongo4cats.circe,
     Libraries.pureconfig.core,
     Libraries.squants,
-    Libraries.bcrypt
+    Libraries.bcrypt.cross(CrossVersion.for3Use2_13)
   ) ++
     Libraries.circe.all ++
     Libraries.http4s.all ++
