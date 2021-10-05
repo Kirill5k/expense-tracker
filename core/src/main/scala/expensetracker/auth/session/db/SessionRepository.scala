@@ -1,14 +1,14 @@
 package expensetracker.auth.session.db
 
 import cats.effect.Async
-import cats.implicits._
+import cats.implicits.*
 import expensetracker.auth.user.UserId
-import io.circe.generic.auto._
-import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId}
+import io.circe.generic.auto.*
+import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import expensetracker.common.db.Repository
-import expensetracker.common.json._
+import expensetracker.common.json.*
 import mongo4cats.database.MongoDatabase
-import mongo4cats.circe._
+import mongo4cats.circe.*
 import mongo4cats.collection.operations.Update
 import mongo4cats.collection.MongoCollection
 
@@ -23,8 +23,8 @@ final private class LiveSessionRepository[F[_]: Async](
     private val collection: MongoCollection[F, SessionEntity]
 ) extends SessionRepository[F] {
 
-  private val logoutUpdate     = Update.set("status", "logged-out").set("active", false)
-  private val invalidateUpdate = Update.set("status", "invalidated").set("active", false)
+  private val logoutUpdate     = Update.set(Field.Status, SessionStatus.LoggedOut).set("active", false)
+  private val invalidateUpdate = Update.set(Field.Status, SessionStatus.Invalidated).set("active", false)
 
   override def create(cs: CreateSession): F[SessionId] = {
     val createSession = SessionEntity.create(cs)
@@ -50,6 +50,6 @@ object SessionRepository {
   def make[F[_]: Async](db: MongoDatabase[F]): F[SessionRepository[F]] =
     db
       .getCollectionWithCodec[SessionEntity]("sessions")
-      .map(_.withAddedCodec[SessionActivity])
+      .map(_.withAddedCodec[SessionActivity].withAddedCodec[SessionStatus])
       .map(coll => new LiveSessionRepository[F](coll))
 }

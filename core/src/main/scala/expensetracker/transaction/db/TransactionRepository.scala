@@ -76,7 +76,7 @@ final private class LiveTransactionRepository[F[_]: Async](
 
   override def isHidden(aid: UserId, txid: TransactionId): F[Boolean] =
     collection
-      .count(userIdEq(aid).and(idEq(txid.value)).and(Filter.eq(HiddenField, true)))
+      .count(userIdEq(aid).and(idEq(txid.value)).and(Filter.eq(Field.Hidden, true)))
       .map(_ > 0)
 }
 

@@ -26,13 +26,13 @@ final private class LiveUserRepository[F[_]: Async](
 
   override def findBy(email: UserEmail): F[Option[User]] =
     collection
-      .find(Filter.eq(EmailField, email.value))
+      .find(Filter.eq(Field.Email, email.value))
       .first
       .map(_.map(_.toDomain))
 
   override def create(details: UserDetails, password: PasswordHash): F[UserId] =
     collection
-      .count(Filter.eq(EmailField, details.email.value))
+      .count(Filter.eq(Field.Email, details.email.value))
       .flatMap {
         case 0 =>
           val createAcc = AccountEntity.create(details, password)

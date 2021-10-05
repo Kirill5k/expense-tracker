@@ -11,18 +11,22 @@ import java.time.Instant
 
 trait Repository[F[_]] {
 
-  protected val UIdField           = "userId"
-  protected val IdField            = "_id"
-  protected val EmailField         = "email"
-  protected val HiddenField        = "hidden"
-  protected val LastUpdatedAtField = "lastUpdatedAt"
+  protected object Field {
+    val Name          = "name"
+    val UId           = "userId"
+    val Id            = "_id"
+    val Email         = "email"
+    val Hidden        = "hidden"
+    val LastUpdatedAt = "lastUpdatedAt"
+    val Status        = "status"
+  }
 
-  protected val notHidden: Filter = Filter.ne(HiddenField, true)
+  protected val notHidden: Filter = Filter.ne(Field.Hidden, true)
 
   private def idEqFilter(name: String, id: String): Filter = Filter.eq(name, ObjectId(id))
-  protected def idEq(id: String): Filter                   = idEqFilter(IdField, id)
-  protected def userIdEq(aid: Option[UserId]): Filter      = idEqFilter(UIdField, aid.map(_.value).orNull)
-  protected def userIdEq(aid: UserId): Filter              = idEqFilter(UIdField, aid.value)
+  protected def idEq(id: String): Filter                   = idEqFilter(Field.Id, id)
+  protected def userIdEq(aid: Option[UserId]): Filter      = idEqFilter(Field.UId, aid.map(_.value).orNull)
+  protected def userIdEq(aid: UserId): Filter              = idEqFilter(Field.UId, aid.value)
 
   protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =
     Option(res).map(_.pure[F]).getOrElse(error.raiseError[F, A])
@@ -31,5 +35,5 @@ trait Repository[F[_]] {
     if (res.getMatchedCount > 0) F.unit else error.raiseError[F, Unit]
 
   protected def updateHidden(hidden: Boolean): Update =
-    Update.set(HiddenField, hidden).set(LastUpdatedAtField, Instant.now())
+    Update.set(Field.Hidden, hidden).set(Field.LastUpdatedAt, Instant.now())
 }
