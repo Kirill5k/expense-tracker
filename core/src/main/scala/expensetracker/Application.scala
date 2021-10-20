@@ -13,26 +13,26 @@ import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import fs2.Stream
 
-object Application extends IOApp.Simple {
-
-  val config = AppConfig.load
-
-  implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
-
+object Application extends IOApp.Simple:
+  implicit val log: Logger[IO] = Slf4jLogger.getLogger[IO]
   override val run: IO[Unit] =
-    Resources.make[IO](config).use { res =>
-      for {
-        dispatcher <- ActionDispatcher.make[IO]
-        health     <- Health.make[IO]
-        auth       <- Auth.make(config.auth, res, dispatcher)
-        cats       <- Categories.make(res)
-        txs        <- Transactions.make(res)
-        http       <- Http.make(health, auth, cats, txs)
-        processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
-        server = BlazeServerBuilder[IO](runtime.compute)
-          .bindHttp(config.server.port, config.server.host)
-          .withHttpApp(http.httpApp)
-        _ <- Stream(processor.process, server.serve).parJoinUnbounded.compile.drain
-      } yield ()
-    }
-}
+    for
+      config <- AppConfig.load[IO]
+      _ <- Resources.make[IO](config).use { res =>
+        for
+          dispatcher <- ActionDispatcher.make[IO]
+          health     <- Health.make[IO]
+          auth       <- Auth.make(config.auth, res, dispatcher)
+          cats       <- Categories.make(res)
+          txs        <- Transactions.make(res)
+          http       <- Http.make(health, auth, cats, txs)
+          processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
+          server = BlazeServerBuilder[IO]
+            .withExecutionContext(runtime.compute)
+            .bindHttp(config.server.port, config.server.host)
+            .withHttpApp(http.httpApp)
+          _ <- Stream(processor.process, server.serve).parJoinUnbounded.compile.drain
+        yield ()
+      }
+    yield ()
+

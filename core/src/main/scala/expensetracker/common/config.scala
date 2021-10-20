@@ -1,5 +1,7 @@
 package expensetracker.common
 
+import cats.effect.kernel.Sync
+import cats.syntax.monad.*
 import pureconfig.*
 import pureconfig.generic.derivation.default.*
 
@@ -25,6 +27,7 @@ object config {
   ) derives ConfigReader
 
   object AppConfig {
-    def load: AppConfig = ConfigSource.default.loadOrThrow[AppConfig]
+    def load[F[_]: Sync]: F[AppConfig] =
+      Sync[F].blocking(ConfigSource.default.loadOrThrow[AppConfig])
   }
 }
