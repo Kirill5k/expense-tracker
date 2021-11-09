@@ -35,4 +35,3 @@ object Application extends IOApp.Simple:
         yield ()
       }
     yield ()
-
