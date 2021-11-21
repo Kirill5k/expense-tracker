@@ -5,11 +5,10 @@ import expensetracker.common.config.{AppConfig, MongoConfig}
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 
-trait Resources[F[_]] {
+trait Resources[F[_]]:
   def mongo: MongoDatabase[F]
-}
 
-object Resources {
+object Resources:
 
   private def mongoDb[F[_]: Async](config: MongoConfig): Resource[F, MongoDatabase[F]] =
     MongoClient
@@ -22,4 +21,3 @@ object Resources {
         def mongo: MongoDatabase[F] = db
       }
     }
-}
