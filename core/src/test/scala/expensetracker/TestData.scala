@@ -27,8 +27,7 @@ trait TestData {
   val cat   = Category(cid, CategoryKind.Expense, cname, CategoryIcon("icon"), CategoryColor.Blue, Some(uid))
 
   val txid = TransactionId("BC0C5342AB0C5342AB0C5342")
-  val tx =
-    Transaction(txid, uid, TransactionKind.Expense, cid, GBP(10.99), LocalDate.parse("2021-06-06"), Some("test tx"))
+  val tx   = Transaction(txid, uid, TransactionKind.Expense, cid, GBP(10.99), LocalDate.parse("2021-06-06"), Some("test tx"), List("test"))
 
   val sid          = SessionId(ObjectId().toHexString)
   val sid2         = SessionId(ObjectId().toHexString)

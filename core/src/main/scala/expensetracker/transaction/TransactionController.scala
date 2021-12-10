@@ -19,7 +19,7 @@ import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.typelevel.log4cats.Logger
 import squants.market.Money
 
-import java.time.{LocalDate}
+import java.time.LocalDate
 
 final class TransactionController[F[_]: Logger](
     private val service: TransactionService[F]
@@ -91,7 +91,8 @@ object TransactionController {
       categoryId: ValidIdString,
       amount: Money,
       date: LocalDate,
-      note: Option[String]
+      note: Option[String],
+      tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
@@ -100,7 +101,8 @@ object TransactionController {
         categoryId = CategoryId(categoryId.value),
         amount = amount,
         date = date,
-        note = note.filter(_.nonEmpty)
+        note = note.filter(_.nonEmpty),
+        tags = tags.getOrElse(Nil)
       )
   }
 
@@ -112,7 +114,8 @@ object TransactionController {
       categoryId: String,
       amount: Money,
       date: LocalDate,
-      note: Option[String]
+      note: Option[String],
+      tags: List[String]
   )
 
   object TransactionView {
@@ -123,7 +126,8 @@ object TransactionController {
         categoryId = tx.categoryId.value,
         amount = tx.amount,
         date = tx.date,
-        note = tx.note
+        note = tx.note,
+        tags = tx.tags
       )
   }
 
@@ -135,7 +139,8 @@ object TransactionController {
       categoryId: ValidIdString,
       amount: Money,
       date: LocalDate,
-      note: Option[String]
+      note: Option[String],
+      tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): Transaction =
       Transaction(
@@ -145,7 +150,8 @@ object TransactionController {
         userId = aid,
         amount = amount,
         date = date,
-        note = note
+        note = note,
+        tags = tags.getOrElse(Nil)
       )
   }
 

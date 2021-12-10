@@ -25,14 +25,15 @@ class TransactionControllerSpec extends ControllerSpec {
             |"categoryId":"AB0C5342AB0C5342AB0C5342",
             |"kind":"expense",
             |"date": "2021-01-01",
-            |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}}
+            |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}},
+            |"tags": ["foo"]
             |}""".stripMargin)
         val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${txid.value}"}"""))
         verify(svc).create(
-          CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None)
+          CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None, List("foo"))
         )
       }
 
@@ -92,7 +93,8 @@ class TransactionControllerSpec extends ControllerSpec {
           |      "currency":{"code":"GBP","symbol":"£"}
           |    },
           |    "date" : "2021-06-06",
-          |    "note" : "test tx"
+          |    "note" : "test tx",
+          |    "tags" : ["test"]
           |  }
           |]""".stripMargin
 
@@ -113,16 +115,14 @@ class TransactionControllerSpec extends ControllerSpec {
                         |"id" : "BC0C5342AB0C5342AB0C5342",
                         |"kind" : "expense",
                         |"categoryId" : "AB0C5342AB0C5342AB0C5342",
-                        |"amount" : {
-                        |  "value" : 10.99,
-                        |  "currency":{"code":"GBP","symbol":"£"}
-                        |},
+                        |"amount" : {"value" : 10.99, "currency":{"code":"GBP","symbol":"£"}},
                         |"date" : "2021-06-06",
-                        |"note" : "test tx"
+                        |"note" : "test tx",
+                        |"tags" : ["test"]
                         |}""".stripMargin
 
         verifyJsonResponse(res, Status.Ok, Some(resBody))
-        verify(svc).get(uid,  txid)
+        verify(svc).get(uid, txid)
       }
 
       "return 404 when tx does not exist" in {
@@ -134,7 +134,7 @@ class TransactionControllerSpec extends ControllerSpec {
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NotFound, Some("""{"message":"Transaction with id BC0C5342AB0C5342AB0C5342 does not exist"}"""))
-        verify(svc).get(uid,  txid)
+        verify(svc).get(uid, txid)
       }
     }
 
@@ -160,12 +160,10 @@ class TransactionControllerSpec extends ControllerSpec {
                       |"id" : "BC0C5342AB0C5342AB0C5342",
                       |"kind" : "expense",
                       |"categoryId" : "AB0C5342AB0C5342AB0C5342",
-                      |"amount" : {
-                      |  "value" : 10.99,
-                      |  "currency":{"code":"GBP","symbol":"£"}
-                      |},
+                      |"amount" : {"value" : 10.99,"currency":{"code":"GBP","symbol":"£"}},
                       |"date" : "2021-06-06",
-                      |"note" : "test tx"
+                      |"note" : "test tx",
+                      |"tags" : ["test"]
                       |}""".stripMargin
 
       "update user's transaction" in {

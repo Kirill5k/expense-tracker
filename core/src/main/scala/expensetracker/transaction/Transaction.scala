@@ -26,7 +26,8 @@ final case class Transaction(
     categoryId: CategoryId,
     amount: Money,
     date: LocalDate,
-    note: Option[String]
+    note: Option[String],
+    tags: List[String]
 )
 
 final case class CreateTransaction(
@@ -35,5 +36,6 @@ final case class CreateTransaction(
     categoryId: CategoryId,
     amount: Money,
     date: LocalDate,
-    note: Option[String]
+    note: Option[String],
+    tags: List[String]
 )

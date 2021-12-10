@@ -78,7 +78,7 @@ class TransactionServiceSpec extends CatsSpec {
       val repo = mock[TransactionRepository[IO]]
       when(repo.create(any[CreateTransaction])).thenReturn(IO.pure(txid))
 
-      val create = CreateTransaction(uid, TransactionKind.Income, cid, GBP(5.0), LocalDate.now(), None)
+      val create = CreateTransaction(uid, TransactionKind.Income, cid, GBP(5.0), LocalDate.now(), None, Nil)
       val result = for {
         svc <- TransactionService.make[IO](repo)
         res <- svc.create(create)
