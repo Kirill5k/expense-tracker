@@ -5,8 +5,8 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryService
-import org.mockito.ArgumentMatchers.{any}
-import org.mockito.Mockito.{when, verify}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 
 import scala.concurrent.duration._
 
@@ -20,9 +20,9 @@ class ActionProcessorSpec extends CatsSpec {
 
       val result = for {
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, catSvc)
-        _ <- dispatcher.dispatch(Action.SetupNewUser(uid))
-        res <- processor.process.interruptAfter(2.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, catSvc)
+        _          <- dispatcher.dispatch(Action.SetupNewUser(uid))
+        res        <- processor.process.interruptAfter(2.second).compile.drain
       } yield res
 
       result.unsafeToFuture().map { r =>
@@ -32,7 +32,6 @@ class ActionProcessorSpec extends CatsSpec {
     }
   }
 
-  def mocks: CategoryService[IO] = {
+  def mocks: CategoryService[IO] =
     mock[CategoryService[IO]]
-  }
 }

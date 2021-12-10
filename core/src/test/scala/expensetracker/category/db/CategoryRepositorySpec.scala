@@ -4,8 +4,9 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.MongoOps
 import expensetracker.auth.user.UserId
-import expensetracker.category._
+import expensetracker.category.*
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
+import expensetracker.fixtures.{Categories, Users}
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
@@ -19,33 +20,22 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
   override protected val mongoPort: Int = 12348
 
-  val acc1Id = UserId(ObjectId().toHexString)
-  val acc2Id = UserId(ObjectId().toHexString)
-  val cat1Id = CategoryId(ObjectId().toHexString)
-  val cat2Id = CategoryId(ObjectId().toHexString)
-
   "A CategoryRepository" when {
 
     "create" should {
       "create new category in db" in {
         withEmbeddedMongoDb { client =>
-          val create = CreateCategory(
-            CategoryKind.Income,
-            CategoryName("c2i"),
-            CategoryIcon("icon"),
-            CategoryColor.Blue,
-            acc1Id
-          )
+          val create = Categories.create()
           val result = for {
             repo <- CategoryRepository.make(client)
             id   <- repo.create(create)
-            cat  <- repo.get(acc1Id, id)
+            cat  <- repo.get(Users.uid1, id)
           } yield cat
 
           result.map { cat =>
             cat.name mustBe create.name
             cat.icon mustBe create.icon
-            cat.userId mustBe Some(acc1Id)
+            cat.userId mustBe Some(Users.uid1)
             cat.kind mustBe create.kind
           }
         }
@@ -53,21 +43,12 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
       "return error if cat with such name already exists" in {
         withEmbeddedMongoDb { client =>
-          val create = CreateCategory(
-            CategoryKind.Income,
-            CategoryName("C2"),
-            CategoryIcon("icon"),
-            CategoryColor.Blue,
-            acc2Id
-          )
           val result = for {
             repo <- CategoryRepository.make(client)
-            id   <- repo.create(create)
+            id   <- repo.create(Categories.create(name = CategoryName("C2"), uid = Users.uid2))
           } yield id
 
-          result.attempt.map { err =>
-            err mustBe Left(CategoryAlreadyExists(CategoryName("C2")))
-          }
+          result.attempt.map(_ mustBe Left(CategoryAlreadyExists(CategoryName("C2"))))
         }
       }
     }
@@ -77,12 +58,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            cat  <- repo.get(acc1Id, cat2Id)
+            cat  <- repo.get(Users.uid1, Categories.catid2)
           } yield cat
 
-          result.attempt.map { res =>
-            res mustBe Left(CategoryDoesNotExist(cat2Id))
-          }
+          result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.catid2)))
         }
       }
     }
@@ -91,27 +70,23 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
       "return hidden status of hidden cat" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- CategoryRepository.make(client)
-            _    <- repo.hide(acc2Id, cat2Id)
-            isHidden <- repo.isHidden(acc2Id, cat2Id)
+            repo     <- CategoryRepository.make(client)
+            _        <- repo.hide(Users.uid2, Categories.catid2)
+            isHidden <- repo.isHidden(Users.uid2, Categories.catid2)
           } yield isHidden
 
-          result.map { res =>
-            res mustBe true
-          }
+          result.map(_ mustBe true)
         }
       }
 
       "return hidden status of displayed cat" in {
         withEmbeddedMongoDb { client =>
           val result = for {
-            repo <- CategoryRepository.make(client)
-            isHidden <- repo.isHidden(acc2Id, cat2Id)
+            repo     <- CategoryRepository.make(client)
+            isHidden <- repo.isHidden(Users.uid2, Categories.catid2)
           } yield isHidden
 
-          result.map { res =>
-            res mustBe false
-          }
+          result.map(_ mustBe false)
         }
       }
     }
@@ -121,13 +96,11 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            _    <- repo.hide(acc2Id, cat2Id)
-            cats <- repo.getAll(acc2Id)
+            _    <- repo.hide(Users.uid2, Categories.catid2)
+            cats <- repo.getAll(Users.uid2)
           } yield cats
 
-          result.map { res =>
-            res mustBe Nil
-          }
+          result.map(_ mustBe Nil)
         }
       }
 
@@ -135,12 +108,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            res  <- repo.hide(acc1Id, cat2Id)
+            res  <- repo.hide(Users.uid1, Categories.catid2)
           } yield res
 
-          result.attempt.map { res =>
-            res mustBe Left(CategoryDoesNotExist(cat2Id))
-          }
+          result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.catid2)))
         }
       }
     }
@@ -150,14 +121,14 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            cats <- repo.getAll(acc2Id)
+            cats <- repo.getAll(Users.uid2)
           } yield cats
 
           result.map { cats =>
             cats must have size 1
-            cats.head.id mustBe cat2Id
+            cats.head.id mustBe Categories.catid2
             cats.head.name mustBe CategoryName("c2")
-            cats.head.userId mustBe Some(acc2Id)
+            cats.head.userId mustBe Some(Users.uid2)
           }
         }
       }
@@ -168,14 +139,14 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            _    <- repo.assignDefault(acc2Id)
-            cats <- repo.getAll(acc2Id)
+            _    <- repo.assignDefault(Users.uid2)
+            cats <- repo.getAll(Users.uid2)
           } yield cats
 
           result.map { cats =>
             cats must have size 2
             cats.map(_.name) mustBe List(CategoryName("c1"), CategoryName("c2"))
-            cats.flatMap(_.userId) mustBe List(acc2Id, acc2Id)
+            cats.flatMap(_.userId) mustBe List(Users.uid2, Users.uid2)
           }
         }
       }
@@ -186,13 +157,11 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            _    <- repo.delete(acc2Id, cat2Id)
-            cats <- repo.getAll(acc2Id)
+            _    <- repo.delete(Users.uid2, Categories.catid2)
+            cats <- repo.getAll(Users.uid2)
           } yield cats
 
-          result.map { cats =>
-            cats must have size 0
-          }
+          result.map(_ must have size 0)
         }
       }
 
@@ -200,12 +169,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for {
             repo <- CategoryRepository.make(client)
-            res  <- repo.delete(acc1Id, cat2Id)
+            res  <- repo.delete(Users.uid1, Categories.catid2)
           } yield res
 
-          result.attempt.map { res =>
-            res mustBe Left(CategoryDoesNotExist(cat2Id))
-          }
+          result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.catid2)))
         }
       }
     }
@@ -213,18 +180,11 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
     "update" should {
       "update existing category" in {
         withEmbeddedMongoDb { db =>
-          val update = Category(
-            cat2Id,
-            CategoryKind.Income,
-            CategoryName("c2-upd"),
-            CategoryIcon("icon-upd"),
-            CategoryColor.Blue,
-            Some(acc2Id)
-          )
+          val update = Categories.cat(id = Categories.catid2, name = CategoryName("c2-upd"), uid = Some(Users.uid2))
           val result = for {
             repo <- CategoryRepository.make(db)
             _    <- repo.update(update)
-            cats <- repo.getAll(acc2Id)
+            cats <- repo.getAll(Users.uid2)
           } yield cats
 
           result.map { cats =>
@@ -236,22 +196,12 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
       "return error when category does not exist" in {
         withEmbeddedMongoDb { db =>
-          val update = Category(
-            cat1Id,
-            CategoryKind.Expense,
-            CategoryName("c2-upd"),
-            CategoryIcon("icon-upd"),
-            CategoryColor.Blue,
-            Some(acc2Id)
-          )
           val result = for {
             repo <- CategoryRepository.make(db)
-            res  <- repo.update(update)
+            res  <- repo.update(Categories.cat(id = Categories.catid1, name = CategoryName("c2-upd")))
           } yield res
 
-          result.attempt.map { res =>
-            res mustBe Left(CategoryDoesNotExist(cat1Id))
-          }
+          result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.catid1)))
         }
       }
     }
@@ -265,9 +215,9 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           for {
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
-            _ <- categories.insertMany(List(categoryDoc(cat1Id, "c1"), categoryDoc(cat2Id, "c2", Some(acc2Id))))
+            _ <- categories.insertMany(List(categoryDoc(Categories.catid1, "c1"), categoryDoc(Categories.catid2, "c2", Some(Users.uid2))))
             accounts <- db.getCollection("accounts")
-            _        <- accounts.insertMany(List(accDoc(acc1Id, "acc1"), accDoc(acc2Id, "acc2")))
+            _        <- accounts.insertMany(List(accDoc(Users.uid1, "acc1"), accDoc(Users.uid2, "acc2")))
             res      <- test(db)
           } yield res
         }

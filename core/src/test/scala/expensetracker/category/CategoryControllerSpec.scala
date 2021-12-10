@@ -19,9 +19,8 @@ class CategoryControllerSpec extends ControllerSpec {
         when(svc.create(any[CreateCategory])).thenReturn(IO.pure(cid))
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req =
-          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
-        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+        val req     = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val res     = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${cid.value}"}"""))
         verify(svc).create {
@@ -40,9 +39,8 @@ class CategoryControllerSpec extends ControllerSpec {
         when(svc.create(any[CreateCategory])).thenReturn(IO.raiseError(CategoryAlreadyExists(cname)))
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req =
-          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
-        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+        val req     = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val res     = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Conflict, Some(s"""{"message":"A category with name cat-1 already exists"}"""))
         verify(svc).create {
@@ -60,9 +58,8 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo","color":"#2962FF"}""")
-        val req =
-          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
-        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+        val req     = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val res     = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(
           res,
@@ -76,9 +73,8 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"income","color":"blue"}""")
-        val req =
-          Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
-        val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+        val req     = Request[IO](uri = uri"/categories", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val res     = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(
           res,
@@ -97,11 +93,8 @@ class CategoryControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/categories", method = Method.GET).addCookie(sessIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(
-          res,
-          Status.Ok,
-          Some(s"""[{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}]""")
-        )
+        val responseBody = s"""[{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}]"""
+        verifyJsonResponse(res, Status.Ok, Some(responseBody))
         verify(svc).getAll(uid)
       }
     }
@@ -111,15 +104,11 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.get(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId])).thenReturn(IO.pure(cat))
 
-        val req =
-          Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
+        val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.GET).addCookie(sessIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(
-          res,
-          Status.Ok,
-          Some(s"""{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        )
+        val responseBody = s"""{"id":"${cid.value}","name":"cat-1","icon":"icon","kind":"expense","color":"#2962FF"}"""
+        verifyJsonResponse(res, Status.Ok, Some(responseBody))
         verify(svc).get(uid, cid)
       }
     }
@@ -145,9 +134,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.update(any[Category])).thenReturn(IO.unit)
 
-        val reqBody = parseJson(
-          """{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}"""
-        )
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessIdCookie)
           .withEntity(reqBody)
@@ -169,9 +156,7 @@ class CategoryControllerSpec extends ControllerSpec {
       "return 400 when provided ids do not match" in {
         val svc = mock[CategoryService[IO]]
 
-        val reqBody = parseJson(
-          """{"id":"AB0C5342AB0C5342AB0C5341","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}"""
-        )
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5341","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessIdCookie)
           .withEntity(reqBody)
@@ -200,9 +185,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.update(any[Category])).thenReturn(IO.raiseError(CategoryDoesNotExist(cid)))
 
-        val reqBody = parseJson(
-          """{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}"""
-        )
+        val reqBody = parseJson("""{"id":"AB0C5342AB0C5342AB0C5342","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.PUT)
           .addCookie(sessIdCookie)
           .withEntity(reqBody)
@@ -228,8 +211,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val svc = mock[CategoryService[IO]]
         when(svc.delete(any[String].asInstanceOf[UserId], any[String].asInstanceOf[CategoryId])).thenReturn(IO.unit)
 
-        val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.DELETE)
-          .addCookie(sessIdCookie)
+        val req = Request[IO](uri = uri"/categories/AB0C5342AB0C5342AB0C5342", method = Method.DELETE).addCookie(sessIdCookie)
         val res = CategoryController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)

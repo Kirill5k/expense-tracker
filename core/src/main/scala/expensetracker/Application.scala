@@ -30,7 +30,7 @@ object Application extends IOApp.Simple:
           server = BlazeServerBuilder[IO]
             .withExecutionContext(runtime.compute)
             .bindHttp(config.server.port, config.server.host)
-            .withHttpApp(http.httpApp)
+            .withHttpApp(http.app)
           _ <- Stream(processor.process, server.serve).parJoinUnbounded.compile.drain
         yield ()
       }

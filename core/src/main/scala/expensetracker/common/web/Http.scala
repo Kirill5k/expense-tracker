@@ -30,24 +30,19 @@ final class Http[F[_]: Async] private (
   }
 
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => AutoSlash(http) }
-    .andThen { (http: HttpRoutes[F]) =>
-      CORS.policy.withAllowOriginAll
-        .withAllowCredentials(false)
-        .apply(http)
-    }
+    .andThen((http: HttpRoutes[F]) => CORS.policy.withAllowOriginAll.withAllowCredentials(false).apply(http))
     .andThen((http: HttpRoutes[F]) => Timeout(60.seconds)(http))
 
   private val loggers: HttpApp[F] => HttpApp[F] = { (http: HttpApp[F]) => RequestLogger.httpApp(true, true)(http) }
     .andThen((http: HttpApp[F]) => ResponseLogger.httpApp(true, true)(http))
 
-  val httpApp: HttpApp[F] = loggers(middleware(routes).orNotFound)
+  val app: HttpApp[F] = loggers(middleware(routes).orNotFound)
 }
 
-object Http {
+object Http:
   def make[F[_]: Async](
       health: Health[F],
       auth: Auth[F],
       cats: Categories[F],
       txs: Transactions[F]
   ): F[Http[F]] = Monad[F].pure(new Http(health, auth, cats, txs))
-}
