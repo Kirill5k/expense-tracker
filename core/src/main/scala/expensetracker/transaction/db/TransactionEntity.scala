@@ -17,7 +17,7 @@ final case class TransactionEntity(
     date: LocalDate,
     note: Option[String],
     lastUpdatedAt: Option[Instant],
-    tags: List[String] = Nil
+    tags: Option[List[String]]
 ) {
   def toDomain: Transaction =
     Transaction(
@@ -28,7 +28,7 @@ final case class TransactionEntity(
       amount = amount,
       date = date,
       note = note,
-      tags = tags
+      tags = tags.getOrElse(Nil)
     )
 }
 
@@ -43,7 +43,7 @@ object TransactionEntity {
       tx.amount,
       tx.date,
       tx.note,
-      tags = tx.tags,
+      tags = Some(tx.tags),
       lastUpdatedAt = Some(Instant.now())
     )
 
@@ -56,7 +56,7 @@ object TransactionEntity {
       tx.amount,
       tx.date,
       tx.note,
-      tags = tx.tags,
+      tags = Some(tx.tags),
       lastUpdatedAt = None
     )
 }
