@@ -101,6 +101,30 @@
             />
           </v-menu>
 
+          <v-container fluid class="pa-0">
+            <v-combobox
+              class="pt-0"
+              v-model="newTransaction.tags"
+              :items="tags"
+              :search-input.sync="search"
+              hide-selected
+              label="Tags"
+              multiple
+              persistent-hint
+              small-chips
+            >
+              <template v-slot:no-data v-if="search">
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title class="text-center">
+                      No results matching "<strong>{{ search }}</strong>"<br>Press <kbd>enter</kbd> to create a new one
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-combobox>
+          </v-container>
+
           <v-textarea
             rows="2"
             counter
@@ -138,12 +162,17 @@ const DEFAULT_TRANSACTION = () => ({
   amount: null,
   date: new Date().toISOString().slice(0, 10),
   kind: 'expense',
+  tags: [],
   note: null
 })
 
 export default {
   name: 'NewTransactionDialog',
   props: {
+    tags: {
+      type: Array,
+      default: () => []
+    },
     expenseCats: {
       type: Array,
       default: () => []
@@ -158,6 +187,7 @@ export default {
     }
   },
   data: () => ({
+    search: null,
     dialog: false,
     datePicker: false,
     valid: true,

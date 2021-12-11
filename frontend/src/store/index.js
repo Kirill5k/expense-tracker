@@ -56,6 +56,7 @@ export default new Vuex.Store({
     ...DEFAULT_STATE
   },
   getters: {
+    tags: state => state.transactions.flatMap(t => t.tags),
     transactionsByCatsCount: state => state.transactions
       .filter(t => t.hidden !== true)
       .reduce((acc, tx) => {

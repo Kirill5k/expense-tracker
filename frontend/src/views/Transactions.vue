@@ -73,6 +73,7 @@
             :currency="currency"
             :expense-cats="$store.getters.expenseCats"
             :income-cats="$store.getters.incomeCats"
+            :tags="$store.getters.tags"
             @save="(newTx) => dispatchAction('createTransaction', newTx)"
             @update="(tx) => dispatchAction('updateTransaction', tx)"
           />
