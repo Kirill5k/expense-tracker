@@ -49,7 +49,7 @@
               color="success"
               outlined
             >
-              <v-icon>
+              <v-icon size="12">
                 mdi-currency-{{currency.code.toLowerCase()}}
               </v-icon>
               <span>{{ $store.getters.totalEarned }}</span>
@@ -61,7 +61,7 @@
               color="error"
               outlined
             >
-              <v-icon>
+              <v-icon size="12">
                 mdi-currency-{{currency.code.toLowerCase()}}
               </v-icon>
               <span>{{ $store.getters.totalSpent }}</span>

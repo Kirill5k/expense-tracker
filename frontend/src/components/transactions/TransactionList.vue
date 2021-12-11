@@ -36,7 +36,7 @@
                 :color="item.amount.kind === 'expense' ? 'error' : 'success'"
               >
                 {{ item.amount.kind === 'expense' ? '-' : '+' }}
-                <v-icon>
+                <v-icon size="12">
                   mdi-currency-{{item.amount.currency.toLowerCase()}}
                 </v-icon>
                 {{item.amount.value}}
