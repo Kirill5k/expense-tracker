@@ -19,9 +19,6 @@ trait JsonCodecs {
 
   implicit val encodeIpAddress: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 
-  implicit val decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
-  implicit val encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap(_.value)
-
   implicit val decodeCurrency: Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for {
       code     <- json("code").flatMap(_.asString).toRight("missing currency code")
@@ -51,12 +48,6 @@ trait JsonCodecs {
       "currency" -> e(m.currency)
     )
   }
-
-  implicit val decodeTransactionKind: Decoder[TransactionKind] = Decoder[String].emap(TransactionKind.from)
-  implicit val encodeTransactionKind: Encoder[TransactionKind] = Encoder[String].contramap(_.value)
-
-  implicit val decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap(CategoryKind.from)
-  implicit val encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap(_.value)
 
   private def roundUp(value: BigDecimal): BigDecimal = value.setScale(2, BigDecimal.RoundingMode.HALF_UP)
   private def roundUp(value: Double): BigDecimal     = roundUp(BigDecimal(value))

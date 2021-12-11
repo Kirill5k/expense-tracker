@@ -32,24 +32,17 @@ class TransactionControllerSpec extends ControllerSpec {
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${txid.value}"}"""))
-        verify(svc).create(
-          CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None, List("foo"))
-        )
+        verify(svc).create(CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None, List("foo")))
       }
 
       "return 422 when invalid kind passed" in {
         val svc = mock[TransactionService[IO]]
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo"}""")
-        val req =
-          Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(
-          res,
-          Status.UnprocessableEntity,
-          Some(s"""{"message":"Invalid transaction kind foo"}""")
-        )
+        verifyJsonResponse(res, Status.UnprocessableEntity, Some(s"""{"message":"Invalid transaction kind foo"}"""))
         verifyNoInteractions(svc)
       }
 
@@ -66,11 +59,7 @@ class TransactionControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
-        verifyJsonResponse(
-          res,
-          Status.UnprocessableEntity,
-          Some(s"""{"message":"FOO is not a valid categoryId"}""")
-        )
+        verifyJsonResponse(res, Status.UnprocessableEntity, Some(s"""{"message":"FOO is not a valid categoryId"}"""))
         verifyNoInteractions(svc)
       }
     }

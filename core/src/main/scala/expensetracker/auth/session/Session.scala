@@ -2,21 +2,23 @@ package expensetracker.auth.session
 
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.user.UserId
+import io.circe.{Decoder, Encoder}
 
 import java.time.Instant
 
 final case class SessionId(value: String) extends AnyVal
 
-sealed abstract class SessionStatus(val value: String)
+enum SessionStatus(val value: String):
+  case Authenticated extends SessionStatus("authenticated")
+  case LoggedOut     extends SessionStatus("logged-out")
+  case Invalidated   extends SessionStatus("invalidated")
+
 object SessionStatus {
-  case object Authenticated extends SessionStatus("authenticated")
-  case object LoggedOut     extends SessionStatus("logged-out")
-  case object Invalidated   extends SessionStatus("invalidated")
-
-  private val all: List[SessionStatus] = List(Authenticated, LoggedOut, Invalidated)
-
   def from(value: String): Either[String, SessionStatus] =
-    all.find(_.value == value).toRight(s"Unexpected session status $value")
+    SessionStatus.values.find(_.value == value).toRight(s"Unexpected session status $value")
+
+  given decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
+  given encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap(_.value)
 }
 
 final case class SessionActivity(

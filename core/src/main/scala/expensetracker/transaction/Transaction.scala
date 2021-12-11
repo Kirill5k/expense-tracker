@@ -2,21 +2,23 @@ package expensetracker.transaction
 
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
+import io.circe.{Decoder, Encoder}
 import squants.market.Money
 
 import java.time.LocalDate
 
 final case class TransactionId(value: String) extends AnyVal
 
-sealed abstract class TransactionKind(val value: String)
+enum TransactionKind(val value: String):
+  case Expense extends TransactionKind("expense")
+  case Income  extends TransactionKind("income")
+
 object TransactionKind {
-  case object Expense extends TransactionKind("expense")
-  case object Income  extends TransactionKind("income")
-
-  private val all: List[TransactionKind] = List(Expense, Income)
-
   def from(value: String): Either[String, TransactionKind] =
-    all.find(_.value == value).toRight(s"Invalid transaction kind $value")
+    TransactionKind.values.find(_.value == value).toRight(s"Invalid transaction kind $value")
+
+  given decode: Decoder[TransactionKind] = Decoder[String].emap(TransactionKind.from)
+  given encode: Encoder[TransactionKind] = Encoder[String].contramap(_.value)
 }
 
 final case class Transaction(
