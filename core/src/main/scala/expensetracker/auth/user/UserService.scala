@@ -23,8 +23,6 @@ final private class LiveUserService[F[_]](
     F: MonadError[F, Throwable]
 ) extends UserService[F] {
 
-  import LoginResult._
-
   override def create(details: UserDetails, password: Password): F[UserId] =
     encryptor.hash(password).flatMap(h => repository.create(details, h))
 
@@ -32,12 +30,12 @@ final private class LiveUserService[F[_]](
     repository
       .findBy(email)
       .flatMap {
-        case Some(acc) => encryptor.isValid(password, acc.password).map[LoginResult](if (_) Success(acc) else Fail)
-        case None      => F.pure[LoginResult](Fail)
+        case Some(acc) => encryptor.isValid(password, acc.password).map(if (_) LoginResult.Success(acc) else LoginResult.Fail)
+        case None      => F.pure(LoginResult.Fail)
       }
       .flatMap {
-        case Fail       => InvalidEmailOrPassword.raiseError[F, User]
-        case Success(a) => F.pure(a)
+        case LoginResult.Fail       => InvalidEmailOrPassword.raiseError[F, User]
+        case LoginResult.Success(a) => F.pure(a)
       }
 
   override def find(aid: UserId): F[User] =
