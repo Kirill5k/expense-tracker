@@ -1,10 +1,11 @@
 package expensetracker.auth.session.db
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import cats.effect.unsafe.IORuntime
 import cats.implicits._
 import com.comcast.ip4s.IpAddress
 import expensetracker.MongoOps
+import expensetracker.fixtures.{Sessions, Users}
 import expensetracker.auth.session._
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
@@ -18,32 +19,28 @@ import java.time.Instant
 import java.time.temporal.ChronoField
 import scala.concurrent.Future
 
-class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
+class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
 
   override protected val mongoPort: Int = 12347
-
-  val aid = UserId(ObjectId().toHexString)
-  val ts = Instant.now().`with`(ChronoField.MILLI_OF_SECOND, 0)
 
   "A SessionRepository" should {
 
     "create new sessions" in {
       withEmbeddedMongoDb { db =>
-        val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts)
         val result = for {
           repo <- SessionRepository.make(db)
-          sid  <- repo.create(create)
+          sid  <- repo.create(Sessions.create())
           res  <- repo.find(sid, None)
         } yield (sid, res)
 
         result.map { case (sid, sess) =>
           sess mustBe Session(
             sid,
-            aid,
-            create.time,
+            Users.uid1,
+            Sessions.ts,
             true,
             SessionStatus.Authenticated,
-            create.ipAddress.map(ip => SessionActivity(ip, create.time))
+            Some(SessionActivity(Sessions.ip, Sessions.ts))
           ).some
         }
       }
@@ -53,7 +50,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       withEmbeddedMongoDb { db =>
         val result = for {
           repo <- SessionRepository.make(db)
-          res  <- repo.find(SessionId(ObjectId().toHexString), None)
+          res  <- repo.find(Sessions.sid, None)
         } yield res
 
         result.map(_ mustBe None)
@@ -62,10 +59,9 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "unauth session" in {
       withEmbeddedMongoDb { db =>
-        val create = CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts)
         val result = for {
           repo <- SessionRepository.make(db)
-          sid  <- repo.create(create)
+          sid  <- repo.create(Sessions.create())
           _    <- repo.unauth(sid)
           res  <- repo.find(sid, None)
         } yield res
@@ -82,9 +78,9 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       withEmbeddedMongoDb { db =>
         val result = for {
           repo <- SessionRepository.make(db)
-          sid1  <- repo.create(CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts))
-          sid2  <- repo.create(CreateSession(aid, IpAddress.fromString("127.0.0.1"), ts))
-          _    <- repo.invalidatedAll(aid)
+          sid1  <- repo.create(Sessions.create())
+          sid2  <- repo.create(Sessions.create())
+          _    <- repo.invalidatedAll(Users.uid1)
           res  <- (repo.find(sid1, None), repo.find(sid2, None)).tupled
         } yield res
 
@@ -101,16 +97,16 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "update session last recorded activity on find" in {
       withEmbeddedMongoDb { db =>
-        val activity = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, ts))
+        val activity = SessionActivity(Sessions.ip, Sessions.ts)
         val result = for {
           repo <- SessionRepository.make(db)
-          sid  <- repo.create(CreateSession(aid, None, ts))
-          _    <- repo.find(sid, activity)
+          sid  <- repo.create(Sessions.create())
+          _    <- repo.find(sid, Some(activity))
           res  <- repo.find(sid, None)
         } yield res
 
         result.map { sess =>
-          sess.flatMap(_.lastRecordedActivity) mustBe activity
+          sess.flatMap(_.lastRecordedActivity) mustBe Some(activity)
         }
       }
     }
@@ -121,10 +117,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       MongoClient
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
-          for {
-            db  <- client.getDatabase("expense-tracker")
-            res <- test(db)
-          } yield res
+          client.getDatabase("expense-tracker").flatMap(test)
         }
-    }.unsafeToFuture()
+    }.unsafeToFuture()(IORuntime.global)
 }
