@@ -10,16 +10,15 @@ import org.typelevel.log4cats.Logger
 
 import scala.concurrent.duration._
 
-trait ActionProcessor[F[_]] {
-  def process: Stream[F, Unit]
-}
+trait ActionProcessor[F[_]]:
+  def run: Stream[F, Unit]
 
 private final class LiveActionProcessor[F[_]: Temporal: Logger](
     private val dispatcher: ActionDispatcher[F],
     private val categoryService: CategoryService[F]
 ) extends ActionProcessor[F] {
 
-  override def process: Stream[F, Unit] =
+  override def run: Stream[F, Unit] =
     dispatcher
       .stream
       .parEvalMapUnordered(Int.MaxValue)(handleAction)

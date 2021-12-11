@@ -1,7 +1,7 @@
 package expensetracker.category
 
 import cats.effect.Async
-import cats.implicits._
+import cats.implicits.*
 import expensetracker.Resources
 import expensetracker.auth.session.Session
 import expensetracker.category.db.CategoryRepository

@@ -12,12 +12,11 @@ import mongo4cats.circe.*
 import mongo4cats.collection.operations.Update
 import mongo4cats.collection.MongoCollection
 
-trait SessionRepository[F[_]] extends Repository[F] {
+trait SessionRepository[F[_]] extends Repository[F]:
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
   def invalidatedAll(aid: UserId): F[Unit]
-}
 
 final private class LiveSessionRepository[F[_]: Async](
     private val collection: MongoCollection[F, SessionEntity]

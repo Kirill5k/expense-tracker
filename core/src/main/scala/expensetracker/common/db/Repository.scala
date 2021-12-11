@@ -1,7 +1,7 @@
 package expensetracker.common.db
 
 import cats.MonadError
-import cats.implicits._
+import cats.implicits.*
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
@@ -28,10 +28,10 @@ trait Repository[F[_]] {
   protected def userIdEq(aid: Option[UserId]): Filter      = idEqFilter(Field.UId, aid.map(_.value).orNull)
   protected def userIdEq(aid: UserId): Filter              = idEqFilter(Field.UId, aid.value)
 
-  protected def errorIfNull[A](error: Throwable)(res: A)(implicit F: MonadError[F, Throwable]): F[A] =
+  protected def errorIfNull[A](error: Throwable)(res: A)(using F: MonadError[F, Throwable]): F[A] =
     Option(res).map(_.pure[F]).getOrElse(error.raiseError[F, A])
 
-  protected def errorIfNoMatches(error: Throwable)(res: UpdateResult)(implicit F: MonadError[F, Throwable]): F[Unit] =
+  protected def errorIfNoMatches(error: Throwable)(res: UpdateResult)(using F: MonadError[F, Throwable]): F[Unit] =
     if (res.getMatchedCount > 0) F.unit else error.raiseError[F, Unit]
 
   protected def updateHidden(hidden: Boolean): Update =

@@ -4,12 +4,11 @@ import cats.Monad
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
 
-trait SessionService[F[_]] {
+trait SessionService[F[_]]:
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
-  def invalidateAll(aid: UserId): F[Unit]
-}
+  def invalidateAll(uid: UserId): F[Unit]
 
 final private class LiveSessionService[F[_]](
     private val repository: SessionRepository[F]
@@ -24,8 +23,8 @@ final private class LiveSessionService[F[_]](
   override def unauth(sid: SessionId): F[Unit] =
     repository.unauth(sid)
 
-  override def invalidateAll(aid: UserId): F[Unit] =
-    repository.invalidatedAll(aid)
+  override def invalidateAll(uid: UserId): F[Unit] =
+    repository.invalidatedAll(uid)
 }
 
 object SessionService {

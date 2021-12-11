@@ -87,12 +87,12 @@ final class TransactionController[F[_]: Logger](
 object TransactionController {
 
   final case class CreateTransactionRequest(
-      kind: TransactionKind,
-      categoryId: ValidIdString,
-      amount: Money,
-      date: LocalDate,
-      note: Option[String],
-      tags: Option[List[String]]
+                                             kind: TransactionKind,
+                                             categoryId: IdString,
+                                             amount: Money,
+                                             date: LocalDate,
+                                             note: Option[String],
+                                             tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
@@ -102,7 +102,7 @@ object TransactionController {
         amount = amount,
         date = date,
         note = note.filter(_.nonEmpty),
-        tags = tags.getOrElse(Nil)
+        tags = tags.map(_.toSet).getOrElse(Set.empty)
       )
   }
 
@@ -115,7 +115,7 @@ object TransactionController {
       amount: Money,
       date: LocalDate,
       note: Option[String],
-      tags: List[String]
+      tags: Set[String]
   )
 
   object TransactionView {
@@ -134,13 +134,13 @@ object TransactionController {
   final case class HideTransactionRequest(hidden: Boolean)
 
   final case class UpdateTransactionRequest(
-      id: NonEmptyString,
-      kind: TransactionKind,
-      categoryId: ValidIdString,
-      amount: Money,
-      date: LocalDate,
-      note: Option[String],
-      tags: Option[List[String]]
+                                             id: NonEmptyString,
+                                             kind: TransactionKind,
+                                             categoryId: IdString,
+                                             amount: Money,
+                                             date: LocalDate,
+                                             note: Option[String],
+                                             tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): Transaction =
       Transaction(
@@ -151,7 +151,7 @@ object TransactionController {
         amount = amount,
         date = date,
         note = note,
-        tags = tags.getOrElse(Nil)
+        tags = tags.map(_.toSet).getOrElse(Set.empty)
       )
   }
 

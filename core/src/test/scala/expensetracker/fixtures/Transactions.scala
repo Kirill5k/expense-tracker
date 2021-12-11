@@ -21,7 +21,7 @@ object Transactions {
       amount: Money = GBP(15.0),
       date: LocalDate = LocalDate.now(),
       note: Option[String] = None,
-      tags: List[String] = Nil
+      tags: Set[String] = Set.empty
   ): Transaction = Transaction(id, uid, kind, catid, amount, date, note, tags)
 
   def create(
@@ -31,6 +31,6 @@ object Transactions {
       amount: Money = GBP(15.0),
       date: LocalDate = LocalDate.now(),
       note: Option[String] = None,
-      tags: List[String] = Nil
+      tags: Set[String] = Set.empty
   ): CreateTransaction = CreateTransaction(uid, kind, catid, amount, date, note, tags)
 }

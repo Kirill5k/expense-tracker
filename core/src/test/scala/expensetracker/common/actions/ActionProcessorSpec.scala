@@ -22,7 +22,7 @@ class ActionProcessorSpec extends CatsSpec {
         dispatcher <- ActionDispatcher.make[IO]
         processor  <- ActionProcessor.make[IO](dispatcher, catSvc)
         _          <- dispatcher.dispatch(Action.SetupNewUser(uid))
-        res        <- processor.process.interruptAfter(2.second).compile.drain
+        res        <- processor.run.interruptAfter(2.second).compile.drain
       } yield res
 
       result.unsafeToFuture().map { r =>

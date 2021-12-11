@@ -1,13 +1,13 @@
 package expensetracker.common.web
 
-import cats.{MonadError}
-import cats.implicits._
+import cats.MonadError
+import cats.implicits.*
 import expensetracker.common.JsonCodecs
 import expensetracker.common.errors.AppError
-import io.circe.generic.auto._
-import org.http4s.circe.CirceEntityCodec._
+import io.circe.generic.auto.*
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
-import org.http4s._
+import org.http4s.*
 import org.http4s.headers.`WWW-Authenticate`
 import org.typelevel.log4cats.Logger
 final case class ErrorResponse(message: String)
@@ -53,8 +53,7 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
     }
 
   def getSessionIdCookie(req: Request[F]): Option[RequestCookie] =
-    req.cookies
-      .find(_.name == SessionIdCookie)
+    req.cookies.find(_.name == SessionIdCookie)
 
   protected def sessionIdResponseCookie(token: String): ResponseCookie =
     ResponseCookie(

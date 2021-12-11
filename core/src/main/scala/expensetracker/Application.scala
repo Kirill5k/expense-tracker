@@ -31,7 +31,7 @@ object Application extends IOApp.Simple:
             .withExecutionContext(runtime.compute)
             .bindHttp(config.server.port, config.server.host)
             .withHttpApp(http.app)
-          _ <- Stream(processor.process, server.serve).parJoinUnbounded.compile.drain
+          _ <- Stream(processor.run, server.serve).parJoinUnbounded.compile.drain
         yield ()
       }
     yield ()

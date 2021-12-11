@@ -1,19 +1,19 @@
 package expensetracker.auth.user
 
 import cats.MonadError
-import cats.implicits._
+import cats.implicits.*
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
 enum LoginResult:
-  case Fail extends LoginResult
-  case Success(user: User) extends LoginResult
+  case Fail
+  case Success(user: User)
 
 trait UserService[F[_]]:
   def create(details: UserDetails, password: Password): F[UserId]
   def login(email: UserEmail, password: Password): F[User]
-  def find(aid: UserId): F[User]
-  def updateSettings(aid: UserId, settings: UserSettings): F[Unit]
+  def find(uid: UserId): F[User]
+  def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
 
 final private class LiveUserService[F[_]](
@@ -38,11 +38,11 @@ final private class LiveUserService[F[_]](
         case LoginResult.Success(a) => F.pure(a)
       }
 
-  override def find(aid: UserId): F[User] =
-    repository.find(aid)
+  override def find(uid: UserId): F[User] =
+    repository.find(uid)
 
-  override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
-    repository.updateSettings(aid, settings)
+  override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
+    repository.updateSettings(uid, settings)
 
   override def changePassword(cp: ChangePassword): F[Unit] =
     repository

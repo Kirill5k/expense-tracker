@@ -6,10 +6,9 @@ import cats.effect.std.Queue
 import cats.implicits._
 import fs2.Stream
 
-trait ActionDispatcher[F[_]] {
+trait ActionDispatcher[F[_]]:
   def dispatch(action: Action): F[Unit]
   def stream: Stream[F, Action]
-}
 
 final private class LiveActionDispatcher[F[_]: Functor](
   private val actions: Queue[F, Action]

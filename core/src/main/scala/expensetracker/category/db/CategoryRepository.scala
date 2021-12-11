@@ -1,20 +1,20 @@
 package expensetracker.category.db
 
 import cats.effect.Async
-import cats.implicits._
+import cats.implicits.*
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
-import io.circe.generic.auto._
-import expensetracker.common.json._
+import io.circe.generic.auto.*
+import expensetracker.common.json.*
 import mongo4cats.bson.ObjectId
-import mongo4cats.circe._
+import mongo4cats.circe.*
 import mongo4cats.collection.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
-trait CategoryRepository[F[_]] extends Repository[F] {
+trait CategoryRepository[F[_]] extends Repository[F]:
   def create(cat: CreateCategory): F[CategoryId]
   def update(cat: Category): F[Unit]
   def get(aid: UserId, cid: CategoryId): F[Category]
@@ -23,7 +23,6 @@ trait CategoryRepository[F[_]] extends Repository[F] {
   def assignDefault(aid: UserId): F[Unit]
   def hide(aid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit]
   def isHidden(aid: UserId, cid: CategoryId): F[Boolean]
-}
 
 final private class LiveCategoryRepository[F[_]: Async](
     private val collection: MongoCollection[F, CategoryEntity]

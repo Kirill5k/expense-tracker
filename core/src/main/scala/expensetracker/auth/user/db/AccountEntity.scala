@@ -1,6 +1,6 @@
 package expensetracker.auth.user.db
 
-import expensetracker.auth.user._
+import expensetracker.auth.user.*
 import mongo4cats.bson.ObjectId
 
 import java.time.Instant
