@@ -2,7 +2,7 @@ package expensetracker.category
 
 import cats.Monad
 import cats.effect.Concurrent
-import cats.implicits._
+import cats.implicits.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
@@ -16,12 +16,13 @@ import expensetracker.category.CategoryController.{
   UpdateCategoryRequest
 }
 import expensetracker.common.errors.AppError.IdMismatch
+import expensetracker.common.validations.*
 import expensetracker.common.web.Controller
-import io.circe.generic.auto._
-import io.circe.refined._
+import io.circe.generic.auto.*
+import io.circe.refined.*
 import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, HttpRoutes}
-import org.http4s.circe.CirceEntityCodec._
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
 
@@ -88,13 +89,11 @@ final class CategoryController[F[_]: Logger](
 
 object CategoryController {
 
-  type Color = String Refined MatchesRegex["^#[A-Za-z0-9]{3,6}$"]
-
   final case class CreateCategoryRequest(
       kind: CategoryKind,
       name: NonEmptyString,
       icon: NonEmptyString,
-      color: Color
+      color: ColorString
   ) {
     def toDomain(aid: UserId): CreateCategory =
       CreateCategory(
@@ -113,7 +112,7 @@ object CategoryController {
       kind: CategoryKind,
       name: NonEmptyString,
       icon: NonEmptyString,
-      color: Color
+      color: ColorString
   ) {
     def toDomain(aid: UserId): Category =
       Category(

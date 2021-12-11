@@ -1,7 +1,7 @@
 package expensetracker.common.db
 
 import cats.MonadError
-import cats.implicits._
+import cats.implicits.*
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId

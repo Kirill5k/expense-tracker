@@ -1,6 +1,5 @@
 package expensetracker.category.db
 
-import cats.implicits._
 import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
@@ -46,7 +45,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      userId = ObjectId(cat.userId.value).some,
+      userId = Some(ObjectId(cat.userId.value)),
       lastUpdatedAt = None
     )
 }

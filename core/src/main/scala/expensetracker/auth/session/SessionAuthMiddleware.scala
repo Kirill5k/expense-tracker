@@ -2,12 +2,12 @@ package expensetracker.auth.session
 
 import cats.data.{Kleisli, OptionT}
 import cats.effect.Temporal
-import cats.implicits._
-import io.circe.generic.auto._
+import cats.implicits.*
+import io.circe.generic.auto.*
 import expensetracker.common.web.{Controller, ErrorResponse}
 import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, Request}
-import org.http4s.circe.CirceEntityCodec._
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.server.AuthMiddleware
 
 import java.time.Instant

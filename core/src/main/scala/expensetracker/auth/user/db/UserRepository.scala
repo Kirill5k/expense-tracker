@@ -1,24 +1,23 @@
 package expensetracker.auth.user.db
 
 import cats.effect.Async
-import cats.implicits._
+import cats.implicits.*
 import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserSettings}
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
-import expensetracker.common.json._
-import io.circe.generic.auto._
-import mongo4cats.circe._
+import expensetracker.common.json.*
+import io.circe.generic.auto.*
+import mongo4cats.circe.*
 import mongo4cats.collection.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
-trait UserRepository[F[_]] extends Repository[F] {
+trait UserRepository[F[_]] extends Repository[F]:
   def find(aid: UserId): F[User]
   def findBy(email: UserEmail): F[Option[User]]
   def create(details: UserDetails, password: PasswordHash): F[UserId]
   def updateSettings(aid: UserId, settings: UserSettings): F[Unit]
   def updatePassword(aid: UserId)(password: PasswordHash): F[Unit]
-}
 
 final private class LiveUserRepository[F[_]: Async](
     private val collection: MongoCollection[F, AccountEntity]
