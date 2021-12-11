@@ -3,7 +3,7 @@ package expensetracker.category.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.MongoOps
-import expensetracker.auth.user.UserId
+import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.*
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import expensetracker.fixtures.{Categories, Users}
@@ -217,7 +217,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             categories <- db.getCollection("categories")
             _ <- categories.insertMany(List(categoryDoc(Categories.catid1, "c1"), categoryDoc(Categories.catid2, "c2", Some(Users.uid2))))
             accounts <- db.getCollection("accounts")
-            _        <- accounts.insertMany(List(accDoc(Users.uid1, "acc1"), accDoc(Users.uid2, "acc2")))
+            _        <- accounts.insertMany(List(accDoc(Users.uid1, UserEmail("acc1")), accDoc(Users.uid2, UserEmail("acc2"))))
             res      <- test(db)
           } yield res
         }

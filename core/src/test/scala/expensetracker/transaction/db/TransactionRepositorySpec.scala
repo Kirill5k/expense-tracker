@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.MongoOps
-import expensetracker.auth.user.UserId
+import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import expensetracker.fixtures.{Categories, Transactions, Users}
@@ -237,7 +237,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             categories <- db.getCollection("categories")
             _    <- categories.insertMany(List(categoryDoc(Categories.catid1, "category-1"), categoryDoc(Categories.catid2, "category-2")))
             accs <- db.getCollection("accounts")
-            _    <- accs.insertMany(List(accDoc(Users.uid1, "acc-1"), accDoc(Users.uid2, "acc-2")))
+            _    <- accs.insertMany(List(accDoc(Users.uid1, UserEmail("acc-1")), accDoc(Users.uid2, UserEmail("acc-2"))))
             res  <- test(db)
           } yield res
         }

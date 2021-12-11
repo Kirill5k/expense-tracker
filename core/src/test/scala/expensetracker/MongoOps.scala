@@ -1,6 +1,6 @@
 package expensetracker
 
-import expensetracker.auth.user.UserId
+import expensetracker.auth.user.{PasswordHash, UserEmail, UserId}
 import expensetracker.category.CategoryId
 import mongo4cats.bson.{Document, ObjectId}
 
@@ -20,14 +20,19 @@ trait MongoOps {
       )
     )
 
-  def accDoc(id: UserId, email: String, password: String = "password"): Document =
+  def accDoc(
+      id: UserId,
+      email: UserEmail,
+      password: PasswordHash = PasswordHash("password"),
+      registrationDate: Instant = Instant.parse("2021-06-01T00:00:00Z")
+  ): Document =
     Document(
       Map(
         "_id"              -> ObjectId(id.value),
-        "email"            -> email,
-        "password"         -> password,
+        "email"            -> email.value,
+        "password"         -> password.value,
         "name"             -> Document.parse("""{"first":"John","last":"Bloggs"}"""),
-        "registrationDate" -> Instant.parse("2021-06-01T00:00:00Z")
+        "registrationDate" -> registrationDate
       )
     )
 }
