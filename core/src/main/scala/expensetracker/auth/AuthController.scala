@@ -2,7 +2,7 @@ package expensetracker.auth
 
 import cats.Monad
 import cats.effect.Temporal
-import cats.implicits._
+import cats.implicits.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
@@ -10,12 +10,13 @@ import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, Us
 import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
+import expensetracker.common.validations.*
 import expensetracker.common.web.Controller
-import io.circe.generic.auto._
-import io.circe.refined._
+import io.circe.generic.auto.*
+import io.circe.refined.*
 import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, HttpRoutes}
-import org.http4s.circe.CirceEntityCodec._
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.server.{AuthMiddleware, Router}
 import org.typelevel.log4cats.Logger
 import squants.market.Currency
@@ -100,10 +101,8 @@ final class AuthController[F[_]: Logger](
 
 object AuthController {
 
-  type Email = String Refined MatchesRegex["^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+$"]
-
   final case class CreateUserRequest(
-      email: Email,
+      email: EmailString,
       firstName: NonEmptyString,
       lastName: NonEmptyString,
       password: NonEmptyString
@@ -117,7 +116,7 @@ object AuthController {
   final case class CreateUserResponse(id: String)
 
   final case class LoginRequest(
-      email: Email,
+      email: EmailString,
       password: NonEmptyString
   ) {
     def userEmail    = UserEmail(email.value.toLowerCase)

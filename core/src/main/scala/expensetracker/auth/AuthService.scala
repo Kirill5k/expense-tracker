@@ -11,8 +11,8 @@ trait AuthService[F[_]] {
   def login(email: UserEmail, password: Password): F[User]
   def logout(sid: SessionId): F[Unit]
   def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
-  def findUser(aid: UserId): F[User]
-  def updateSettings(aid: UserId, settings: UserSettings): F[Unit]
+  def findUser(uid: UserId): F[User]
+  def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
 }
 
@@ -36,11 +36,11 @@ final private class LiveAuthService[F[_]: Monad](
   override def findSession(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
     sessionService.find(sid, activity)
 
-  override def findUser(aid: UserId): F[User] =
-    accountService.find(aid)
+  override def findUser(uid: UserId): F[User] =
+    accountService.find(uid)
 
-  override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
-    accountService.updateSettings(aid, settings)
+  override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
+    accountService.updateSettings(uid, settings)
 
   override def changePassword(cp: ChangePassword): F[Unit] =
     accountService.changePassword(cp) *>

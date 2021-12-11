@@ -87,12 +87,12 @@ final class TransactionController[F[_]: Logger](
 object TransactionController {
 
   final case class CreateTransactionRequest(
-      kind: TransactionKind,
-      categoryId: ValidIdString,
-      amount: Money,
-      date: LocalDate,
-      note: Option[String],
-      tags: Option[List[String]]
+                                             kind: TransactionKind,
+                                             categoryId: IdString,
+                                             amount: Money,
+                                             date: LocalDate,
+                                             note: Option[String],
+                                             tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
@@ -134,13 +134,13 @@ object TransactionController {
   final case class HideTransactionRequest(hidden: Boolean)
 
   final case class UpdateTransactionRequest(
-      id: NonEmptyString,
-      kind: TransactionKind,
-      categoryId: ValidIdString,
-      amount: Money,
-      date: LocalDate,
-      note: Option[String],
-      tags: Option[List[String]]
+                                             id: NonEmptyString,
+                                             kind: TransactionKind,
+                                             categoryId: IdString,
+                                             amount: Money,
+                                             date: LocalDate,
+                                             note: Option[String],
+                                             tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): Transaction =
       Transaction(
