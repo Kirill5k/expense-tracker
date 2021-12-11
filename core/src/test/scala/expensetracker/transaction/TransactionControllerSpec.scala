@@ -32,7 +32,7 @@ class TransactionControllerSpec extends ControllerSpec {
         val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${txid.value}"}"""))
-        verify(svc).create(CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None, List("foo")))
+        verify(svc).create(CreateTransaction(uid, TransactionKind.Expense, cid, GBP(5.99), LocalDate.parse("2021-01-01"), None, Set("foo")))
       }
 
       "return 422 when invalid kind passed" in {

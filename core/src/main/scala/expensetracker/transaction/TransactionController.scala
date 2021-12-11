@@ -102,7 +102,7 @@ object TransactionController {
         amount = amount,
         date = date,
         note = note.filter(_.nonEmpty),
-        tags = tags.getOrElse(Nil)
+        tags = tags.map(_.toSet).getOrElse(Set.empty)
       )
   }
 
@@ -115,7 +115,7 @@ object TransactionController {
       amount: Money,
       date: LocalDate,
       note: Option[String],
-      tags: List[String]
+      tags: Set[String]
   )
 
   object TransactionView {
@@ -151,7 +151,7 @@ object TransactionController {
         amount = amount,
         date = date,
         note = note,
-        tags = tags.getOrElse(Nil)
+        tags = tags.map(_.toSet).getOrElse(Set.empty)
       )
   }
 

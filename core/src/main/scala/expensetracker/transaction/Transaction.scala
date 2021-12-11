@@ -29,7 +29,7 @@ final case class Transaction(
     amount: Money,
     date: LocalDate,
     note: Option[String],
-    tags: List[String]
+    tags: Set[String]
 )
 
 final case class CreateTransaction(
@@ -39,5 +39,5 @@ final case class CreateTransaction(
     amount: Money,
     date: LocalDate,
     note: Option[String],
-    tags: List[String]
+    tags: Set[String]
 )
