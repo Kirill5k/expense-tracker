@@ -25,9 +25,14 @@
               </v-icon>
             </v-list-item-avatar>
             <v-list-item-content class="py-2 px-1">
-              <p class="text-subtitle-2 mb-0" :class="item.tx.note ? '' : 'mt-2 mb-1'">{{ item.tx.name }}</p>
-              <p class="text-caption mb-0 font-weight-medium">{{ item.tx.note }} </p>
-              <p class="text-caption mb-0 font-weight-light" :class="item.tx.note ? '' : 'mb-2'">{{ item.tx.displayDate }}</p>
+              <p class="text-subtitle-2 mb-0" :class="item.tx.note || item.tx.tags.length ? '' : 'mt-2 mb-1'">{{ item.tx.name }}</p>
+              <p class="text-caption mb-0 font-weight-medium">
+                {{ item.tx.note }}
+                <v-chip outlined x-small class="mr-1 px-1 my-0" v-for="tag in item.tx.tags" :key="tag">
+                  {{ tag }}
+                </v-chip>
+              </p>
+              <p class="text-caption mb-0 font-weight-light" :class="item.tx.note || item.tx.tags.length ? '' : 'mb-2'">{{ item.tx.displayDate }}</p>
             </v-list-item-content>
             <v-list-item-action>
               <v-chip
@@ -113,7 +118,7 @@ export default {
         id: item.id,
         color: this.categories[item.categoryId].color,
         icon: this.categories[item.categoryId].icon,
-        tx: { name: this.categories[item.categoryId].name, note: item.note, displayDate: this.formatTxDate(item), date: item.date },
+        tx: { name: this.categories[item.categoryId].name, note: item.note, displayDate: this.formatTxDate(item), date: item.date, tags: item.tags },
         amount: { value: item.amount.value, kind: item.kind, currency: item.amount.currency.code },
         original: item,
         last: i === this.items.length - 1
