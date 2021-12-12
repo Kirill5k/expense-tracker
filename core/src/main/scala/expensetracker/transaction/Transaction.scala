@@ -2,12 +2,14 @@ package expensetracker.transaction
 
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
+import expensetracker.common.IdType
 import io.circe.{Decoder, Encoder}
 import squants.market.Money
 
 import java.time.LocalDate
 
-final case class TransactionId(value: String) extends AnyVal
+opaque type TransactionId = String
+object TransactionId extends IdType[TransactionId]
 
 enum TransactionKind(val value: String):
   case Expense extends TransactionKind("expense")

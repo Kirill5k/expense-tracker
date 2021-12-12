@@ -17,24 +17,24 @@ final case class CategoryEntity(
 ) {
   def toDomain: Category =
     Category(
-      id = CategoryId(_id.toHexString),
+      id = CategoryId(_id),
       kind = kind,
       name = CategoryName(name),
       icon = CategoryIcon(icon),
       color = CategoryColor(color),
-      userId = userId.map(uid => UserId(uid.toHexString))
+      userId = userId.map(uid => UserId(uid))
     )
 }
 
 object CategoryEntity {
   def from(cat: Category): CategoryEntity =
     CategoryEntity(
-      _id = ObjectId(cat.id.value),
+      _id = cat.id.toObjectId,
       kind = cat.kind,
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      userId = cat.userId.map(aid => ObjectId(aid.value)),
+      userId = cat.userId.map(_.toObjectId),
       lastUpdatedAt = Some(Instant.now())
     )
 
@@ -45,7 +45,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
-      userId = Some(ObjectId(cat.userId.value)),
+      userId = Some(cat.userId.toObjectId),
       lastUpdatedAt = None
     )
 }

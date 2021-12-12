@@ -1,10 +1,13 @@
 package expensetracker.auth.user
 
+import expensetracker.common.IdType
 import squants.market.{Currency, GBP}
 
 import java.time.Instant
 
-final case class UserId(value: String)       extends AnyVal
+opaque type UserId = String
+object UserId extends IdType[UserId]
+
 final case class UserEmail(value: String)    extends AnyVal
 final case class Password(value: String)     extends AnyVal
 final case class PasswordHash(value: String) extends AnyVal

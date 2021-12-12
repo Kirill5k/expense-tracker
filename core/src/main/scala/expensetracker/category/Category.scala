@@ -1,9 +1,12 @@
 package expensetracker.category
 
+import expensetracker.common.IdType
 import expensetracker.auth.user.UserId
 import io.circe.{Decoder, Encoder}
 
-final case class CategoryId(value: String)    extends AnyVal
+opaque type CategoryId = String
+object CategoryId extends IdType[CategoryId]
+
 final case class CategoryName(value: String)  extends AnyVal
 final case class CategoryIcon(value: String)  extends AnyVal
 final case class CategoryColor(value: String) extends AnyVal
@@ -18,12 +21,12 @@ object CategoryColor {
 
 enum CategoryKind(val value: String):
   case Expense extends CategoryKind("expense")
-  case Income  extends CategoryKind("income")
+  case Income extends CategoryKind("income")
 
 object CategoryKind {
   def from(value: String): Either[String, CategoryKind] =
     CategoryKind.values.find(_.value == value).toRight(s"Invalid category kind $value")
-  
+
   given decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap(CategoryKind.from)
   given encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap(_.value)
 }

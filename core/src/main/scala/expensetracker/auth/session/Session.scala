@@ -2,11 +2,13 @@ package expensetracker.auth.session
 
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.user.UserId
+import expensetracker.common.IdType
 import io.circe.{Decoder, Encoder}
 
 import java.time.Instant
 
-final case class SessionId(value: String) extends AnyVal
+opaque type SessionId = String
+object SessionId extends IdType[SessionId]
 
 enum SessionStatus(val value: String):
   case Authenticated extends SessionStatus("authenticated")
