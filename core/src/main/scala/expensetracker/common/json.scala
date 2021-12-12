@@ -1,6 +1,6 @@
 package expensetracker.common
 
-import cats.implicits._
+import cats.syntax.either._
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.session.SessionStatus
 import expensetracker.category.CategoryKind

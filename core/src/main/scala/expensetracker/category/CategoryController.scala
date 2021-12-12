@@ -2,7 +2,10 @@ package expensetracker.category
 
 import cats.Monad
 import cats.effect.Concurrent
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.apply.*
+import cats.syntax.functor.*
+import cats.syntax.alternative.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
@@ -28,7 +31,7 @@ import org.typelevel.log4cats.Logger
 
 final class CategoryController[F[_]: Logger](
     private val service: CategoryService[F]
-)(implicit
+)(using
     F: Concurrent[F]
 ) extends Controller[F] {
   private val prefixPath = "/categories"

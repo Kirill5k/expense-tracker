@@ -1,7 +1,8 @@
 package expensetracker.common.web
 
 import cats.MonadError
-import cats.implicits.*
+import cats.syntax.applicativeError.*
+import cats.syntax.apply.*
 import expensetracker.common.JsonCodecs
 import expensetracker.common.errors.AppError
 import io.circe.generic.auto.*
@@ -24,7 +25,7 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
 
   protected def withErrorHandling(
       response: => F[Response[F]]
-  )(implicit
+  )(using
       F: MonadError[F, Throwable],
       logger: Logger[F]
   ): F[Response[F]] =

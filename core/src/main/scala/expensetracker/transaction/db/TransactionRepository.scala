@@ -1,26 +1,29 @@
 package expensetracker.transaction.db
 
 import cats.effect.Async
-import cats.implicits._
+import cats.syntax.flatMap.*
+import cats.syntax.applicative.*
+import cats.syntax.functor.*
+import cats.syntax.applicativeError.*
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.common.json.given
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
-import io.circe.generic.auto._
-import mongo4cats.circe._
+import io.circe.generic.auto.*
+import mongo4cats.circe.*
 import mongo4cats.collection.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[TransactionId]
-  def getAll(aid: UserId): F[List[Transaction]]
-  def get(aid: UserId, txid: TransactionId): F[Transaction]
-  def delete(aid: UserId, txid: TransactionId): F[Unit]
+  def getAll(uid: UserId): F[List[Transaction]]
+  def get(uid: UserId, txid: TransactionId): F[Transaction]
+  def delete(uid: UserId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
-  def hide(aid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
-  def isHidden(aid: UserId, txid: TransactionId): F[Boolean]
+  def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
+  def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
 
 final private class LiveTransactionRepository[F[_]: Async](
     private val collection: MongoCollection[F, TransactionEntity]
@@ -33,16 +36,16 @@ final private class LiveTransactionRepository[F[_]: Async](
       .as(TransactionId(create._id.toHexString))
   }
 
-  override def getAll(aid: UserId): F[List[Transaction]] =
+  override def getAll(uid: UserId): F[List[Transaction]] =
     collection
-      .find(userIdEq(aid).and(notHidden))
+      .find(userIdEq(uid).and(notHidden))
       .sortByDesc("date")
       .all
       .map(_.map(_.toDomain).toList)
 
-  override def get(aid: UserId, txid: TransactionId): F[Transaction] =
+  override def get(uid: UserId, txid: TransactionId): F[Transaction] =
     collection
-      .find(userIdEq(aid).and(idEq(txid.value)))
+      .find(userIdEq(uid).and(idEq(txid.value)))
       .first
       .flatMap {
         case Some(tx) => tx.toDomain.pure[F]
@@ -60,22 +63,22 @@ final private class LiveTransactionRepository[F[_]: Async](
         case None    => TransactionDoesNotExist(tx.id).raiseError[F, Unit]
       }
 
-  override def delete(aid: UserId, txid: TransactionId): F[Unit] =
+  override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete(userIdEq(aid).and(idEq(txid.value)))
+      .findOneAndDelete(userIdEq(uid).and(idEq(txid.value)))
       .flatMap {
         case Some(_) => ().pure[F]
         case None    => TransactionDoesNotExist(txid).raiseError[F, Unit]
       }
 
-  override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
+  override def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
-      .updateOne(userIdEq(aid).and(idEq(txid.value)), updateHidden(hidden))
+      .updateOne(userIdEq(uid).and(idEq(txid.value)), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
-  override def isHidden(aid: UserId, txid: TransactionId): F[Boolean] =
+  override def isHidden(uid: UserId, txid: TransactionId): F[Boolean] =
     collection
-      .count(userIdEq(aid).and(idEq(txid.value)).and(Filter.eq(Field.Hidden, true)))
+      .count(userIdEq(uid).and(idEq(txid.value)).and(Filter.eq(Field.Hidden, true)))
       .map(_ > 0)
 }
 

@@ -13,6 +13,6 @@ object validations {
 
   final case class ValidId()
 
-  implicit def idValidate[T]: Validate.Plain[T, ValidId] =
+  inline given idValidate[T]: Validate.Plain[T, ValidId] =
     Validate.fromPredicate(id => ObjectId.isValid(id.toString), id => s"($id is valid id)", ValidId())
 }

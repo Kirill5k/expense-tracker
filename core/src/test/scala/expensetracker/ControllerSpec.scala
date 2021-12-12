@@ -19,7 +19,7 @@ import scala.io.Source
 
 trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers with TestData {
 
-  implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
+  given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   val emptyJson: Json = Json.fromJsonObject(JsonObject.empty)
 

@@ -1,7 +1,8 @@
 package expensetracker.auth
 
 import cats.effect.{Async, Temporal}
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.functor.*
 import expensetracker.Resources
 import expensetracker.auth.user.{UserService, PasswordEncryptor}
 import expensetracker.auth.user.db.UserRepository

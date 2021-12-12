@@ -1,7 +1,10 @@
 package expensetracker.auth.user.db
 
 import cats.effect.Async
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.applicative.*
+import cats.syntax.functor.*
+import cats.syntax.applicativeError.*
 import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserSettings}
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}

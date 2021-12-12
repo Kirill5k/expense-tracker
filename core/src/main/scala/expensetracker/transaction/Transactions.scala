@@ -1,7 +1,8 @@
 package expensetracker.transaction
 
 import cats.effect.Async
-import cats.implicits._
+import cats.syntax.flatMap.*
+import cats.syntax.functor.*
 import expensetracker.Resources
 import expensetracker.auth.session.Session
 import expensetracker.transaction.db.TransactionRepository

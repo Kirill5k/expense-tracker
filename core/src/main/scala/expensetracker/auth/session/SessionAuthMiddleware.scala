@@ -2,7 +2,10 @@ package expensetracker.auth.session
 
 import cats.data.{Kleisli, OptionT}
 import cats.effect.Temporal
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.either.*
+import cats.syntax.applicative.*
+import cats.syntax.functor.*
 import io.circe.generic.auto.*
 import expensetracker.common.web.{Controller, ErrorResponse}
 import org.bson.types.ObjectId
@@ -16,10 +19,10 @@ object SessionAuthMiddleware {
 
   def apply[F[_]](
       obtainSession: (SessionId, Option[SessionActivity]) => F[Option[Session]]
-  )(implicit
+  )(using
       F: Temporal[F]
   ): AuthMiddleware[F, Session] = {
-    val dsl = new Controller[F] {}; import dsl._
+    val dsl = new Controller[F] {}; import dsl.*
 
     val onFailure: AuthedRoutes[String, F] =
       Kleisli(req => OptionT.liftF(Forbidden(ErrorResponse(req.context)).map(_.removeCookie(SessionIdCookie))))

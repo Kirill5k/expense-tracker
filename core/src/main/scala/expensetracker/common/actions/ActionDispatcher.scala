@@ -3,7 +3,7 @@ package expensetracker.common.actions
 import cats.Functor
 import cats.effect.Concurrent
 import cats.effect.std.Queue
-import cats.implicits._
+import cats.syntax.functor.*
 import fs2.Stream
 
 trait ActionDispatcher[F[_]]:

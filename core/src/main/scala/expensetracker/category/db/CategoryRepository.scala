@@ -1,7 +1,10 @@
 package expensetracker.category.db
 
 import cats.effect.Async
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.applicative.*
+import cats.syntax.functor.*
+import cats.syntax.applicativeError.*
 import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository

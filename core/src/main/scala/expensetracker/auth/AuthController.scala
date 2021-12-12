@@ -2,7 +2,11 @@ package expensetracker.auth
 
 import cats.Monad
 import cats.effect.Temporal
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.applicative.*
+import cats.syntax.apply.*
+import cats.syntax.functor.*
+import cats.syntax.alternative.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
@@ -26,10 +30,10 @@ import java.time.Instant
 final class AuthController[F[_]: Logger](
     private val service: AuthService[F],
     private val dispatcher: ActionDispatcher[F]
-)(implicit
+)(using
     F: Temporal[F]
 ) extends Controller[F] {
-  import AuthController._
+  import AuthController.*
 
   object UserIdPath {
     def unapply(cid: String): Option[UserId] =

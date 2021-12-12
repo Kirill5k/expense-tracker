@@ -2,13 +2,14 @@ package expensetracker.common.actions
 
 import cats.Monad
 import cats.effect.Temporal
-import cats.implicits._
+import cats.syntax.apply.*
+import cats.syntax.applicativeError.*
 import expensetracker.category.CategoryService
 import expensetracker.common.errors.AppError
 import fs2.Stream
 import org.typelevel.log4cats.Logger
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 trait ActionProcessor[F[_]]:
   def run: Stream[F, Unit]

@@ -1,7 +1,7 @@
 package expensetracker.auth.session.db
 
 import cats.effect.Async
-import cats.implicits.*
+import cats.syntax.functor.*
 import expensetracker.auth.user.UserId
 import io.circe.generic.auto.*
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}

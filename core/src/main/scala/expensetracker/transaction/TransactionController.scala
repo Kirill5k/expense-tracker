@@ -2,7 +2,11 @@ package expensetracker.transaction
 
 import cats.Monad
 import cats.effect.Concurrent
-import cats.implicits.*
+import cats.syntax.flatMap.*
+import cats.syntax.apply.*
+import cats.syntax.applicative.*
+import cats.syntax.functor.*
+import cats.syntax.alternative.*
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
@@ -23,7 +27,7 @@ import java.time.LocalDate
 
 final class TransactionController[F[_]: Logger](
     private val service: TransactionService[F]
-)(implicit
+)(using
     F: Concurrent[F]
 ) extends Controller[F] {
   import TransactionController.*

@@ -9,5 +9,5 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 trait CatsSpec extends AsyncWordSpec with Matchers with MockitoSugar with TestData {
 
-  implicit val logger: Logger[IO]   = Slf4jLogger.getLogger[IO]
+  given logger: Logger[IO]   = Slf4jLogger.getLogger[IO]
 }

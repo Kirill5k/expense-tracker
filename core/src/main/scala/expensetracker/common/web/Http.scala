@@ -2,17 +2,17 @@ package expensetracker.common.web
 
 import cats.Monad
 import cats.effect.Async
-import cats.implicits._
+import cats.syntax.semigroupk.*
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
-import org.http4s._
-import org.http4s.implicits._
+import org.http4s.*
+import org.http4s.implicits.*
 import org.http4s.server.Router
-import org.http4s.server.middleware._
+import org.http4s.server.middleware.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 final class Http[F[_]: Async] private (
     private val health: Health[F],

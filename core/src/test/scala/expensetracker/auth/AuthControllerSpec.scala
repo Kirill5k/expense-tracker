@@ -6,8 +6,8 @@ import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmai
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
-import org.http4s.circe.CirceEntityCodec._
-import org.http4s.implicits._
+import org.http4s.circe.CirceEntityCodec.*
+import org.http4s.implicits.*
 import org.http4s.{HttpDate, Method, Request, ResponseCookie, Status}
 import squants.market.USD
 import org.mockito.ArgumentMatchers.{any}
