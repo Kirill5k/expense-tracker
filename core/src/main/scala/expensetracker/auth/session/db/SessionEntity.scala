@@ -16,8 +16,8 @@ final case class SessionEntity(
 ) {
   def toDomain: Session =
     Session(
-      id = SessionId(_id.toHexString),
-      userId = UserId(userId.toHexString),
+      id = SessionId(_id),
+      userId = UserId(userId),
       createdAt = createdAt,
       active = active,
       status = status,
@@ -29,7 +29,7 @@ object SessionEntity {
   def create(cs: CreateSession): SessionEntity =
     SessionEntity(
       ObjectId(),
-      ObjectId(cs.userId.value),
+      cs.userId.toObjectId,
       cs.time,
       true,
       SessionStatus.Authenticated,

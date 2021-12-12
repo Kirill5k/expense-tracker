@@ -2,18 +2,18 @@ package expensetracker.transaction
 
 import cats.Monad
 import cats.effect.Concurrent
-import cats.implicits._
+import cats.implicits.*
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.Controller
-import expensetracker.common.validations._
+import expensetracker.common.validations.*
 import org.bson.types.ObjectId
-import io.circe.generic.auto._
-import io.circe.refined._
-import org.http4s.circe.CirceEntityCodec._
+import io.circe.generic.auto.*
+import io.circe.refined.*
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.server.{AuthMiddleware, Router}
 import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.typelevel.log4cats.Logger
@@ -26,7 +26,7 @@ final class TransactionController[F[_]: Logger](
 )(implicit
     F: Concurrent[F]
 ) extends Controller[F] {
-  import TransactionController._
+  import TransactionController.*
 
   private val prefixPath = "/transactions"
 
@@ -87,12 +87,12 @@ final class TransactionController[F[_]: Logger](
 object TransactionController {
 
   final case class CreateTransactionRequest(
-                                             kind: TransactionKind,
-                                             categoryId: IdString,
-                                             amount: Money,
-                                             date: LocalDate,
-                                             note: Option[String],
-                                             tags: Option[List[String]]
+      kind: TransactionKind,
+      categoryId: IdString,
+      amount: Money,
+      date: LocalDate,
+      note: Option[String],
+      tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
@@ -134,13 +134,13 @@ object TransactionController {
   final case class HideTransactionRequest(hidden: Boolean)
 
   final case class UpdateTransactionRequest(
-                                             id: NonEmptyString,
-                                             kind: TransactionKind,
-                                             categoryId: IdString,
-                                             amount: Money,
-                                             date: LocalDate,
-                                             note: Option[String],
-                                             tags: Option[List[String]]
+      id: NonEmptyString,
+      kind: TransactionKind,
+      categoryId: IdString,
+      amount: Money,
+      date: LocalDate,
+      note: Option[String],
+      tags: Option[List[String]]
   ) {
     def toDomain(aid: UserId): Transaction =
       Transaction(

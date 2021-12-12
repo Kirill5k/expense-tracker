@@ -21,9 +21,9 @@ final case class TransactionEntity(
 ) {
   def toDomain: Transaction =
     Transaction(
-      id = TransactionId(_id.toHexString),
-      userId = UserId(userId.toHexString),
-      categoryId = CategoryId(categoryId.toHexString),
+      id = TransactionId(_id),
+      userId = UserId(userId),
+      categoryId = CategoryId(categoryId),
       kind = kind,
       amount = amount,
       date = date,
@@ -36,9 +36,9 @@ object TransactionEntity {
 
   def from(tx: Transaction): TransactionEntity =
     TransactionEntity(
-      ObjectId(tx.id.value),
-      ObjectId(tx.userId.value),
-      ObjectId(tx.categoryId.value),
+      tx.id.toObjectId,
+      tx.userId.toObjectId,
+      tx.categoryId.toObjectId,
       tx.kind,
       tx.amount,
       tx.date,
@@ -50,8 +50,8 @@ object TransactionEntity {
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       ObjectId(),
-      ObjectId(tx.userId.value),
-      ObjectId(tx.categoryId.value),
+      tx.userId.toObjectId,
+      tx.categoryId.toObjectId,
       tx.kind,
       tx.amount,
       tx.date,

@@ -15,7 +15,7 @@ final case class AccountEntity(
 ) {
   def toDomain: User =
     User(
-      id = UserId(_id.toHexString),
+      id = UserId(_id),
       email = UserEmail(email),
       name = name,
       password = PasswordHash(password),
