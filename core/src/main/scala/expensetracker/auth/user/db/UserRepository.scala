@@ -5,7 +5,7 @@ import cats.implicits.*
 import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserSettings}
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
-import expensetracker.common.json.*
+import expensetracker.common.json.given
 import io.circe.generic.auto.*
 import mongo4cats.circe.*
 import mongo4cats.collection.operations.{Filter, Update}

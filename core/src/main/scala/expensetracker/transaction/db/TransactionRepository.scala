@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.Async
 import cats.implicits._
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
-import expensetracker.common.json._
+import expensetracker.common.json.given
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
@@ -13,7 +13,7 @@ import mongo4cats.collection.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
-trait TransactionRepository[F[_]] extends Repository[F] {
+trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[TransactionId]
   def getAll(aid: UserId): F[List[Transaction]]
   def get(aid: UserId, txid: TransactionId): F[Transaction]
@@ -21,7 +21,6 @@ trait TransactionRepository[F[_]] extends Repository[F] {
   def update(tx: Transaction): F[Unit]
   def hide(aid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
   def isHidden(aid: UserId, txid: TransactionId): F[Boolean]
-}
 
 final private class LiveTransactionRepository[F[_]: Async](
     private val collection: MongoCollection[F, TransactionEntity]

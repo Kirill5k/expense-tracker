@@ -6,7 +6,7 @@ import expensetracker.auth.user.UserId
 import io.circe.generic.auto.*
 import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
 import expensetracker.common.db.Repository
-import expensetracker.common.json.*
+import expensetracker.common.json.given
 import mongo4cats.database.MongoDatabase
 import mongo4cats.circe.*
 import mongo4cats.collection.operations.Update
