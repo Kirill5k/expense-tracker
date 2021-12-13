@@ -46,6 +46,6 @@ trait JsonCodecs {
     )
   }
 
-  private def roundUp(value: BigDecimal): BigDecimal = (value + BigDecimal(0.00d)).setScale(2, BigDecimal.RoundingMode.HALF_UP)
+  private def roundUp(value: BigDecimal): BigDecimal = (value).setScale(2, BigDecimal.RoundingMode.HALF_UP)
   private def roundUp(value: Double): BigDecimal     = roundUp(BigDecimal(value))
 }
