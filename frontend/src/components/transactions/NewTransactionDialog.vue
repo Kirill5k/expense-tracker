@@ -5,7 +5,7 @@
     transition="dialog-bottom-transition"
     v-model="dialog"
     max-width="400px"
-    @click:outside="reset"
+    @click:outside="close"
   >
     <template v-slot:activator="{ on, attrs }">
       <v-btn
@@ -17,13 +17,14 @@
         fab
         v-bind="attrs"
         v-on="on"
+        @click="open"
       >
         <v-icon dark>mdi-plus</v-icon>
       </v-btn>
     </template>
     <v-card>
       <v-card-title>
-        {{newTransaction.id ? 'Edit transaction' : 'New transaction'}}
+        {{ newTransaction.id ? 'Edit transaction' : 'New transaction' }}
       </v-card-title>
       <v-card-text>
         <v-form
@@ -56,12 +57,12 @@
           >
             <template slot="selection" slot-scope="data">
               <span class="mt-1 mb-1">
-                <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
+                <v-icon class="mr-2">{{ data.item.text.icon }}</v-icon>{{ data.item.text.name }}
               </span>
             </template>
             <template slot="item" slot-scope="data">
               <span>
-                <v-icon class="mr-2">{{data.item.text.icon}}</v-icon>{{ data.item.text.name }}
+                <v-icon class="mr-2">{{ data.item.text.icon }}</v-icon>{{ data.item.text.name }}
               </span>
             </template>
           </v-select>
@@ -157,16 +158,6 @@
 </template>
 
 <script>
-const DEFAULT_TRANSACTION = () => ({
-  id: undefined,
-  categoryId: null,
-  amount: null,
-  date: new Date().toISOString().slice(0, 10),
-  kind: 'expense',
-  tags: [],
-  note: null
-})
-
 export default {
   name: 'NewTransactionDialog',
   props: {
@@ -192,7 +183,7 @@ export default {
     dialog: false,
     datePicker: false,
     valid: true,
-    newTransaction: { ...DEFAULT_TRANSACTION() },
+    newTransaction: {},
     rules: {
       category: [v => !!v || 'Please select a category'],
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
@@ -227,13 +218,20 @@ export default {
     }
   },
   methods: {
-    reset () {
-      this.newTransaction = { ...DEFAULT_TRANSACTION() }
-      this.valid = true
-      this.$refs.newTransactionForm.resetValidation()
+    open () {
+      this.newTransaction = {
+        id: undefined,
+        categoryId: null,
+        amount: null,
+        date: new Date().toISOString().slice(0, 10),
+        kind: 'expense',
+        tags: [],
+        note: null
+      }
     },
     close () {
-      this.reset()
+      this.valid = true
+      this.$refs.newTransactionForm.resetValidation()
       this.dialog = false
     },
     save () {
