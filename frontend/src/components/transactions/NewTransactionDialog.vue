@@ -17,7 +17,7 @@
         fab
         v-bind="attrs"
         v-on="on"
-        @click="open"
+        @click="setTx"
       >
         <v-icon dark>mdi-plus</v-icon>
       </v-btn>
@@ -114,6 +114,10 @@
               multiple
               persistent-hint
               small-chips
+              :allow-overflow="false"
+              clearable
+              deletable-chips
+              disable-lookup
             >
               <template v-slot:no-data v-if="search">
                 <v-list-item>
@@ -218,7 +222,7 @@ export default {
     }
   },
   methods: {
-    open () {
+    setTx () {
       this.newTransaction = {
         id: undefined,
         categoryId: null,
@@ -230,8 +234,9 @@ export default {
       }
     },
     close () {
-      this.valid = true
+      this.setTx()
       this.$refs.newTransactionForm.resetValidation()
+      this.valid = true
       this.dialog = false
     },
     save () {
