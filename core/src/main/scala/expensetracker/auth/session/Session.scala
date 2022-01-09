@@ -2,7 +2,7 @@ package expensetracker.auth.session
 
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.user.UserId
-import expensetracker.common.IdType
+import expensetracker.common.types.IdType
 import io.circe.{Decoder, Encoder}
 
 import java.time.Instant

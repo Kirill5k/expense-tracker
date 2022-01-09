@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
-import expensetracker.common.IdType
+import expensetracker.common.types.IdType
 import io.circe.{Decoder, Encoder}
 import squants.market.Money
 

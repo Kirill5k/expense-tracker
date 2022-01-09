@@ -1,6 +1,6 @@
 package expensetracker.category
 
-import expensetracker.common.IdType
+import expensetracker.common.types.IdType
 import expensetracker.auth.user.UserId
 import io.circe.{Decoder, Encoder}
 

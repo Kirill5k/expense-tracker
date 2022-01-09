@@ -1,16 +1,22 @@
 package expensetracker.auth.user
 
-import expensetracker.common.IdType
+import expensetracker.common.types.{IdType, StringType}
 import squants.market.{Currency, GBP}
+import expensetracker.common.validations.EmailString
 
 import java.time.Instant
 
 opaque type UserId = String
 object UserId extends IdType[UserId]
 
-final case class UserEmail(value: String)    extends AnyVal
-final case class Password(value: String)     extends AnyVal
-final case class PasswordHash(value: String) extends AnyVal
+opaque type UserEmail = String
+object UserEmail extends StringType[UserEmail]:
+  def from(email: EmailString): UserEmail = email.value.toLowerCase
+
+opaque type Password = String
+object Password extends StringType[Password]
+opaque type PasswordHash = String
+object PasswordHash extends StringType[PasswordHash]
 
 final case class UserName(
     first: String,

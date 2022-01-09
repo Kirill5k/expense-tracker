@@ -112,7 +112,7 @@ object AuthController {
       password: NonEmptyString
   ) {
     def userDetails: UserDetails =
-      UserDetails(UserEmail(email.value.toLowerCase), UserName(firstName.value, lastName.value))
+      UserDetails(UserEmail.from(email), UserName(firstName.value, lastName.value))
 
     def userPassword: Password = Password(password.value)
   }
@@ -123,7 +123,7 @@ object AuthController {
       email: EmailString,
       password: NonEmptyString
   ) {
-    def userEmail    = UserEmail(email.value.toLowerCase)
+    def userEmail    = UserEmail.from(email)
     def userPassword = Password(password.value)
   }
 
