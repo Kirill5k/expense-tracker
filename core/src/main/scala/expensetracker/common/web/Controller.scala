@@ -23,6 +23,8 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
 
   private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
 
+  def routes: HttpRoutes[F]
+
   protected def withErrorHandling(
       response: => F[Response[F]]
   )(using
