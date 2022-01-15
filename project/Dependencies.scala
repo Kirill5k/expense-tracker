@@ -11,6 +11,7 @@ object Dependencies {
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.9.28"
+    val tapir      = "0.20.0-M3"
 
     val scalaTest = "3.2.10"
     val mockito   = "3.2.10.0"
@@ -62,6 +63,14 @@ object Dependencies {
       val all = Seq(core, dsl, server, blaze, circe)
     }
 
+    object tapir {
+      val core   = "com.softwaremill.sttp.tapir" %% "tapir-core"          % Versions.tapir
+      val circe  = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"    % Versions.tapir
+      val http4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % Versions.tapir
+
+      val all = Seq(core, circe, http4s)
+    }
+
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
     val mockito   = "org.scalatestplus" %% "mockito-3-4" % Versions.mockito
   }
@@ -75,6 +84,7 @@ object Dependencies {
   ) ++
     Libraries.circe.all ++
     Libraries.http4s.all ++
+    Libraries.tapir.all ++
     Libraries.logging.all ++
     Libraries.refined.all
 
