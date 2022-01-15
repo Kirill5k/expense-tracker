@@ -2,11 +2,10 @@ package expensetracker.health
 
 import cats.effect.Async
 import cats.syntax.functor._
-import expensetracker.common.web.Controller
 import org.http4s.HttpRoutes
 
 final class Health[F[_]] private (
-    val controller: Controller[F]
+    val controller: HealthController[F]
 ) {
   val routes: HttpRoutes[F] = controller.routes
 }

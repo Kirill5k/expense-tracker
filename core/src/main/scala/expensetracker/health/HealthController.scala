@@ -33,6 +33,7 @@ object HealthController:
 
   final case class AppStatus(startupTime: Instant) derives Codec.AsObject
 
-  def make[F[_]: Async]: F[Controller[F]] =
+  def make[F[_]: Async]: F[HealthController[F]] =
     Temporal[F].realTimeInstant
-      .flatMap(ts => Ref.of(ts).map(ref => new HealthController[F](ref)))
+      .flatMap(ts => Ref.of(ts))
+      .map(ref => HealthController[F](ref))
