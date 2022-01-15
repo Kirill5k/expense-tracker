@@ -12,10 +12,12 @@ import org.http4s.HttpRoutes
 import sttp.tapir.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.generic.SchemaDerivation
+import sttp.tapir.json.circe.TapirJsonCirce
 
 final class HealthController[F[_]: Async](
     private val startupTime: Ref[F, Instant]
-) extends Controller[F] {
+) extends Controller[F] with TapirJsonCirce with SchemaDerivation {
 
   implicit val statusSchema: Schema[HealthController.AppStatus] = Schema.string
 
