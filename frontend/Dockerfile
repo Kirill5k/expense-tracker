@@ -1,9 +1,9 @@
-FROM node:latest as build-stage
+FROM node:16.0.0 as build-stage
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+RUN yarn install
 COPY ./ .
-RUN npm run build
+RUN yarn run build
 
 FROM nginx as production-stage
 RUN mkdir /app
