@@ -41,7 +41,7 @@
           small
           outlined
         >
-          <v-icon>
+          <v-icon size="12">
             mdi-currency-{{currency.code.toLowerCase()}}
           </v-icon>
           {{item.total.toFixed(2)}}
