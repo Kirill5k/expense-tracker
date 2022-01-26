@@ -5,15 +5,15 @@ object Dependencies {
     val mongo4cats = "0.4.3"
     val pureConfig = "0.17.1"
     val circe      = "0.14.1"
-    val http4s     = "0.23.7"
+    val http4s     = "0.23.8"
     val logback    = "1.2.10"
-    val log4cats   = "2.1.1"
+    val log4cats   = "2.2.0"
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.9.28"
-    val tapir      = "0.20.0-M3"
+    val tapir      = "0.20.0-M6"
 
-    val scalaTest = "3.2.10"
+    val scalaTest = "3.2.11"
     val mockito   = "3.2.10.0"
   }
 
@@ -34,7 +34,6 @@ object Dependencies {
     object logging {
       val logback  = "ch.qos.logback" % "logback-classic" % Versions.logback
       val log4cats = "org.typelevel" %% "log4cats-slf4j"  % Versions.log4cats
-
       val all = Seq(log4cats, logback)
     }
 
@@ -48,8 +47,7 @@ object Dependencies {
     }
 
     object refined {
-      val core = "eu.timepit" %% "refined"      % Versions.refined
-
+      val core = "eu.timepit" %% "refined" % Versions.refined
       val all = Seq(core)
     }
 
@@ -59,7 +57,6 @@ object Dependencies {
       val server = "org.http4s" %% "http4s-server"       % Versions.http4s
       val blaze  = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
       val circe  = "org.http4s" %% "http4s-circe"        % Versions.http4s
-
       val all = Seq(core, dsl, server, blaze, circe)
     }
 
@@ -67,7 +64,6 @@ object Dependencies {
       val core   = "com.softwaremill.sttp.tapir" %% "tapir-core"          % Versions.tapir
       val circe  = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"    % Versions.tapir
       val http4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % Versions.tapir
-
       val all = Seq(core, circe, http4s)
     }
 
