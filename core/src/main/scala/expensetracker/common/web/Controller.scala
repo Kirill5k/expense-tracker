@@ -17,9 +17,9 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
   val SessionIdCookie = "session-id"
 
   private val FailedRegexValidation = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.: DownField\\((.*)\\)".r
-  private val NullFieldValidation = "Attempt to decode value on failed cursor: DownField\\((.*)\\)".r
-  private val EmptyFieldValidation = "Predicate isEmpty\\(\\) did not fail\\.: DownField\\((.*)\\)".r
-  private val IdValidation = "Predicate failed: \\((.*) is valid id\\).: DownField\\((.*)\\)".r
+  private val NullFieldValidation   = "Attempt to decode value on failed cursor: DownField\\((.*)\\)".r
+  private val EmptyFieldValidation  = "Predicate isEmpty\\(\\) did not fail\\.: DownField\\((.*)\\)".r
+  private val IdValidation          = "Predicate failed: \\((.*) is valid id\\).: DownField\\((.*)\\)".r
 
   private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
 

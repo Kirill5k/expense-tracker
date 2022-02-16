@@ -6,7 +6,7 @@ import expensetracker.CatsSpec
 import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmail, UserId, UserService, UserSettings}
 import expensetracker.auth.session.{SessionActivity, SessionId, SessionService}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{when, verify, verifyNoInteractions}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 class AuthServiceSpec extends CatsSpec {
 

@@ -11,7 +11,7 @@ trait ActionDispatcher[F[_]]:
   def stream: Stream[F, Action]
 
 final private class LiveActionDispatcher[F[_]: Functor](
-  private val actions: Queue[F, Action]
+    private val actions: Queue[F, Action]
 ) extends ActionDispatcher[F] {
 
   override def dispatch(action: Action): F[Unit] =

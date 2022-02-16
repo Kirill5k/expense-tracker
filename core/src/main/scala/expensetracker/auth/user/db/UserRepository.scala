@@ -49,7 +49,7 @@ final private class LiveUserRepository[F[_]: Async](
       .first
       .flatMap {
         case Some(user) => user.toDomain.pure[F]
-        case None => AccountDoesNotExist(aid).raiseError[F, User]
+        case None       => AccountDoesNotExist(aid).raiseError[F, User]
       }
 
   override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =

@@ -10,7 +10,7 @@ import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.implicits.*
 import org.http4s.{HttpDate, Method, Request, ResponseCookie, Status}
 import squants.market.USD
-import org.mockito.ArgumentMatchers.{any}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 class AuthControllerSpec extends ControllerSpec {
@@ -18,7 +18,7 @@ class AuthControllerSpec extends ControllerSpec {
   "An AuthController" when {
     "GET /auth/user" should {
       "return current account" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.findUser(any[String].asInstanceOf[UserId])).thenReturn(IO.pure(user))
@@ -43,7 +43,7 @@ class AuthControllerSpec extends ControllerSpec {
 
     "PUT /auth/user/:id/settings" should {
       "return error when id in path is different from id in session" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         val reqBody =
@@ -63,7 +63,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return 204 when after updating account settings" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.updateSettings(any[String].asInstanceOf[UserId], any[UserSettings])).thenReturn(IO.unit)
@@ -88,10 +88,10 @@ class AuthControllerSpec extends ControllerSpec {
 
     "POST /auth/user/:id/password" should {
       "return error when id in path is different from id in session" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        val reqBody ="""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
+        val reqBody = """{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
         val req = Request[IO](uri = uri"/auth/user/60e70e87fb134e0c1a271122/password", method = Method.POST)
           .withEntity(parseJson(reqBody))
           .addCookie(sessIdCookie)
@@ -102,13 +102,13 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return 204 when after updating account password" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
         when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(sid2))
 
-        val reqBody ="""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
+        val reqBody = """{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
         val req = Request[IO](uri = uri"/auth/user/60e70e87fb134e0c1a271121/password", method = Method.POST)
           .withEntity(parseJson(reqBody))
           .addCookie(sessIdCookie)
@@ -131,7 +131,7 @@ class AuthControllerSpec extends ControllerSpec {
 
     "POST /auth/user" should {
       "return bad request if email is already taken" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.createUser(any[UserDetails], any[String].asInstanceOf[Password]))
@@ -154,7 +154,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return bad request when invalid response" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"","firstName":"John","lastName":"Bloggs"}""")
@@ -171,7 +171,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "create new account and return 201" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.createUser(any[UserDetails], any[String].asInstanceOf[Password])).thenReturn(IO.pure(uid))
@@ -193,7 +193,7 @@ class AuthControllerSpec extends ControllerSpec {
     "POST /auth/login" should {
 
       "return 422 on invalid json" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         val req = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity("""{foo}""")
@@ -205,9 +205,8 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return bad req on parsing error" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
-
 
         val reqBody  = parseJson("""{"email":"foo","password":""}""")
         val res      = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
@@ -219,7 +218,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return unauthorized when invalid password or email" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.login(any[String].asInstanceOf[UserEmail], any[String].asInstanceOf[Password]))
@@ -235,7 +234,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return account on success and create session id cookie" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.login(any[String].asInstanceOf[UserEmail], any[String].asInstanceOf[Password])).thenReturn(IO.pure(user))
@@ -271,7 +270,7 @@ class AuthControllerSpec extends ControllerSpec {
 
     "POST /auth/logout" should {
       "return forbidden if session id cookie is missing" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST)
@@ -282,7 +281,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return forbidden if session does not exist" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
@@ -293,9 +292,8 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return forbidden if session is inactive" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
-
 
         val exp = sess.copy(active = false)
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
@@ -306,9 +304,8 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "return forbidden if session id is malformed" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
-
 
         val req =
           Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie.copy(content = "f"))
@@ -319,7 +316,7 @@ class AuthControllerSpec extends ControllerSpec {
       }
 
       "delete session on success" in {
-        val svc = mock[AuthService[IO]]
+        val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.logout(any[String].asInstanceOf[SessionId])).thenReturn(IO.unit)

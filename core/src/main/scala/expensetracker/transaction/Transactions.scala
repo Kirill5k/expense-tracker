@@ -10,7 +10,7 @@ import org.http4s.HttpRoutes
 import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
 
-final class Transactions[F[_]] private(
+final class Transactions[F[_]] private (
     private val controller: TransactionController[F]
 ) {
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = controller.routes(authMiddleware)
@@ -24,4 +24,3 @@ object Transactions {
       ctrl <- TransactionController.make[F](svc)
     } yield new Transactions[F](ctrl)
 }
-

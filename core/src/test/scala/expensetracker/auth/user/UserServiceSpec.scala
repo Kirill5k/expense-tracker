@@ -5,7 +5,7 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
-import org.mockito.ArgumentMatchers.{any}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 
 class UserServiceSpec extends CatsSpec {

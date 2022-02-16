@@ -4,7 +4,7 @@ import cats.effect.{Async, Temporal}
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.Resources
-import expensetracker.auth.user.{UserService, PasswordEncryptor}
+import expensetracker.auth.user.{PasswordEncryptor, UserService}
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.{Session, SessionAuthMiddleware, SessionService}

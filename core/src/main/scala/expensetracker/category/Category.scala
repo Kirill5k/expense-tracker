@@ -21,7 +21,7 @@ object CategoryColor {
 
 enum CategoryKind(val value: String):
   case Expense extends CategoryKind("expense")
-  case Income extends CategoryKind("income")
+  case Income  extends CategoryKind("income")
 
 object CategoryKind {
   def from(value: String): Either[String, CategoryKind] =

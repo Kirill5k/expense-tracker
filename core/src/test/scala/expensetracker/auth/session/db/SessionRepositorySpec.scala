@@ -78,8 +78,8 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       withEmbeddedMongoDb { db =>
         val result = for {
           repo <- SessionRepository.make(db)
-          sid1  <- repo.create(Sessions.create())
-          sid2  <- repo.create(Sessions.create())
+          sid1 <- repo.create(Sessions.create())
+          sid2 <- repo.create(Sessions.create())
           _    <- repo.invalidatedAll(Users.uid1)
           res  <- (repo.find(sid1, None), repo.find(sid2, None)).tupled
         } yield res

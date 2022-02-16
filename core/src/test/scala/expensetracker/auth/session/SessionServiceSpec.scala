@@ -5,8 +5,8 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
-import org.mockito.ArgumentMatchers.{any}
-import org.mockito.Mockito.{when, verify}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 
 import java.time.Instant
 

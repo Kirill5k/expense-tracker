@@ -39,8 +39,8 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo"}""")
-        val req = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+        val req     = Request[IO](uri = uri"/transactions", method = Method.POST).addCookie(sessIdCookie).withEntity(reqBody)
+        val res     = TransactionController.make[IO](svc).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(s"""{"message":"Invalid transaction kind foo"}"""))
         verifyNoInteractions(svc)
