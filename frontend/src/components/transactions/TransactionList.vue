@@ -2,7 +2,7 @@
   <v-virtual-scroll
     v-if="items.length"
     class="transaction-list"
-    :height="height"
+    :max-height="height"
     :items="tableData"
     item-height="78"
     bench="1000"
