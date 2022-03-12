@@ -1,17 +1,20 @@
 import com.typesafe.sbt.packager.docker._
+import sbtghactions.JavaSpec
 
-ThisBuild / scalaVersion := "3.1.0"
+ThisBuild / scalaVersion := "3.1.1"
 ThisBuild / version      := scala.sys.process.Process("git rev-parse HEAD").!!.trim.slice(0, 7)
 ThisBuild / organization := "io.github.kirill5k"
+ThisBuild / githubWorkflowPublishTargetBranches := Nil
+ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("17"))
 
-lazy val noPublish = Seq(
+val noPublish = Seq(
   publish         := {},
   publishLocal    := {},
   publishArtifact := false,
   publish / skip  := true
 )
 
-lazy val docker = Seq(
+val docker = Seq(
   packageName        := moduleName.value,
   version            := version.value,
   maintainer         := "immotional@aol.com",
@@ -29,15 +32,7 @@ lazy val docker = Seq(
   }
 )
 
-lazy val root = project
-  .in(file("."))
-  .settings(noPublish)
-  .settings(
-    name := "expense-tracker"
-  )
-  .aggregate(core)
-
-lazy val core = project
+val core = project
   .in(file("core"))
   .enablePlugins(JavaAppPackaging, JavaAgent, DockerPlugin)
   .settings(docker)
@@ -47,3 +42,11 @@ lazy val core = project
     Docker / packageName := "expense-tracker-core",
     libraryDependencies ++= Dependencies.core ++ Dependencies.test
   )
+
+val root = project
+  .in(file("."))
+  .settings(noPublish)
+  .settings(
+    name := "expense-tracker"
+  )
+  .aggregate(core)
