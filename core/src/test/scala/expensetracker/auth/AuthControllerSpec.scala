@@ -6,6 +6,7 @@ import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmai
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
+import expensetracker.fixtures.{Sessions, Users}
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.implicits.*
 import org.http4s.{HttpDate, Method, Request, ResponseCookie, Status}
@@ -21,22 +22,23 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.findUser(any[UserId])).thenReturn(IO.pure(user))
+        when(svc.findUser(any[UserId])).thenReturn(IO.pure(Users.user))
 
         val req = Request[IO](uri = uri"/auth/user", method = Method.GET).addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
 
         val resBody =
-          """{
-            |"id":"60e70e87fb134e0c1a271121",
-            |"email":"email",
-            |"firstName":"John",
-            |"lastName":"Bloggs",
+          s"""{
+            |"id":"${Users.uid1}",
+            |"email":"${Users.email}",
+            |"firstName":"${Users.details.name.first}",
+            |"lastName":"${Users.details.name.last}",
             |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
-            |"registrationDate": "2021-06-01T00:00:00Z"
+            |"registrationDate": "${Users.regDate}"
             |}""".stripMargin
+
         verifyJsonResponse(res, Status.Ok, Some(resBody))
-        verify(svc).findUser(sess.userId)
+        verify(svc).findUser(Sessions.sess.userId)
         verifyNoInteractions(disp)
       }
     }
@@ -134,7 +136,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.createUser(any[UserDetails], any[String].asInstanceOf[Password]))
+        when(svc.createUser(any[UserDetails], any[Password]))
           .thenReturn(IO.raiseError(AccountAlreadyExists(UserEmail("foo@bar.com"))))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
@@ -153,7 +155,7 @@ class AuthControllerSpec extends ControllerSpec {
         verifyNoInteractions(disp)
       }
 
-      "return bad request when invalid response" in {
+      "return bad request when invalid request" in {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
@@ -174,7 +176,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.createUser(any[UserDetails], any[String].asInstanceOf[Password])).thenReturn(IO.pure(uid))
+        when(svc.createUser(any[UserDetails], any[Password])).thenReturn(IO.pure(uid))
         when(disp.dispatch(any[Action])).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
@@ -221,7 +223,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.login(any[String].asInstanceOf[UserEmail], any[String].asInstanceOf[Password]))
+        when(svc.login(any[UserEmail], any[Password]))
           .thenReturn(IO.raiseError(InvalidEmailOrPassword))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
@@ -237,7 +239,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.login(any[String].asInstanceOf[UserEmail], any[String].asInstanceOf[Password])).thenReturn(IO.pure(user))
+        when(svc.login(any[UserEmail], any[Password])).thenReturn(IO.pure(user))
         when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(sid))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
@@ -319,7 +321,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.logout(any[String].asInstanceOf[SessionId])).thenReturn(IO.unit)
+        when(svc.logout(any[SessionId])).thenReturn(IO.unit)
 
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))

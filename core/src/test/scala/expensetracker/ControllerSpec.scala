@@ -7,7 +7,7 @@ import io.circe.parser.*
 import io.circe.{Json, JsonObject}
 import org.http4s.circe.*
 import org.http4s.server.AuthMiddleware
-import org.http4s.{Response, ResponseCookie, Status}
+import org.http4s.{RequestCookie, Response, ResponseCookie, Status}
 import org.scalatest.Assertion
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -19,9 +19,9 @@ import scala.io.Source
 
 trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers with TestData {
 
-  given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
+  val sessIdCookie = RequestCookie("session-id", sid.value)
 
-  val emptyJson: Json = Json.fromJsonObject(JsonObject.empty)
+  given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   def sessMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
     SessionAuth.middleware((_, _) => IO.pure(sess))

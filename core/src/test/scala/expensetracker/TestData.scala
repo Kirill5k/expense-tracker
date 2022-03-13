@@ -33,5 +33,5 @@ trait TestData {
   val sid2         = SessionId(ObjectId().toHexString)
   val sa           = IpAddress.fromString("192.168.0.1").map(ip => SessionActivity(ip, Instant.now()))
   val sess         = Session(sid, uid, Instant.now(), true, SessionStatus.Authenticated, sa)
-  val sessIdCookie = RequestCookie("session-id", sid.value)
+
 }

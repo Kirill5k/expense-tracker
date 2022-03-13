@@ -170,5 +170,5 @@ object AuthController {
   }
 
   def make[F[_]: Temporal: Logger](service: AuthService[F], dispatcher: ActionDispatcher[F]): F[AuthController[F]] =
-    Monad[F].pure(new AuthController[F](service, dispatcher))
+    Monad[F].pure(AuthController[F](service, dispatcher))
 }
