@@ -108,7 +108,7 @@ class AuthControllerSpec extends ControllerSpec {
         val disp = mock[ActionDispatcher[IO]]
 
         when(svc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
-        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(sid2))
+        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(Sessions.sid2))
 
         val reqBody = """{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
         val req = Request[IO](uri = Uri.unsafeFromString(s"/auth/user/${Users.uid1}/password"), method = Method.POST)
@@ -118,7 +118,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         val sessCookie = ResponseCookie(
           "session-id",
-          sid2.value,
+          Sessions.sid2.value,
           httpOnly = true,
           maxAge = Some(Long.MaxValue),
           expires = Some(HttpDate.MaxValue),
@@ -176,19 +176,19 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.createUser(any[UserDetails], any[Password])).thenReturn(IO.pure(uid))
+        when(svc.createUser(any[UserDetails], any[Password])).thenReturn(IO.pure(Users.uid1))
         when(disp.dispatch(any[Action])).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${uid.value}"}"""))
+        verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Users.uid1}"}"""))
         verify(svc).createUser(
           UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs")),
           Password("pwd")
         )
-        verify(disp).dispatch(Action.SetupNewUser(uid))
+        verify(disp).dispatch(Action.SetupNewUser(Users.uid1))
       }
     }
 
