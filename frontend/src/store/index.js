@@ -185,7 +185,7 @@ export default new Vuex.Store({
       commit('loading')
       return Clients.get(state.isOnline)
         .login(requestBody)
-        .then(acc => dispatch('loadData', acc))
+        .then(() => dispatch('getUser'))
         .catch(e => {
           commit('loaded')
           return handleError(commit, e, true)

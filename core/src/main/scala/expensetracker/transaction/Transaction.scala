@@ -19,8 +19,8 @@ object TransactionKind {
   def from(value: String): Either[String, TransactionKind] =
     TransactionKind.values.find(_.value == value).toRight(s"Invalid transaction kind $value")
 
-  inline given decode: Decoder[TransactionKind] = Decoder[String].emap(TransactionKind.from)
-  inline given encode: Encoder[TransactionKind] = Encoder[String].contramap(_.value)
+  given Decoder[TransactionKind] = Decoder[String].emap(TransactionKind.from)
+  given Encoder[TransactionKind] = Encoder[String].contramap(_.value)
 }
 
 final case class Transaction(
