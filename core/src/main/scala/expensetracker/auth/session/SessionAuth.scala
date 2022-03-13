@@ -7,23 +7,24 @@ import cats.syntax.either.*
 import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import io.circe.generic.auto.*
-import expensetracker.common.web.{Controller, ErrorResponse}
+import expensetracker.common.web.{ErrorResponse}
 import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, HttpDate, Request, ResponseCookie}
 import org.http4s.circe.CirceEntityCodec.*
+import org.http4s.dsl.Http4sDsl
 import org.http4s.server.AuthMiddleware
 
 import java.time.Instant
 
-object SessionAuthMiddleware {
+object SessionAuth {
   val SessionIdCookie = "session-id"
 
-  def apply[F[_]](
+  def middleware[F[_]](
       obtainSession: (SessionId, Option[SessionActivity]) => F[Option[Session]]
   )(using
       F: Temporal[F]
   ): AuthMiddleware[F, Session] = {
-    val dsl = new Controller[F] {}; import dsl.*
+    val dsl = new Http4sDsl[F] {}; import dsl.*
 
     val onFailure: AuthedRoutes[String, F] =
       Kleisli(req => OptionT.liftF(Forbidden(ErrorResponse(req.context)).map(_.removeCookie(SessionIdCookie))))
@@ -54,7 +55,7 @@ object SessionAuthMiddleware {
     AuthMiddleware(getValidSession, onFailure)
   }
 
-  def sessionIdResponseCookie(sid: SessionId): ResponseCookie =
+  def responseCookie(sid: SessionId): ResponseCookie =
     ResponseCookie(
       SessionIdCookie,
       sid.value,

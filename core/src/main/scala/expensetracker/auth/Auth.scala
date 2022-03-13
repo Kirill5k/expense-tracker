@@ -7,7 +7,7 @@ import expensetracker.Resources
 import expensetracker.auth.user.{PasswordEncryptor, UserService}
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.auth.session.db.SessionRepository
-import expensetracker.auth.session.{Session, SessionAuthMiddleware, SessionService}
+import expensetracker.auth.session.{Session, SessionAuth, SessionService}
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
 import org.http4s.HttpRoutes
@@ -18,7 +18,7 @@ final class Auth[F[_]: Temporal] private (
     private val authService: AuthService[F],
     private val authController: AuthController[F]
 ) {
-  val sessionAuthMiddleware: AuthMiddleware[F, Session] = SessionAuthMiddleware[F](authService.findSession)
+  val sessionAuthMiddleware: AuthMiddleware[F, Session] = SessionAuth.middleware[F](authService.findSession)
 
   def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = authController.routes(authMiddleware)
 }

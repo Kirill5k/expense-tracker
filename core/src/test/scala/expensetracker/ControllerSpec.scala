@@ -2,7 +2,7 @@ package expensetracker
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.auth.session.{Session, SessionAuthMiddleware}
+import expensetracker.auth.session.{Session, SessionAuth}
 import io.circe.parser._
 import io.circe.{Json, JsonObject}
 import org.http4s.circe._
@@ -24,7 +24,7 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers with Te
   val emptyJson: Json = Json.fromJsonObject(JsonObject.empty)
 
   def sessMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
-    SessionAuthMiddleware((_, _) => IO.pure(sess))
+    SessionAuth.middleware((_, _) => IO.pure(sess))
 
   def verifyJsonResponse(
       actual: IO[Response[IO]],

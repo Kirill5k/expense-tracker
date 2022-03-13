@@ -3,7 +3,7 @@ package expensetracker.common.web
 import cats.MonadError
 import cats.syntax.applicativeError.*
 import cats.syntax.apply.*
-import expensetracker.auth.session.SessionAuthMiddleware
+import expensetracker.auth.session.SessionAuth
 import expensetracker.common.JsonCodecs
 import expensetracker.common.errors.AppError
 import io.circe.generic.auto.*

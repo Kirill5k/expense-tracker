@@ -11,7 +11,7 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
-import expensetracker.auth.session.{CreateSession, Session, SessionAuthMiddleware}
+import expensetracker.auth.session.{CreateSession, Session, SessionAuth}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.common.validations.*
@@ -60,7 +60,7 @@ final class AuthController[F[_]: Logger](
           acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
           res   <- Ok(UserView.from(acc))
-        } yield res.addCookie(SessionAuthMiddleware.sessionIdResponseCookie(sid))
+        } yield res.addCookie(SessionAuth.responseCookie(sid))
       }
   }
 
@@ -88,7 +88,7 @@ final class AuthController[F[_]: Logger](
             time <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
             sid  <- service.createSession(CreateSession(id, authedReq.req.from, time))
             res  <- NoContent()
-          } yield res.addCookie(SessionAuthMiddleware.sessionIdResponseCookie(sid))
+          } yield res.addCookie(SessionAuth.responseCookie(sid))
         }
       case POST -> Root / "logout" as session =>
         withErrorHandling {
