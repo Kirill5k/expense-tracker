@@ -12,6 +12,8 @@ import org.http4s.dsl.Http4sDsl
 import org.http4s.*
 import org.http4s.headers.`WWW-Authenticate`
 import org.typelevel.log4cats.Logger
+import sttp.model.StatusCode
+
 final case class ErrorResponse(message: String)
 
 trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
@@ -23,34 +25,41 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
 
   private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
 
+  private def mapError(error: Throwable): (ErrorResponse, StatusCode) =
+    error match {
+      case err: AppError.Conflict =>
+        (ErrorResponse(err.getMessage), StatusCode.Conflict)
+      case err: AppError.BadReq =>
+        (ErrorResponse(err.getMessage), StatusCode.BadRequest)
+      case err: AppError.NotFound =>
+        (ErrorResponse(err.getMessage), StatusCode.NotFound)
+      case err: AppError.Forbidden =>
+        (ErrorResponse(err.getMessage), StatusCode.Forbidden)
+      case err: AppError.Unauth =>
+        (ErrorResponse(err.getMessage), StatusCode.Unauthorized)
+      case err: InvalidMessageBodyFailure =>
+        (ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.message)), StatusCode.UnprocessableEntity)
+      case err =>
+        (ErrorResponse(err.getMessage), StatusCode.InternalServerError)
+    }
+
   protected def withErrorHandling(
       response: => F[Response[F]]
   )(using
       F: MonadError[F, Throwable],
       logger: Logger[F]
   ): F[Response[F]] =
-    response.handleErrorWith {
-      case err: AppError.Conflict =>
-        logger.error(err.getMessage) *>
-          Conflict(ErrorResponse(err.getMessage))
-      case err: AppError.BadReq =>
-        logger.error(err.getMessage) *>
-          BadRequest(ErrorResponse(err.getMessage))
-      case err: AppError.NotFound =>
-        logger.error(err.getMessage) *>
-          NotFound(ErrorResponse(err.getMessage))
-      case err: AppError.Forbidden =>
-        logger.error(err.getMessage) *>
-          Forbidden(ErrorResponse(err.getMessage))
-      case err: AppError.Unauth =>
-        logger.error(err.getMessage) *>
-          Unauthorized(WWWAuthHeader, ErrorResponse(err.getMessage))
-      case err: InvalidMessageBodyFailure =>
-        logger.error(err.getCause())(err.getMessage()) *>
-          UnprocessableEntity(ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.message)))
-      case err =>
-        logger.error(err)(s"unexpected error: ${err.getMessage}") *>
-          InternalServerError(ErrorResponse(err.getMessage))
+    response.handleErrorWith { error =>
+      val (errorResponse, statusCode) = mapError(error)
+      logger.error(errorResponse.message) *> (statusCode match {
+        case StatusCode.Conflict            => Conflict(errorResponse)
+        case StatusCode.BadRequest          => BadRequest(errorResponse)
+        case StatusCode.NotFound            => NotFound(errorResponse)
+        case StatusCode.Forbidden           => Forbidden(errorResponse)
+        case StatusCode.Unauthorized        => Unauthorized(WWWAuthHeader, errorResponse)
+        case StatusCode.UnprocessableEntity => UnprocessableEntity(errorResponse)
+        case _                              => InternalServerError(errorResponse)
+      })
     }
 
   private def formatValidationError(cause: Throwable): Option[String] =
