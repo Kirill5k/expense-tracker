@@ -1,17 +1,20 @@
 package expensetracker.category
 
-import expensetracker.common.types.IdType
+import expensetracker.common.types.{IdType, StringType}
 import expensetracker.auth.user.UserId
 import io.circe.{Decoder, Encoder}
 
 opaque type CategoryId = String
 object CategoryId extends IdType[CategoryId]
 
-final case class CategoryName(value: String)  extends AnyVal
-final case class CategoryIcon(value: String)  extends AnyVal
-final case class CategoryColor(value: String) extends AnyVal
+opaque type CategoryName = String
+object CategoryName extends StringType[CategoryName]
 
-object CategoryColor {
+opaque type CategoryIcon = String
+object CategoryIcon extends StringType[CategoryIcon]
+
+opaque type CategoryColor = String
+object CategoryColor extends StringType[CategoryColor] {
   val Cyan       = CategoryColor("#84FFFF")
   val LightBlue  = CategoryColor("#00B0FF")
   val Blue       = CategoryColor("#2962FF")
