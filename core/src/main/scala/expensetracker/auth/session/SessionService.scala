@@ -27,7 +27,7 @@ final private class LiveSessionService[F[_]](
     repository.invalidatedAll(uid)
 }
 
-object SessionService {
+object SessionService:
   def make[F[_]: Monad](repo: SessionRepository[F]): F[SessionService[F]] =
-    Monad[F].pure(new LiveSessionService[F](repo))
-}
+    Monad[F].pure(LiveSessionService[F](repo))
+

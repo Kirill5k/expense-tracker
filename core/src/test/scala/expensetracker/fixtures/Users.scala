@@ -1,6 +1,6 @@
 package expensetracker.fixtures
 
-import expensetracker.auth.user.{PasswordHash, UserDetails, UserEmail, UserId, UserName}
+import expensetracker.auth.user.*
 import mongo4cats.bson.ObjectId
 
 import java.time.Instant
@@ -12,5 +12,7 @@ object Users {
 
   lazy val regDate = Instant.now.`with`(ChronoField.MILLI_OF_SECOND, 0)
   lazy val hash    = PasswordHash("hash")
-  lazy val details = UserDetails(UserEmail("acc1@et.com"), UserName("John", "Bloggs"))
+  lazy val email   = UserEmail("acc1@et.com")
+  lazy val details = UserDetails(email, UserName("John", "Bloggs"))
+  lazy val user    = User(uid1, details.email, details.name, hash, UserSettings.Default, regDate)
 }

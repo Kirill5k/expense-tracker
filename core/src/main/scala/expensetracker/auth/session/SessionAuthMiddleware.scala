@@ -9,13 +9,14 @@ import cats.syntax.functor.*
 import io.circe.generic.auto.*
 import expensetracker.common.web.{Controller, ErrorResponse}
 import org.bson.types.ObjectId
-import org.http4s.{AuthedRoutes, Request}
+import org.http4s.{AuthedRoutes, HttpDate, Request, ResponseCookie}
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.server.AuthMiddleware
 
 import java.time.Instant
 
 object SessionAuthMiddleware {
+  val SessionIdCookie = "session-id"
 
   def apply[F[_]](
       obtainSession: (SessionId, Option[SessionActivity]) => F[Option[Session]]
@@ -29,10 +30,12 @@ object SessionAuthMiddleware {
 
     val getValidSession: Kleisli[F, Request[F], Either[String, Session]] =
       Kleisli { req =>
-        getSessionIdCookie(req)
+        req
+          .cookies
+          .find(_.name == SessionIdCookie)
           .toRight("missing session-id cookie")
           .map(_.content)
-          .flatMap(sid => if (ObjectId.isValid(sid)) Right(SessionId(sid)) else Left("invalid session-id format"))
+          .flatMap(sid => Either.cond(ObjectId.isValid(sid),  SessionId(sid), "invalid session-id format"))
           .fold(
             _.asLeft[Session].pure[F],
             sid =>
@@ -50,4 +53,14 @@ object SessionAuthMiddleware {
 
     AuthMiddleware(getValidSession, onFailure)
   }
+
+  def sessionIdResponseCookie(sid: SessionId): ResponseCookie =
+    ResponseCookie(
+      SessionIdCookie,
+      sid.value,
+      httpOnly = true,
+      maxAge = Some(Long.MaxValue),
+      expires = Some(HttpDate.MaxValue),
+      path = Some("/")
+    )
 }

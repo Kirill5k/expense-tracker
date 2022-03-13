@@ -59,8 +59,6 @@ final private class LiveUserService[F[_]](
 
 }
 
-object UserService {
+object UserService:
   def make[F[_]](repo: UserRepository[F], encr: PasswordEncryptor[F])(using F: MonadError[F, Throwable]): F[UserService[F]] =
-    F.pure(new LiveUserService[F](repo, encr))
-
-}
+    F.pure(LiveUserService[F](repo, encr))

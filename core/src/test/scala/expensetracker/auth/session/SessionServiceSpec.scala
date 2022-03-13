@@ -5,6 +5,7 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
+import expensetracker.fixtures.{Sessions, Users}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 
@@ -16,61 +17,60 @@ class SessionServiceSpec extends CatsSpec {
 
     "create new session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.create(any[CreateSession])).thenReturn(IO.pure(sid))
+      when(repo.create(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
 
-      val create = CreateSession(uid, None, Instant.now())
       val result = for {
         svc <- SessionService.make(repo)
-        sid <- svc.create(create)
+        sid <- svc.create(Sessions.create())
       } yield sid
 
       result.unsafeToFuture().map { res =>
-        verify(repo).create(create)
-        res mustBe sid
+        verify(repo).create(Sessions.create())
+        res mustBe Sessions.sid
       }
     }
 
     "return existing session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.find(any[String].asInstanceOf[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(sess)))
+      when(repo.find(any[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(Sessions.sess)))
 
       val result = for {
         svc  <- SessionService.make(repo)
-        sess <- svc.find(sid, sa)
+        sess <- svc.find(Sessions.sid, Some(Sessions.sa))
       } yield sess
 
       result.unsafeToFuture().map { res =>
-        verify(repo).find(sid, sa)
-        res mustBe Some(sess)
+        verify(repo).find(Sessions.sid, Some(Sessions.sa))
+        res mustBe Some(Sessions.sess)
       }
     }
 
     "unauth session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.unauth(sid)).thenReturn(IO.unit)
+      when(repo.unauth(Sessions.sid)).thenReturn(IO.unit)
 
       val result = for {
         svc <- SessionService.make(repo)
-        res <- svc.unauth(sid)
+        res <- svc.unauth(Sessions.sid)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).unauth(sid)
+        verify(repo).unauth(Sessions.sid)
         res mustBe ()
       }
     }
 
     "invalidate all sessions" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.invalidatedAll(any[String].asInstanceOf[UserId])).thenReturn(IO.unit)
+      when(repo.invalidatedAll(any[UserId])).thenReturn(IO.unit)
 
       val result = for {
         svc <- SessionService.make(repo)
-        res <- svc.invalidateAll(uid)
+        res <- svc.invalidateAll(Users.uid1)
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(repo).invalidatedAll(uid)
+        verify(repo).invalidatedAll(Users.uid1)
         res mustBe ()
       }
     }
