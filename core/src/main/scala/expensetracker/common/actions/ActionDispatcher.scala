@@ -21,7 +21,6 @@ final private class LiveActionDispatcher[F[_]: Functor](
     Stream.fromQueueUnterminated(actions)
 }
 
-object ActionDispatcher {
+object ActionDispatcher:
   def make[F[_]: Concurrent]: F[ActionDispatcher[F]] =
-    Queue.unbounded[F, Action].map(q => new LiveActionDispatcher[F](q))
-}
+    Queue.unbounded[F, Action].map(q => LiveActionDispatcher[F](q))

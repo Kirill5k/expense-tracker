@@ -21,7 +21,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.findUser(any[String].asInstanceOf[UserId])).thenReturn(IO.pure(user))
+        when(svc.findUser(any[UserId])).thenReturn(IO.pure(user))
 
         val req = Request[IO](uri = uri"/auth/user", method = Method.GET).addCookie(sessIdCookie)
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(Some(sess))).orNotFound.run(req))
@@ -66,7 +66,7 @@ class AuthControllerSpec extends ControllerSpec {
         val svc  = mock[AuthService[IO]]
         val disp = mock[ActionDispatcher[IO]]
 
-        when(svc.updateSettings(any[String].asInstanceOf[UserId], any[UserSettings])).thenReturn(IO.unit)
+        when(svc.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
 
         val reqBody =
           """{

@@ -3,9 +3,9 @@ package expensetracker
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.auth.session.{Session, SessionAuth}
-import io.circe.parser._
+import io.circe.parser.*
 import io.circe.{Json, JsonObject}
-import org.http4s.circe._
+import org.http4s.circe.*
 import org.http4s.server.AuthMiddleware
 import org.http4s.{Response, ResponseCookie, Status}
 import org.scalatest.Assertion
@@ -27,23 +27,31 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers with Te
     SessionAuth.middleware((_, _) => IO.pure(sess))
 
   def verifyJsonResponse(
-      actual: IO[Response[IO]],
+      response: IO[Response[IO]],
       expectedStatus: Status,
       expectedBody: Option[String] = None,
       expectedCookies: List[ResponseCookie] = Nil
-  ): Assertion = {
-    val actualResp = actual.unsafeRunSync()
-
-    actualResp.status must be(expectedStatus)
-    actualResp.cookies must contain allElementsOf expectedCookies
-    expectedBody match {
-      case Some(expected) =>
-        val actual = actualResp.asJson.unsafeRunSync()
-        actual mustBe parse(expected).getOrElse(throw new RuntimeException)
-      case None =>
-        actualResp.body.compile.toVector.unsafeRunSync() mustBe empty
-    }
-  }
+  ): Assertion =
+    response
+      .flatTap { res =>
+        IO {
+          res.status mustBe expectedStatus
+          res.cookies must contain allElementsOf expectedCookies
+        }
+      }
+      .flatMap { res =>
+        expectedBody match {
+          case Some(expectedJson) =>
+            res.as[String].map { receivedJson =>
+              parse(receivedJson) mustBe parse(expectedJson)
+            }
+          case None =>
+            res.body.compile.toVector.map { receivedJson =>
+              receivedJson mustBe empty
+            }
+        }
+      }
+      .unsafeRunSync()
 
   def readFileFromResources(path: String): String =
     Source.fromResource(path).getLines().toList.mkString

@@ -7,7 +7,7 @@ import cats.syntax.either.*
 import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import io.circe.generic.auto.*
-import expensetracker.common.web.{ErrorResponse}
+import expensetracker.common.web.ErrorResponse
 import org.bson.types.ObjectId
 import org.http4s.{AuthedRoutes, HttpDate, Request, ResponseCookie}
 import org.http4s.circe.CirceEntityCodec.*
