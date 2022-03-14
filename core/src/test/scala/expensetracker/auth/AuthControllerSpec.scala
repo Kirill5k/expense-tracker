@@ -246,15 +246,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
-        val resBody =
-          s"""{
-             |"id":"${Users.uid1}",
-             |"email":"${Users.email}",
-             |"firstName":"${Users.details.name.first}",
-             |"lastName":"${Users.details.name.last}",
-             |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
-             |"registrationDate": "${Users.regDate}"
-             |}""".stripMargin
+        val resBody = s"""{"token":"${Sessions.sid}"}""".stripMargin
         val sessCookie = ResponseCookie(
           "session-id",
           Sessions.sid.value,

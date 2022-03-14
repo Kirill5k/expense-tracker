@@ -59,7 +59,7 @@ final class AuthController[F[_]: Logger](
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
           acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
-          res   <- Ok(UserView.from(acc))
+          res   <- Ok(LoginResponse(sid.value))
         } yield res.addCookie(SessionAuth.responseCookie(sid))
       }
   }
@@ -126,6 +126,10 @@ object AuthController {
     def userEmail    = UserEmail.from(email)
     def userPassword = Password(password.value)
   }
+
+  final case class LoginResponse(
+      token: String
+  )
 
   final case class UserView(
       id: String,
