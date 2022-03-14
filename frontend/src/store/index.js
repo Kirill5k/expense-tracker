@@ -88,6 +88,9 @@ export default new Vuex.Store({
     setOnline (state, isOnline) {
       state.isOnline = isOnline
     },
+    setToken (state, token) {
+      state.token = token
+    },
     sort (state, { field, desc, index }) {
       state.transactions = state.transactions.sort(txSorts[field](desc))
       state.sortBy = { field, desc, index }
@@ -185,7 +188,7 @@ export default new Vuex.Store({
       commit('loading')
       return Clients.get(state.isOnline)
         .login(requestBody)
-        .then(sid => console.log(sid.token))
+        .then(sid => commit('setToken', sid.token))
         .then(() => dispatch('getUser'))
         .catch(e => {
           commit('loaded')
