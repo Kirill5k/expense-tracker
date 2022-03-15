@@ -87,6 +87,7 @@ export default {
     Page
   },
   mounted () {
+    console.log(this.$store.state.token)
     this.setTheme(this.darkMode)
     if (!this.userId) {
       this.$store.commit('loading')

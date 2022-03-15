@@ -19,8 +19,8 @@ object SessionStatus {
   def from(value: String): Either[String, SessionStatus] =
     SessionStatus.values.find(_.value == value).toRight(s"Unexpected session status $value")
 
-  given decodeSessionStatus: Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
-  given encodeSessionStatus: Encoder[SessionStatus] = Encoder[String].contramap(_.value)
+  given Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
+  given Encoder[SessionStatus] = Encoder[String].contramap(_.value)
 }
 
 final case class SessionActivity(
