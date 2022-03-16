@@ -14,6 +14,7 @@ import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, Us
 import expensetracker.auth.session.{CreateSession, Session, SessionAuth}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
+import expensetracker.common.jwt.{JwtEncoder, JwtToken}
 import expensetracker.common.validations.*
 import expensetracker.common.web.Controller
 import io.circe.generic.auto.*
@@ -29,7 +30,8 @@ import java.time.Instant
 
 final class AuthController[F[_]: Logger](
     private val service: AuthService[F],
-    private val dispatcher: ActionDispatcher[F]
+    private val dispatcher: ActionDispatcher[F],
+    private val jwtEncoder: JwtEncoder[F]
 )(using
     F: Temporal[F]
 ) extends Controller[F] {
@@ -59,7 +61,8 @@ final class AuthController[F[_]: Logger](
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
           acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
-          res   <- Ok(LoginResponse(sid.value))
+          token <- jwtEncoder.encode(JwtToken(sid.value, acc.id.value))
+          res   <- Ok(LoginResponse(token, "Bearer"))
         } yield res.addCookie(SessionAuth.responseCookie(sid))
       }
   }
@@ -82,12 +85,13 @@ final class AuthController[F[_]: Logger](
       case authedReq @ POST -> Root / "user" / UserIdPath(id) / "password" as session =>
         withErrorHandling {
           for {
-            _    <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
-            req  <- authedReq.req.as[ChangePasswordRequest]
-            _    <- service.changePassword(req.toDomain(id))
-            time <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
-            sid  <- service.createSession(CreateSession(id, authedReq.req.from, time))
-            res  <- NoContent()
+            _     <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
+            req   <- authedReq.req.as[ChangePasswordRequest]
+            _     <- service.changePassword(req.toDomain(id))
+            time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
+            sid   <- service.createSession(CreateSession(id, authedReq.req.from, time))
+            token <- jwtEncoder.encode(JwtToken(sid.value, id.value))
+            res   <- Ok(LoginResponse(token, "Bearer"))
           } yield res.addCookie(SessionAuth.responseCookie(sid))
         }
       case POST -> Root / "logout" as session =>
@@ -128,7 +132,8 @@ object AuthController {
   }
 
   final case class LoginResponse(
-      token: String
+      access_token: String,
+      token_type: String
   )
 
   final case class UserView(
@@ -173,6 +178,10 @@ object AuthController {
       ChangePassword(id, Password(currentPassword.value), Password(newPassword.value))
   }
 
-  def make[F[_]: Temporal: Logger](service: AuthService[F], dispatcher: ActionDispatcher[F]): F[AuthController[F]] =
-    Monad[F].pure(AuthController[F](service, dispatcher))
+  def make[F[_]: Temporal: Logger](
+      service: AuthService[F],
+      dispatcher: ActionDispatcher[F],
+      jwtEncoder: JwtEncoder[F]
+  ): F[AuthController[F]] =
+    Monad[F].pure(AuthController[F](service, dispatcher, jwtEncoder))
 }

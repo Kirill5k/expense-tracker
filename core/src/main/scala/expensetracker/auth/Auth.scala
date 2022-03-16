@@ -10,6 +10,7 @@ import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.{Session, SessionAuth, SessionService}
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
+import expensetracker.common.jwt.JwtEncoder
 import org.http4s.HttpRoutes
 import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
@@ -32,6 +33,7 @@ object Auth {
       encr     <- PasswordEncryptor.make[F](config)
       accSvc   <- UserService.make[F](accRepo, encr)
       authSvc  <- AuthService.make[F](accSvc, sessSvc)
-      authCtrl <- AuthController.make[F](authSvc, dispatcher)
+      jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)
+      authCtrl <- AuthController.make[F](authSvc, dispatcher, jwtEnc)
     } yield new Auth[F](authSvc, authCtrl)
 }

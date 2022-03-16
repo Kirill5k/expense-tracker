@@ -188,7 +188,7 @@ export default new Vuex.Store({
       commit('loading')
       return Clients.get(state.isOnline)
         .login(requestBody)
-        .then(sid => commit('setToken', sid.token))
+        .then(res => commit('setToken', res.access_token))
         .then(() => dispatch('getUser'))
         .catch(e => {
           commit('loaded')
@@ -210,6 +210,7 @@ export default new Vuex.Store({
     changeUserPassword ({ commit, state }, requestBody) {
       return Clients.get(state.isOnline)
         .changeUserPassword(state.user.id, requestBody)
+        .then(res => commit('setToken', res.access_token))
         .then(() => commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS))
         .catch(e => handleError(commit, e))
     },
