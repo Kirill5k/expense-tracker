@@ -4,6 +4,8 @@ import cats.effect.Sync
 import cats.syntax.either.*
 import io.circe.*
 import io.circe.syntax.*
+import expensetracker.auth.session.SessionId
+import expensetracker.auth.user.UserId
 import expensetracker.common.config.JwtConfig
 import expensetracker.common.errors.AppError
 import pdi.jwt.algorithms.{JwtAsymmetricAlgorithm, JwtHmacAlgorithm}
@@ -13,7 +15,7 @@ import scala.util.Failure
 
 object jwt {
 
-  final case class JwtToken(sessionId: String, userId: String) derives Codec.AsObject
+  final case class JwtToken(sessionId: SessionId, userId: UserId) derives Codec.AsObject
 
   trait JwtEncoder[F[_]]:
     def encode(token: JwtToken): F[String]

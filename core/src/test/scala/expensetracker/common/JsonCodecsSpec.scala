@@ -1,5 +1,6 @@
 package expensetracker.common
 
+import expensetracker.auth.session.SessionId
 import io.circe.parser.*
 import io.circe.syntax.*
 import org.scalatest.wordspec.AnyWordSpec
@@ -18,6 +19,16 @@ class JsonCodecsSpec extends AnyWordSpec with Matchers with JsonCodecs {
 
     "convert money to json" in {
       GBP(BigDecimal(1)).asJson.noSpaces mustBe """{"value":1.00,"currency":{"code":"GBP","symbol":"£"}}"""
+    }
+  }
+
+  "Id codec" should {
+    "decode and encode ids" in {
+      val id = SessionId("FOO")
+      val json = id.asJson.noSpaces
+
+      json mustBe """"FOO""""
+      decode[SessionId](json) mustBe Right(id)
     }
   }
 }

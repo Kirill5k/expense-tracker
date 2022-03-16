@@ -3,7 +3,7 @@ package expensetracker.common
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.session.{Session, SessionId, SessionStatus}
+import expensetracker.auth.session.SessionId
 import expensetracker.auth.user.UserId
 import expensetracker.common.config.JwtConfig
 import expensetracker.common.errors.AppError
@@ -15,7 +15,7 @@ import java.time.Instant
 class JwtEncoderSpec extends CatsSpec with JsonCodecs {
 
   val config  = JwtConfig("HS256", "secret-key")
-  val session = JwtToken("s1", "u1")
+  val session = JwtToken(SessionId("s1"), UserId("u1"))
   val jwtToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJzMSIsInVzZXJJZCI6InUxIn0.6mnaHsD11IgZqficW13C9GVOxc9U7ureb8V42EJqlIU"
 
   "A CirceJwtEncoder" should {

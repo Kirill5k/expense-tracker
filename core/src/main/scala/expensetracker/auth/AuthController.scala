@@ -61,7 +61,7 @@ final class AuthController[F[_]: Logger](
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
           acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
-          token <- jwtEncoder.encode(JwtToken(sid.value, acc.id.value))
+          token <- jwtEncoder.encode(JwtToken(sid, acc.id))
           res   <- Ok(LoginResponse(token, "Bearer"))
         } yield res.addCookie(SessionAuth.responseCookie(sid))
       }
@@ -90,7 +90,7 @@ final class AuthController[F[_]: Logger](
             _     <- service.changePassword(req.toDomain(id))
             time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
             sid   <- service.createSession(CreateSession(id, authedReq.req.from, time))
-            token <- jwtEncoder.encode(JwtToken(sid.value, id.value))
+            token <- jwtEncoder.encode(JwtToken(sid, id))
             res   <- Ok(LoginResponse(token, "Bearer"))
           } yield res.addCookie(SessionAuth.responseCookie(sid))
         }

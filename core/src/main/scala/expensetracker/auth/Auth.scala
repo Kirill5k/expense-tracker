@@ -35,5 +35,5 @@ object Auth {
       authSvc  <- AuthService.make[F](accSvc, sessSvc)
       jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)
       authCtrl <- AuthController.make[F](authSvc, dispatcher, jwtEnc)
-    } yield new Auth[F](authSvc, authCtrl)
+    } yield Auth[F](authSvc, authCtrl)
 }
