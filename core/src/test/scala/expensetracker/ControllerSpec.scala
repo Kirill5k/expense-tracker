@@ -3,6 +3,7 @@ package expensetracker
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.auth.session.{Session, SessionAuth}
+import expensetracker.fixtures.Sessions
 import io.circe.parser.*
 import io.circe.{Json, JsonObject}
 import org.http4s.circe.*
@@ -17,9 +18,9 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.io.Source
 
-trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers with TestData {
+trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
 
-  val sessIdCookie = RequestCookie("session-id", sid.value)
+  val sessIdCookie = RequestCookie("session-id", Sessions.sid.value)
 
   given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
