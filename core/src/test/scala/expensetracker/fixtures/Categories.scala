@@ -5,21 +5,22 @@ import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryI
 import mongo4cats.bson.ObjectId
 
 object Categories {
-  lazy val catid1 = CategoryId(ObjectId().toHexString)
-  lazy val catid2 = CategoryId(ObjectId().toHexString)
+  lazy val cid: CategoryId     = CategoryId(ObjectId().toHexString)
+  lazy val cname: CategoryName = CategoryName("cat-1")
+  lazy val cid2: CategoryId    = CategoryId(ObjectId().toHexString)
 
   def cat(
-      id: CategoryId = catid1,
-      kind: CategoryKind = CategoryKind.Income,
-      name: CategoryName = CategoryName("c2i"),
+      id: CategoryId = cid,
+      kind: CategoryKind = CategoryKind.Expense,
+      name: CategoryName = cname,
       icon: CategoryIcon = CategoryIcon("icon"),
       color: CategoryColor = CategoryColor.Blue,
       uid: Option[UserId] = Some(Users.uid1)
   ): Category = Category(id, kind, name, icon, color, uid)
 
   def create(
-      kind: CategoryKind = CategoryKind.Income,
-      name: CategoryName = CategoryName("c2i"),
+      kind: CategoryKind = CategoryKind.Expense,
+      name: CategoryName = cname,
       icon: CategoryIcon = CategoryIcon("icon"),
       color: CategoryColor = CategoryColor.Blue,
       uid: UserId = Users.uid1

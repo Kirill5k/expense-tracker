@@ -134,7 +134,7 @@ class AuthControllerSpec extends ControllerSpec {
         verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""), List(sessCookie))
         verify(svc).changePassword(ChangePassword(Users.uid1, Password("curr-pwd"), Password("new-pwd")))
         verify(svc).createSession(any[CreateSession])
-        verify(jwtEnc).encode(JwtToken(Sessions.sid2.value, Users.uid1.value))
+        verify(jwtEnc).encode(JwtToken(Sessions.sid2, Users.uid1))
         verifyNoInteractions(disp)
       }
     }
@@ -273,7 +273,7 @@ class AuthControllerSpec extends ControllerSpec {
         verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""), List(sessCookie))
         verify(svc).login(UserEmail("foo@bar.com"), Password("bar"))
         verify(svc).createSession(any[CreateSession])
-        verify(jwtEnc).encode(JwtToken(Sessions.sid.value, Users.uid1.value))
+        verify(jwtEnc).encode(JwtToken(Sessions.sid, Users.uid1))
         verifyNoInteractions(disp)
       }
     }

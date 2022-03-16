@@ -14,23 +14,23 @@ object Transactions {
   lazy val txid: TransactionId = TransactionId(ObjectId().toHexString)
 
   def tx(
-      id: TransactionId = txid,
-      uid: UserId = Users.uid1,
-      kind: TransactionKind = TransactionKind.Expense,
-      catid: CategoryId = Categories.catid1,
-      amount: Money = GBP(15.0),
-      date: LocalDate = LocalDate.now(),
-      note: Option[String] = None,
-      tags: Set[String] = Set.empty
+          id: TransactionId = txid,
+          uid: UserId = Users.uid1,
+          kind: TransactionKind = TransactionKind.Expense,
+          catid: CategoryId = Categories.cid,
+          amount: Money = GBP(15.0),
+          date: LocalDate = LocalDate.now(),
+          note: Option[String] = None,
+          tags: Set[String] = Set.empty
   ): Transaction = Transaction(id, uid, kind, catid, amount, date, note, tags)
 
   def create(
-      uid: UserId = Users.uid1,
-      kind: TransactionKind = TransactionKind.Expense,
-      catid: CategoryId = Categories.catid1,
-      amount: Money = GBP(15.0),
-      date: LocalDate = LocalDate.now(),
-      note: Option[String] = None,
-      tags: Set[String] = Set.empty
+              uid: UserId = Users.uid1,
+              kind: TransactionKind = TransactionKind.Expense,
+              catid: CategoryId = Categories.cid,
+              amount: Money = GBP(15.0),
+              date: LocalDate = LocalDate.now(),
+              note: Option[String] = None,
+              tags: Set[String] = Set.empty
   ): CreateTransaction = CreateTransaction(uid, kind, catid, amount, date, note, tags)
 }

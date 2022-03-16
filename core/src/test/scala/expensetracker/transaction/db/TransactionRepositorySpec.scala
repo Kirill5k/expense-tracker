@@ -46,7 +46,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
         val result = for {
           repo <- TransactionRepository.make(client)
           _    <- repo.create(Transactions.create())
-          _    <- repo.create(Transactions.create(catid = Categories.catid2, kind = TransactionKind.Income, amount = GBP(45.0)))
+          _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
           txs  <- repo.getAll(Users.uid1)
         } yield txs
 
@@ -54,7 +54,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           txs must have size 2
           txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
-          txs.map(_.categoryId) mustBe List(Categories.catid1, Categories.catid2)
+          txs.map(_.categoryId) mustBe List(Categories.cid, Categories.cid2)
         }
       }
     }
@@ -92,7 +92,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
         val result = for {
           repo <- TransactionRepository.make(client)
           _    <- repo.create(Transactions.create())
-          _    <- repo.create(Transactions.create(catid = Categories.catid2, amount = GBP(45.0)))
+          _    <- repo.create(Transactions.create(catid = Categories.cid2, amount = GBP(45.0)))
           txs  <- repo.getAll(Users.uid2)
         } yield txs
 
@@ -235,7 +235,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           for {
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
-            _    <- categories.insertMany(List(categoryDoc(Categories.catid1, "category-1"), categoryDoc(Categories.catid2, "category-2")))
+            _    <- categories.insertMany(List(categoryDoc(Categories.cid, "category-1"), categoryDoc(Categories.cid2, "category-2")))
             accs <- db.getCollection("accounts")
             _    <- accs.insertMany(List(accDoc(Users.uid1, UserEmail("acc-1")), accDoc(Users.uid2, UserEmail("acc-2"))))
             res  <- test(db)
