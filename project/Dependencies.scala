@@ -12,14 +12,16 @@ object Dependencies {
     val bcrypt     = "4.3.0"
     val refined    = "0.9.28"
     val tapir      = "1.0.0-M1"
+    val jwt        = "9.0.4"
 
     val scalaTest = "3.2.11"
     val mockito   = "3.2.10.0"
   }
 
   object Libraries {
-    val squants = "org.typelevel"     %% "squants"      % Versions.squants
-    val bcrypt  = "com.github.t3hnar" %% "scala-bcrypt" % Versions.bcrypt
+    val squants = "org.typelevel"        %% "squants"      % Versions.squants
+    val bcrypt  = "com.github.t3hnar"    %% "scala-bcrypt" % Versions.bcrypt
+    val jwt     = "com.github.jwt-scala" %% "jwt-circe"    % Versions.jwt
 
     object mongo4cats {
       val core     = "io.github.kirill5k" %% "mongo4cats-core"     % Versions.mongo4cats
@@ -76,6 +78,7 @@ object Dependencies {
     Libraries.mongo4cats.circe,
     Libraries.pureconfig.core,
     Libraries.squants,
+    Libraries.jwt,
     Libraries.bcrypt.cross(CrossVersion.for3Use2_13)
   ) ++
     Libraries.circe.all ++

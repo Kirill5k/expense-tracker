@@ -7,8 +7,14 @@ import pureconfig.generic.derivation.default.*
 
 object config {
 
+  final case class JwtConfig(
+      alg: String,
+      secret: String
+  ) derives ConfigReader
+
   final case class AuthConfig(
-      passwordSalt: String
+      passwordSalt: String,
+      jwt: JwtConfig
   ) derives ConfigReader
 
   final case class MongoConfig(
