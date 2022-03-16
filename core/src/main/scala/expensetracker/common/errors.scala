@@ -3,12 +3,12 @@ package expensetracker.common
 import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.{CategoryId, CategoryName}
 import expensetracker.transaction.TransactionId
+import pdi.jwt.JwtAlgorithm
 
 object errors {
 
   sealed trait AppError extends Throwable {
     def message: String
-
     override def getMessage: String = message
   }
 
@@ -19,40 +19,36 @@ object errors {
     sealed trait BadReq    extends AppError
     sealed trait Forbidden extends AppError
 
-    final case class AccountAlreadyExists(email: UserEmail) extends Conflict {
-      override def message: String = s"An account with email ${email.value} already exists"
-    }
+    final case class AccountAlreadyExists(email: UserEmail) extends Conflict:
+      override val message: String = s"An account with email $email already exists"
 
-    final case class AccountDoesNotExist(id: UserId) extends NotFound {
-      override def message: String = s"Account with id ${id.value} does not exist"
-    }
+    final case class AccountDoesNotExist(id: UserId) extends NotFound:
+      override val message: String = s"Account with id $id does not exist"
 
-    case object InvalidEmailOrPassword extends Unauth {
-      override def message: String = "Invalid email or password"
-    }
+    case object InvalidEmailOrPassword extends Unauth:
+      override val message: String = "Invalid email or password"
 
-    case object InvalidPassword extends Unauth {
-      override def message: String = "Entered password appears to be incorrect"
-    }
+    case object InvalidPassword extends Unauth:
+      override val message: String = "Entered password appears to be incorrect"
 
-    case object SomeoneElsesSession extends Forbidden {
-      override def message: String = "The current session belongs to a different user"
-    }
+    case object SomeoneElsesSession extends Forbidden:
+      override val message: String = "The current session belongs to a different user"
 
-    case object IdMismatch extends BadReq {
-      override def message: String = "The id supplied in the path does not match with the id in the request body"
-    }
+    case object IdMismatch extends BadReq:
+      override val message: String = "The id supplied in the path does not match with the id in the request body"
 
-    final case class CategoryDoesNotExist(id: CategoryId) extends NotFound {
-      override def message: String = s"Category with id ${id.value} does not exist"
-    }
+    final case class CategoryDoesNotExist(id: CategoryId) extends NotFound:
+      override val message: String = s"Category with id $id does not exist"
 
-    final case class CategoryAlreadyExists(name: CategoryName) extends Conflict {
-      override def message: String = s"A category with name ${name.value} already exists"
-    }
+    final case class CategoryAlreadyExists(name: CategoryName) extends Conflict:
+      override val message: String = s"A category with name $name already exists"
 
-    final case class TransactionDoesNotExist(id: TransactionId) extends NotFound {
-      override def message: String = s"Transaction with id ${id.value} does not exist"
-    }
+    final case class TransactionDoesNotExist(id: TransactionId) extends NotFound:
+      override val message: String = s"Transaction with id $id does not exist"
+
+    final case class InvalidJwtEncryptionAlgorithm(alg: JwtAlgorithm) extends AppError:
+      override val message = s"unrecognized jwt encryption algorithm $alg"
+
+    final case class InvalidJwtToken(message: String) extends Forbidden
   }
 }
