@@ -91,6 +91,7 @@ export default new Vuex.Store({
     },
     setToken (state, token) {
       state.accessToken = token
+      state.isAuthenticated = true
     },
     sort (state, { field, desc, index }) {
       state.transactions = state.transactions.sort(txSorts[field](desc))
@@ -104,9 +105,6 @@ export default new Vuex.Store({
     },
     clearAlert (state) {
       state.alert = { ...state.alert, show: false }
-    },
-    authenticate (state) {
-      state.isAuthenticated = true
     },
     loading (state) {
       state.isLoading = true
@@ -153,29 +151,27 @@ export default new Vuex.Store({
     logout (state) {
       state.isAuthenticated = false
       state.accessToken = null
-      state.user = {}
-      state.categories = []
       state.transaction = []
+      state.categories = []
+      state.user = {}
       state.displayDate = {}
       state.isLoading = false
     }
   },
   actions: {
-    loadData ({ commit, dispatch }, user) {
+    loadData ({ commit, dispatch }) {
       return Promise.all([dispatch('getCategories'), dispatch('getTransactions')])
-        .then(() => {
-          commit('authenticate')
-          commit('setUser', user)
-        })
         .then(() => commit('loaded'))
         .catch(() => commit('logout'))
     },
     getUser ({ state, commit, dispatch }) {
+      commit('loading')
       return Clients.get(state.isOnline)
         .getUser(state.accessToken)
         .then(acc => {
           if (!state.user.id || acc.id === state.user.id) {
-            return dispatch('loadData', acc)
+            commit('setUser', acc)
+            return dispatch('loadData')
           } else {
             commit('logout')
             commit('setAlert', Alerts.SESSION_EXPIRED)
@@ -187,13 +183,10 @@ export default new Vuex.Store({
         })
     },
     login ({ state, commit, dispatch }, requestBody) {
-      commit('loading')
       return Clients.get(state.isOnline)
         .login(requestBody)
         .then(res => commit('setToken', res.access_token))
-        .then(() => dispatch('getUser'))
         .catch(e => {
-          commit('loaded')
           return handleError(commit, e, true)
         })
     },
@@ -209,10 +202,10 @@ export default new Vuex.Store({
         .then(() => commit('setSettings', requestBody))
         .catch(e => handleError(commit, e))
     },
-    changeUserPassword ({ commit, state }, requestBody) {
+    changeUserPassword ({ commit, state, dispatch }, requestBody) {
       return Clients.get(state.isOnline)
         .changeUserPassword(state.accessToken, state.user.id, requestBody)
-        .then(res => commit('setToken', res.access_token))
+        .then(() => dispatch('login', { email: state.user.email, password: requestBody.newPassword }))
         .then(() => commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS))
         .catch(e => handleError(commit, e))
     },

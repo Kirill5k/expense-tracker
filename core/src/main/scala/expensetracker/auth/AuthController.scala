@@ -85,14 +85,11 @@ final class AuthController[F[_]: Logger](
       case authedReq @ POST -> Root / "user" / UserIdPath(id) / "password" as session =>
         withErrorHandling {
           for {
-            _     <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
-            req   <- authedReq.req.as[ChangePasswordRequest]
-            _     <- service.changePassword(req.toDomain(id))
-            time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
-            sid   <- service.createSession(CreateSession(id, authedReq.req.from, time))
-            token <- jwtEncoder.encode(JwtToken(sid, id))
-            res   <- Ok(LoginResponse.bearer(token))
-          } yield res.addCookie(SessionAuth.responseCookie(sid))
+            _   <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
+            req <- authedReq.req.as[ChangePasswordRequest]
+            _   <- service.changePassword(req.toDomain(id))
+            res <- NoContent()
+          } yield res
         }
       case POST -> Root / "logout" as session =>
         withErrorHandling {
@@ -135,7 +132,7 @@ object AuthController {
       access_token: String,
       token_type: String
   )
-  
+
   object LoginResponse {
     def bearer(bearerToken: BearerToken): LoginResponse =
       LoginResponse(access_token = bearerToken.value, token_type = "Bearer")

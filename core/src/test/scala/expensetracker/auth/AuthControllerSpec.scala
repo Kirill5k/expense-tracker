@@ -117,25 +117,14 @@ class AuthControllerSpec extends ControllerSpec {
         when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(Sessions.sid2))
         when(jwtEnc.encode(any[JwtToken])).thenReturn(IO.pure("token"))
 
-        val reqBody = """{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
         val req = Request[IO](uri = Uri.unsafeFromString(s"/auth/user/${Users.uid1}/password"), method = Method.POST)
-          .withEntity(parseJson(reqBody))
+          .withEntity(parseJson("""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""))
           .addCookie(sessIdCookie)
         val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
 
-        val sessCookie = ResponseCookie(
-          "session-id",
-          Sessions.sid2.value,
-          httpOnly = true,
-          maxAge = Some(Long.MaxValue),
-          expires = Some(HttpDate.MaxValue),
-          path = Some("/")
-        )
-        verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""), List(sessCookie))
+        verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).changePassword(ChangePassword(Users.uid1, Password("curr-pwd"), Password("new-pwd")))
-        verify(svc).createSession(any[CreateSession])
-        verify(jwtEnc).encode(JwtToken(Sessions.sid2, Users.uid1))
-        verifyNoInteractions(disp)
+        verifyNoInteractions(disp, jwtEnc)
       }
     }
 
