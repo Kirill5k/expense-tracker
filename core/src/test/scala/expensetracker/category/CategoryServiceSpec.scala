@@ -59,7 +59,7 @@ class CategoryServiceSpec extends CatsSpec {
 
     "create new category in db" in {
       val repo = mock[CategoryRepository[IO]]
-      when(repo.create(any[CreateCategory])).thenReturn(IO.pure(Categories.cat()))
+      when(repo.create(any[CreateCategory])).thenReturn(IO.pure(Categories.cid))
 
       val result = for {
         svc <- CategoryService.make[IO](repo)
