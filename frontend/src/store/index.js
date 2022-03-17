@@ -33,6 +33,7 @@ const DEFAULT_STATE = {
   isOnline: true,
   isLoading: false,
   isAuthenticated: false,
+  accessToken: null,
   user: {},
   categories: [],
   transactions: [],
@@ -89,7 +90,7 @@ export default new Vuex.Store({
       state.isOnline = isOnline
     },
     setToken (state, token) {
-      state.token = token
+      state.accessToken = token
     },
     sort (state, { field, desc, index }) {
       state.transactions = state.transactions.sort(txSorts[field](desc))
@@ -151,6 +152,7 @@ export default new Vuex.Store({
     },
     logout (state) {
       state.isAuthenticated = false
+      state.accessToken = null
       state.user = {}
       state.categories = []
       state.transaction = []
@@ -170,7 +172,7 @@ export default new Vuex.Store({
     },
     getUser ({ state, commit, dispatch }) {
       return Clients.get(state.isOnline)
-        .getUser()
+        .getUser(state.accessToken)
         .then(acc => {
           if (!state.user.id || acc.id === state.user.id) {
             return dispatch('loadData', acc)
@@ -203,66 +205,66 @@ export default new Vuex.Store({
     },
     updateUserSettings ({ commit, state }, requestBody) {
       return Clients.get(state.isOnline)
-        .updateUserSettings(state.user.id, requestBody)
+        .updateUserSettings(state.accessToken, state.user.id, requestBody)
         .then(() => commit('setSettings', requestBody))
         .catch(e => handleError(commit, e))
     },
     changeUserPassword ({ commit, state }, requestBody) {
       return Clients.get(state.isOnline)
-        .changeUserPassword(state.user.id, requestBody)
+        .changeUserPassword(state.accessToken, state.user.id, requestBody)
         .then(res => commit('setToken', res.access_token))
         .then(() => commit('setAlert', Alerts.PASSWORD_CHANGE_SUCCESS))
         .catch(e => handleError(commit, e))
     },
     logout ({ state, commit }) {
       return Clients.get(state.isOnline)
-        .logout()
+        .logout(state.accessToken)
         .then(() => commit('logout'))
         .catch(e => handleError(commit, e))
     },
     createCategory ({ state, commit, dispatch }, requestBody) {
       return Clients.get(state.isOnline)
-        .createCategory(requestBody)
+        .createCategory(state.accessToken, requestBody)
         .then(cat => commit('addCategory', cat))
         .catch(e => handleError(commit, e))
     },
     getCategories ({ state, commit }) {
       return Clients.get(state.isOnline)
-        .getCategories()
+        .getCategories(state.accessToken)
         .then(cats => commit('setCategories', cats))
     },
     hideCategory ({ state, commit }, { id, hidden }) {
       return Clients.get(state.isOnline)
-        .hideCategory({ id, hidden })
+        .hideCategory(state.accessToken, { id, hidden })
         .then(() => commit('hideCategory', { id, hidden }))
         .catch(e => handleError(commit, e, true))
     },
     updateCategory ({ state, commit }, requestBody) {
       return Clients.get(state.isOnline)
-        .updateCategory(requestBody)
+        .updateCategory(state.accessToken, requestBody)
         .then(res => commit('updateCategory', res))
         .catch(e => handleError(commit, e))
     },
     getTransactions ({ state, commit }) {
       return Clients.get(state.isOnline)
-        .getTransactions()
+        .getTransactions(state.accessToken)
         .then(txs => commit('setTransactions', txs))
     },
     createTransaction ({ state, commit, dispatch }, requestBody) {
       return Clients.get(state.isOnline)
-        .createTransaction(requestBody)
+        .createTransaction(state.accessToken, requestBody)
         .then(tx => commit('addTransaction', tx))
         .catch(e => handleError(commit, e))
     },
     hideTransaction ({ state, commit }, { id, hidden }) {
       return Clients.get(state.isOnline)
-        .hideTransaction({ id, hidden })
+        .hideTransaction(state.accessToken, { id, hidden })
         .then(() => commit('hideTransaction', { id, hidden }))
         .catch(e => handleError(commit, e, true))
     },
     updateTransaction ({ state, commit }, requestBody) {
       return Clients.get(state.isOnline)
-        .updateTransaction(requestBody)
+        .updateTransaction(state.accessToken, requestBody)
         .then(() => commit('updateTransaction', requestBody))
         .catch(e => handleError(commit, e))
     }

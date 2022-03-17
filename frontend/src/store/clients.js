@@ -1,12 +1,17 @@
-
 const DEFAULT_REQUEST_PARAMS = {
   mode: 'cors',
   cache: 'no-cache',
-  credentials: 'include',
-  headers: { 'Content-Type': 'application/json' }
+  credentials: 'include'
 }
 
-const requestWithBody = (reqBody, method) => ({ ...DEFAULT_REQUEST_PARAMS, method, body: JSON.stringify(reqBody) })
+const simpleRequest = (token) => {
+  const headers = { 'Content-Type': 'application/json' }
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+  return { headers, ...DEFAULT_REQUEST_PARAMS }
+}
+const requestWithBody = (reqBody, method, token) => ({ ...simpleRequest(token), method, body: JSON.stringify(reqBody) })
 
 // eslint-disable-next-line
 const notConnectedToTheInternet = () => Promise.reject({
@@ -39,59 +44,77 @@ class StubClient {
 }
 
 class BackendClient {
-  getUser = () => fetch('/api/auth/user', DEFAULT_REQUEST_PARAMS)
-    .then(res => res.status === 200 ? res.json() : reject(res))
+  getUser = (token) =>
+    fetch('/api/auth/user', simpleRequest(token))
+      .then(res => res.status === 200 ? res.json() : reject(res))
 
-  login = (requestBody) => fetch('/api/auth/login', requestWithBody(requestBody, 'POST'))
-    .then(res => res.status === 200 ? res.json() : reject(res))
+  login = (requestBody) =>
+    fetch('/api/auth/login', requestWithBody(requestBody, 'POST'))
+      .then(res => res.status === 200 ? res.json() : reject(res))
 
-  createUser = (requestBody) => fetch('/api/auth/user', requestWithBody(requestBody, 'POST'))
-    .then(res => res.status === 201 ? {} : reject(res))
+  createUser = (requestBody) =>
+    fetch('/api/auth/user', requestWithBody(requestBody, 'POST'))
+      .then(res => res.status === 201 ? {} : reject(res))
 
-  updateUserSettings = (userId, requestBody) => fetch(`/api/auth/user/${userId}/settings`, requestWithBody(requestBody, 'PUT'))
-    .then(res => res.status === 204 ? requestBody : reject(res))
+  updateUserSettings = (token, userId, requestBody) =>
+    fetch(`/api/auth/user/${userId}/settings`, requestWithBody(requestBody, 'PUT', token))
+      .then(res => res.status === 204 ? requestBody : reject(res))
 
-  changeUserPassword = (userId, requestBody) => fetch(`/api/auth/user/${userId}/password`, requestWithBody(requestBody, 'POST'))
-    .then(res => res.status === 204 ? {} : reject(res))
+  changeUserPassword = (token, userId, requestBody) =>
+    fetch(`/api/auth/user/${userId}/password`, requestWithBody(requestBody, 'POST', token))
+      .then(res => res.status === 204 ? {} : reject(res))
 
-  logout = () => fetch('/api/auth/logout', requestWithBody({}, 'POST'))
-    .then(res => res.status === 204 ? {} : reject(res))
+  logout = (token) =>
+    fetch('/api/auth/logout', requestWithBody({}, 'POST', token))
+      .then(res => res.status === 204 ? {} : reject(res))
 
-  getCategories = () => fetch('/api/categories', DEFAULT_REQUEST_PARAMS)
-    .then(res => res.status === 200 ? res.json() : reject(res))
+  getCategories = (token) =>
+    fetch('/api/categories', simpleRequest(token))
+      .then(res => res.status === 200 ? res.json() : reject(res))
 
-  createCategory = (requestBody) => fetch('/api/categories', requestWithBody(requestBody, 'POST'))
-    .then(res => res.status === 201 ? res.json() : reject(res))
-    .then(res => this.getCategory(res.id))
+  createCategory = (token, requestBody) =>
+    fetch('/api/categories', requestWithBody(requestBody, 'POST', token))
+      .then(res => res.status === 201 ? res.json() : reject(res))
+      .then(res => this.getCategory(res.id))
 
-  getCategory = (id) => fetch(`/api/categories/${id}`, DEFAULT_REQUEST_PARAMS)
-    .then(res => res.status === 200 ? res.json() : reject(res))
+  getCategory = (token, id) =>
+    fetch(`/api/categories/${id}`, simpleRequest(token))
+      .then(res => res.status === 200 ? res.json() : reject(res))
 
-  hideCategory = ({ id, hidden }) => fetch(`/api/categories/${id}/hidden`, requestWithBody({ hidden }, 'PUT'))
-    .then(res => res.status === 204 ? {} : reject(res))
+  hideCategory = (token, { id, hidden }) =>
+    fetch(`/api/categories/${id}/hidden`, requestWithBody({ hidden }, 'PUT', token))
+      .then(res => res.status === 204 ? {} : reject(res))
 
-  updateCategory = (requestBody) => fetch(`/api/categories/${requestBody.id}`, requestWithBody(requestBody, 'PUT'))
-    .then(res => res.status === 204 ? requestBody : reject(res))
+  updateCategory = (token, requestBody) =>
+    fetch(`/api/categories/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
+      .then(res => res.status === 204 ? requestBody : reject(res))
 
-  getTransactions = () => fetch('/api/transactions', DEFAULT_REQUEST_PARAMS)
-    .then(res => res.status === 200 ? res.json() : reject(res))
+  getTransactions = (token) =>
+    fetch('/api/transactions', simpleRequest(token))
+      .then(res => res.status === 200 ? res.json() : reject(res))
 
-  createTransaction = (requestBody) => fetch('/api/transactions', requestWithBody(requestBody, 'POST'))
-    .then(res => res.status === 201 ? res.json() : reject(res))
-    .then(res => this.getTransaction(res.id))
+  createTransaction = (token, requestBody) =>
+    fetch('/api/transactions', requestWithBody(requestBody, 'POST', token))
+      .then(res => res.status === 201 ? res.json() : reject(res))
+      .then(res => this.getTransaction(res.id))
 
-  getTransaction = (id) => fetch(`/api/transactions/${id}`, DEFAULT_REQUEST_PARAMS)
-    .then(res => res.status === 200 ? res.json() : reject(res))
+  getTransaction = (token, id) =>
+    fetch(`/api/transactions/${id}`, simpleRequest(token))
+      .then(res => res.status === 200 ? res.json() : reject(res))
 
-  hideTransaction = ({ id, hidden }) => fetch(`/api/transactions/${id}/hidden`, requestWithBody({ hidden }, 'PUT'))
-    .then(res => res.status === 204 ? {} : reject(res))
+  hideTransaction = (token, { id, hidden }) =>
+    fetch(`/api/transactions/${id}/hidden`, requestWithBody({ hidden }, 'PUT', token))
+      .then(res => res.status === 204 ? {} : reject(res))
 
-  updateTransaction = (requestBody) => fetch(`/api/transactions/${requestBody.id}`, requestWithBody(requestBody, 'PUT'))
-    .then(res => res.status === 204 ? requestBody : reject(res))
+  updateTransaction = (token, requestBody) =>
+    fetch(`/api/transactions/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
+      .then(res => res.status === 204 ? requestBody : reject(res))
 }
 
 const onlineClient = new BackendClient()
 const stubClient = new StubClient()
-const clients = { get: isOnline => isOnline ? onlineClient : stubClient }
+const clients = {
+  get: isOnline => isOnline ? onlineClient : stubClient
+}
 
 export default clients
