@@ -3,6 +3,7 @@ package expensetracker.auth.user
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
+import expensetracker.fixtures.Users
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 import org.mockito.ArgumentMatchers.any
@@ -14,18 +15,18 @@ class UserServiceSpec extends CatsSpec {
     "create" should {
       "return account id on success" in {
         val (repo, encr) = mocks
-        when(encr.hash(any[Password])).thenReturn(IO.pure(hash))
-        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturn(IO.pure(uid))
+        when(encr.hash(any[Password])).thenReturn(IO.pure(Users.hash))
+        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturn(IO.pure(Users.uid1))
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.create(details, pwd)
+          res     <- service.create(Users.details, Users.pwd)
         } yield res
 
         result.unsafeToFuture().map { res =>
-          verify(encr).hash(pwd)
-          verify(repo).create(details, hash)
-          res mustBe uid
+          verify(encr).hash(Users.pwd)
+          verify(repo).create(Users.details, Users.hash)
+          res mustBe Users.uid1
         }
       }
     }
@@ -37,11 +38,11 @@ class UserServiceSpec extends CatsSpec {
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.updateSettings(uid, UserSettings.Default)
+          res     <- service.updateSettings(Users.uid1, UserSettings.Default)
         } yield res
 
         result.unsafeToFuture().map { res =>
-          verify(repo).updateSettings(uid, UserSettings.Default)
+          verify(repo).updateSettings(Users.uid1, UserSettings.Default)
           verifyNoInteractions(encr)
           res mustBe ()
         }
@@ -49,13 +50,13 @@ class UserServiceSpec extends CatsSpec {
     }
 
     "updatePassword" should {
-      val cp = ChangePassword(uid, pwd, Password("new-password"))
+      val cp = ChangePassword(Users.uid1, Users.pwd, Password("new-password"))
 
       "return unit on success" in {
         val (repo, encr) = mocks
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
-        when(encr.hash(any[Password])).thenReturn(IO.pure(hash))
-        when(repo.find(any[UserId])).thenReturn(IO.pure(user))
+        when(encr.hash(any[Password])).thenReturn(IO.pure(Users.hash))
+        when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
         when(repo.updatePassword(any[UserId])(any[PasswordHash])).thenReturn(IO.unit)
 
         val result = for {
@@ -65,16 +66,16 @@ class UserServiceSpec extends CatsSpec {
 
         result.unsafeToFuture().map { res =>
           verify(repo).find(cp.id)
-          verify(encr).isValid(cp.currentPassword, user.password)
+          verify(encr).isValid(cp.currentPassword, Users.user.password)
           verify(encr).hash(cp.newPassword)
-          verify(repo).updatePassword(cp.id)(hash)
+          verify(repo).updatePassword(cp.id)(Users.hash)
           res mustBe ()
         }
       }
 
       "return error when passwords do not match" in {
         val (repo, encr) = mocks
-        when(repo.find(any[UserId])).thenReturn(IO.pure(user))
+        when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
         val result = for {
@@ -84,7 +85,7 @@ class UserServiceSpec extends CatsSpec {
 
         result.attempt.unsafeToFuture().map { res =>
           verify(repo).find(cp.id)
-          verify(encr).isValid(cp.currentPassword, user.password)
+          verify(encr).isValid(cp.currentPassword, Users.user.password)
           verifyNoMoreInteractions(repo, encr)
           res mustBe Left(InvalidPassword)
         }
@@ -94,17 +95,17 @@ class UserServiceSpec extends CatsSpec {
     "find" should {
       "return account on success" in {
         val (repo, encr) = mocks
-        when(repo.find(any[UserId])).thenReturn(IO.pure(user))
+        when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.find(uid)
+          res     <- service.find(Users.uid1)
         } yield res
 
         result.unsafeToFuture().map { res =>
           verifyNoInteractions(encr)
-          verify(repo).find(uid)
-          res mustBe user
+          verify(repo).find(Users.uid1)
+          res mustBe Users.user
         }
       }
     }
@@ -113,18 +114,18 @@ class UserServiceSpec extends CatsSpec {
 
       "return account on success" in {
         val (repo, encr) = mocks
-        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(user)))
+        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(Users.user)))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.login(details.email, pwd)
+          res     <- service.login(Users.details.email, Users.pwd)
         } yield res
 
         result.unsafeToFuture().map { res =>
-          verify(repo).findBy(details.email)
-          verify(encr).isValid(pwd, hash)
-          res mustBe user
+          verify(repo).findBy(Users.details.email)
+          verify(encr).isValid(Users.pwd, Users.hash)
+          res mustBe Users.user
         }
       }
 
@@ -134,11 +135,11 @@ class UserServiceSpec extends CatsSpec {
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.login(details.email, pwd)
+          res     <- service.login(Users.details.email, Users.pwd)
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
-          verify(repo).findBy(details.email)
+          verify(repo).findBy(Users.details.email)
           verifyNoInteractions(encr)
           res mustBe Left(InvalidEmailOrPassword)
         }
@@ -146,17 +147,17 @@ class UserServiceSpec extends CatsSpec {
 
       "return error when password doesn't match" in {
         val (repo, encr) = mocks
-        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(user)))
+        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(Users.user)))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.login(details.email, pwd)
+          res     <- service.login(Users.details.email, Users.pwd)
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
-          verify(repo).findBy(details.email)
-          verify(encr).isValid(pwd, hash)
+          verify(repo).findBy(Users.details.email)
+          verify(encr).isValid(Users.pwd, Users.hash)
           res mustBe Left(InvalidEmailOrPassword)
         }
       }

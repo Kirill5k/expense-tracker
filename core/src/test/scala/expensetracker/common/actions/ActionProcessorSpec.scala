@@ -3,6 +3,7 @@ package expensetracker.common.actions
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
+import expensetracker.fixtures.Users
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryService
 import org.mockito.ArgumentMatchers.any
@@ -16,17 +17,17 @@ class ActionProcessorSpec extends CatsSpec {
 
     "setup new account" in {
       val catSvc = mocks
-      when(catSvc.assignDefault(any[String].asInstanceOf[UserId])).thenReturn(IO.unit)
+      when(catSvc.assignDefault(any[UserId])).thenReturn(IO.unit)
 
       val result = for {
         dispatcher <- ActionDispatcher.make[IO]
         processor  <- ActionProcessor.make[IO](dispatcher, catSvc)
-        _          <- dispatcher.dispatch(Action.SetupNewUser(uid))
+        _          <- dispatcher.dispatch(Action.SetupNewUser(Users.uid1))
         res        <- processor.run.interruptAfter(2.second).compile.drain
       } yield res
 
       result.unsafeToFuture().map { r =>
-        verify(catSvc).assignDefault(uid)
+        verify(catSvc).assignDefault(Users.uid1)
         r mustBe ()
       }
     }
