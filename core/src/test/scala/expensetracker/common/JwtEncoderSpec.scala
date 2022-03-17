@@ -7,7 +7,7 @@ import expensetracker.auth.session.SessionId
 import expensetracker.auth.user.UserId
 import expensetracker.common.config.JwtConfig
 import expensetracker.common.errors.AppError
-import expensetracker.common.jwt.{JwtEncoder, JwtToken}
+import expensetracker.common.jwt.{BearerToken, JwtEncoder, JwtToken}
 import pdi.jwt.algorithms.JwtUnknownAlgorithm
 
 import java.time.Instant
@@ -16,7 +16,7 @@ class JwtEncoderSpec extends CatsSpec with JsonCodecs {
 
   val config  = JwtConfig("HS256", "secret-key")
   val session = JwtToken(SessionId("s1"), UserId("u1"))
-  val jwtToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJzMSIsInVzZXJJZCI6InUxIn0.6mnaHsD11IgZqficW13C9GVOxc9U7ureb8V42EJqlIU"
+  val jwtToken = BearerToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJzMSIsInVzZXJJZCI6InUxIn0.6mnaHsD11IgZqficW13C9GVOxc9U7ureb8V42EJqlIU")
 
   "A CirceJwtEncoder" should {
 
@@ -41,7 +41,7 @@ class JwtEncoderSpec extends CatsSpec with JsonCodecs {
     "return error when invalid jwt token" in {
       val result = for {
         encoder     <- JwtEncoder.circeJwtEncoder[IO](config)
-        accessToken <- encoder.decode("foo-bar")
+        accessToken <- encoder.decode(BearerToken("foo-bar"))
       } yield accessToken
 
       result.attempt.unsafeToFuture().map { res =>
@@ -52,7 +52,7 @@ class JwtEncoderSpec extends CatsSpec with JsonCodecs {
     "return error when unexpected json payload" in {
       val result = for {
         encoder     <- JwtEncoder.circeJwtEncoder[IO](config)
-        accessToken <- encoder.decode("IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
+        accessToken <- encoder.decode(BearerToken("IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"))
       } yield accessToken
 
       result.attempt.unsafeToFuture().map { res =>

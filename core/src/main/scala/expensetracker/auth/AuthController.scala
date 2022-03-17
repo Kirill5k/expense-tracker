@@ -14,7 +14,7 @@ import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, Us
 import expensetracker.auth.session.{CreateSession, Session, SessionAuth}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
-import expensetracker.common.jwt.{JwtEncoder, JwtToken}
+import expensetracker.common.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.common.validations.*
 import expensetracker.common.web.Controller
 import io.circe.generic.auto.*
@@ -62,7 +62,7 @@ final class AuthController[F[_]: Logger](
           acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
           token <- jwtEncoder.encode(JwtToken(sid, acc.id))
-          res   <- Ok(LoginResponse(token, "Bearer"))
+          res   <- Ok(LoginResponse.bearer(token))
         } yield res.addCookie(SessionAuth.responseCookie(sid))
       }
   }
@@ -91,7 +91,7 @@ final class AuthController[F[_]: Logger](
             time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
             sid   <- service.createSession(CreateSession(id, authedReq.req.from, time))
             token <- jwtEncoder.encode(JwtToken(sid, id))
-            res   <- Ok(LoginResponse(token, "Bearer"))
+            res   <- Ok(LoginResponse.bearer(token))
           } yield res.addCookie(SessionAuth.responseCookie(sid))
         }
       case POST -> Root / "logout" as session =>
@@ -135,6 +135,11 @@ object AuthController {
       access_token: String,
       token_type: String
   )
+  
+  object LoginResponse {
+    def bearer(bearerToken: BearerToken): LoginResponse =
+      LoginResponse(access_token = bearerToken.value, token_type = "Bearer")
+  }
 
   final case class UserView(
       id: String,
