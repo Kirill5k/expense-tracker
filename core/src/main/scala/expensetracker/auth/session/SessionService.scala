@@ -8,7 +8,7 @@ import expensetracker.auth.session.db.SessionRepository
 trait SessionService[F[_]]:
   def authenticate(auth: Authenticate): F[Session]
   def create(cs: CreateSession): F[SessionId]
-  def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
+  def find(sid: SessionId): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
   def invalidateAll(uid: UserId): F[Unit]
 
@@ -21,8 +21,8 @@ final private class LiveSessionService[F[_]](
   override def create(cs: CreateSession): F[SessionId] =
     repository.create(cs)
 
-  override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] =
-    repository.find(sid, activity)
+  override def find(sid: SessionId): F[Option[Session]] =
+    repository.find(sid)
 
   override def unauth(sid: SessionId): F[Unit] =
     repository.unauth(sid)

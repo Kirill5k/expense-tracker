@@ -32,15 +32,15 @@ class SessionServiceSpec extends CatsSpec {
 
     "return existing session" in {
       val repo = mock[SessionRepository[IO]]
-      when(repo.find(any[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(Sessions.sess)))
+      when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
 
       val result = for {
         svc  <- SessionService.make(repo)
-        sess <- svc.find(Sessions.sid, Some(Sessions.sa))
+        sess <- svc.find(Sessions.sid)
       } yield sess
 
       result.unsafeToFuture().map { res =>
-        verify(repo).find(Sessions.sid, Some(Sessions.sa))
+        verify(repo).find(Sessions.sid)
         res mustBe Some(Sessions.sess)
       }
     }

@@ -5,7 +5,7 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.fixtures.{Users, Sessions}
 import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmail, UserId, UserService, UserSettings}
-import expensetracker.auth.session.{SessionActivity, SessionId, SessionService}
+import expensetracker.auth.session.{SessionId, SessionService}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
@@ -31,16 +31,16 @@ class AuthServiceSpec extends CatsSpec {
 
     "find session by session id" in {
       val (accSvc, sessSvc) = mocks
-      when(sessSvc.find(any[SessionId], any[Option[SessionActivity]])).thenReturn(IO.pure(Some(Sessions.sess)))
+      when(sessSvc.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.findSession(Sessions.sid, Some(Sessions.sa))
+        res     <- authSvc.findSession(Sessions.sid)
       } yield res
 
       result.unsafeToFuture().map { res =>
         verifyNoInteractions(accSvc)
-        verify(sessSvc).find(Sessions.sid, Some(Sessions.sa))
+        verify(sessSvc).find(Sessions.sid)
         res mustBe Some(Sessions.sess)
       }
     }

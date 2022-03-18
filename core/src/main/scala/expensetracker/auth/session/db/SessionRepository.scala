@@ -4,7 +4,7 @@ import cats.effect.Async
 import cats.syntax.functor.*
 import expensetracker.auth.user.UserId
 import io.circe.generic.auto.*
-import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
+import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus}
 import expensetracker.common.db.Repository
 import expensetracker.common.json.given
 import mongo4cats.database.MongoDatabase
@@ -14,7 +14,7 @@ import mongo4cats.collection.MongoCollection
 
 trait SessionRepository[F[_]] extends Repository[F]:
   def create(cs: CreateSession): F[SessionId]
-  def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
+  def find(sid: SessionId): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
   def invalidatedAll(aid: UserId): F[Unit]
 
@@ -30,13 +30,9 @@ final private class LiveSessionRepository[F[_]: Async](
     collection.insertOne(createSession).as(SessionId(createSession._id.toHexString))
   }
 
-  override def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]] = {
-    val idFilter = idEq(sid.value)
-    activity
-      .map(sa => collection.findOneAndUpdate(idFilter, Update.set("lastRecordedActivity", sa)))
-      .getOrElse(collection.find(idFilter).first)
+  override def find(sid: SessionId): F[Option[Session]] =
+    collection.findOneAndUpdate(idEq(sid.value), Update.currentDate(Field.LastAccessedAt))
       .map(_.map(_.toDomain))
-  }
 
   override def unauth(sid: SessionId): F[Unit] =
     collection.updateOne(idEq(sid.value), logoutUpdate).void
@@ -49,6 +45,6 @@ object SessionRepository {
   def make[F[_]: Async](db: MongoDatabase[F]): F[SessionRepository[F]] =
     db
       .getCollectionWithCodec[SessionEntity]("sessions")
-      .map(_.withAddedCodec[SessionActivity].withAddedCodec[SessionStatus])
+      .map(_.withAddedCodec[SessionStatus])
       .map(coll => new LiveSessionRepository[F](coll))
 }

@@ -20,7 +20,7 @@ object SessionAuth {
   val SessionIdCookie = "session-id"
 
   def middleware[F[_]](
-      obtainSession: (SessionId, Option[SessionActivity]) => F[Option[Session]]
+      obtainSession: SessionId => F[Option[Session]]
   )(using
       F: Temporal[F]
   ): AuthMiddleware[F, Session] = {
@@ -31,23 +31,18 @@ object SessionAuth {
 
     val getValidSession: Kleisli[F, Request[F], Either[String, Session]] =
       Kleisli { req =>
-        req
-          .cookies
+        req.cookies
           .find(_.name == SessionIdCookie)
           .toRight("missing session-id cookie")
           .map(_.content)
-          .flatMap(sid => Either.cond(ObjectId.isValid(sid),  SessionId(sid), "invalid session-id format"))
+          .flatMap(sid => Either.cond(ObjectId.isValid(sid), SessionId(sid), "invalid session-id format"))
           .fold(
             _.asLeft[Session].pure[F],
             sid =>
-              F.realTime.flatMap { time =>
-                val currentTime = Instant.ofEpochMilli(time.toMillis)
-                val activity    = req.from.map(ip => SessionActivity(ip, currentTime))
-                obtainSession(sid, activity).map {
-                  case Some(s) if s.active => s.asRight[String]
-                  case Some(_)             => "session is inactive".asLeft[Session]
-                  case None                => "invalid session-id".asLeft[Session]
-                }
+              obtainSession(sid).map {
+                case Some(s) if s.active => s.asRight[String]
+                case Some(_)             => "session is inactive".asLeft[Session]
+                case None                => "invalid session-id".asLeft[Session]
               }
           )
       }

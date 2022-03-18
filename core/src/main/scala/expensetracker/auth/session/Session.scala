@@ -23,18 +23,14 @@ object SessionStatus {
   given Encoder[SessionStatus] = Encoder[String].contramap(_.value)
 }
 
-final case class SessionActivity(
-    ipAddress: IpAddress,
-    time: Instant
-)
-
 final case class Session(
     id: SessionId,
     userId: UserId,
     createdAt: Instant,
     active: Boolean,
     status: SessionStatus,
-    lastRecordedActivity: Option[SessionActivity]
+    ipAddress: Option[IpAddress],
+    lastAccessedAt: Option[Instant]
 )
 
 final case class CreateSession(

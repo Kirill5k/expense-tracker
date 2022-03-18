@@ -15,8 +15,7 @@ object Sessions {
   lazy val ts   = Instant.now().`with`(ChronoField.MILLI_OF_SECOND, 0)
   lazy val ip   = IpAddress.fromString("127.0.0.1").get
 
-  lazy val sa           = SessionActivity(ip, ts)
-  lazy val sess         = Session(sid, Users.uid1, ts, true, SessionStatus.Authenticated, Some(sa))
+  lazy val sess         = Session(sid, Users.uid1, ts, true, SessionStatus.Authenticated, Some(ip), None)
   lazy val sessIdCookie = RequestCookie("session-id", sid.value)
 
   def create(

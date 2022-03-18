@@ -13,13 +13,14 @@ import java.time.Instant
 trait Repository[F[_]] {
 
   protected object Field {
-    val Name          = "name"
-    val UId           = "userId"
-    val Id            = "_id"
-    val Email         = "email"
-    val Hidden        = "hidden"
-    val LastUpdatedAt = "lastUpdatedAt"
-    val Status        = "status"
+    val Name           = "name"
+    val UId            = "userId"
+    val Id             = "_id"
+    val Email          = "email"
+    val Hidden         = "hidden"
+    val LastUpdatedAt  = "lastUpdatedAt"
+    val Status         = "status"
+    val LastAccessedAt = "lastAccessedAt"
   }
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)

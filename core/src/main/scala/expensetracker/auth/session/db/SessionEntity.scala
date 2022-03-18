@@ -1,7 +1,8 @@
 package expensetracker.auth.session.db
 
+import com.comcast.ip4s.IpAddress
 import expensetracker.auth.user.UserId
-import expensetracker.auth.session.{CreateSession, Session, SessionActivity, SessionId, SessionStatus}
+import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus}
 import mongo4cats.bson.ObjectId
 
 import java.time.Instant
@@ -12,7 +13,8 @@ final case class SessionEntity(
     createdAt: Instant,
     active: Boolean,
     status: SessionStatus,
-    lastRecordedActivity: Option[SessionActivity]
+    ipAddress: Option[IpAddress],
+    lastAccessedAt: Option[Instant]
 ) {
   def toDomain: Session =
     Session(
@@ -21,7 +23,8 @@ final case class SessionEntity(
       createdAt = createdAt,
       active = active,
       status = status,
-      lastRecordedActivity = lastRecordedActivity
+      ipAddress = ipAddress,
+      lastAccessedAt = lastAccessedAt
     )
 }
 
@@ -33,6 +36,7 @@ object SessionEntity {
       cs.time,
       true,
       SessionStatus.Authenticated,
-      cs.ipAddress.map(ip => SessionActivity(ip, cs.time))
+      cs.ipAddress,
+      None
     )
 }

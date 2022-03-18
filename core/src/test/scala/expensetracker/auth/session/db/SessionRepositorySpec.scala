@@ -30,7 +30,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
         val result = for {
           repo <- SessionRepository.make(db)
           sid  <- repo.create(Sessions.create())
-          res  <- repo.find(sid, None)
+          res  <- repo.find(sid)
         } yield (sid, res)
 
         result.map { case (sid, sess) =>
@@ -40,7 +40,8 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             Sessions.ts,
             true,
             SessionStatus.Authenticated,
-            Some(SessionActivity(Sessions.ip, Sessions.ts))
+            Some(Sessions.ip),
+            None
           ).some
         }
       }
@@ -50,7 +51,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       withEmbeddedMongoDb { db =>
         val result = for {
           repo <- SessionRepository.make(db)
-          res  <- repo.find(Sessions.sid, None)
+          res  <- repo.find(Sessions.sid)
         } yield res
 
         result.map(_ mustBe None)
@@ -63,7 +64,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           repo <- SessionRepository.make(db)
           sid  <- repo.create(Sessions.create())
           _    <- repo.unauth(sid)
-          res  <- repo.find(sid, None)
+          res  <- repo.find(sid)
         } yield res
 
         result.map { s =>
@@ -81,7 +82,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           sid1 <- repo.create(Sessions.create())
           sid2 <- repo.create(Sessions.create())
           _    <- repo.invalidatedAll(Users.uid1)
-          res  <- (repo.find(sid1, None), repo.find(sid2, None)).tupled
+          res  <- (repo.find(sid1), repo.find(sid2)).tupled
         } yield res
 
         result.map {
@@ -95,18 +96,17 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
       }
     }
 
-    "update session last recorded activity on find" in {
+    "update session lastAccessedAt field on find" in {
       withEmbeddedMongoDb { db =>
-        val activity = SessionActivity(Sessions.ip, Sessions.ts)
         val result = for {
           repo <- SessionRepository.make(db)
           sid  <- repo.create(Sessions.create())
-          _    <- repo.find(sid, Some(activity))
-          res  <- repo.find(sid, None)
+          _    <- repo.find(sid)
+          res  <- repo.find(sid)
         } yield res
 
         result.map { sess =>
-          sess.flatMap(_.lastRecordedActivity) mustBe Some(activity)
+          sess.flatMap(_.lastAccessedAt) must not be empty
         }
       }
     }

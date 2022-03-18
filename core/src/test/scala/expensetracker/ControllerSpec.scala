@@ -25,7 +25,7 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
   given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   def sessMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
-    SessionAuth.middleware((_, _) => IO.pure(sess))
+    SessionAuth.middleware((_) => IO.pure(sess))
 
   def verifyJsonResponse(
       response: IO[Response[IO]],
