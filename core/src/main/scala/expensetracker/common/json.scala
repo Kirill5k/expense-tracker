@@ -1,6 +1,6 @@
 package expensetracker.common
 
-import cats.syntax.either._
+import cats.syntax.either.*
 import com.comcast.ip4s.IpAddress
 import expensetracker.auth.session.SessionStatus
 import expensetracker.category.CategoryKind
@@ -8,13 +8,19 @@ import expensetracker.transaction.TransactionKind
 import io.circe.{Decoder, Encoder, Json, JsonObject}
 import squants.market.{Currency, Money, defaultMoneyContext}
 
+import java.net.InetSocketAddress
 import scala.util.Try
 
 object json extends JsonCodecs
 
 trait JsonCodecs {
-  inline given ipDec: Decoder[IpAddress] = Decoder[String].emap(ip => IpAddress.fromString(ip).toRight(s"invalid ip address $ip"))
-  inline given ipEnc: Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
+  inline given Decoder[IpAddress] = Decoder[String].emap(ip => IpAddress.fromString(ip).toRight(s"invalid ip address $ip"))
+  inline given Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
+
+  inline given Decoder[InetSocketAddress] = Decoder[String].emapTry { ip =>
+    Try(ip.split(":")).flatMap(address => Try(InetSocketAddress.createUnresolved(address.head, address.last.toInt)))
+  }
+  inline given Encoder[InetSocketAddress] = Encoder[String].contramap(_.toString)
 
   inline given currDec: Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for {

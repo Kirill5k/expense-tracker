@@ -5,7 +5,7 @@ import cats.syntax.applicativeError.*
 import cats.syntax.apply.*
 import expensetracker.common.JsonCodecs
 import expensetracker.common.errors.AppError
-import io.circe.generic.auto.*
+import io.circe.Codec
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.*
@@ -13,7 +13,7 @@ import org.http4s.headers.`WWW-Authenticate`
 import org.typelevel.log4cats.Logger
 import sttp.model.StatusCode
 
-final case class ErrorResponse(message: String)
+final case class ErrorResponse(message: String) derives Codec.AsObject
 
 trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
 

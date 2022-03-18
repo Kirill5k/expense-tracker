@@ -42,14 +42,8 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
       }
       .flatMap { res =>
         expectedBody match {
-          case Some(expectedJson) =>
-            res.as[String].map { receivedJson =>
-              parse(receivedJson) mustBe parse(expectedJson)
-            }
-          case None =>
-            res.body.compile.toVector.map { receivedJson =>
-              receivedJson mustBe empty
-            }
+          case Some(expectedJson) => res.as[String].map(parse(_) mustBe parse(expectedJson))
+          case None               => res.body.compile.toVector.map(_ mustBe empty)
         }
       }
       .unsafeRunSync()
