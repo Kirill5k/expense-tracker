@@ -63,15 +63,15 @@ class AuthServiceSpec extends CatsSpec {
 
     "return account on login" in {
       val (accSvc, sessSvc) = mocks
-      when(accSvc.login(any[UserEmail], any[Password])).thenReturn(IO.pure(Users.user))
+      when(accSvc.login(any[Login])).thenReturn(IO.pure(Users.user))
 
       val result = for {
         authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.login(Users.email, Users.pwd)
+        res     <- authSvc.login(Login(Users.email, Users.pwd))
       } yield res
 
       result.unsafeToFuture().map { res =>
-        verify(accSvc).login(Users.email, Users.pwd)
+        verify(accSvc).login(Login(Users.email, Users.pwd))
         verifyNoInteractions(sessSvc)
         res mustBe Users.user
       }

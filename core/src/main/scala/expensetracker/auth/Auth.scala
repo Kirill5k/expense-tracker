@@ -10,7 +10,7 @@ import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.{Session, SessionAuth, SessionService}
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
-import expensetracker.common.jwt.JwtEncoder
+import jwt.JwtEncoder
 import org.http4s.HttpRoutes
 import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger

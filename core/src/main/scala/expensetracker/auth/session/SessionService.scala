@@ -1,10 +1,12 @@
 package expensetracker.auth.session
 
 import cats.Monad
+import expensetracker.auth.Authenticate
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
 
 trait SessionService[F[_]]:
+  def authenticate(auth: Authenticate): F[Session]
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId, activity: Option[SessionActivity]): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
@@ -13,6 +15,8 @@ trait SessionService[F[_]]:
 final private class LiveSessionService[F[_]](
     private val repository: SessionRepository[F]
 ) extends SessionService[F] {
+
+  override def authenticate(auth: Authenticate): F[Session] = ???
 
   override def create(cs: CreateSession): F[SessionId] =
     repository.create(cs)

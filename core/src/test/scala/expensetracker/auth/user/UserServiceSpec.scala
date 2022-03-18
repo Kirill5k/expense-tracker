@@ -4,6 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.fixtures.Users
+import expensetracker.auth.Login
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 import org.mockito.ArgumentMatchers.any
@@ -119,7 +120,7 @@ class UserServiceSpec extends CatsSpec {
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.login(Users.details.email, Users.pwd)
+          res     <- service.login(Login(Users.details.email, Users.pwd))
         } yield res
 
         result.unsafeToFuture().map { res =>
@@ -135,7 +136,7 @@ class UserServiceSpec extends CatsSpec {
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.login(Users.details.email, Users.pwd)
+          res     <- service.login(Login(Users.details.email, Users.pwd))
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>
@@ -152,7 +153,7 @@ class UserServiceSpec extends CatsSpec {
 
         val result = for {
           service <- UserService.make[IO](repo, encr)
-          res     <- service.login(Users.details.email, Users.pwd)
+          res     <- service.login(Login(Users.details.email, Users.pwd))
         } yield res
 
         result.attempt.unsafeToFuture().map { res =>

@@ -1,13 +1,14 @@
-package expensetracker.common
+package expensetracker.auth
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
+import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.session.SessionId
 import expensetracker.auth.user.UserId
+import expensetracker.common.JsonCodecs
 import expensetracker.common.config.JwtConfig
 import expensetracker.common.errors.AppError
-import expensetracker.common.jwt.{BearerToken, JwtEncoder, JwtToken}
 import pdi.jwt.algorithms.JwtUnknownAlgorithm
 
 import java.time.Instant

@@ -5,6 +5,7 @@ import cats.syntax.flatMap.*
 import cats.syntax.apply.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
+import expensetracker.auth.Login
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 
@@ -14,7 +15,7 @@ enum LoginResult:
 
 trait UserService[F[_]]:
   def create(details: UserDetails, password: Password): F[UserId]
-  def login(email: UserEmail, password: Password): F[User]
+  def login(login: Login): F[User]
   def find(uid: UserId): F[User]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
@@ -29,11 +30,11 @@ final private class LiveUserService[F[_]](
   override def create(details: UserDetails, password: Password): F[UserId] =
     encryptor.hash(password).flatMap(h => repository.create(details, h))
 
-  override def login(email: UserEmail, password: Password): F[User] =
+  override def login(login: Login): F[User] =
     repository
-      .findBy(email)
+      .findBy(login.email)
       .flatMap {
-        case Some(acc) => encryptor.isValid(password, acc.password).map(if (_) LoginResult.Success(acc) else LoginResult.Fail)
+        case Some(acc) => encryptor.isValid(login.password, acc.password).map(if (_) LoginResult.Success(acc) else LoginResult.Fail)
         case None      => F.pure(LoginResult.Fail)
       }
       .flatMap {

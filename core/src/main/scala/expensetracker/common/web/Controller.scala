@@ -16,31 +16,7 @@ import sttp.model.StatusCode
 final case class ErrorResponse(message: String) derives Codec.AsObject
 
 trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
-
-  private val FailedRegexValidation = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.: DownField\\((.*)\\)".r
-  private val NullFieldValidation   = "Attempt to decode value on failed cursor: DownField\\((.*)\\)".r
-  private val EmptyFieldValidation  = "Predicate isEmpty\\(\\) did not fail\\.: DownField\\((.*)\\)".r
-  private val IdValidation          = "Predicate failed: \\((.*) is valid id\\).: DownField\\((.*)\\)".r
-
-  private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
-
-  private def mapError(error: Throwable): (StatusCode, ErrorResponse) =
-    error match {
-      case err: AppError.Conflict =>
-        (StatusCode.Conflict, ErrorResponse(err.getMessage))
-      case err: AppError.BadReq =>
-        (StatusCode.BadRequest, ErrorResponse(err.getMessage))
-      case err: AppError.NotFound =>
-        (StatusCode.NotFound, ErrorResponse(err.getMessage))
-      case err: AppError.Forbidden =>
-        (StatusCode.Forbidden, ErrorResponse(err.getMessage))
-      case err: AppError.Unauth =>
-        (StatusCode.Unauthorized, ErrorResponse(err.getMessage))
-      case err: InvalidMessageBodyFailure =>
-        (StatusCode.UnprocessableEntity, ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.message)))
-      case err =>
-        (StatusCode.InternalServerError, ErrorResponse(err.getMessage))
-    }
+  import Controller.*
 
   protected def withErrorHandling(
       response: => F[Response[F]]
@@ -60,6 +36,15 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
         case _                              => InternalServerError(errorResponse)
       )
     }
+}
+
+object Controller {
+  private val FailedRegexValidation = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.: DownField\\((.*)\\)".r
+  private val NullFieldValidation   = "Attempt to decode value on failed cursor: DownField\\((.*)\\)".r
+  private val EmptyFieldValidation  = "Predicate isEmpty\\(\\) did not fail\\.: DownField\\((.*)\\)".r
+  private val IdValidation          = "Predicate failed: \\((.*) is valid id\\).: DownField\\((.*)\\)".r
+
+  private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
 
   private def formatValidationError(cause: Throwable): Option[String] =
     cause.getMessage match {
@@ -75,5 +60,23 @@ trait Controller[F[_]] extends Http4sDsl[F] with JsonCodecs {
         s.split(": DownField").headOption.map(_.capitalize)
       case _ =>
         None
+    }
+
+  def mapError(error: Throwable): (StatusCode, ErrorResponse) =
+    error match {
+      case err: AppError.Conflict =>
+        (StatusCode.Conflict, ErrorResponse(err.getMessage))
+      case err: AppError.BadReq =>
+        (StatusCode.BadRequest, ErrorResponse(err.getMessage))
+      case err: AppError.NotFound =>
+        (StatusCode.NotFound, ErrorResponse(err.getMessage))
+      case err: AppError.Forbidden =>
+        (StatusCode.Forbidden, ErrorResponse(err.getMessage))
+      case err: AppError.Unauth =>
+        (StatusCode.Unauthorized, ErrorResponse(err.getMessage))
+      case err: InvalidMessageBodyFailure =>
+        (StatusCode.UnprocessableEntity, ErrorResponse(formatValidationError(err.getCause()).getOrElse(err.message)))
+      case err =>
+        (StatusCode.InternalServerError, ErrorResponse(err.getMessage))
     }
 }

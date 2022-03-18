@@ -6,7 +6,7 @@ import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmai
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
-import expensetracker.common.jwt.{JwtEncoder, JwtToken}
+import jwt.{JwtEncoder, JwtToken}
 import expensetracker.fixtures.{Sessions, Users}
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.implicits.*
@@ -226,7 +226,7 @@ class AuthControllerSpec extends ControllerSpec {
         val disp   = mock[ActionDispatcher[IO]]
         val jwtEnc = mock[JwtEncoder[IO]]
 
-        when(svc.login(any[UserEmail], any[Password]))
+        when(svc.login(any[Login]))
           .thenReturn(IO.raiseError(InvalidEmailOrPassword))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
@@ -234,7 +234,7 @@ class AuthControllerSpec extends ControllerSpec {
         val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Unauthorized, Some("""{"message":"Invalid email or password"}"""))
-        verify(svc).login(UserEmail("foo@bar.com"), Password("bar"))
+        verify(svc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verifyNoInteractions(disp)
       }
 
@@ -243,7 +243,7 @@ class AuthControllerSpec extends ControllerSpec {
         val disp   = mock[ActionDispatcher[IO]]
         val jwtEnc = mock[JwtEncoder[IO]]
 
-        when(svc.login(any[UserEmail], any[Password])).thenReturn(IO.pure(Users.user))
+        when(svc.login(any[Login])).thenReturn(IO.pure(Users.user))
         when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
         when(jwtEnc.encode(any[JwtToken])).thenReturn(IO.pure("token"))
 
@@ -260,7 +260,7 @@ class AuthControllerSpec extends ControllerSpec {
           path = Some("/")
         )
         verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""), List(sessCookie))
-        verify(svc).login(UserEmail("foo@bar.com"), Password("bar"))
+        verify(svc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verify(svc).createSession(any[CreateSession])
         verify(jwtEnc).encode(JwtToken(Sessions.sid, Users.uid1))
         verifyNoInteractions(disp)

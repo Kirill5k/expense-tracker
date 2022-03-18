@@ -14,7 +14,7 @@ import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, Us
 import expensetracker.auth.session.{CreateSession, Session, SessionAuth}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
-import expensetracker.common.jwt.{BearerToken, JwtEncoder, JwtToken}
+import jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.common.validations.*
 import expensetracker.common.web.Controller
 import io.circe.generic.auto.*
@@ -58,8 +58,8 @@ final class AuthController[F[_]: Logger](
       withErrorHandling {
         for {
           login <- req.as[LoginRequest]
+          acc   <- service.login(login.toDomain)
           time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
-          acc   <- service.login(login.userEmail, login.userPassword)
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
           token <- jwtEncoder.encode(JwtToken(sid, acc.id))
           res   <- Ok(LoginResponse.bearer(token))
@@ -124,8 +124,7 @@ object AuthController {
       email: EmailString,
       password: NonEmptyString
   ) {
-    def userEmail    = UserEmail.from(email)
-    def userPassword = Password(password.value)
+    def toDomain: Login = Login(UserEmail.from(email), Password(password.value))
   }
 
   final case class LoginResponse(
