@@ -3,9 +3,11 @@ package expensetracker.auth.session
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.jwt.JwtEncoder
+import expensetracker.auth.Authenticate
+import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
+import expensetracker.common.errors.AppError
 import expensetracker.fixtures.{Sessions, Users}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
@@ -14,73 +16,157 @@ import java.time.Instant
 
 class SessionServiceSpec extends CatsSpec {
 
-  "A SessionService" should {
+  "A SessionService" when {
 
-    "create new session" in {
-      val jwtEnc = mock[JwtEncoder[IO]]
-      val repo   = mock[SessionRepository[IO]]
-      when(repo.create(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
+    "authenticate" should {
+      val bearerToken = BearerToken("token")
+      val jwtToken    = JwtToken(Sessions.sid, Users.uid1)
 
-      val result = for {
-        svc <- SessionService.make(jwtEnc, repo)
-        sid <- svc.create(Sessions.create())
-      } yield sid
+      "return error on token decryption failure" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.raiseError(AppError.InvalidJwtToken("error")))
 
-      result.unsafeToFuture().map { res =>
-        verifyNoInteractions(jwtEnc)
-        verify(repo).create(Sessions.create())
-        res mustBe Sessions.sid
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          sid <- svc.authenticate(Authenticate(bearerToken))
+        } yield sid
+
+        result.attempt.unsafeToFuture().map { res =>
+          verifyNoInteractions(repo)
+          verify(jwtEnc).decode(bearerToken)
+          res mustBe Left(AppError.InvalidJwtToken("error"))
+        }
+      }
+
+      "return error when session not found" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
+        when(repo.find(any[SessionId])).thenReturn(IO.pure(None))
+
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          sid <- svc.authenticate(Authenticate(bearerToken))
+        } yield sid
+
+        result.attempt.unsafeToFuture().map { res =>
+          verify(jwtEnc).decode(bearerToken)
+          verify(repo).find(Sessions.sid)
+          res mustBe Left(AppError.SessionDoesNotExist(Sessions.sid))
+        }
+      }
+
+      "return error when user id in token is different from user id in session" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
+        when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess.copy(userId = Users.uid2))))
+
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          sid <- svc.authenticate(Authenticate(bearerToken))
+        } yield sid
+
+        result.attempt.unsafeToFuture().map { res =>
+          verify(jwtEnc).decode(bearerToken)
+          verify(repo).find(Sessions.sid)
+          res mustBe Left(AppError.SomeoneElsesSession)
+        }
+      }
+
+      "return session on success" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
+        when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
+
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          sid <- svc.authenticate(Authenticate(bearerToken))
+        } yield sid
+
+        result.unsafeToFuture().map { res =>
+          verify(jwtEnc).decode(bearerToken)
+          verify(repo).find(Sessions.sid)
+          res mustBe Sessions.sess
+        }
       }
     }
 
-    "return existing session" in {
-      val jwtEnc = mock[JwtEncoder[IO]]
-      val repo   = mock[SessionRepository[IO]]
-      when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
+    "create" should {
+      "create new session" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(repo.create(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
 
-      val result = for {
-        svc  <- SessionService.make(jwtEnc, repo)
-        sess <- svc.find(Sessions.sid)
-      } yield sess
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          sid <- svc.create(Sessions.create())
+        } yield sid
 
-      result.unsafeToFuture().map { res =>
-        verifyNoInteractions(jwtEnc)
-        verify(repo).find(Sessions.sid)
-        res mustBe Some(Sessions.sess)
+        result.unsafeToFuture().map { res =>
+          verifyNoInteractions(jwtEnc)
+          verify(repo).create(Sessions.create())
+          res mustBe Sessions.sid
+        }
       }
     }
 
-    "unauth session" in {
-      val jwtEnc = mock[JwtEncoder[IO]]
-      val repo   = mock[SessionRepository[IO]]
-      when(repo.unauth(Sessions.sid)).thenReturn(IO.unit)
+    "find" should {
+      "return existing session" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
 
-      val result = for {
-        svc <- SessionService.make(jwtEnc, repo)
-        res <- svc.unauth(Sessions.sid)
-      } yield res
+        val result = for {
+          svc  <- SessionService.make(jwtEnc, repo)
+          sess <- svc.find(Sessions.sid)
+        } yield sess
 
-      result.unsafeToFuture().map { res =>
-        verifyNoInteractions(jwtEnc)
-        verify(repo).unauth(Sessions.sid)
-        res mustBe ()
+        result.unsafeToFuture().map { res =>
+          verifyNoInteractions(jwtEnc)
+          verify(repo).find(Sessions.sid)
+          res mustBe Some(Sessions.sess)
+        }
       }
     }
 
-    "invalidate all sessions" in {
-      val jwtEnc = mock[JwtEncoder[IO]]
-      val repo   = mock[SessionRepository[IO]]
-      when(repo.invalidatedAll(any[UserId])).thenReturn(IO.unit)
+    "unauth" should {
+      "unauth session" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(repo.unauth(Sessions.sid)).thenReturn(IO.unit)
 
-      val result = for {
-        svc <- SessionService.make(jwtEnc, repo)
-        res <- svc.invalidateAll(Users.uid1)
-      } yield res
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          res <- svc.unauth(Sessions.sid)
+        } yield res
 
-      result.unsafeToFuture().map { res =>
-        verifyNoInteractions(jwtEnc)
-        verify(repo).invalidatedAll(Users.uid1)
-        res mustBe ()
+        result.unsafeToFuture().map { res =>
+          verifyNoInteractions(jwtEnc)
+          verify(repo).unauth(Sessions.sid)
+          res mustBe ()
+        }
+      }
+    }
+
+    "invalidate" should {
+      "invalidate all sessions" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(repo.invalidatedAll(any[UserId])).thenReturn(IO.unit)
+
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          res <- svc.invalidateAll(Users.uid1)
+        } yield res
+
+        result.unsafeToFuture().map { res =>
+          verifyNoInteractions(jwtEnc)
+          verify(repo).invalidatedAll(Users.uid1)
+          res mustBe ()
+        }
       }
     }
   }
