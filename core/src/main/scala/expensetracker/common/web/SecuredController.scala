@@ -1,9 +1,11 @@
 package expensetracker.common.web
 
+import cats.ApplicativeThrow
 import cats.effect.Async
 import cats.syntax.either.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
+import expensetracker.auth.Authenticate
 import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
@@ -16,28 +18,22 @@ import sttp.tapir.server.PartialServerEndpoint
 
 import java.net.InetSocketAddress
 
-final case class RequestInfo(from: Option[InetSocketAddress])
-
 trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with JsonCodecs {
 
-  def service: FooService[F]
-
   private val bearerToken = auth.bearer[String]().map(BearerToken.apply)(_.value)
-  private val requestInfo = extractFromRequest(req => RequestInfo(req.connectionInfo.remote))
 
-  protected def securedEndpoint(using F: Async[F]): PartialServerEndpoint[(BearerToken, RequestInfo), Session, Unit, (StatusCode, ErrorResponse), Unit, Any, F] =
+  protected def securedEndpoint(
+      authenticate: Authenticate => F[Session]
+  )(using
+      F: ApplicativeThrow[F]
+  ): PartialServerEndpoint[BearerToken, Session, Unit, (StatusCode, ErrorResponse), Unit, Any, F] =
     endpoint
-      .securityIn(bearerToken.and(requestInfo))
+      .securityIn(bearerToken)
       .errorOut(statusCode.and(jsonBody[ErrorResponse]))
-      .serverSecurityLogic { (token, info) =>
-        service
-          .findSession(token, info)
+      .serverSecurityLogic { token =>
+        authenticate(Authenticate(token))
           .map(_.asRight[(StatusCode, ErrorResponse)])
           .handleError(e => Controller.mapError(e).asLeft[Session])
       }
 
-}
-
-trait FooService[F[_]] {
-  def findSession(token: BearerToken, info: RequestInfo): F[Session]
 }

@@ -10,7 +10,7 @@ import expensetracker.auth.session.*
 import java.net.InetSocketAddress
 
 final case class Login(email: UserEmail, password: Password)
-final case class Authenticate(token: BearerToken, ipAddress: Option[InetSocketAddress])
+final case class Authenticate(token: BearerToken)
 
 trait AuthService[F[_]]:
   def createUser(details: UserDetails, password: Password): F[UserId]

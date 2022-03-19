@@ -45,4 +45,4 @@ object Http:
       auth: Auth[F],
       cats: Categories[F],
       txs: Transactions[F]
-  ): F[Http[F]] = Monad[F].pure(new Http(health, auth, cats, txs))
+  ): F[Http[F]] = Monad[F].pure(Http(health, auth, cats, txs))
