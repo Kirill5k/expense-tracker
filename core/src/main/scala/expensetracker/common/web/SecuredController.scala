@@ -1,6 +1,6 @@
 package expensetracker.common.web
 
-import cats.ApplicativeThrow
+import cats.{ApplicativeThrow, MonadThrow}
 import cats.effect.Async
 import cats.syntax.either.*
 import cats.syntax.functor.*
@@ -39,4 +39,9 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
           .handleError(e => Controller.mapError(e).asLeft[Session])
       }
 
+  extension [A](fa: F[A])(using F: MonadThrow[F])
+    def mapResponse[B](fab: A => B): F[Either[(StatusCode, ErrorResponse), B]] =
+      fa
+        .map(fab(_).asRight[(StatusCode, ErrorResponse)])
+        .handleError(e => Controller.mapError(e).asLeft[B])
 }
