@@ -4,7 +4,7 @@ import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.either.*
-import cats.syntax.apply.*
+import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import eu.timepit.refined.api.Refined
@@ -13,7 +13,13 @@ import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.Authenticate
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
-import expensetracker.category.CategoryController.{CategoryView, CreateCategoryRequest, CreateCategoryResponse, HideCategoryRequest, UpdateCategoryRequest}
+import expensetracker.category.CategoryController.{
+  CategoryView,
+  CreateCategoryRequest,
+  CreateCategoryResponse,
+  HideCategoryRequest,
+  UpdateCategoryRequest
+}
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, ErrorResponse, SecuredController}
@@ -31,7 +37,7 @@ final class CategoryController[F[_]](
 ) extends SecuredController[F] {
 
   private val basePath = "categories"
-  private val idPath   = basePath / path[String].map(CategoryId.apply)(_.value)
+  private val idPath   = basePath / path[String].map((s: String) => CategoryId(s))(_.value)
 
   private def getAllCategories(auth: Authenticate => F[Session]) =
     securedEndpoint(auth).get
@@ -98,7 +104,7 @@ final class CategoryController[F[_]](
       }
 
   def routes(auth: Authenticate => F[Session]): HttpRoutes[F] =
-    Http4sServerInterpreter[F]().toRoutes(
+    Http4sServerInterpreter[F](serverOptions).toRoutes(
       List(
         getAllCategories(auth),
         getCategoryById(auth),

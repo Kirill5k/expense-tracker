@@ -19,7 +19,7 @@ final class HealthController[F[_]: Async](
     private val startupTime: Ref[F, Instant]
 ) extends Controller[F] with TapirJsonCirce with SchemaDerivation {
 
-  implicit val statusSchema: Schema[HealthController.AppStatus] = Schema.string
+  given Schema[HealthController.AppStatus] = Schema.string
 
   private val statusEndpoint: ServerEndpoint[Any, F] = infallibleEndpoint.get
     .in("health" / "status")
