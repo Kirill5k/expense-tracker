@@ -10,6 +10,7 @@ import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.web.ErrorResponse
+import org.http4s.HttpRoutes
 import sttp.tapir.generic.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
@@ -21,6 +22,8 @@ import java.net.InetSocketAddress
 trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with JsonCodecs {
 
   private val bearerToken = auth.bearer[String]().map(BearerToken.apply)(_.value)
+
+  def routes(authenticate: Authenticate => F[Session]): HttpRoutes[F]
 
   protected def securedEndpoint(
       authenticate: Authenticate => F[Session]

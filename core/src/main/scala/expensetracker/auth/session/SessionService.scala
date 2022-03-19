@@ -1,9 +1,13 @@
 package expensetracker.auth.session
 
-import cats.Monad
+import cats.syntax.flatMap._
+import cats.syntax.functor._
+import cats.{ApplicativeThrow, Monad, MonadThrow}
 import expensetracker.auth.Authenticate
+import expensetracker.auth.jwt.JwtEncoder
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
+import expensetracker.common.errors.AppError
 
 trait SessionService[F[_]]:
   def authenticate(auth: Authenticate): F[Session]
@@ -13,10 +17,19 @@ trait SessionService[F[_]]:
   def invalidateAll(uid: UserId): F[Unit]
 
 final private class LiveSessionService[F[_]](
+    private val jwtEncoder: JwtEncoder[F],
     private val repository: SessionRepository[F]
+)(using
+    F: MonadThrow[F]
 ) extends SessionService[F] {
 
-  override def authenticate(auth: Authenticate): F[Session] = ???
+  override def authenticate(auth: Authenticate): F[Session] =
+    for
+      jwt          <- jwtEncoder.decode(auth.token)
+      maybeSession <- repository.find(jwt.sessionId)
+      session      <- F.fromOption(maybeSession, AppError.SessionDoesNotExist(jwt.sessionId))
+      _            <- F.ensure(F.pure(session.userId))(AppError.SomeoneElsesSession)(_ == jwt.userId)
+    yield session
 
   override def create(cs: CreateSession): F[SessionId] =
     repository.create(cs)
@@ -32,6 +45,5 @@ final private class LiveSessionService[F[_]](
 }
 
 object SessionService:
-  def make[F[_]: Monad](repo: SessionRepository[F]): F[SessionService[F]] =
-    Monad[F].pure(LiveSessionService[F](repo))
-
+  def make[F[_]: MonadThrow](jwtEncoder: JwtEncoder[F], repo: SessionRepository[F]): F[SessionService[F]] =
+    Monad[F].pure(LiveSessionService[F](jwtEncoder, repo))

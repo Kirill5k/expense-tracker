@@ -28,12 +28,12 @@ object Auth {
   def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
     for {
       sessRepo <- SessionRepository.make[F](resources.mongo)
-      sessSvc  <- SessionService.make[F](sessRepo)
+      jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)
+      sessSvc  <- SessionService.make[F](jwtEnc, sessRepo)
       accRepo  <- UserRepository.make[F](resources.mongo)
       encr     <- PasswordEncryptor.make[F](config)
       accSvc   <- UserService.make[F](accRepo, encr)
       authSvc  <- AuthService.make[F](accSvc, sessSvc)
-      jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)
       authCtrl <- AuthController.make[F](authSvc, dispatcher, jwtEnc)
     } yield Auth[F](authSvc, authCtrl)
 }

@@ -1,6 +1,7 @@
 package expensetracker.common
 
 import expensetracker.auth.user.{UserEmail, UserId}
+import expensetracker.auth.session.SessionId
 import expensetracker.category.{CategoryId, CategoryName}
 import expensetracker.transaction.TransactionId
 import pdi.jwt.JwtAlgorithm
@@ -34,6 +35,9 @@ object errors {
     case object SomeoneElsesSession extends Forbidden:
       override val message: String = "The current session belongs to a different user"
 
+    final case class SessionDoesNotExist(id: SessionId) extends Forbidden:
+      override val message: String = s"Session with id $id does not exist"
+    
     case object IdMismatch extends BadReq:
       override val message: String = "The id supplied in the path does not match with the id in the request body"
 
@@ -48,7 +52,7 @@ object errors {
 
     final case class InvalidJwtEncryptionAlgorithm(alg: JwtAlgorithm) extends AppError:
       override val message = s"unrecognized jwt encryption algorithm $alg"
-
+    
     final case class InvalidJwtToken(message: String) extends Forbidden
   }
 }

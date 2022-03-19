@@ -34,6 +34,7 @@ final class CategoryController[F[_]: Logger](
 )(using
     F: Concurrent[F]
 ) extends Controller[F] {
+  
   private val prefixPath = "/categories"
 
   object CategoryIdPath {
@@ -144,5 +145,5 @@ object CategoryController {
   }
 
   def make[F[_]: Concurrent: Logger](service: CategoryService[F]): F[CategoryController[F]] =
-    Monad[F].pure(new CategoryController[F](service))
+    Monad[F].pure(CategoryController[F](service))
 }
