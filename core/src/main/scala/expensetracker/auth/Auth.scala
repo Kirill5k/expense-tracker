@@ -16,12 +16,12 @@ import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]: Temporal] private (
-    private val authService: AuthService[F],
-    private val authController: AuthController[F]
+    val service: AuthService[F],
+    val controller: AuthController[F]
 ) {
-  val sessionAuthMiddleware: AuthMiddleware[F, Session] = SessionAuth.middleware[F](authService.findSession)
+  val sessionAuthMiddleware: AuthMiddleware[F, Session] = SessionAuth.middleware[F](service.findSession)
 
-  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = authController.routes(authMiddleware)
+  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = controller.routes(authMiddleware)
 }
 
 object Auth {

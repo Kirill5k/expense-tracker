@@ -21,13 +21,12 @@ final class Http[F[_]: Async] private (
     private val transactions: Transactions[F]
 ) {
 
-  //TODO: fix routes
   private val routes: HttpRoutes[F] = {
     val api = auth.routes(auth.sessionAuthMiddleware) <+>
-//      categories.routes(auth.sessionAuthMiddleware) <+>
+      categories.controller.routes(auth.service.authenticate) <+>
       transactions.routes(auth.sessionAuthMiddleware)
 
-    Router("/api" -> api, "/" -> health.routes)
+    Router("/api" -> api, "/" -> health.controller.routes)
   }
 
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => AutoSlash(http) }

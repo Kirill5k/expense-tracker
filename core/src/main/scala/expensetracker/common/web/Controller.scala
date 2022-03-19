@@ -45,7 +45,7 @@ object Controller {
   private val EmptyFieldValidation  = "Predicate isEmpty\\(\\) did not fail\\.".r
   private val IdValidation          = "Predicate failed: \\((.*) is valid id\\).".r
 
-  //TODO: to be removed
+  // TODO: to be removed
   private val _FailedRegexValidation = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.: DownField\\((.*)\\)".r
   private val _NullFieldValidation   = "Attempt to decode value on failed cursor: DownField\\((.*)\\)".r
   private val _EmptyFieldValidation  = "Predicate isEmpty\\(\\) did not fail\\.: DownField\\((.*)\\)".r
@@ -54,14 +54,16 @@ object Controller {
   private val WWWAuthHeader = `WWW-Authenticate`(Challenge("Credentials", "Access to the user data"))
 
   private def formatJsonError(err: JsonDecodeException): String =
-    err.errors.map { je =>
-      je.msg match
-        case FailedRegexValidation(value) => s"$value is not a valid ${je.path.head.name}"
-        case NullFieldValidation() => s"${je.path.head.name} is required"
-        case EmptyFieldValidation() => s"${je.path.head.name} must not be empty"
-        case IdValidation(value) => s"$value is not a valid ${je.path.head.name}"
-        case msg => msg
-    }.mkString(", ")
+    err.errors
+      .map { je =>
+        je.msg match
+          case FailedRegexValidation(value) => s"$value is not a valid ${je.path.head.name}"
+          case NullFieldValidation()        => s"${je.path.head.name} is required"
+          case EmptyFieldValidation()       => s"${je.path.head.name} must not be empty"
+          case IdValidation(value)          => s"$value is not a valid ${je.path.head.name}"
+          case msg                          => msg
+      }
+      .mkString(", ")
 
   private def formatValidationError(cause: Throwable): Option[String] =
     cause.getMessage match {

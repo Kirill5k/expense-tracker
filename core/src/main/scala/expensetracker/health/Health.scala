@@ -6,9 +6,7 @@ import org.http4s.HttpRoutes
 
 final class Health[F[_]] private (
     val controller: HealthController[F]
-) {
-  val routes: HttpRoutes[F] = controller.routes
-}
+)
 
 object Health {
   def make[F[_]: Async]: F[Health[F]] =
