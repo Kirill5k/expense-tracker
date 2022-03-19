@@ -29,6 +29,7 @@ final private class LiveSessionService[F[_]](
       maybeSession <- repository.find(jwt.sessionId)
       session      <- F.fromOption(maybeSession, AppError.SessionDoesNotExist(jwt.sessionId))
       _            <- F.ensure(F.pure(session.userId))(AppError.SomeoneElsesSession)(_ == jwt.userId)
+      _            <- F.ensure(F.pure(session))(AppError.ExpiredSession)(_.active)
     yield session
 
   override def create(cs: CreateSession): F[SessionId] =

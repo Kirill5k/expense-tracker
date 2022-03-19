@@ -29,9 +29,9 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
   def requestWithAuthHeader(
       uri: org.http4s.Uri,
       method: org.http4s.Method = Method.GET,
-      bearerToken: String = "token"
+      authHeaderValue: String = "Bearer token"
   ): Request[IO] =
-    Request[IO](uri = uri, method = method, headers = Headers(Header.Raw(CIString("authorization"), s"Bearer $bearerToken")))
+    Request[IO](uri = uri, method = method, headers = Headers(Header.Raw(CIString("authorization"), authHeaderValue)))
 
   def sessMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
     SessionAuth.middleware(_ => IO.pure(sess))

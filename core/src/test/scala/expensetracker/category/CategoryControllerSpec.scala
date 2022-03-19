@@ -3,7 +3,7 @@ package expensetracker.category
 import cats.effect.IO
 import expensetracker.ControllerSpec
 import expensetracker.auth.user.UserId
-import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
+import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist, ExpiredSession}
 import expensetracker.fixtures.{Categories, Sessions, Users}
 import org.http4s.{Method, Request, Status, Uri}
 import org.http4s.implicits.*
@@ -15,7 +15,48 @@ class CategoryControllerSpec extends ControllerSpec {
 
   "A CategoryController" when {
 
-    // TODO: auth tests (missing header, invalid header, invalid token)
+    "Authentication fails" should {
+      "return error when session has expired" in {
+        val svc = mock[CategoryService[IO]]
+
+        val req = requestWithAuthHeader(uri"/categories")
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(_ => IO.raiseError(ExpiredSession)).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Session has expired"}"""))
+        verifyNoInteractions(svc)
+      }
+      
+      "return error empty bearer token" in {
+        val svc = mock[CategoryService[IO]]
+
+        val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "Bearer ")
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Invalid Bearer token"}"""))
+        verifyNoInteractions(svc)
+      }
+
+      "return error on missing bearer token" in {
+        val svc = mock[CategoryService[IO]]
+
+        val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "foo")
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+
+        val responseBody = """{"message":"Invalid authorization header - The given value doesn't start with Bearer"}"""
+        verifyJsonResponse(res, Status.Forbidden, Some(responseBody))
+        verifyNoInteractions(svc)
+      }
+
+      "return error on missing auth header" in {
+        val svc = mock[CategoryService[IO]]
+
+        val req = Request[IO](uri = uri"/categories", method = Method.GET)
+        val res = CategoryController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Missing authorization header"}"""))
+        verifyNoInteractions(svc)
+      }
+    }
 
     "POST /categories" should {
       "create new cat and return 201 on success" in {
@@ -38,7 +79,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val req     = requestWithAuthHeader(uri"/categories", method = Method.POST).withEntity(reqBody)
         val res     = CategoryController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Conflict, Some(s"""{"message":"A category with name cat-1 already exists"}"""))
+        verifyJsonResponse(res, Status.Conflict, Some("""{"message":"A category with name cat-1 already exists"}"""))
         verify(svc).create(Categories.create())
       }
 
@@ -52,7 +93,7 @@ class CategoryControllerSpec extends ControllerSpec {
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some(s"""{"message":"Invalid category kind foo"}""")
+          Some("""{"message":"Invalid category kind foo"}""")
         )
         verifyNoInteractions(svc)
       }

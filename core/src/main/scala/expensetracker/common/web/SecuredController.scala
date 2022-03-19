@@ -10,13 +10,15 @@ import expensetracker.auth.Authenticate
 import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
+import expensetracker.common.errors.AppError
 import expensetracker.common.validations.ColorString
 import expensetracker.common.web.ErrorResponse
 import org.http4s.HttpRoutes
 import sttp.tapir.generic.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
-import sttp.model.StatusCode
+import sttp.model.{HeaderNames, StatusCode}
+import sttp.tapir.EndpointIO.Header
 import sttp.tapir.server.{PartialServerEndpoint, ValuedEndpointOutput}
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.interceptor.DecodeFailureContext
@@ -29,24 +31,20 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
   given Schema[ColorString]    = Schema.string
   given Schema[NonEmptyString] = Schema.string
 
-  private val bearerToken = auth.bearer[String]().map(BearerToken.apply)(_.value)
+  private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
   private val error       = statusCode.and(jsonBody[ErrorResponse])
 
   def routes(authenticate: Authenticate => F[Session]): HttpRoutes[F]
 
   protected def securedEndpoint(
-      authenticate: Authenticate => F[Session]
+      auth: Authenticate => F[Session]
   )(using
       F: MonadThrow[F]
   ): PartialServerEndpoint[BearerToken, Session, Unit, (StatusCode, ErrorResponse), Unit, Any, F] =
     endpoint
       .securityIn(bearerToken)
       .errorOut(error)
-      .serverSecurityLogic { token =>
-        authenticate(Authenticate(token))
-          .map(_.asRight[(StatusCode, ErrorResponse)])
-          .handleError(e => Controller.mapError(e).asLeft[Session])
-      }
+      .serverSecurityLogic(t => auth(Authenticate(t)).mapResponse(identity))
 
   extension [A](fa: F[A])(using F: MonadThrow[F])
     def voidResponse: F[Either[(StatusCode, ErrorResponse), Unit]] = mapResponse(_ => ())
@@ -57,11 +55,21 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
 
   protected def serverOptions(using F: Sync[F]): Http4sServerOptions[F, F] = Http4sServerOptions
     .customInterceptors[F, F]
-    .exceptionHandler((ctx: ExceptionContext) => Some(ValuedEndpointOutput(error, Controller.mapError(ctx.e))))
+    .exceptionHandler((ctx: ExceptionContext) => errorEndpointOut(ctx.e))
     .decodeFailureHandler { (ctx: DecodeFailureContext) =>
-      ctx.failure match
-        case DecodeResult.Error(_, e) => Some(ValuedEndpointOutput(error, Controller.mapError(e)))
-        case _                        => None
+      if (ctx.failingInput.toString.matches("Header.Authorization.*")) {
+        ctx.failure match
+          case DecodeResult.Error(_, e)     => errorEndpointOut(AppError.InvalidAuthorizationHeader(e.getMessage.trim))
+          case DecodeResult.Missing         => errorEndpointOut(AppError.MissingAuthorizationHeader)
+          case DecodeResult.InvalidValue(_) => errorEndpointOut(AppError.InvalidBearerToken)
+          case _                            => None
+      } else {
+        ctx.failure match
+          case DecodeResult.Error(_, e) => errorEndpointOut(e)
+          case _                        => None
+      }
     }
     .options
+
+  private val errorEndpointOut = (e: Throwable) => Some(ValuedEndpointOutput(error, Controller.mapError(e)))
 }

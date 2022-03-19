@@ -75,6 +75,24 @@ class SessionServiceSpec extends CatsSpec {
         }
       }
 
+      "return error when session has expired" in {
+        val jwtEnc = mock[JwtEncoder[IO]]
+        val repo   = mock[SessionRepository[IO]]
+        when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
+        when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess.copy(active = false))))
+
+        val result = for {
+          svc <- SessionService.make(jwtEnc, repo)
+          sid <- svc.authenticate(Authenticate(bearerToken))
+        } yield sid
+
+        result.attempt.unsafeToFuture().map { res =>
+          verify(jwtEnc).decode(bearerToken)
+          verify(repo).find(Sessions.sid)
+          res mustBe Left(AppError.ExpiredSession)
+        }
+      }
+
       "return session on success" in {
         val jwtEnc = mock[JwtEncoder[IO]]
         val repo   = mock[SessionRepository[IO]]

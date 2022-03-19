@@ -35,9 +35,21 @@ object errors {
     case object SomeoneElsesSession extends Forbidden:
       override val message: String = "The current session belongs to a different user"
 
+    case object ExpiredSession extends Forbidden:
+      override val message: String = "Session has expired"
+
+    case object InvalidBearerToken extends Forbidden:
+      override val message: String = "Invalid Bearer token"
+
+    case object MissingAuthorizationHeader extends Forbidden:
+      override val message: String = "Missing authorization header"
+
+    final case class InvalidAuthorizationHeader(error: String) extends Forbidden:
+      override val message: String = s"Invalid authorization header - $error"
+
     final case class SessionDoesNotExist(id: SessionId) extends Forbidden:
       override val message: String = s"Session with id $id does not exist"
-    
+
     case object IdMismatch extends BadReq:
       override val message: String = "The id supplied in the path does not match with the id in the request body"
 
@@ -52,7 +64,7 @@ object errors {
 
     final case class InvalidJwtEncryptionAlgorithm(alg: JwtAlgorithm) extends AppError:
       override val message = s"unrecognized jwt encryption algorithm $alg"
-    
+
     final case class InvalidJwtToken(message: String) extends Forbidden
   }
 }
