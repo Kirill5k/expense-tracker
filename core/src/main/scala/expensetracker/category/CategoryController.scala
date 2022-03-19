@@ -79,7 +79,7 @@ final class CategoryController[F[_]](
         F.ensure(catView.pure[F])(IdMismatch)(_.id.value == cid.value) >>
           service
             .update(catView.toDomain(session.userId))
-            .mapResponse(_ => ())
+            .voidResponse
       }
 
   private def hideCategory(auth: Authenticate => F[Session]) =
@@ -90,7 +90,7 @@ final class CategoryController[F[_]](
       .serverLogic { session => (cid, hideCat) =>
         service
           .hide(session.userId, cid, hideCat.hidden)
-          .mapResponse(_ => ())
+          .voidResponse
       }
 
   private def deleteCategory(auth: Authenticate => F[Session]) =
@@ -100,7 +100,7 @@ final class CategoryController[F[_]](
       .serverLogic { session => cid =>
         service
           .delete(session.userId, cid)
-          .mapResponse(_ => ())
+          .voidResponse
       }
 
   def routes(auth: Authenticate => F[Session]): HttpRoutes[F] =

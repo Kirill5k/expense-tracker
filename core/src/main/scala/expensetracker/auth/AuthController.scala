@@ -59,7 +59,7 @@ final class AuthController[F[_]: Logger](
         for {
           login <- req.as[LoginRequest]
           acc   <- service.login(login.toDomain)
-          time  <- Temporal[F].realTime.map(t => Instant.ofEpochMilli(t.toMillis))
+          time  <- Temporal[F].realTimeInstant
           sid   <- service.createSession(CreateSession(acc.id, req.from, time))
           token <- jwtEncoder.encode(JwtToken(sid, acc.id))
           res   <- Ok(LoginResponse.bearer(token))

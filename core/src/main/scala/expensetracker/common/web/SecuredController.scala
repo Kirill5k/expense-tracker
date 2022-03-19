@@ -49,6 +49,7 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
       }
 
   extension [A](fa: F[A])(using F: MonadThrow[F])
+    def voidResponse: F[Either[(StatusCode, ErrorResponse), Unit]] = mapResponse(_ => ())
     def mapResponse[B](fab: A => B): F[Either[(StatusCode, ErrorResponse), B]] =
       fa
         .map(fab(_).asRight[(StatusCode, ErrorResponse)])
