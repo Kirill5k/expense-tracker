@@ -20,7 +20,7 @@ trait JsonCodecs {
       Try(InetSocketAddress.createUnresolved(host, port.toInt))
     }
   }
-  inline given Encoder[InetSocketAddress] = Encoder[String].contramap(_.toString)
+  inline given Encoder[InetSocketAddress] = Encoder[String].contramap(ip => s"${ip.getHostName}:${ip.getPort}")
 
   inline given currDec: Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for {
