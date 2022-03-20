@@ -21,10 +21,11 @@ import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
 import sttp.model.{HeaderNames, StatusCode}
 import sttp.tapir.EndpointIO.Header
-import sttp.tapir.server.{PartialServerEndpoint, ValuedEndpointOutput}
+import sttp.tapir.server.PartialServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.exception.{ExceptionContext, ExceptionHandler}
+import sttp.tapir.server.model.ValuedEndpointOutput
 
 trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with JsonCodecs {
 

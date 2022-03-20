@@ -5,13 +5,13 @@ object Dependencies {
     val mongo4cats = "0.4.6"
     val pureConfig = "0.17.1"
     val circe      = "0.14.1"
-    val http4s     = "0.23.10"
-    val logback    = "1.2.10"
+    val http4s     = "0.23.11"
+    val logback    = "1.2.11"
     val log4cats   = "2.2.0"
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.9.28"
-    val tapir      = "1.0.0-M1"
+    val tapir      = "1.0.0-M2"
     val jwt        = "9.0.4"
 
     val scalaTest = "3.2.11"
@@ -54,12 +54,9 @@ object Dependencies {
     }
 
     object http4s {
-      val core   = "org.http4s" %% "http4s-core"         % Versions.http4s
-      val dsl    = "org.http4s" %% "http4s-dsl"          % Versions.http4s
-      val server = "org.http4s" %% "http4s-server"       % Versions.http4s
       val blaze  = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
       val circe  = "org.http4s" %% "http4s-circe"        % Versions.http4s
-      val all    = Seq(core, dsl, server, blaze, circe)
+      val all    = Seq(blaze, circe)
     }
 
     object tapir {
