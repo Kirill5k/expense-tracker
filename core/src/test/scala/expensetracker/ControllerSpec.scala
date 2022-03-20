@@ -2,9 +2,6 @@ package expensetracker
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.auth.jwt.BearerToken
-import expensetracker.auth.session.Session
-import expensetracker.fixtures.Sessions
 import io.circe.parser.*
 import io.circe.{Json, JsonObject}
 import org.http4s.circe.*
@@ -14,8 +11,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.typelevel.ci.CIString
-import org.typelevel.log4cats.Logger
-import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.io.Source
 

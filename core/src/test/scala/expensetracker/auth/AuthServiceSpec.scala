@@ -3,9 +3,10 @@ package expensetracker.auth
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.fixtures.{Users, Sessions}
+import expensetracker.auth.jwt.BearerToken
+import expensetracker.fixtures.{Sessions, Users}
 import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmail, UserId, UserService, UserSettings}
-import expensetracker.auth.session.{SessionId, SessionService}
+import expensetracker.auth.session.{CreateSession, SessionId, SessionService}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
@@ -26,22 +27,6 @@ class AuthServiceSpec extends CatsSpec {
         verify(accSvc).create(Users.details, Users.pwd)
         verifyNoInteractions(sessSvc)
         res mustBe Users.uid1
-      }
-    }
-
-    "find session by session id" in {
-      val (accSvc, sessSvc) = mocks
-      when(sessSvc.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
-
-      val result = for {
-        authSvc <- AuthService.make[IO](accSvc, sessSvc)
-        res     <- authSvc.findSession(Sessions.sid)
-      } yield res
-
-      result.unsafeToFuture().map { res =>
-        verifyNoInteractions(accSvc)
-        verify(sessSvc).find(Sessions.sid)
-        res mustBe Some(Sessions.sess)
       }
     }
 
@@ -77,6 +62,22 @@ class AuthServiceSpec extends CatsSpec {
       }
     }
 
+    "create new session" in {
+      val (accSvc, sessSvc) = mocks
+      when(sessSvc.create(any[CreateSession])).thenReturn(IO.pure(BearerToken("token")))
+
+      val result = for {
+        authSvc <- AuthService.make[IO](accSvc, sessSvc)
+        res     <- authSvc.createSession(Sessions.create())
+      } yield res
+
+      result.unsafeToFuture().map { res =>
+        verify(sessSvc).create(Sessions.create())
+        verifyNoInteractions(accSvc)
+        res mustBe BearerToken("token")
+      }
+    }
+    
     "delete session on logout" in {
       val (accSvc, sessSvc) = mocks
       when(sessSvc.unauth(any[SessionId])).thenReturn(IO.unit)

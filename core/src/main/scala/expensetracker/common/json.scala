@@ -1,7 +1,6 @@
 package expensetracker.common
 
 import cats.syntax.either.*
-import com.comcast.ip4s.IpAddress
 import expensetracker.auth.session.SessionStatus
 import expensetracker.category.CategoryKind
 import expensetracker.transaction.TransactionKind
@@ -14,9 +13,6 @@ import scala.util.Try
 object json extends JsonCodecs
 
 trait JsonCodecs {
-  inline given Decoder[IpAddress] = Decoder[String].emap(ip => IpAddress.fromString(ip).toRight(s"invalid ip address $ip"))
-  inline given Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
-
   inline given Decoder[InetSocketAddress] = Decoder[String].emapTry { ip =>
     Try(ip.split(":")).flatMap { address =>
       val host = address.headOption.getOrElse("0.0.0.0")

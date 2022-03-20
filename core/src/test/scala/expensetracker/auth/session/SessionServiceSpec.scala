@@ -117,16 +117,17 @@ class SessionServiceSpec extends CatsSpec {
         val jwtEnc = mock[JwtEncoder[IO]]
         val repo   = mock[SessionRepository[IO]]
         when(repo.create(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
+        when(jwtEnc.encode(any[JwtToken])).thenReturn(IO.pure(BearerToken("token")))
 
         val result = for {
           svc <- SessionService.make(jwtEnc, repo)
-          sid <- svc.create(Sessions.create())
-        } yield sid
+          tok <- svc.create(Sessions.create())
+        } yield tok
 
         result.unsafeToFuture().map { res =>
-          verifyNoInteractions(jwtEnc)
+          verify(jwtEnc).encode(JwtToken(Sessions.sid, Users.uid1))
           verify(repo).create(Sessions.create())
-          res mustBe Sessions.sid
+          res mustBe BearerToken("token")
         }
       }
     }

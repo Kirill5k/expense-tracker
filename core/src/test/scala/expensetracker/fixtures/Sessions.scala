@@ -1,6 +1,5 @@
 package expensetracker.fixtures
 
-import com.comcast.ip4s.IpAddress
 import expensetracker.auth.session.*
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId

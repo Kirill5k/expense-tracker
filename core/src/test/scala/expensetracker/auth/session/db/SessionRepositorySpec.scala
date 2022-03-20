@@ -3,7 +3,6 @@ package expensetracker.auth.session.db
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import cats.implicits._
-import com.comcast.ip4s.IpAddress
 import expensetracker.MongoOps
 import expensetracker.fixtures.{Sessions, Users}
 import expensetracker.auth.session._
