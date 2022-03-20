@@ -25,8 +25,10 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
 
-final private class LiveTransactionRepository[F[_]: Async](
+final private class LiveTransactionRepository[F[_]](
     private val collection: MongoCollection[F, TransactionEntity]
+)(using
+  F: Async[F]
 ) extends TransactionRepository[F] {
 
   override def create(tx: CreateTransaction): F[TransactionId] = {
@@ -47,9 +49,8 @@ final private class LiveTransactionRepository[F[_]: Async](
     collection
       .find(userIdEq(uid).and(idEq(txid.value)))
       .first
-      .flatMap {
-        case Some(tx) => tx.toDomain.pure[F]
-        case None     => TransactionDoesNotExist(txid).raiseError[F, Transaction]
+      .flatMap { maybetx =>
+        F.fromOption(maybetx.map(_.toDomain), TransactionDoesNotExist(txid))
       }
 
   override def update(tx: Transaction): F[Unit] =
@@ -58,17 +59,15 @@ final private class LiveTransactionRepository[F[_]: Async](
         userIdEq(tx.userId).and(idEq(tx.id.value)),
         TransactionEntity.from(tx)
       )
-      .flatMap {
-        case Some(_) => ().pure[F]
-        case None    => TransactionDoesNotExist(tx.id).raiseError[F, Unit]
+      .flatMap { maybetx =>
+        F.fromOption(maybetx.void, TransactionDoesNotExist(tx.id))
       }
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
       .findOneAndDelete(userIdEq(uid).and(idEq(txid.value)))
-      .flatMap {
-        case Some(_) => ().pure[F]
-        case None    => TransactionDoesNotExist(txid).raiseError[F, Unit]
+      .flatMap { maybetx =>
+        F.fromOption(maybetx.void, TransactionDoesNotExist(txid))
       }
 
   override def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =

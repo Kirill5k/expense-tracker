@@ -16,14 +16,16 @@ import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
 trait UserRepository[F[_]] extends Repository[F]:
-  def find(aid: UserId): F[User]
+  def find(uid: UserId): F[User]
   def findBy(email: UserEmail): F[Option[User]]
   def create(details: UserDetails, password: PasswordHash): F[UserId]
-  def updateSettings(aid: UserId, settings: UserSettings): F[Unit]
-  def updatePassword(aid: UserId)(password: PasswordHash): F[Unit]
+  def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
+  def updatePassword(uid: UserId)(password: PasswordHash): F[Unit]
 
-final private class LiveUserRepository[F[_]: Async](
+final private class LiveUserRepository[F[_]](
     private val collection: MongoCollection[F, AccountEntity]
+)(using
+  F: Async[F]
 ) extends UserRepository[F] {
 
   override def findBy(email: UserEmail): F[Option[User]] =
@@ -43,13 +45,12 @@ final private class LiveUserRepository[F[_]: Async](
           AccountAlreadyExists(details.email).raiseError[F, UserId]
       }
 
-  override def find(aid: UserId): F[User] =
+  override def find(uid: UserId): F[User] =
     collection
-      .find(idEq(aid.value))
+      .find(idEq(uid.value))
       .first
-      .flatMap {
-        case Some(user) => user.toDomain.pure[F]
-        case None       => AccountDoesNotExist(aid).raiseError[F, User]
+      .flatMap { maybeUser =>
+        F.fromOption(maybeUser.map(_.toDomain), AccountDoesNotExist(uid))
       }
 
   override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =

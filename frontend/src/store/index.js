@@ -165,7 +165,9 @@ export default new Vuex.Store({
         .catch(() => commit('logout'))
     },
     getUser ({ state, commit, dispatch }) {
-      commit('loading')
+      if (!state.user.id) {
+        commit('loading')
+      }
       return Clients.get(state.isOnline)
         .getUser(state.accessToken)
         .then(acc => {

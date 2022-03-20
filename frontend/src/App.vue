@@ -87,11 +87,7 @@ export default {
     Page
   },
   mounted () {
-    console.log(this.$store.state.accessToken)
     this.setTheme(this.darkMode)
-    if (!this.userId) {
-      this.$store.commit('loading')
-    }
     this.$store.dispatch('getUser')
   },
   data: () => ({
@@ -108,9 +104,6 @@ export default {
     },
     darkMode () {
       return this.$store.state.user?.settings?.darkMode
-    },
-    userId () {
-      return this.$store.state.user?.id
     }
   },
   watch: {

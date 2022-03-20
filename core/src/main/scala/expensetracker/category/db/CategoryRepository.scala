@@ -27,8 +27,10 @@ trait CategoryRepository[F[_]] extends Repository[F]:
   def hide(aid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit]
   def isHidden(aid: UserId, cid: CategoryId): F[Boolean]
 
-final private class LiveCategoryRepository[F[_]: Async](
+final private class LiveCategoryRepository[F[_]](
     private val collection: MongoCollection[F, CategoryEntity]
+)(using
+    F: Async[F]
 ) extends CategoryRepository[F] {
 
   override def getAll(aid: UserId): F[List[Category]] =
@@ -42,17 +44,15 @@ final private class LiveCategoryRepository[F[_]: Async](
     collection
       .find(userIdEq(aid).and(idEq(cid.value)))
       .first
-      .flatMap {
-        case Some(cat) => cat.toDomain.pure[F]
-        case None      => CategoryDoesNotExist(cid).raiseError[F, Category]
+      .flatMap { maybeCat =>
+        F.fromOption(maybeCat.map(_.toDomain), CategoryDoesNotExist(cid))
       }
 
   override def delete(aid: UserId, cid: CategoryId): F[Unit] =
     collection
       .findOneAndDelete(userIdEq(aid).and(idEq(cid.value)))
-      .flatMap {
-        case Some(_) => ().pure[F]
-        case None    => CategoryDoesNotExist(cid).raiseError[F, Unit]
+      .flatMap { maybeCat =>
+        F.fromOption(maybeCat.void, CategoryDoesNotExist(cid))
       }
 
   override def create(cat: CreateCategory): F[CategoryId] = {
@@ -68,9 +68,8 @@ final private class LiveCategoryRepository[F[_]: Async](
   override def update(cat: Category): F[Unit] =
     collection
       .findOneAndReplace(userIdEq(cat.userId).and(idEq(cat.id.value)), CategoryEntity.from(cat))
-      .flatMap {
-        case Some(_) => ().pure[F]
-        case None    => CategoryDoesNotExist(cat.id).raiseError[F, Unit]
+      .flatMap { maybeCat =>
+        F.fromOption(maybeCat.void, CategoryDoesNotExist(cat.id))
       }
 
   override def assignDefault(aid: UserId): F[Unit] =
