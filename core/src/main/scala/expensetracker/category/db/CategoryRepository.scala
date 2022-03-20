@@ -92,10 +92,7 @@ final private class LiveCategoryRepository[F[_]: Async](
       .map(_ > 0)
 }
 
-object CategoryRepository {
-
+object CategoryRepository:
   def make[F[_]: Async](db: MongoDatabase[F]): F[CategoryRepository[F]] =
-    db
-      .getCollectionWithCodec[CategoryEntity]("categories")
-      .map(coll => new LiveCategoryRepository[F](coll))
-}
+    db.getCollectionWithCodec[CategoryEntity]("categories")
+      .map(coll => LiveCategoryRepository[F](coll))

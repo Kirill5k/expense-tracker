@@ -31,7 +31,8 @@ final private class LiveSessionRepository[F[_]: Async](
   }
 
   override def find(sid: SessionId): F[Option[Session]] =
-    collection.findOneAndUpdate(idEq(sid.value), Update.currentDate(Field.LastAccessedAt))
+    collection
+      .findOneAndUpdate(idEq(sid.value), Update.currentDate(Field.LastAccessedAt))
       .map(_.map(_.toDomain))
 
   override def unauth(sid: SessionId): F[Unit] =
@@ -41,10 +42,8 @@ final private class LiveSessionRepository[F[_]: Async](
     collection.updateMany(userIdEq(aid), invalidateUpdate).void
 }
 
-object SessionRepository {
+object SessionRepository:
   def make[F[_]: Async](db: MongoDatabase[F]): F[SessionRepository[F]] =
-    db
-      .getCollectionWithCodec[SessionEntity]("sessions")
+    db.getCollectionWithCodec[SessionEntity]("sessions")
       .map(_.withAddedCodec[SessionStatus])
-      .map(coll => new LiveSessionRepository[F](coll))
-}
+      .map(coll => LiveSessionRepository[F](coll))

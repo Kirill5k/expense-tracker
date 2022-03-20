@@ -82,9 +82,7 @@ final private class LiveTransactionRepository[F[_]: Async](
       .map(_ > 0)
 }
 
-object TransactionRepository {
-
+object TransactionRepository:
   def make[F[_]: Async](db: MongoDatabase[F]): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
-      .map(coll => new LiveTransactionRepository[F](coll))
-}
+      .map(coll => LiveTransactionRepository[F](coll))

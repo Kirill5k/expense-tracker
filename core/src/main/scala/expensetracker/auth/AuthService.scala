@@ -51,7 +51,6 @@ final private class LiveAuthService[F[_]: Monad](
       sessionService.invalidateAll(cp.id)
 }
 
-object AuthService {
+object AuthService:
   def make[F[_]: Monad](accSvc: UserService[F], sessSvc: SessionService[F]): F[AuthService[F]] =
-    Monad[F].pure(new LiveAuthService[F](accSvc, sessSvc))
-}
+    Monad[F].pure(LiveAuthService[F](accSvc, sessSvc))

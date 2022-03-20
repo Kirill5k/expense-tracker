@@ -63,9 +63,8 @@ final private class LiveUserRepository[F[_]: Async](
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 }
 
-object UserRepository {
+object UserRepository:
   def make[F[_]: Async](db: MongoDatabase[F]): F[UserRepository[F]] =
     db.getCollectionWithCodec[AccountEntity]("users")
       .map(_.withAddedCodec[UserSettings])
-      .map(coll => new LiveUserRepository[F](coll))
-}
+      .map(coll => LiveUserRepository[F](coll))

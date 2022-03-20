@@ -40,7 +40,6 @@ final private class LiveCategoryService[F[_]](
     repository.hide(uid: UserId, cid: CategoryId, hidden: Boolean)
 }
 
-object CategoryService {
+object CategoryService:
   def make[F[_]: Monad](repository: CategoryRepository[F]): F[CategoryService[F]] =
-    Monad[F].pure(new LiveCategoryService[F](repository))
-}
+    Monad[F].pure(LiveCategoryService[F](repository))

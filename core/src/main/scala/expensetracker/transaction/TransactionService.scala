@@ -35,8 +35,6 @@ final private class LiveTransactionService[F[_]](
     repository.hide(aid, txid, hidden)
 }
 
-object TransactionService {
+object TransactionService:
   def make[F[_]: Monad](repository: TransactionRepository[F]): F[TransactionService[F]] =
-    Monad[F].pure(new LiveTransactionService[F](repository))
-
-}
+    Monad[F].pure(LiveTransactionService[F](repository))
