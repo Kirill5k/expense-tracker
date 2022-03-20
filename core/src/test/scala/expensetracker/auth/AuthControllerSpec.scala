@@ -5,12 +5,12 @@ import expensetracker.ControllerSpec
 import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
-import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword}
-import jwt.{JwtEncoder, JwtToken}
+import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword, SessionDoesNotExist}
+import jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.fixtures.{Sessions, Users}
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.implicits.*
-import org.http4s.{HttpDate, Method, Request, ResponseCookie, Status, Uri}
+import org.http4s.{HttpDate, Method, Request, Status, Uri}
 import squants.market.USD
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
@@ -22,12 +22,11 @@ class AuthControllerSpec extends ControllerSpec {
       "return current account" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.findUser(any[UserId])).thenReturn(IO.pure(Users.user))
 
-        val req = Request[IO](uri = uri"/auth/user", method = Method.GET).addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val req = requestWithAuthHeader(uri"/auth/user", Method.GET)
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
         val resBody =
           s"""{
@@ -49,7 +48,6 @@ class AuthControllerSpec extends ControllerSpec {
       "return error when id in path is different from id in session" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         val reqBody =
           """{
@@ -58,10 +56,8 @@ class AuthControllerSpec extends ControllerSpec {
             |"darkMode":false
             |}""".stripMargin
 
-        val req = Request[IO](uri = uri"/auth/user/60e70e87fb134e0c1a271122/settings", method = Method.PUT)
-          .withEntity(parseJson(reqBody))
-          .addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val req = requestWithAuthHeader(uri"/auth/user/60e70e87fb134e0c1a271122/settings", Method.PUT).withEntity(parseJson(reqBody))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))
         verifyNoInteractions(disp, svc)
@@ -70,7 +66,6 @@ class AuthControllerSpec extends ControllerSpec {
       "return 204 when after updating account settings" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
 
@@ -81,10 +76,9 @@ class AuthControllerSpec extends ControllerSpec {
             |"darkMode":false
             |}""".stripMargin
 
-        val req = Request[IO](uri = Uri.unsafeFromString(s"/auth/user/${Users.uid1}/settings"), method = Method.PUT)
+        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/auth/user/${Users.uid1}/settings"), method = Method.PUT)
           .withEntity(parseJson(reqBody))
-          .addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).updateSettings(Users.uid1, UserSettings(USD, false, Some(false)))
@@ -96,13 +90,11 @@ class AuthControllerSpec extends ControllerSpec {
       "return error when id in path is different from id in session" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         val reqBody = """{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""
-        val req = Request[IO](uri = uri"/auth/user/60e70e87fb134e0c1a271122/password", method = Method.POST)
+        val req = requestWithAuthHeader(uri"/auth/user/60e70e87fb134e0c1a271122/password", Method.POST)
           .withEntity(parseJson(reqBody))
-          .addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))
         verifyNoInteractions(disp, svc)
@@ -111,20 +103,17 @@ class AuthControllerSpec extends ControllerSpec {
       "return 204 when after updating account password" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
-        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(Sessions.sid2))
-        when(jwtEnc.encode(any[JwtToken])).thenReturn(IO.pure("token"))
+        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(BearerToken("token")))
 
-        val req = Request[IO](uri = Uri.unsafeFromString(s"/auth/user/${Users.uid1}/password"), method = Method.POST)
+        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/auth/user/${Users.uid1}/password"), Method.POST)
           .withEntity(parseJson("""{"newPassword":"new-pwd","currentPassword":"curr-pwd"}"""))
-          .addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).changePassword(ChangePassword(Users.uid1, Password("curr-pwd"), Password("new-pwd")))
-        verifyNoInteractions(disp, jwtEnc)
+        verifyNoInteractions(disp)
       }
     }
 
@@ -132,14 +121,13 @@ class AuthControllerSpec extends ControllerSpec {
       "return bad request if email is already taken" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.createUser(any[UserDetails], any[Password]))
           .thenReturn(IO.raiseError(AccountAlreadyExists(UserEmail("foo@bar.com"))))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
         verifyJsonResponse(
           res,
@@ -156,16 +144,15 @@ class AuthControllerSpec extends ControllerSpec {
       "return bad request when invalid request" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some("""{"message":"Password must not be empty"}""")
+          Some("""{"message":"password must not be empty"}""")
         )
         verifyNoInteractions(svc)
         verifyNoInteractions(disp)
@@ -174,14 +161,13 @@ class AuthControllerSpec extends ControllerSpec {
       "create new account and return 201" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.createUser(any[UserDetails], any[Password])).thenReturn(IO.pure(Users.uid1))
         when(disp.dispatch(any[Action])).thenReturn(IO.unit)
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Users.uid1}"}"""))
         verify(svc).createUser(
@@ -197,10 +183,9 @@ class AuthControllerSpec extends ControllerSpec {
       "return 422 on invalid json" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         val req = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity("""{foo}""")
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
         val responseBody = """{"message":"Invalid message body: Could not decode JSON: \"{foo}\""}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
@@ -210,13 +195,12 @@ class AuthControllerSpec extends ControllerSpec {
       "return bad req on parsing error" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         val reqBody  = parseJson("""{"email":"foo","password":""}""")
         val res      = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
-        val response = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(res))
+        val response = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(res))
 
-        val resBody = """{"message":"foo is not a valid email"}"""
+        val resBody = """{"message":"foo is not a valid email, password must not be empty"}"""
         verifyJsonResponse(response, Status.UnprocessableEntity, Some(resBody))
         verifyNoInteractions(svc, disp)
       }
@@ -224,101 +208,68 @@ class AuthControllerSpec extends ControllerSpec {
       "return unauthorized when invalid password or email" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
-        when(svc.login(any[Login]))
-          .thenReturn(IO.raiseError(InvalidEmailOrPassword))
+        when(svc.login(any[Login])).thenReturn(IO.raiseError(InvalidEmailOrPassword))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
+        val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Unauthorized, Some("""{"message":"Invalid email or password"}"""))
         verify(svc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verifyNoInteractions(disp)
       }
 
-      "return account on success and create session id cookie" in {
+      "return bearer token on success" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.login(any[Login])).thenReturn(IO.pure(Users.user))
-        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
-        when(jwtEnc.encode(any[JwtToken])).thenReturn(IO.pure("token"))
+        when(svc.createSession(any[CreateSession])).thenReturn(IO.pure(BearerToken("token")))
 
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
-        val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
-        
+        val res     = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
+
         verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""))
         verify(svc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verify(svc).createSession(any[CreateSession])
-        verify(jwtEnc).encode(JwtToken(Sessions.sid, Users.uid1))
         verifyNoInteractions(disp)
       }
     }
 
     "POST /auth/logout" should {
-      "return forbidden if session id cookie is missing" in {
+      "return forbidden if auth header is missing" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"missing session-id cookie"}"""))
+        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Missing authorization header"}"""))
         verifyNoInteractions(svc, disp)
       }
 
       "return forbidden if session does not exist" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
+        val req = requestWithAuthHeader(uri"/auth/logout", method = Method.POST)
+        val missingSession = (auth: Authenticate) => IO.raiseError(SessionDoesNotExist(Sessions.sid))
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(missingSession).orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid session-id"}"""))
-        verifyNoInteractions(svc, disp)
-      }
-
-      "return forbidden if session is inactive" in {
-        val svc    = mock[AuthService[IO]]
-        val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
-
-        val exp = Sessions.sess.copy(active = false)
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(exp))).orNotFound.run(req))
-
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"session is inactive"}"""))
-        verifyNoInteractions(svc, disp)
-      }
-
-      "return forbidden if session id is malformed" in {
-        val svc    = mock[AuthService[IO]]
-        val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
-
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST)
-          .addCookie(sessIdCookie.copy(content = "f"))
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
-
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"invalid session-id format"}"""))
+        verifyJsonResponse(res, Status.Forbidden, Some(s"""{"message":"Session with id ${Sessions.sid} does not exist"}"""))
         verifyNoInteractions(svc, disp)
       }
 
       "delete session on success" in {
         val svc    = mock[AuthService[IO]]
         val disp   = mock[ActionDispatcher[IO]]
-        val jwtEnc = mock[JwtEncoder[IO]]
 
         when(svc.logout(any[SessionId])).thenReturn(IO.unit)
 
-        val req = Request[IO](uri = uri"/auth/logout", method = Method.POST).addCookie(sessIdCookie)
-        val res = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(Some(Sessions.sess))).orNotFound.run(req))
+        val req = requestWithAuthHeader(uri"/auth/logout", method = Method.POST)
+        val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).logout(Sessions.sid)

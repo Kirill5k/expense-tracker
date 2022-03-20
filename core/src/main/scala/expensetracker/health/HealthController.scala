@@ -17,7 +17,7 @@ import sttp.tapir.json.circe.TapirJsonCirce
 
 final class HealthController[F[_]: Async](
     private val startupTime: Ref[F, Instant]
-) extends Controller[F] with TapirJsonCirce with SchemaDerivation {
+) extends TapirJsonCirce with SchemaDerivation {
 
   private val statusEndpoint: ServerEndpoint[Any, F] = infallibleEndpoint.get
     .in("health" / "status")

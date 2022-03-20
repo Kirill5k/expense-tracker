@@ -7,12 +7,11 @@ import expensetracker.Resources
 import expensetracker.auth.user.{PasswordEncryptor, UserService}
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.auth.session.db.SessionRepository
-import expensetracker.auth.session.{Session, SessionService}
+import expensetracker.auth.session.SessionService
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
 import jwt.JwtEncoder
 import org.http4s.HttpRoutes
-import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]: Temporal] private (

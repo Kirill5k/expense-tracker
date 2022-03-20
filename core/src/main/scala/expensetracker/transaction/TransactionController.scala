@@ -16,9 +16,7 @@ import expensetracker.common.validations.*
 import org.bson.types.ObjectId
 import io.circe.generic.auto.*
 import io.circe.refined.*
-import org.http4s.circe.CirceEntityCodec.*
-import org.http4s.server.{AuthMiddleware, Router}
-import org.http4s.{AuthedRoutes, HttpRoutes}
+import org.http4s.HttpRoutes
 import squants.market.Money
 import sttp.model.StatusCode
 import sttp.tapir.*

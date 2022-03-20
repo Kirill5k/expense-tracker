@@ -4,11 +4,8 @@ import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.Resources
-import expensetracker.auth.Authenticate
-import expensetracker.auth.session.Session
 import expensetracker.category.db.CategoryRepository
 import org.http4s.HttpRoutes
-import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
 
 final class Categories[F[_]] private (

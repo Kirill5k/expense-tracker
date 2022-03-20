@@ -36,7 +36,7 @@ final class AuthController[F[_]](
 
   private val basePath   = "auth"
   private val userPath   = basePath / "user"
-  private val userIdPath = basePath / path[String].map((s: String) => UserId(s))(_.value)
+  private val userIdPath = userPath / path[String].map((s: String) => UserId(s))(_.value)
 
   private def logout(auth: Authenticate => F[Session]) =
     securedEndpoint(auth).post

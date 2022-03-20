@@ -4,7 +4,6 @@ import com.comcast.ip4s.IpAddress
 import expensetracker.auth.session.*
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
-import org.http4s.RequestCookie
 
 import java.net.InetSocketAddress
 import java.time.Instant

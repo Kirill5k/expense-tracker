@@ -8,8 +8,7 @@ import expensetracker.fixtures.Sessions
 import io.circe.parser.*
 import io.circe.{Json, JsonObject}
 import org.http4s.circe.*
-import org.http4s.server.AuthMiddleware
-import org.http4s.{Header, Headers, Method, Request, RequestCookie, Response, ResponseCookie, Status}
+import org.http4s.{Header, Headers, Method, Request, Response, Status}
 import org.scalatest.Assertion
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -32,14 +31,12 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
   def verifyJsonResponse(
       response: IO[Response[IO]],
       expectedStatus: Status,
-      expectedBody: Option[String] = None,
-      expectedCookies: List[ResponseCookie] = Nil
+      expectedBody: Option[String] = None
   ): Assertion =
     response
       .flatTap { res =>
         IO {
           res.status mustBe expectedStatus
-          res.cookies must contain allElementsOf expectedCookies
         }
       }
       .flatMap { res =>

@@ -4,10 +4,7 @@ import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.Resources
-import expensetracker.auth.session.Session
 import expensetracker.transaction.db.TransactionRepository
-import org.http4s.HttpRoutes
-import org.http4s.server.AuthMiddleware
 import org.typelevel.log4cats.Logger
 
 final class Transactions[F[_]] private (
