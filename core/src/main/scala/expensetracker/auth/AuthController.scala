@@ -9,7 +9,7 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
-import expensetracker.auth.session.{CreateSession, Session}
+import expensetracker.auth.session.{CreateSession, IpAddress, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.auth.jwt.BearerToken
@@ -93,7 +93,7 @@ final class AuthController[F[_]](
 
   private def login = publicEndpoint.post
     .in(basePath / "login")
-    .in(extractFromRequest(_.connectionInfo.remote))
+    .in(extractFromRequest(_.connectionInfo.remote.map(ip => IpAddress(ip.getHostName, ip.getPort))))
     .in(jsonBody[LoginRequest])
     .out(jsonBody[LoginResponse])
     .serverLogic { (ip, login) =>

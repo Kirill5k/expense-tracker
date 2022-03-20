@@ -7,21 +7,11 @@ import expensetracker.transaction.TransactionKind
 import io.circe.{Decoder, Encoder, Json, JsonObject}
 import squants.market.{Currency, Money, defaultMoneyContext}
 
-import java.net.InetSocketAddress
 import scala.util.Try
 
 object json extends JsonCodecs
 
 trait JsonCodecs {
-  inline given Decoder[InetSocketAddress] = Decoder[String].emapTry { ip =>
-    Try(ip.split(":")).flatMap { address =>
-      val host = address.headOption.getOrElse("0.0.0.0")
-      val port = address.drop(1).headOption.getOrElse("80")
-      Try(InetSocketAddress.createUnresolved(host, port.toInt))
-    }
-  }
-  inline given Encoder[InetSocketAddress] = Encoder[String].contramap(ip => s"${ip.getHostName}:${ip.getPort}")
-
   inline given currDec: Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for {
       code     <- json("code").flatMap(_.asString).toRight("missing currency code")

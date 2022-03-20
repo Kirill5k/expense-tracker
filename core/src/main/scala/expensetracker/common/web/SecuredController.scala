@@ -26,8 +26,6 @@ import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.exception.{ExceptionContext, ExceptionHandler}
 
-import java.net.InetSocketAddress
-
 trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with JsonCodecs {
 
   given Schema[IdString]       = Schema.string

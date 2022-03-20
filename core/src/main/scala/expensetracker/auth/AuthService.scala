@@ -7,8 +7,6 @@ import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.user.*
 import expensetracker.auth.session.*
 
-import java.net.InetSocketAddress
-
 final case class Login(email: UserEmail, password: Password)
 final case class Authenticate(token: BearerToken)
 
