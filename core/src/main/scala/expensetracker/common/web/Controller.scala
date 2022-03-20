@@ -22,7 +22,7 @@ object Controller {
           case NullFieldValidation()        => s"${je.path.head.name} is required"
           case EmptyFieldValidation()       => s"${je.path.head.name} must not be empty"
           case IdValidation(value)          => s"$value is not a valid ${je.path.head.name}"
-          case msg                          => msg
+          case msg                          => s"Invalid message body: Could not decode $msg json"
       }
       .mkString(", ")
 

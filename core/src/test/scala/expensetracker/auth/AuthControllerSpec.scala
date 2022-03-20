@@ -6,7 +6,7 @@ import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmai
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword, SessionDoesNotExist}
-import jwt.{BearerToken, JwtEncoder, JwtToken}
+import expensetracker.auth.jwt.BearerToken
 import expensetracker.fixtures.{Sessions, Users}
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.implicits.*
@@ -187,7 +187,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity("""{foo}""")
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(_ => ???).orNotFound.run(req))
 
-        val responseBody = """{"message":"Invalid message body: Could not decode JSON: \"{foo}\""}"""
+        val responseBody = """{"message":"Invalid message body: Could not decode LoginRequest json"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
         verifyNoInteractions(svc, disp)
       }
