@@ -14,7 +14,7 @@ final case class Authenticate(token: BearerToken)
 
 trait AuthService[F[_]]:
   def createUser(details: UserDetails, password: Password): F[UserId]
-  def createSession(cs: CreateSession): F[SessionId]
+  def createSession(cs: CreateSession): F[BearerToken]
   def authenticate(auth: Authenticate): F[Session]
   def login(login: Login): F[User]
   def logout(sid: SessionId): F[Unit]
@@ -31,7 +31,7 @@ final private class LiveAuthService[F[_]: Monad](
   override def createUser(details: UserDetails, password: Password): F[UserId] =
     accountService.create(details, password)
 
-  override def createSession(cs: CreateSession): F[SessionId] =
+  override def createSession(cs: CreateSession): F[BearerToken] =
     sessionService.create(cs)
 
   override def authenticate(auth: Authenticate): F[Session] =

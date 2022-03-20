@@ -1,10 +1,10 @@
 package expensetracker.auth.session
 
-import com.comcast.ip4s.IpAddress
 import expensetracker.auth.user.UserId
 import expensetracker.common.types.IdType
 import io.circe.{Decoder, Encoder}
 
+import java.net.InetSocketAddress
 import java.time.Instant
 
 opaque type SessionId = String
@@ -29,12 +29,12 @@ final case class Session(
     createdAt: Instant,
     active: Boolean,
     status: SessionStatus,
-    ipAddress: Option[IpAddress],
+    ipAddress: Option[InetSocketAddress],
     lastAccessedAt: Option[Instant]
 )
 
 final case class CreateSession(
     userId: UserId,
-    ipAddress: Option[IpAddress],
+    ipAddress: Option[InetSocketAddress],
     time: Instant
 )

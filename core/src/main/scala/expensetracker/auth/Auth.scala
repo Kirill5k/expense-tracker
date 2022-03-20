@@ -7,7 +7,7 @@ import expensetracker.Resources
 import expensetracker.auth.user.{PasswordEncryptor, UserService}
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.auth.session.db.SessionRepository
-import expensetracker.auth.session.{Session, SessionAuth, SessionService}
+import expensetracker.auth.session.{Session, SessionService}
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
 import jwt.JwtEncoder
@@ -18,11 +18,7 @@ import org.typelevel.log4cats.Logger
 final class Auth[F[_]: Temporal] private (
     val service: AuthService[F],
     val controller: AuthController[F]
-) {
-  val sessionAuthMiddleware: AuthMiddleware[F, Session] = SessionAuth.middleware[F](service.findSession)
-
-  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] = controller.routes(authMiddleware)
-}
+)
 
 object Auth {
   def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
@@ -34,6 +30,6 @@ object Auth {
       encr     <- PasswordEncryptor.make[F](config)
       accSvc   <- UserService.make[F](accRepo, encr)
       authSvc  <- AuthService.make[F](accSvc, sessSvc)
-      authCtrl <- AuthController.make[F](authSvc, dispatcher, jwtEnc)
+      authCtrl <- AuthController.make[F](authSvc, dispatcher)
     } yield Auth[F](authSvc, authCtrl)
 }

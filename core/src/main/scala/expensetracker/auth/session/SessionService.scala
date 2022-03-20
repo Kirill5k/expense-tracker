@@ -1,17 +1,17 @@
 package expensetracker.auth.session
 
-import cats.syntax.flatMap._
-import cats.syntax.functor._
+import cats.syntax.flatMap.*
+import cats.syntax.functor.*
 import cats.{ApplicativeThrow, Monad, MonadThrow}
 import expensetracker.auth.Authenticate
-import expensetracker.auth.jwt.JwtEncoder
+import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
 import expensetracker.common.errors.AppError
 
 trait SessionService[F[_]]:
   def authenticate(auth: Authenticate): F[Session]
-  def create(cs: CreateSession): F[SessionId]
+  def create(cs: CreateSession): F[BearerToken]
   def find(sid: SessionId): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
   def invalidateAll(uid: UserId): F[Unit]
@@ -32,8 +32,10 @@ final private class LiveSessionService[F[_]](
       _            <- F.ensure(F.pure(session))(AppError.ExpiredSession)(_.active)
     yield session
 
-  override def create(cs: CreateSession): F[SessionId] =
-    repository.create(cs)
+  override def create(cs: CreateSession): F[BearerToken] =
+    repository
+      .create(cs)
+      .flatMap(sid => jwtEncoder.encode(JwtToken(sid, cs.userId)))
 
   override def find(sid: SessionId): F[Option[Session]] =
     repository.find(sid)

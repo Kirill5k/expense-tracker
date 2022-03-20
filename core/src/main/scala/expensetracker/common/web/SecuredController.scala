@@ -11,17 +11,16 @@ import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
-import expensetracker.common.validations.{ColorString, IdString}
+import expensetracker.common.validations.{ColorString, EmailString, IdString}
 import expensetracker.common.web.ErrorResponse
 import org.http4s.HttpRoutes
 import squants.Money
+import squants.market.Currency
 import sttp.tapir.generic.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
 import sttp.model.{HeaderNames, StatusCode}
 import sttp.tapir.EndpointIO.Header
-import sttp.tapir.Schema.SName
-import sttp.tapir.SchemaType.SProduct
 import sttp.tapir.server.{PartialServerEndpoint, ValuedEndpointOutput}
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.interceptor.DecodeFailureContext
@@ -34,8 +33,10 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
   given Schema[IdString]       = Schema.string
   given Schema[ColorString]    = Schema.string
   given Schema[NonEmptyString] = Schema.string
+  given Schema[EmailString]    = Schema.string
   // TODO: add schema
-  given Schema[Money] = Schema.string
+  given Schema[Money]    = Schema.string
+  given Schema[Currency] = Schema.string
 
   private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
   private val error       = statusCode.and(jsonBody[ErrorResponse])
@@ -51,6 +52,9 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
       .securityIn(bearerToken)
       .errorOut(error)
       .serverSecurityLogic(t => auth(Authenticate(t)).mapResponse(identity))
+
+  protected def publicEndpoint: PublicEndpoint[Unit, (StatusCode, ErrorResponse), Unit, Any] =
+    endpoint.errorOut(error)
 
   extension [A](fa: F[A])(using F: MonadThrow[F])
     def voidResponse: F[Either[(StatusCode, ErrorResponse), Unit]] = mapResponse(_ => ())

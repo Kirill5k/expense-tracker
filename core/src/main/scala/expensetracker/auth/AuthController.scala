@@ -1,106 +1,119 @@
 package expensetracker.auth
 
 import cats.Monad
-import cats.effect.Temporal
+import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
-import cats.syntax.apply.*
 import cats.syntax.functor.*
-import cats.syntax.alternative.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
-import expensetracker.auth.session.{CreateSession, Session, SessionAuth}
+import expensetracker.auth.session.{CreateSession, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
-import jwt.{BearerToken, JwtEncoder, JwtToken}
+import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.validations.*
-import expensetracker.common.web.Controller
+import expensetracker.common.web.SecuredController
 import io.circe.generic.auto.*
 import io.circe.refined.*
-import org.bson.types.ObjectId
-import org.http4s.{AuthedRoutes, HttpRoutes}
-import org.http4s.circe.CirceEntityCodec.*
-import org.http4s.server.{AuthMiddleware, Router}
-import org.typelevel.log4cats.Logger
+import org.http4s.HttpRoutes
 import squants.market.Currency
+import sttp.model.StatusCode
+import sttp.tapir.*
+import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import java.time.Instant
+import java.time.temporal.Temporal
 
-final class AuthController[F[_]: Logger](
+final class AuthController[F[_]](
     private val service: AuthService[F],
-    private val dispatcher: ActionDispatcher[F],
-    private val jwtEncoder: JwtEncoder[F]
+    private val dispatcher: ActionDispatcher[F]
 )(using
-    F: Temporal[F]
-) extends Controller[F] {
+    F: Async[F]
+) extends SecuredController[F] {
   import AuthController.*
 
-  object UserIdPath {
-    def unapply(cid: String): Option[UserId] =
-      ObjectId.isValid(cid).guard[Option].as(UserId(cid))
-  }
+  private val basePath   = "auth"
+  private val userPath   = basePath / "user"
+  private val userIdPath = basePath / path[String].map((s: String) => UserId(s))(_.value)
 
-  private val prefixPath = "/auth"
-
-  private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
-    case req @ POST -> Root / "user" =>
-      withErrorHandling {
-        for {
-          create <- req.as[CreateUserRequest]
-          aid    <- service.createUser(create.userDetails, create.userPassword)
-          _      <- dispatcher.dispatch(Action.SetupNewUser(aid))
-          res    <- Created(CreateUserResponse(aid.value))
-        } yield res
+  private def logout(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).post
+      .in(basePath / "logout")
+      .out(statusCode(StatusCode.NoContent))
+      .serverLogic { session => _ =>
+        service
+          .logout(session.id)
+          .voidResponse
       }
-    case req @ POST -> Root / "login" =>
-      withErrorHandling {
-        for {
-          login <- req.as[LoginRequest]
-          acc   <- service.login(login.toDomain)
-          time  <- Temporal[F].realTimeInstant
-          sid   <- service.createSession(CreateSession(acc.id, req.from, time))
-          token <- jwtEncoder.encode(JwtToken(sid, acc.id))
-          res   <- Ok(LoginResponse.bearer(token))
-        } yield res.addCookie(SessionAuth.responseCookie(sid))
-      }
-  }
 
-  private val authedRoutes: AuthedRoutes[Session, F] =
-    AuthedRoutes.of {
-      case GET -> Root / "user" as session =>
-        withErrorHandling {
-          service.findUser(session.userId).map(UserView.from).flatMap(Ok(_))
-        }
-      case authedReq @ PUT -> Root / "user" / UserIdPath(id) / "settings" as session =>
-        withErrorHandling {
-          for {
-            _   <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
-            req <- authedReq.req.as[UpdateUserSettingsRequest]
-            _   <- service.updateSettings(id, req.toDomain)
-            res <- NoContent()
-          } yield res
-        }
-      case authedReq @ POST -> Root / "user" / UserIdPath(id) / "password" as session =>
-        withErrorHandling {
-          for {
-            _   <- F.ensure(id.pure[F])(SomeoneElsesSession)(_ == session.userId)
-            req <- authedReq.req.as[ChangePasswordRequest]
-            _   <- service.changePassword(req.toDomain(id))
-            res <- NoContent()
-          } yield res
-        }
-      case POST -> Root / "logout" as session =>
-        withErrorHandling {
-          service.logout(session.id) *> NoContent()
-        }
+  private def changePassword(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).post
+      .in(userIdPath / "password")
+      .in(jsonBody[ChangePasswordRequest])
+      .out(statusCode(StatusCode.NoContent))
+      .serverLogic { session => (uid, req) =>
+        F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
+          service
+            .changePassword(req.toDomain(uid))
+            .voidResponse
+      }
+
+  private def updateSettings(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).put
+      .in(userIdPath / "settings")
+      .in(jsonBody[UpdateUserSettingsRequest])
+      .out(statusCode(StatusCode.NoContent))
+      .serverLogic { session => (uid, req) =>
+        F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
+          service.updateSettings(uid, req.toDomain).voidResponse
+      }
+
+  private def getCurrentUser(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).get
+      .in(userPath)
+      .out(jsonBody[UserView])
+      .serverLogic { session => _ =>
+        service
+          .findUser(session.userId)
+          .mapResponse(UserView.from)
+      }
+
+  private def createUser = publicEndpoint.post
+    .in(userPath)
+    .in(jsonBody[CreateUserRequest])
+    .out(statusCode(StatusCode.Created).and(jsonBody[CreateUserResponse]))
+    .serverLogic { req =>
+      service
+        .createUser(req.userDetails, req.userPassword)
+        .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
+        .mapResponse(uid => CreateUserResponse(uid.value))
     }
 
-  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
-    Router(
-      prefixPath -> authMiddleware(authedRoutes),
-      prefixPath -> routes
+  private def login = publicEndpoint.post
+    .in(basePath / "login")
+    .in(extractFromRequest(_.connectionInfo.remote))
+    .in(jsonBody[LoginRequest])
+    .out(jsonBody[LoginResponse])
+    .serverLogic { (ip, login) =>
+      for {
+        acc  <- service.login(login.toDomain)
+        time <- F.realTimeInstant
+        res  <- service.createSession(CreateSession(acc.id, ip, time)).mapResponse(LoginResponse.bearer)
+      } yield res
+    }
+
+  def routes(auth: Authenticate => F[Session]): HttpRoutes[F] =
+    Http4sServerInterpreter[F](serverOptions).toRoutes(
+      List(
+        login,
+        createUser,
+        getCurrentUser(auth),
+        updateSettings(auth),
+        changePassword(auth),
+        logout(auth)
+      )
     )
 }
 
@@ -179,10 +192,9 @@ object AuthController {
       ChangePassword(id, Password(currentPassword.value), Password(newPassword.value))
   }
 
-  def make[F[_]: Temporal: Logger](
+  def make[F[_]: Async](
       service: AuthService[F],
-      dispatcher: ActionDispatcher[F],
-      jwtEncoder: JwtEncoder[F]
+      dispatcher: ActionDispatcher[F]
   ): F[AuthController[F]] =
-    Monad[F].pure(AuthController[F](service, dispatcher, jwtEncoder))
+    Monad[F].pure(AuthController[F](service, dispatcher))
 }

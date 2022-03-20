@@ -250,16 +250,8 @@ class AuthControllerSpec extends ControllerSpec {
         val reqBody = parseJson("""{"email":"foo@bar.com","password":"bar"}""")
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withEntity(reqBody)
         val res     = AuthController.make[IO](svc, disp, jwtEnc).flatMap(_.routes(sessMiddleware(None)).orNotFound.run(req))
-
-        val sessCookie = ResponseCookie(
-          "session-id",
-          Sessions.sid.value,
-          httpOnly = true,
-          maxAge = Some(Long.MaxValue),
-          expires = Some(HttpDate.MaxValue),
-          path = Some("/")
-        )
-        verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""), List(sessCookie))
+        
+        verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""))
         verify(svc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verify(svc).createSession(any[CreateSession])
         verify(jwtEnc).encode(JwtToken(Sessions.sid, Users.uid1))

@@ -3,7 +3,7 @@ package expensetracker
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.auth.jwt.BearerToken
-import expensetracker.auth.session.{Session, SessionAuth}
+import expensetracker.auth.session.Session
 import expensetracker.fixtures.Sessions
 import io.circe.parser.*
 import io.circe.{Json, JsonObject}
@@ -22,19 +22,12 @@ import scala.io.Source
 
 trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
 
-  val sessIdCookie = RequestCookie("session-id", Sessions.sid.value)
-
-  given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
-
   def requestWithAuthHeader(
       uri: org.http4s.Uri,
       method: org.http4s.Method = Method.GET,
       authHeaderValue: String = "Bearer token"
   ): Request[IO] =
     Request[IO](uri = uri, method = method, headers = Headers(Header.Raw(CIString("authorization"), authHeaderValue)))
-
-  def sessMiddleware(sess: Option[Session]): AuthMiddleware[IO, Session] =
-    SessionAuth.middleware(_ => IO.pure(sess))
 
   def verifyJsonResponse(
       response: IO[Response[IO]],

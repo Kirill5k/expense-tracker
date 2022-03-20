@@ -22,7 +22,7 @@ final class Http[F[_]: Async] private (
 ) {
 
   private val routes: HttpRoutes[F] = {
-    val api = auth.routes(auth.sessionAuthMiddleware) <+>
+    val api = auth.controller.routes(auth.service.authenticate) <+>
       categories.controller.routes(auth.service.authenticate) <+>
       transactions.controller.routes(auth.service.authenticate)
 

@@ -18,7 +18,11 @@ trait JsonCodecs {
   inline given Encoder[IpAddress] = Encoder[String].contramap(_.toUriString)
 
   inline given Decoder[InetSocketAddress] = Decoder[String].emapTry { ip =>
-    Try(ip.split(":")).flatMap(address => Try(InetSocketAddress.createUnresolved(address.head, address.last.toInt)))
+    Try(ip.split(":")).flatMap { address =>
+      val host = address.headOption.getOrElse("0.0.0.0")
+      val port = address.drop(1).headOption.getOrElse("80")
+      Try(InetSocketAddress.createUnresolved(host, port.toInt))
+    }
   }
   inline given Encoder[InetSocketAddress] = Encoder[String].contramap(_.toString)
 
