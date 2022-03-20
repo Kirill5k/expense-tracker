@@ -1,18 +1,17 @@
 package expensetracker.transaction
 
 import cats.Monad
-import cats.effect.Concurrent
+import cats.effect.Async
 import cats.syntax.flatMap.*
-import cats.syntax.apply.*
 import cats.syntax.applicative.*
 import cats.syntax.functor.*
-import cats.syntax.alternative.*
 import eu.timepit.refined.types.string.NonEmptyString
+import expensetracker.auth.Authenticate
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
-import expensetracker.common.web.Controller
+import expensetracker.common.web.{Controller, SecuredController}
 import expensetracker.common.validations.*
 import org.bson.types.ObjectId
 import io.circe.generic.auto.*
@@ -20,72 +19,98 @@ import io.circe.refined.*
 import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.server.{AuthMiddleware, Router}
 import org.http4s.{AuthedRoutes, HttpRoutes}
-import org.typelevel.log4cats.Logger
 import squants.market.Money
+import sttp.model.StatusCode
+import sttp.tapir.*
+import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import java.time.LocalDate
 
-final class TransactionController[F[_]: Logger](
+final class TransactionController[F[_]](
     private val service: TransactionService[F]
 )(using
-    F: Concurrent[F]
-) extends Controller[F] {
+    F: Async[F]
+) extends SecuredController[F] {
   import TransactionController.*
 
-  private val prefixPath = "/transactions"
+  private val basePath = "transactions"
+  private val idPath   = basePath / path[String].map((s: String) => TransactionId(s))(_.value)
 
-  object TransactionIdPath {
-    def unapply(cid: String): Option[TransactionId] =
-      ObjectId.isValid(cid).guard[Option].as(TransactionId(cid))
-  }
-
-  private val authedRoutes: AuthedRoutes[Session, F] = AuthedRoutes.of {
-    case GET -> Root as session =>
-      withErrorHandling {
+  private def getAllTransactions(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).get
+      .in(basePath)
+      .out(jsonBody[List[TransactionView]])
+      .serverLogic { session => _ =>
         service
           .getAll(session.userId)
-          .map(_.map(TransactionView.from))
-          .flatMap(Ok(_))
+          .mapResponse(_.map(TransactionView.from))
       }
-    case GET -> Root / TransactionIdPath(txid) as session =>
-      withErrorHandling {
+
+  private def getTransactionById(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).get
+      .in(idPath)
+      .out(jsonBody[TransactionView])
+      .serverLogic { session => txid =>
         service
           .get(session.userId, txid)
-          .map(TransactionView.from)
-          .flatMap(Ok(_))
+          .mapResponse(TransactionView.from)
       }
-    case authReq @ POST -> Root as session =>
-      withErrorHandling {
-        for {
-          req <- authReq.req.as[CreateTransactionRequest]
-          cid <- service.create(req.toDomain(session.userId))
-          res <- Created(CreateTransactionResponse(cid.value))
-        } yield res
-      }
-    case DELETE -> Root / TransactionIdPath(txid) as session =>
-      withErrorHandling {
-        service.delete(session.userId, txid) *> NoContent()
-      }
-    case authReq @ PUT -> Root / TransactionIdPath(cid) / "hidden" as session =>
-      withErrorHandling {
-        for {
-          req <- authReq.req.as[HideTransactionRequest]
-          _   <- service.hide(session.userId, cid, req.hidden)
-          res <- NoContent()
-        } yield res
-      }
-    case authReq @ PUT -> Root / TransactionIdPath(cid) as session =>
-      withErrorHandling {
-        for {
-          txView <- F.ensure(authReq.req.as[UpdateTransactionRequest])(IdMismatch)(_.id.value == cid.value)
-          _      <- service.update(txView.toDomain(session.userId))
-          res    <- NoContent()
-        } yield res
-      }
-  }
 
-  def routes(authMiddleware: AuthMiddleware[F, Session]): HttpRoutes[F] =
-    Router(prefixPath -> authMiddleware(authedRoutes))
+  private def createTransaction(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).post
+      .in(basePath)
+      .in(jsonBody[CreateTransactionRequest])
+      .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
+      .serverLogic { session => req =>
+        service
+          .create(req.toDomain(session.userId))
+          .mapResponse(txid => CreateTransactionResponse(txid.value))
+      }
+
+  private def deleteTransaction(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).delete
+      .in(idPath)
+      .out(statusCode(StatusCode.NoContent))
+      .serverLogic { session => txid =>
+        service
+          .delete(session.userId, txid)
+          .voidResponse
+      }
+
+  private def updateTransaction(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).put
+      .in(idPath)
+      .in(jsonBody[UpdateTransactionRequest])
+      .out(statusCode(StatusCode.NoContent))
+      .serverLogic { session => (txid, txView) =>
+        F.ensure(txView.pure[F])(IdMismatch)(_.id.value == txid.value) >>
+          service
+            .update(txView.toDomain(session.userId))
+            .voidResponse
+      }
+
+  private def hideTransaction(auth: Authenticate => F[Session]) =
+    securedEndpoint(auth).put
+      .in(idPath / "hidden")
+      .in(jsonBody[HideTransactionRequest])
+      .out(statusCode(StatusCode.NoContent))
+      .serverLogic { session => (txid, hidetx) =>
+        service
+          .hide(session.userId, txid, hidetx.hidden)
+          .voidResponse
+      }
+
+  def routes(auth: Authenticate => F[Session]): HttpRoutes[F] =
+    Http4sServerInterpreter[F](serverOptions).toRoutes(
+      List(
+        getAllTransactions(auth),
+        getTransactionById(auth),
+        createTransaction(auth),
+        updateTransaction(auth),
+        hideTransaction(auth),
+        deleteTransaction(auth)
+      )
+    )
 }
 
 object TransactionController {
@@ -159,6 +184,6 @@ object TransactionController {
       )
   }
 
-  def make[F[_]: Concurrent: Logger](service: TransactionService[F]): F[TransactionController[F]] =
-    Monad[F].pure(new TransactionController[F](service))
+  def make[F[_]: Async](service: TransactionService[F]): F[TransactionController[F]] =
+    Monad[F].pure(TransactionController[F](service))
 }

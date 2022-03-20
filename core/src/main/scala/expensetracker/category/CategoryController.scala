@@ -3,7 +3,6 @@ package expensetracker.category
 import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
-import cats.syntax.either.*
 import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
@@ -22,7 +21,7 @@ import expensetracker.category.CategoryController.{
 }
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.validations.*
-import expensetracker.common.web.{Controller, ErrorResponse, SecuredController}
+import expensetracker.common.web.SecuredController
 import io.circe.generic.auto.*
 import io.circe.refined.*
 import org.http4s.HttpRoutes

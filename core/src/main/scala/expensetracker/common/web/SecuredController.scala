@@ -11,14 +11,17 @@ import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
-import expensetracker.common.validations.ColorString
+import expensetracker.common.validations.{ColorString, IdString}
 import expensetracker.common.web.ErrorResponse
 import org.http4s.HttpRoutes
+import squants.Money
 import sttp.tapir.generic.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
 import sttp.model.{HeaderNames, StatusCode}
 import sttp.tapir.EndpointIO.Header
+import sttp.tapir.Schema.SName
+import sttp.tapir.SchemaType.SProduct
 import sttp.tapir.server.{PartialServerEndpoint, ValuedEndpointOutput}
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.interceptor.DecodeFailureContext
@@ -28,8 +31,11 @@ import java.net.InetSocketAddress
 
 trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with JsonCodecs {
 
+  given Schema[IdString]       = Schema.string
   given Schema[ColorString]    = Schema.string
   given Schema[NonEmptyString] = Schema.string
+  // TODO: add schema
+  given Schema[Money] = Schema.string
 
   private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
   private val error       = statusCode.and(jsonBody[ErrorResponse])

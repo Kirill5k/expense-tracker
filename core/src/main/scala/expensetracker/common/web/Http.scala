@@ -24,7 +24,7 @@ final class Http[F[_]: Async] private (
   private val routes: HttpRoutes[F] = {
     val api = auth.routes(auth.sessionAuthMiddleware) <+>
       categories.controller.routes(auth.service.authenticate) <+>
-      transactions.routes(auth.sessionAuthMiddleware)
+      transactions.controller.routes(auth.service.authenticate)
 
     Router("/api" -> api, "/" -> health.controller.routes)
   }
