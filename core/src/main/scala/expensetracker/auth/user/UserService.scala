@@ -5,7 +5,6 @@ import cats.syntax.flatMap.*
 import cats.syntax.apply.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
-import expensetracker.auth.Login
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 

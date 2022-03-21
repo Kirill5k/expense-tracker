@@ -6,9 +6,9 @@ import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.Authenticate
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
+import expensetracker.auth.jwt.BearerToken
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.{Controller, SecuredController}
@@ -34,7 +34,7 @@ final class TransactionController[F[_]](
   private val basePath = "transactions"
   private val idPath   = basePath / path[String].map((s: String) => TransactionId(s))(_.value)
 
-  private def getAllTransactions(auth: Authenticate => F[Session]) =
+  private def getAllTransactions(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).get
       .in(basePath)
       .out(jsonBody[List[TransactionView]])
@@ -44,7 +44,7 @@ final class TransactionController[F[_]](
           .mapResponse(_.map(TransactionView.from))
       }
 
-  private def getTransactionById(auth: Authenticate => F[Session]) =
+  private def getTransactionById(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).get
       .in(idPath)
       .out(jsonBody[TransactionView])
@@ -54,7 +54,7 @@ final class TransactionController[F[_]](
           .mapResponse(TransactionView.from)
       }
 
-  private def createTransaction(auth: Authenticate => F[Session]) =
+  private def createTransaction(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).post
       .in(basePath)
       .in(jsonBody[CreateTransactionRequest])
@@ -65,7 +65,7 @@ final class TransactionController[F[_]](
           .mapResponse(txid => CreateTransactionResponse(txid.value))
       }
 
-  private def deleteTransaction(auth: Authenticate => F[Session]) =
+  private def deleteTransaction(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).delete
       .in(idPath)
       .out(statusCode(StatusCode.NoContent))
@@ -75,7 +75,7 @@ final class TransactionController[F[_]](
           .voidResponse
       }
 
-  private def updateTransaction(auth: Authenticate => F[Session]) =
+  private def updateTransaction(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).put
       .in(idPath)
       .in(jsonBody[UpdateTransactionRequest])
@@ -87,7 +87,7 @@ final class TransactionController[F[_]](
             .voidResponse
       }
 
-  private def hideTransaction(auth: Authenticate => F[Session]) =
+  private def hideTransaction(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).put
       .in(idPath / "hidden")
       .in(jsonBody[HideTransactionRequest])
@@ -98,7 +98,7 @@ final class TransactionController[F[_]](
           .voidResponse
       }
 
-  def routes(auth: Authenticate => F[Session]): HttpRoutes[F] =
+  def routes(auth: BearerToken => F[Session]): HttpRoutes[F] =
     Http4sServerInterpreter[F](serverOptions).toRoutes(
       List(
         getAllTransactions(auth),

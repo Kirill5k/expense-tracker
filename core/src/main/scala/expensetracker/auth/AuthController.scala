@@ -8,7 +8,7 @@ import cats.syntax.functor.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.user.{ChangePassword, Password, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
+import expensetracker.auth.user.*
 import expensetracker.auth.session.{CreateSession, IpAddress, Session}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
@@ -38,7 +38,7 @@ final class AuthController[F[_]](
   private val userPath   = basePath / "user"
   private val userIdPath = userPath / path[String].map((s: String) => UserId(s))(_.value)
 
-  private def logout(auth: Authenticate => F[Session]) =
+  private def logout(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).post
       .in(basePath / "logout")
       .out(statusCode(StatusCode.NoContent))
@@ -48,7 +48,7 @@ final class AuthController[F[_]](
           .voidResponse
       }
 
-  private def changePassword(auth: Authenticate => F[Session]) =
+  private def changePassword(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).post
       .in(userIdPath / "password")
       .in(jsonBody[ChangePasswordRequest])
@@ -60,7 +60,7 @@ final class AuthController[F[_]](
             .voidResponse
       }
 
-  private def updateSettings(auth: Authenticate => F[Session]) =
+  private def updateSettings(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).put
       .in(userIdPath / "settings")
       .in(jsonBody[UpdateUserSettingsRequest])
@@ -70,7 +70,7 @@ final class AuthController[F[_]](
           service.updateSettings(uid, req.toDomain).voidResponse
       }
 
-  private def getCurrentUser(auth: Authenticate => F[Session]) =
+  private def getCurrentUser(auth: BearerToken => F[Session]) =
     securedEndpoint(auth).get
       .in(userPath)
       .out(jsonBody[UserView])
@@ -104,7 +104,7 @@ final class AuthController[F[_]](
       } yield res
     }
 
-  def routes(auth: Authenticate => F[Session]): HttpRoutes[F] =
+  def routes(auth: BearerToken => F[Session]): HttpRoutes[F] =
     Http4sServerInterpreter[F](serverOptions).toRoutes(
       List(
         login,

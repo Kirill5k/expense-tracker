@@ -3,7 +3,6 @@ package expensetracker.auth.session
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
-import expensetracker.auth.Authenticate
 import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
@@ -29,7 +28,7 @@ class SessionServiceSpec extends CatsSpec {
 
         val result = for {
           svc <- SessionService.make(jwtEnc, repo)
-          sid <- svc.authenticate(Authenticate(bearerToken))
+          sid <- svc.authenticate(bearerToken)
         } yield sid
 
         result.attempt.unsafeToFuture().map { res =>
@@ -47,7 +46,7 @@ class SessionServiceSpec extends CatsSpec {
 
         val result = for {
           svc <- SessionService.make(jwtEnc, repo)
-          sid <- svc.authenticate(Authenticate(bearerToken))
+          sid <- svc.authenticate(bearerToken)
         } yield sid
 
         result.attempt.unsafeToFuture().map { res =>
@@ -65,7 +64,7 @@ class SessionServiceSpec extends CatsSpec {
 
         val result = for {
           svc <- SessionService.make(jwtEnc, repo)
-          sid <- svc.authenticate(Authenticate(bearerToken))
+          sid <- svc.authenticate(bearerToken)
         } yield sid
 
         result.attempt.unsafeToFuture().map { res =>
@@ -83,7 +82,7 @@ class SessionServiceSpec extends CatsSpec {
 
         val result = for {
           svc <- SessionService.make(jwtEnc, repo)
-          sid <- svc.authenticate(Authenticate(bearerToken))
+          sid <- svc.authenticate(bearerToken)
         } yield sid
 
         result.attempt.unsafeToFuture().map { res =>
@@ -101,7 +100,7 @@ class SessionServiceSpec extends CatsSpec {
 
         val result = for {
           svc <- SessionService.make(jwtEnc, repo)
-          sid <- svc.authenticate(Authenticate(bearerToken))
+          sid <- svc.authenticate(bearerToken)
         } yield sid
 
         result.unsafeToFuture().map { res =>

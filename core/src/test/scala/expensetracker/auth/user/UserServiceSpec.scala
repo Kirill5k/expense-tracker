@@ -4,7 +4,6 @@ import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.fixtures.Users
-import expensetracker.auth.Login
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 import org.mockito.ArgumentMatchers.any

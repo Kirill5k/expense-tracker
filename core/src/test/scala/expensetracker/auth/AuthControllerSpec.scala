@@ -2,7 +2,7 @@ package expensetracker.auth
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
-import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmail, UserId, UserName, UserSettings}
+import expensetracker.auth.user.*
 import expensetracker.auth.session.{CreateSession, SessionId}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword, SessionDoesNotExist}
@@ -255,7 +255,7 @@ class AuthControllerSpec extends ControllerSpec {
         val disp   = mock[ActionDispatcher[IO]]
 
         val req = requestWithAuthHeader(uri"/auth/logout", method = Method.POST)
-        val missingSession = (auth: Authenticate) => IO.raiseError(SessionDoesNotExist(Sessions.sid))
+        val missingSession = (auth: BearerToken) => IO.raiseError(SessionDoesNotExist(Sessions.sid))
         val res = AuthController.make[IO](svc, disp).flatMap(_.routes(missingSession).orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some(s"""{"message":"Session with id ${Sessions.sid} does not exist"}"""))

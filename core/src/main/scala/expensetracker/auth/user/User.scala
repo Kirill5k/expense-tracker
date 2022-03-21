@@ -56,3 +56,8 @@ final case class ChangePassword(
     currentPassword: Password,
     newPassword: Password
 )
+
+final case class Login(
+    email: UserEmail,
+    password: Password
+)

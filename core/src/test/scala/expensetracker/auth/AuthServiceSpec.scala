@@ -5,7 +5,7 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.CatsSpec
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.fixtures.{Sessions, Users}
-import expensetracker.auth.user.{ChangePassword, Password, UserDetails, UserEmail, UserId, UserService, UserSettings}
+import expensetracker.auth.user.*
 import expensetracker.auth.session.{CreateSession, SessionId, SessionService}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
