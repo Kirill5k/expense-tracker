@@ -12,7 +12,7 @@ import expensetracker.auth.session.Session
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
-import expensetracker.common.web.{Controller, SecuredController}
+import expensetracker.common.web.Controller
 import expensetracker.common.validations.*
 import org.bson.types.ObjectId
 import io.circe.generic.auto.*
@@ -25,11 +25,11 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import java.time.LocalDate
 
-final class TransactionController[F[_]](
+final private class TransactionController[F[_]](
     private val service: TransactionService[F]
 )(using
     F: Async[F]
-) extends SecuredController[F] {
+) extends Controller[F] {
   import TransactionController.*
 
   private val basePath = "transactions"
@@ -183,6 +183,6 @@ object TransactionController {
       )
   }
 
-  def make[F[_]: Async](service: TransactionService[F]): F[TransactionController[F]] =
+  def make[F[_]: Async](service: TransactionService[F]): F[Controller[F]] =
     Monad[F].pure(TransactionController[F](service))
 }

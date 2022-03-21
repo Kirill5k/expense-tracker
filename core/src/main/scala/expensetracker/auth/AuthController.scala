@@ -14,7 +14,7 @@ import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.validations.*
-import expensetracker.common.web.SecuredController
+import expensetracker.common.web.Controller
 import io.circe.generic.auto.*
 import io.circe.refined.*
 import org.http4s.HttpRoutes
@@ -26,12 +26,12 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 import java.time.Instant
 import java.time.temporal.Temporal
 
-final class AuthController[F[_]](
+final private class AuthController[F[_]](
     private val service: AuthService[F],
     private val dispatcher: ActionDispatcher[F]
 )(using
     F: Async[F]
-) extends SecuredController[F] {
+) extends Controller[F] {
   import AuthController.*
 
   private val basePath   = "auth"
@@ -195,6 +195,6 @@ object AuthController {
   def make[F[_]: Async](
       service: AuthService[F],
       dispatcher: ActionDispatcher[F]
-  ): F[AuthController[F]] =
+  ): F[Controller[F]] =
     Monad[F].pure(AuthController[F](service, dispatcher))
 }

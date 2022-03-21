@@ -16,7 +16,7 @@ import expensetracker.auth.jwt.BearerToken
 import expensetracker.category.CategoryController.{CategoryView, CreateCategoryRequest, CreateCategoryResponse, HideCategoryRequest, UpdateCategoryRequest}
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.validations.*
-import expensetracker.common.web.SecuredController
+import expensetracker.common.web.Controller
 import io.circe.generic.auto.*
 import io.circe.refined.*
 import org.http4s.HttpRoutes
@@ -24,11 +24,11 @@ import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 
-final class CategoryController[F[_]](
+final private class CategoryController[F[_]](
     private val service: CategoryService[F]
 )(using
     F: Async[F]
-) extends SecuredController[F] {
+) extends Controller[F] {
 
   private val basePath = "categories"
   private val idPath   = basePath / path[String].map((s: String) => CategoryId(s))(_.value)
@@ -163,6 +163,6 @@ object CategoryController {
       CategoryView(cat.id.value, cat.name.value, cat.icon.value, cat.kind, cat.color.value)
   }
 
-  def make[F[_]: Async](service: CategoryService[F]): F[CategoryController[F]] =
+  def make[F[_]: Async](service: CategoryService[F]): F[Controller[F]] =
     Monad[F].pure(CategoryController[F](service))
 }

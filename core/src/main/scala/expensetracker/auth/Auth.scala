@@ -10,13 +10,14 @@ import expensetracker.auth.session.db.SessionRepository
 import expensetracker.auth.session.SessionService
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
+import expensetracker.common.web.Controller
 import jwt.JwtEncoder
 import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]: Temporal] private (
     val service: AuthService[F],
-    val controller: AuthController[F]
+    val controller: Controller[F]
 )
 
 object Auth {
