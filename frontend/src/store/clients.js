@@ -75,7 +75,7 @@ class BackendClient {
   createCategory = (token, requestBody) =>
     fetch('/api/categories', requestWithBody(requestBody, 'POST', token))
       .then(res => res.status === 201 ? res.json() : reject(res))
-      .then(res => this.getCategory(res.id))
+      .then(res => this.getCategory(token, res.id))
 
   getCategory = (token, id) =>
     fetch(`/api/categories/${id}`, simpleRequest(token))
@@ -96,7 +96,7 @@ class BackendClient {
   createTransaction = (token, requestBody) =>
     fetch('/api/transactions', requestWithBody(requestBody, 'POST', token))
       .then(res => res.status === 201 ? res.json() : reject(res))
-      .then(res => this.getTransaction(res.id))
+      .then(res => this.getTransaction(token, res.id))
 
   getTransaction = (token, id) =>
     fetch(`/api/transactions/${id}`, simpleRequest(token))
