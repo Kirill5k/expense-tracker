@@ -11,18 +11,12 @@ import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
-import expensetracker.common.validations.{ColorString, EmailString, IdString}
-import expensetracker.common.web.ErrorResponse
 import io.circe.Codec
 import org.http4s.HttpRoutes
-import squants.Money
-import squants.market.Currency
-import sttp.tapir.generic.SchemaDerivation
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
-import sttp.model.{HeaderNames, StatusCode}
+import sttp.model.StatusCode
 import sttp.tapir.DecodeResult.Error.JsonDecodeException
-import sttp.tapir.EndpointIO.Header
 import sttp.tapir.server.PartialServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.interceptor.DecodeFailureContext
@@ -31,15 +25,7 @@ import sttp.tapir.server.model.ValuedEndpointOutput
 
 final case class ErrorResponse(message: String) derives Codec.AsObject
 
-trait Controller[F[_]] extends TapirJsonCirce with SchemaDerivation with JsonCodecs {
-
-  given Schema[IdString]       = Schema.string
-  given Schema[ColorString]    = Schema.string
-  given Schema[NonEmptyString] = Schema.string
-  given Schema[EmailString]    = Schema.string
-  // TODO: add schema
-  given Schema[Money]    = Schema.string
-  given Schema[Currency] = Schema.string
+trait Controller[F[_]] extends TapirJsonCirce with TapirSchema with JsonCodecs {
 
   private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
   private val error       = statusCode.and(jsonBody[ErrorResponse])

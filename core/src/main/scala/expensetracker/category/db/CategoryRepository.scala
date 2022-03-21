@@ -76,7 +76,7 @@ final private class LiveCategoryRepository[F[_]](
     collection
       .find(Filter.notExists(Field.UId).or(Filter.isNull(Field.UId)))
       .all
-      .map(_.map(_.copy(_id = ObjectId(), userId = Some(ObjectId(aid.value)))).toList)
+      .map(_.map(_.copy(_id = ObjectId.get, userId = Some(ObjectId(aid.value)))).toList)
       .flatMap(collection.insertMany)
       .void
 

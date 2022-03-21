@@ -44,8 +44,7 @@ object Dependencies {
       val generic = "io.circe" %% "circe-generic" % Versions.circe
       val refined = "io.circe" %% "circe-refined" % Versions.circe
       val parser  = "io.circe" %% "circe-parser"  % Versions.circe
-
-      val all = Seq(core, generic, refined, parser)
+      val all     = Seq(core, generic, refined, parser)
     }
 
     object refined {
@@ -54,9 +53,9 @@ object Dependencies {
     }
 
     object http4s {
-      val blaze  = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
-      val circe  = "org.http4s" %% "http4s-circe"        % Versions.http4s
-      val all    = Seq(blaze, circe)
+      val blaze = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
+      val circe = "org.http4s" %% "http4s-circe"        % Versions.http4s
+      val all   = Seq(blaze, circe)
     }
 
     object tapir {
