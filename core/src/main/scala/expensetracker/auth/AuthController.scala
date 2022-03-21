@@ -38,8 +38,8 @@ final class AuthController[F[_]](
   private val userPath   = basePath / "user"
   private val userIdPath = userPath / path[String].map((s: String) => UserId(s))(_.value)
 
-  private def logout(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).post
+  private def logout(using authenticator: Authenticator[F]) =
+    securedEndpoint.post
       .in(basePath / "logout")
       .out(statusCode(StatusCode.NoContent))
       .serverLogic { session => _ =>
@@ -48,8 +48,8 @@ final class AuthController[F[_]](
           .voidResponse
       }
 
-  private def changePassword(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).post
+  private def changePassword(using authenticator: Authenticator[F]) =
+    securedEndpoint.post
       .in(userIdPath / "password")
       .in(jsonBody[ChangePasswordRequest])
       .out(statusCode(StatusCode.NoContent))
@@ -60,8 +60,8 @@ final class AuthController[F[_]](
             .voidResponse
       }
 
-  private def updateSettings(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).put
+  private def updateSettings(using authenticator: Authenticator[F]) =
+    securedEndpoint.put
       .in(userIdPath / "settings")
       .in(jsonBody[UpdateUserSettingsRequest])
       .out(statusCode(StatusCode.NoContent))
@@ -70,8 +70,8 @@ final class AuthController[F[_]](
           service.updateSettings(uid, req.toDomain).voidResponse
       }
 
-  private def getCurrentUser(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).get
+  private def getCurrentUser(using authenticator: Authenticator[F]) =
+    securedEndpoint.get
       .in(userPath)
       .out(jsonBody[UserView])
       .serverLogic { session => _ =>
@@ -104,15 +104,15 @@ final class AuthController[F[_]](
       } yield res
     }
 
-  def routes(auth: BearerToken => F[Session]): HttpRoutes[F] =
+  def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
     Http4sServerInterpreter[F](serverOptions).toRoutes(
       List(
         login,
         createUser,
-        getCurrentUser(auth),
-        updateSettings(auth),
-        changePassword(auth),
-        logout(auth)
+        getCurrentUser,
+        updateSettings,
+        changePassword,
+        logout
       )
     )
 }

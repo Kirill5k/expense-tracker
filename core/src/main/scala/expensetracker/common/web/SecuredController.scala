@@ -1,11 +1,12 @@
 package expensetracker.common.web
 
 import cats.MonadThrow
-import cats.effect.{Async, Sync}
+import cats.effect.Sync
 import cats.syntax.either.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import eu.timepit.refined.types.string.NonEmptyString
+import expensetracker.auth.Authenticator
 import expensetracker.auth.session.Session
 import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
@@ -39,17 +40,16 @@ trait SecuredController[F[_]] extends TapirJsonCirce with SchemaDerivation with 
   private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
   private val error       = statusCode.and(jsonBody[ErrorResponse])
 
-  def routes(authenticate: BearerToken => F[Session]): HttpRoutes[F]
+  def routes(using authenticator: Authenticator[F]): HttpRoutes[F]
 
-  protected def securedEndpoint(
-      auth: BearerToken => F[Session]
-  )(using
-      F: MonadThrow[F]
+  protected def securedEndpoint(using
+      F: MonadThrow[F],
+      authenticator: Authenticator[F]
   ): PartialServerEndpoint[BearerToken, Session, Unit, (StatusCode, ErrorResponse), Unit, Any, F] =
     endpoint
       .securityIn(bearerToken)
       .errorOut(error)
-      .serverSecurityLogic(t => auth(t).mapResponse(identity))
+      .serverSecurityLogic(t => authenticator.authenticate(t).mapResponse(identity))
 
   protected def publicEndpoint: PublicEndpoint[Unit, (StatusCode, ErrorResponse), Unit, Any] =
     endpoint.errorOut(error)

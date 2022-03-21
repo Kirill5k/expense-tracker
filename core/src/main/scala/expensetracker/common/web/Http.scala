@@ -3,7 +3,8 @@ package expensetracker.common.web
 import cats.Monad
 import cats.effect.Async
 import cats.syntax.semigroupk.*
-import expensetracker.auth.Auth
+import expensetracker.auth.jwt.BearerToken
+import expensetracker.auth.{Auth, Authenticator}
 import expensetracker.category.Categories
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
@@ -22,9 +23,10 @@ final class Http[F[_]: Async] private (
 ) {
 
   private val routes: HttpRoutes[F] = {
-    val api = auth.controller.routes(auth.service.authenticate) <+>
-      categories.controller.routes(auth.service.authenticate) <+>
-      transactions.controller.routes(auth.service.authenticate)
+    given Authenticator[F] = (token: BearerToken) => auth.service.authenticate(token)
+    val api = auth.controller.routes <+>
+      categories.controller.routes <+>
+      transactions.controller.routes
 
     Router("/api" -> api, "/" -> health.controller.routes)
   }

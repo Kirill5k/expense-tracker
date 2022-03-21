@@ -2,6 +2,7 @@ package expensetracker.transaction
 
 import cats.effect.IO
 import expensetracker.ControllerSpec
+import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
 import expensetracker.fixtures.{Categories, Sessions, Transactions, Users}
@@ -22,6 +23,8 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.create(any[CreateTransaction])).thenReturn(IO.pure(Transactions.txid))
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val reqBody = parseJson(s"""{
             |"categoryId":"${Categories.cid}",
             |"kind":"expense",
@@ -31,7 +34,7 @@ class TransactionControllerSpec extends ControllerSpec {
             |"tags": ["foo"]
             |}""".stripMargin)
         val req = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Transactions.txid}"}"""))
         verify(svc).create(Transactions.create())
@@ -40,9 +43,11 @@ class TransactionControllerSpec extends ControllerSpec {
       "return 422 when invalid kind passed" in {
         val svc = mock[TransactionService[IO]]
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo"}""")
         val req     = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
-        val res     = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res     = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Invalid transaction kind foo, categoryId is required, amount is required, date is required"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
@@ -53,6 +58,8 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.create(any[CreateTransaction])).thenReturn(IO.pure(Transactions.txid))
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val reqBody = parseJson("""{
                                   |"categoryId":"FOO",
                                   |"kind":"expense",
@@ -60,7 +67,7 @@ class TransactionControllerSpec extends ControllerSpec {
                                   |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}}
                                   |}""".stripMargin)
         val req = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.UnprocessableEntity, Some("""{"message":"FOO is not a valid categoryId"}"""))
         verifyNoInteractions(svc)
@@ -72,8 +79,10 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(Transactions.tx())))
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(uri"/transactions", Method.GET)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Ok, Some(s"""[${Transactions.txjson}]"""))
         verify(svc).getAll(Users.uid1)
@@ -85,8 +94,10 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.get(any[UserId], any[TransactionId])).thenReturn(IO.pure(Transactions.tx()))
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.GET)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Ok, Some(Transactions.txjson))
         verify(svc).get(Users.uid1, Transactions.txid)
@@ -96,8 +107,10 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.get(any[UserId], any[TransactionId])).thenReturn(IO.raiseError(TransactionDoesNotExist(Transactions.txid)))
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.GET)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NotFound, Some(s"""{"message":"Transaction with id ${Transactions.txid} does not exist"}"""))
         verify(svc).get(Users.uid1, Transactions.txid)
@@ -109,10 +122,12 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val reqBody = parseJson("""{"hidden":true}""")
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}/hidden"), Method.PUT)
           .withEntity(reqBody)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).hide(Users.uid1, Transactions.txid, true)
@@ -125,9 +140,11 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.update(any[Transaction])).thenReturn(IO.unit)
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT)
           .withEntity(parseJson(Transactions.txjson))
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).update(Transactions.tx())
@@ -136,9 +153,11 @@ class TransactionControllerSpec extends ControllerSpec {
       "return 400 when provided ids do not match" in {
         val svc = mock[TransactionService[IO]]
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(uri"/transactions/AB0C5342AB0C5342AB0C5342", Method.PUT)
           .withEntity(parseJson(Transactions.txjson))
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
         verifyJsonResponse(res, Status.BadRequest, Some(resBody))
@@ -148,9 +167,11 @@ class TransactionControllerSpec extends ControllerSpec {
       "return 422 when request has validation errors" in {
         val svc = mock[TransactionService[IO]]
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT)
           .withEntity(parseJson("""{"id":"BC0C5342AB0C5342AB0C5342","categoryId":"foo"}"""))
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"kind is required, foo is not a valid categoryId, amount is required, date is required"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(resBody))
@@ -161,9 +182,11 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.update(any[Transaction])).thenReturn(IO.raiseError(CategoryDoesNotExist(Categories.cid)))
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT)
           .withEntity(parseJson(Transactions.txjson))
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = s"""{"message":"Category with id ${Categories.cid} does not exist"}"""
         verifyJsonResponse(res, Status.NotFound, Some(resBody))
@@ -176,8 +199,10 @@ class TransactionControllerSpec extends ControllerSpec {
         val svc = mock[TransactionService[IO]]
         when(svc.delete(any[UserId], any[TransactionId])).thenReturn(IO.unit)
 
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.DELETE)
-        val res = TransactionController.make[IO](svc).flatMap(_.routes(_ => IO.pure(Sessions.sess)).orNotFound.run(req))
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
         verify(svc).delete(Users.uid1, Transactions.txid)

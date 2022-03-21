@@ -9,16 +9,11 @@ import cats.syntax.applicativeError.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
+import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.Session
 import expensetracker.auth.jwt.BearerToken
-import expensetracker.category.CategoryController.{
-  CategoryView,
-  CreateCategoryRequest,
-  CreateCategoryResponse,
-  HideCategoryRequest,
-  UpdateCategoryRequest
-}
+import expensetracker.category.CategoryController.{CategoryView, CreateCategoryRequest, CreateCategoryResponse, HideCategoryRequest, UpdateCategoryRequest}
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.validations.*
 import expensetracker.common.web.SecuredController
@@ -38,8 +33,8 @@ final class CategoryController[F[_]](
   private val basePath = "categories"
   private val idPath   = basePath / path[String].map((s: String) => CategoryId(s))(_.value)
 
-  private def getAllCategories(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).get
+  private def getAllCategories(using authenticator: Authenticator[F]) =
+    securedEndpoint.get
       .in(basePath)
       .out(jsonBody[List[CategoryView]])
       .serverLogic { session => _ =>
@@ -48,8 +43,8 @@ final class CategoryController[F[_]](
           .mapResponse(_.map(CategoryView.from))
       }
 
-  private def getCategoryById(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).get
+  private def getCategoryById(using authenticator: Authenticator[F]) =
+    securedEndpoint.get
       .in(idPath)
       .out(jsonBody[CategoryView])
       .serverLogic { session => cid =>
@@ -58,8 +53,8 @@ final class CategoryController[F[_]](
           .mapResponse(CategoryView.from)
       }
 
-  private def createCategory(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).post
+  private def createCategory(using authenticator: Authenticator[F]) =
+    securedEndpoint.post
       .in(basePath)
       .in(jsonBody[CreateCategoryRequest])
       .out(statusCode(StatusCode.Created).and(jsonBody[CreateCategoryResponse]))
@@ -69,8 +64,8 @@ final class CategoryController[F[_]](
           .mapResponse(cid => CreateCategoryResponse(cid.value))
       }
 
-  private def updateCategory(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).put
+  private def updateCategory(using authenticator: Authenticator[F]) =
+    securedEndpoint.put
       .in(idPath)
       .in(jsonBody[UpdateCategoryRequest])
       .out(statusCode(StatusCode.NoContent))
@@ -81,8 +76,8 @@ final class CategoryController[F[_]](
             .voidResponse
       }
 
-  private def hideCategory(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).put
+  private def hideCategory(using authenticator: Authenticator[F]) =
+    securedEndpoint.put
       .in(idPath / "hidden")
       .in(jsonBody[HideCategoryRequest])
       .out(statusCode(StatusCode.NoContent))
@@ -92,8 +87,8 @@ final class CategoryController[F[_]](
           .voidResponse
       }
 
-  private def deleteCategory(auth: BearerToken => F[Session]) =
-    securedEndpoint(auth).delete
+  private def deleteCategory(using authenticator: Authenticator[F]) =
+    securedEndpoint.delete
       .in(idPath)
       .out(statusCode(StatusCode.NoContent))
       .serverLogic { session => cid =>
@@ -102,15 +97,15 @@ final class CategoryController[F[_]](
           .voidResponse
       }
 
-  def routes(auth: BearerToken => F[Session]): HttpRoutes[F] =
+  def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
     Http4sServerInterpreter[F](serverOptions).toRoutes(
       List(
-        getAllCategories(auth),
-        getCategoryById(auth),
-        createCategory(auth),
-        updateCategory(auth),
-        hideCategory(auth),
-        deleteCategory(auth)
+        getAllCategories,
+        getCategoryById,
+        createCategory,
+        updateCategory,
+        hideCategory,
+        deleteCategory
       )
     )
 }
