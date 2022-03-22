@@ -34,7 +34,7 @@ trait Repository[F[_]] {
     F.fromOption(Option(res), error)
 
   protected def errorIfNoMatches(error: Throwable)(res: UpdateResult)(using F: MonadError[F, Throwable]): F[Unit] =
-    F.raiseWhen(res.getMatchedCount > 0)(error)
+    F.raiseWhen(res.getMatchedCount == 0)(error)
 
   protected def updateHidden(hidden: Boolean): Update =
     Update.set(Field.Hidden, hidden).currentDate(Field.LastUpdatedAt)
