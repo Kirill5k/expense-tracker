@@ -12,6 +12,7 @@ import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
 import io.circe.Codec
+import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
@@ -26,6 +27,10 @@ import sttp.tapir.server.model.ValuedEndpointOutput
 final case class ErrorResponse(message: String) derives Codec.AsObject
 
 trait Controller[F[_]] extends TapirJsonCirce with TapirSchema with JsonCodecs {
+
+  protected val validId: Validator[String] = Validator.custom { id =>
+    Option.when(!ObjectId.isValid(id))(ValidationError.Custom(id, s"Invalid hexadecimal representation of an id: $id", Nil)).toList
+  }
 
   private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
   private val error       = statusCode.and(jsonBody[ErrorResponse])
@@ -64,7 +69,10 @@ trait Controller[F[_]] extends TapirJsonCirce with TapirSchema with JsonCodecs {
       } else {
         ctx.failure match
           case DecodeResult.Error(_, e) => errorEndpointOut(e)
-          case _                        => None
+          case DecodeResult.InvalidValue(e) =>
+            val msgs = e.collect { case ValidationError.Custom(_, msg, _) => msg }
+            errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))
+          case _ => None
       }
     }
     .options
@@ -103,6 +111,8 @@ object Controller {
         (StatusCode.Forbidden, ErrorResponse(err.getMessage))
       case err: AppError.Unauth =>
         (StatusCode.Unauthorized, ErrorResponse(err.getMessage))
+      case err: AppError.Unprocessable =>
+        (StatusCode.UnprocessableEntity, ErrorResponse(err.getMessage))
       case err: JsonDecodeException =>
         (StatusCode.UnprocessableEntity, ErrorResponse(formatJsonError(err)))
       case err =>

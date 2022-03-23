@@ -14,11 +14,12 @@ object errors {
   }
 
   object AppError {
-    sealed trait Unauth    extends AppError
-    sealed trait NotFound  extends AppError
-    sealed trait Conflict  extends AppError
-    sealed trait BadReq    extends AppError
-    sealed trait Forbidden extends AppError
+    sealed trait Unauth        extends AppError
+    sealed trait NotFound      extends AppError
+    sealed trait Conflict      extends AppError
+    sealed trait BadReq        extends AppError
+    sealed trait Forbidden     extends AppError
+    sealed trait Unprocessable extends AppError
 
     final case class AccountAlreadyExists(email: UserEmail) extends Conflict:
       override val message: String = s"An account with email $email already exists"
@@ -66,5 +67,7 @@ object errors {
       override val message = s"unrecognized jwt encryption algorithm $alg"
 
     final case class InvalidJwtToken(message: String) extends Forbidden
+
+    final case class FailedValidation(message: String) extends Unprocessable
   }
 }

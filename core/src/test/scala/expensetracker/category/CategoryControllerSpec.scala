@@ -161,6 +161,18 @@ class CategoryControllerSpec extends ControllerSpec {
         verifyJsonResponse(res, Status.Ok, Some(responseBody))
         verify(svc).get(Users.uid1, Categories.cid)
       }
+
+      "return error when id is invalid" in {
+        val svc = mock[CategoryService[IO]]
+
+        given auth: Authenticator[IO] = _ => IO.raiseError(new RuntimeException(""))
+
+        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/foo"), method = Method.GET)
+        val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        verifyJsonResponse(res, Status.UnprocessableEntity, Some("""{"message":"Invalid hexadecimal representation of an id: foo"}"""))
+        verifyNoInteractions(svc)
+      }
     }
 
     "PUT /categories/:id/hidden" should {

@@ -31,7 +31,7 @@ final private class CategoryController[F[_]](
 ) extends Controller[F] {
 
   private val basePath = "categories"
-  private val idPath   = basePath / path[String].map((s: String) => CategoryId(s))(_.value)
+  private val idPath   = basePath / path[String].validate(validId).map((s: String) => CategoryId(s))(_.value)
 
   private def getAllCategories(using authenticator: Authenticator[F]) =
     securedEndpoint.get

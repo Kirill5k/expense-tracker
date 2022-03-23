@@ -33,7 +33,7 @@ final private class TransactionController[F[_]](
   import TransactionController.*
 
   private val basePath = "transactions"
-  private val idPath   = basePath / path[String].map((s: String) => TransactionId(s))(_.value)
+  private val idPath   = basePath / path[String].validate(validId).map((s: String) => TransactionId(s))(_.value)
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
     securedEndpoint.get
