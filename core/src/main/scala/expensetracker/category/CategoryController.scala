@@ -98,7 +98,7 @@ final private class CategoryController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Http4sServerInterpreter[F](serverOptions).toRoutes(
+    Http4sServerInterpreter[F](Controller.serverOptions).toRoutes(
       List(
         getAllCategories,
         getCategoryById,

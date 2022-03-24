@@ -80,7 +80,7 @@ final private class AuthController[F[_]](
           .mapResponse(UserView.from)
       }
 
-  private def createUser = publicEndpoint.post
+  private def createUser = Controller.publicEndpoint.post
     .in(userPath)
     .in(jsonBody[CreateUserRequest])
     .out(statusCode(StatusCode.Created).and(jsonBody[CreateUserResponse]))
@@ -91,7 +91,7 @@ final private class AuthController[F[_]](
         .mapResponse(uid => CreateUserResponse(uid.value))
     }
 
-  private def login = publicEndpoint.post
+  private def login = Controller.publicEndpoint.post
     .in(basePath / "login")
     .in(extractFromRequest(_.connectionInfo.remote.map(ip => IpAddress(ip.getHostName, ip.getPort))))
     .in(jsonBody[LoginRequest])
@@ -105,7 +105,7 @@ final private class AuthController[F[_]](
     }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Http4sServerInterpreter[F](serverOptions).toRoutes(
+    Http4sServerInterpreter[F](Controller.serverOptions).toRoutes(
       List(
         login,
         createUser,
