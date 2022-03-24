@@ -12,10 +12,10 @@ import expensetracker.auth.session.Session
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
-import expensetracker.common.web.Controller
+import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.common.validations.*
 import org.bson.types.ObjectId
-import io.circe.generic.auto.*
+import io.circe.Codec
 import io.circe.refined.*
 import org.http4s.HttpRoutes
 import squants.market.Money
@@ -32,14 +32,8 @@ final private class TransactionController[F[_]](
 ) extends Controller[F] {
   import TransactionController.*
 
-  private val basePath = "transactions"
-  private val idPath   = basePath / path[String].validate(validId).map((s: String) => TransactionId(s))(_.value)
-
   private def getAllTransactions(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.get
-      .in(basePath)
-      .out(jsonBody[List[TransactionView]])
-      .withAuthenticatedSession
+    getAllTransactionsEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .getAll(session.userId)
@@ -47,10 +41,7 @@ final private class TransactionController[F[_]](
       }
 
   private def getTransactionById(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.get
-      .in(idPath)
-      .out(jsonBody[TransactionView])
-      .withAuthenticatedSession
+    getTransactionByIdEndpoint.withAuthenticatedSession
       .serverLogic { session => txid =>
         service
           .get(session.userId, txid)
@@ -58,11 +49,7 @@ final private class TransactionController[F[_]](
       }
 
   private def createTransaction(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.post
-      .in(basePath)
-      .in(jsonBody[CreateTransactionRequest])
-      .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
-      .withAuthenticatedSession
+    createTransactionEndpoint.withAuthenticatedSession
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
@@ -70,10 +57,7 @@ final private class TransactionController[F[_]](
       }
 
   private def deleteTransaction(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.delete
-      .in(idPath)
-      .out(statusCode(StatusCode.NoContent))
-      .withAuthenticatedSession
+    deleteTransactionEndpoint.withAuthenticatedSession
       .serverLogic { session => txid =>
         service
           .delete(session.userId, txid)
@@ -81,11 +65,7 @@ final private class TransactionController[F[_]](
       }
 
   private def updateTransaction(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.put
-      .in(idPath)
-      .in(jsonBody[UpdateTransactionRequest])
-      .out(statusCode(StatusCode.NoContent))
-      .withAuthenticatedSession
+    updateTransactionEndpoint.withAuthenticatedSession
       .serverLogic { session => (txid, txView) =>
         F.ensure(txView.pure[F])(IdMismatch)(_.id.value == txid.value) >>
           service
@@ -94,11 +74,7 @@ final private class TransactionController[F[_]](
       }
 
   private def hideTransaction(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.put
-      .in(idPath / "hidden")
-      .in(jsonBody[HideTransactionRequest])
-      .out(statusCode(StatusCode.NoContent))
-      .withAuthenticatedSession
+    hideTransactionEndpoint.withAuthenticatedSession
       .serverLogic { session => (txid, hidetx) =>
         service
           .hide(session.userId, txid, hidetx.hidden)
@@ -118,7 +94,7 @@ final private class TransactionController[F[_]](
     )
 }
 
-object TransactionController {
+object TransactionController extends TapirSchema with TapirJson {
 
   final case class CreateTransactionRequest(
       kind: TransactionKind,
@@ -127,7 +103,7 @@ object TransactionController {
       date: LocalDate,
       note: Option[String],
       tags: Option[List[String]]
-  ) {
+  ) derives Codec.AsObject {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
         userId = aid,
@@ -140,7 +116,7 @@ object TransactionController {
       )
   }
 
-  final case class CreateTransactionResponse(id: String)
+  final case class CreateTransactionResponse(id: String) derives Codec.AsObject
 
   final case class TransactionView(
       id: String,
@@ -150,7 +126,7 @@ object TransactionController {
       date: LocalDate,
       note: Option[String],
       tags: Set[String]
-  )
+  ) derives Codec.AsObject
 
   object TransactionView {
     def from(tx: Transaction): TransactionView =
@@ -165,7 +141,7 @@ object TransactionController {
       )
   }
 
-  final case class HideTransactionRequest(hidden: Boolean)
+  final case class HideTransactionRequest(hidden: Boolean) derives Codec.AsObject
 
   final case class UpdateTransactionRequest(
       id: NonEmptyString,
@@ -175,7 +151,7 @@ object TransactionController {
       date: LocalDate,
       note: Option[String],
       tags: Option[List[String]]
-  ) {
+  ) derives Codec.AsObject {
     def toDomain(aid: UserId): Transaction =
       Transaction(
         id = TransactionId(id.value),
@@ -188,6 +164,36 @@ object TransactionController {
         tags = tags.map(_.toSet).getOrElse(Set.empty)
       )
   }
+
+  private val basePath = "transactions"
+  private val idPath   = basePath / path[String].validate(Controller.validId).map((s: String) => TransactionId(s))(_.value)
+
+  val createTransactionEndpoint = Controller.securedEndpoint.post
+    .in(basePath)
+    .in(jsonBody[CreateTransactionRequest])
+    .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
+
+  val getAllTransactionsEndpoint = Controller.securedEndpoint.get
+    .in(basePath)
+    .out(jsonBody[List[TransactionView]])
+
+  val getTransactionByIdEndpoint = Controller.securedEndpoint.get
+    .in(idPath)
+    .out(jsonBody[TransactionView])
+
+  val updateTransactionEndpoint = Controller.securedEndpoint.put
+    .in(idPath)
+    .in(jsonBody[UpdateTransactionRequest])
+    .out(statusCode(StatusCode.NoContent))
+
+  val hideTransactionEndpoint = Controller.securedEndpoint.put
+    .in(idPath / "hidden")
+    .in(jsonBody[HideTransactionRequest])
+    .out(statusCode(StatusCode.NoContent))
+
+  val deleteTransactionEndpoint = Controller.securedEndpoint.delete
+    .in(idPath)
+    .out(statusCode(StatusCode.NoContent))
 
   def make[F[_]: Async](service: TransactionService[F]): F[Controller[F]] =
     Monad[F].pure(TransactionController[F](service))

@@ -10,7 +10,7 @@ import sttp.tapir.{FieldName, Schema}
 import sttp.tapir.Schema.SName
 import sttp.tapir.SchemaType.{SProduct, SProductField}
 
-trait TapirSchema extends SchemaDerivation {
+transparent trait TapirSchema extends SchemaDerivation {
   given Schema[IdString]       = Schema.string
   given Schema[ColorString]    = Schema.string
   given Schema[NonEmptyString] = Schema.string

@@ -16,7 +16,6 @@ import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes
 import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.model.StatusCode
 import sttp.tapir.DecodeResult.Error.JsonDecodeException
 import sttp.tapir.server.PartialServerEndpoint
@@ -26,16 +25,8 @@ import sttp.tapir.server.interceptor.exception.{ExceptionContext, ExceptionHandl
 import sttp.tapir.server.model.ValuedEndpointOutput
 
 final case class ErrorResponse(message: String) derives Codec.AsObject
-object ErrorResponse {
-  given Schema[ErrorResponse] = Schema.derived
-}
 
-trait Controller[F[_]] extends TapirJsonCirce with TapirSchema with JsonCodecs {
-
-  protected val validId: Validator[String] = Validator.custom { id =>
-    lazy val error = ValidationError.Custom(id, s"Invalid hexadecimal representation of an id: $id", Nil)
-    Option.when(!ObjectId.isValid(id))(error).toList
-  }
+trait Controller[F[_]] extends TapirJson with TapirSchema {
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F]
 
@@ -54,7 +45,12 @@ trait Controller[F[_]] extends TapirJsonCirce with TapirSchema with JsonCodecs {
       se.serverSecurityLogic(t => auth.authenticate(t).mapResponse(identity))
 }
 
-object Controller {
+object Controller extends TapirSchema with TapirJson {
+  val validId: Validator[String] = Validator.custom { id =>
+    lazy val error = ValidationError.Custom(id, s"Invalid hexadecimal representation of an id: $id", Nil)
+    Option.when(!ObjectId.isValid(id))(error).toList
+  }
+
   private val error = statusCode.and(jsonBody[ErrorResponse])
 
   val publicEndpoint: PublicEndpoint[Unit, (StatusCode, ErrorResponse), Unit, Any] =

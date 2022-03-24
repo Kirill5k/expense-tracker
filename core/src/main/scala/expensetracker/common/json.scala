@@ -8,7 +8,7 @@ import scala.util.Try
 
 object json extends JsonCodecs
 
-trait JsonCodecs {
+transparent trait JsonCodecs {
   inline given Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for
       code     <- json("code").flatMap(_.asString).toRight("Missing currency code")

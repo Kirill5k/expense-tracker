@@ -14,8 +14,8 @@ import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.validations.*
-import expensetracker.common.web.Controller
-import io.circe.generic.auto.*
+import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
+import io.circe.Codec
 import io.circe.refined.*
 import org.http4s.HttpRoutes
 import squants.market.Currency
@@ -34,15 +34,8 @@ final private class AuthController[F[_]](
 ) extends Controller[F] {
   import AuthController.*
 
-  private val basePath   = "auth"
-  private val userPath   = basePath / "user"
-  private val userIdPath = userPath / path[String].validate(validId).map((s: String) => UserId(s))(_.value)
-
   private def logout(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.post
-      .in(basePath / "logout")
-      .out(statusCode(StatusCode.NoContent))
-      .withAuthenticatedSession
+    logoutEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .logout(session.id)
@@ -50,11 +43,7 @@ final private class AuthController[F[_]](
       }
 
   private def changePassword(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.post
-      .in(userIdPath / "password")
-      .in(jsonBody[ChangePasswordRequest])
-      .out(statusCode(StatusCode.NoContent))
-      .withAuthenticatedSession
+    changePasswordEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
         F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
           service
@@ -63,50 +52,38 @@ final private class AuthController[F[_]](
       }
 
   private def updateSettings(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.put
-      .in(userIdPath / "settings")
-      .in(jsonBody[UpdateUserSettingsRequest])
-      .out(statusCode(StatusCode.NoContent))
-      .withAuthenticatedSession
+    updateUserSettingsEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
         F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
           service.updateSettings(uid, req.toDomain).voidResponse
       }
 
   private def getCurrentUser(using authenticator: Authenticator[F]) =
-    Controller.securedEndpoint.get
-      .in(userPath)
-      .out(jsonBody[UserView])
-      .withAuthenticatedSession
+    getCurrentUserEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .findUser(session.userId)
           .mapResponse(UserView.from)
       }
 
-  private def createUser = Controller.publicEndpoint.post
-    .in(userPath)
-    .in(jsonBody[CreateUserRequest])
-    .out(statusCode(StatusCode.Created).and(jsonBody[CreateUserResponse]))
-    .serverLogic { req =>
-      service
-        .createUser(req.userDetails, req.userPassword)
-        .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
-        .mapResponse(uid => CreateUserResponse(uid.value))
-    }
+  private def createUser =
+    createUserEndpoint
+      .serverLogic { req =>
+        service
+          .createUser(req.userDetails, req.userPassword)
+          .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
+          .mapResponse(uid => CreateUserResponse(uid.value))
+      }
 
-  private def login = Controller.publicEndpoint.post
-    .in(basePath / "login")
-    .in(extractFromRequest(_.connectionInfo.remote.map(ip => IpAddress(ip.getHostName, ip.getPort))))
-    .in(jsonBody[LoginRequest])
-    .out(jsonBody[LoginResponse])
-    .serverLogic { (ip, login) =>
-      for {
-        acc  <- service.login(login.toDomain)
-        time <- F.realTimeInstant
-        res  <- service.createSession(CreateSession(acc.id, ip, time)).mapResponse(LoginResponse.bearer)
-      } yield res
-    }
+  private def login =
+    loginEndpoint
+      .serverLogic { (ip, login) =>
+        for {
+          acc  <- service.login(login.toDomain)
+          time <- F.realTimeInstant
+          res  <- service.createSession(CreateSession(acc.id, ip, time)).mapResponse(LoginResponse.bearer)
+        } yield res
+      }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
     Http4sServerInterpreter[F](Controller.serverOptions).toRoutes(
@@ -121,33 +98,33 @@ final private class AuthController[F[_]](
     )
 }
 
-object AuthController {
+object AuthController extends TapirSchema with TapirJson {
 
   final case class CreateUserRequest(
       email: EmailString,
       firstName: NonEmptyString,
       lastName: NonEmptyString,
       password: NonEmptyString
-  ) {
+  ) derives Codec.AsObject {
     def userDetails: UserDetails =
       UserDetails(UserEmail.from(email), UserName(firstName.value, lastName.value))
 
     def userPassword: Password = Password(password.value)
   }
 
-  final case class CreateUserResponse(id: String)
+  final case class CreateUserResponse(id: String) derives Codec.AsObject
 
   final case class LoginRequest(
       email: EmailString,
       password: NonEmptyString
-  ) {
+  ) derives Codec.AsObject {
     def toDomain: Login = Login(UserEmail.from(email), Password(password.value))
   }
 
   final case class LoginResponse(
       access_token: String,
       token_type: String
-  )
+  ) derives Codec.AsObject
 
   object LoginResponse {
     def bearer(bearerToken: BearerToken): LoginResponse =
@@ -161,7 +138,7 @@ object AuthController {
       email: String,
       settings: UserSettings,
       registrationDate: Instant
-  )
+  ) derives Codec.AsObject
 
   object UserView {
     def from(acc: User): UserView =
@@ -179,7 +156,7 @@ object AuthController {
       currency: Currency,
       hideFutureTransactions: Boolean,
       darkMode: Option[Boolean]
-  ) {
+  ) derives Codec.AsObject {
     def toDomain: UserSettings =
       UserSettings(
         currency,
@@ -191,10 +168,43 @@ object AuthController {
   final case class ChangePasswordRequest(
       currentPassword: NonEmptyString,
       newPassword: NonEmptyString
-  ) {
+  ) derives Codec.AsObject {
     def toDomain(id: UserId): ChangePassword =
       ChangePassword(id, Password(currentPassword.value), Password(newPassword.value))
   }
+
+  private val basePath   = "auth"
+  private val userPath   = basePath / "user"
+  private val userIdPath = userPath / path[String].validate(Controller.validId).map((s: String) => UserId(s))(_.value)
+
+  val createUserEndpoint = Controller.publicEndpoint.post
+    .in(userPath)
+    .in(jsonBody[CreateUserRequest])
+    .out(statusCode(StatusCode.Created).and(jsonBody[CreateUserResponse]))
+
+  val loginEndpoint = Controller.publicEndpoint.post
+    .in(basePath / "login")
+    .in(extractFromRequest(_.connectionInfo.remote.map(ip => IpAddress(ip.getHostName, ip.getPort))))
+    .in(jsonBody[LoginRequest])
+    .out(jsonBody[LoginResponse])
+
+  val getCurrentUserEndpoint = Controller.securedEndpoint.get
+    .in(userPath)
+    .out(jsonBody[UserView])
+
+  val updateUserSettingsEndpoint = Controller.securedEndpoint.put
+    .in(userIdPath / "settings")
+    .in(jsonBody[UpdateUserSettingsRequest])
+    .out(statusCode(StatusCode.NoContent))
+
+  val changePasswordEndpoint = Controller.securedEndpoint.post
+    .in(userIdPath / "password")
+    .in(jsonBody[ChangePasswordRequest])
+    .out(statusCode(StatusCode.NoContent))
+
+  val logoutEndpoint = Controller.securedEndpoint.post
+    .in(basePath / "logout")
+    .out(statusCode(StatusCode.NoContent))
 
   def make[F[_]: Async](
       service: AuthService[F],
