@@ -11,7 +11,7 @@ object Dependencies {
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.9.28"
-    val tapir      = "1.0.0-M3"
+    val tapir      = "1.0.0-M4"
     val jwt        = "9.0.5"
 
     val scalaTest = "3.2.11"
@@ -59,10 +59,13 @@ object Dependencies {
     }
 
     object tapir {
-      val core   = "com.softwaremill.sttp.tapir" %% "tapir-core"          % Versions.tapir
-      val circe  = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"    % Versions.tapir
-      val http4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % Versions.tapir
-      val all    = Seq(core, circe, http4s)
+      val core        = "com.softwaremill.sttp.tapir" %% "tapir-core"               % Versions.tapir
+      val circe       = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"         % Versions.tapir
+      val http4s      = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"      % Versions.tapir
+      val openapiDocs = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % Versions.tapir
+      val openapiYaml = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % Versions.tapir
+      val swagger     = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui"         % Versions.tapir
+      val all         = Seq(core, circe, http4s)
     }
 
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
@@ -87,5 +90,11 @@ object Dependencies {
     Libraries.scalaTest           % Test,
     Libraries.mockito             % Test,
     Libraries.mongo4cats.embedded % Test
+  )
+
+  lazy val openapi = Seq(
+    Libraries.tapir.openapiDocs,
+    Libraries.tapir.openapiYaml,
+    Libraries.tapir.swagger
   )
 }
