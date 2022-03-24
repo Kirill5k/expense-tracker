@@ -36,9 +36,10 @@ final private class TransactionController[F[_]](
   private val idPath   = basePath / path[String].validate(validId).map((s: String) => TransactionId(s))(_.value)
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
-    securedEndpoint.get
+    Controller.securedEndpoint.get
       .in(basePath)
       .out(jsonBody[List[TransactionView]])
+      .withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .getAll(session.userId)
@@ -46,9 +47,10 @@ final private class TransactionController[F[_]](
       }
 
   private def getTransactionById(using authenticator: Authenticator[F]) =
-    securedEndpoint.get
+    Controller.securedEndpoint.get
       .in(idPath)
       .out(jsonBody[TransactionView])
+      .withAuthenticatedSession
       .serverLogic { session => txid =>
         service
           .get(session.userId, txid)
@@ -56,10 +58,11 @@ final private class TransactionController[F[_]](
       }
 
   private def createTransaction(using authenticator: Authenticator[F]) =
-    securedEndpoint.post
+    Controller.securedEndpoint.post
       .in(basePath)
       .in(jsonBody[CreateTransactionRequest])
       .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
+      .withAuthenticatedSession
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
@@ -67,9 +70,10 @@ final private class TransactionController[F[_]](
       }
 
   private def deleteTransaction(using authenticator: Authenticator[F]) =
-    securedEndpoint.delete
+    Controller.securedEndpoint.delete
       .in(idPath)
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => txid =>
         service
           .delete(session.userId, txid)
@@ -77,10 +81,11 @@ final private class TransactionController[F[_]](
       }
 
   private def updateTransaction(using authenticator: Authenticator[F]) =
-    securedEndpoint.put
+    Controller.securedEndpoint.put
       .in(idPath)
       .in(jsonBody[UpdateTransactionRequest])
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => (txid, txView) =>
         F.ensure(txView.pure[F])(IdMismatch)(_.id.value == txid.value) >>
           service
@@ -89,10 +94,11 @@ final private class TransactionController[F[_]](
       }
 
   private def hideTransaction(using authenticator: Authenticator[F]) =
-    securedEndpoint.put
+    Controller.securedEndpoint.put
       .in(idPath / "hidden")
       .in(jsonBody[HideTransactionRequest])
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => (txid, hidetx) =>
         service
           .hide(session.userId, txid, hidetx.hidden)

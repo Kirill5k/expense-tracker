@@ -34,9 +34,10 @@ final private class CategoryController[F[_]](
   private val idPath   = basePath / path[String].validate(validId).map((s: String) => CategoryId(s))(_.value)
 
   private def getAllCategories(using authenticator: Authenticator[F]) =
-    securedEndpoint.get
+    Controller.securedEndpoint.get
       .in(basePath)
       .out(jsonBody[List[CategoryView]])
+      .withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .getAll(session.userId)
@@ -44,9 +45,10 @@ final private class CategoryController[F[_]](
       }
 
   private def getCategoryById(using authenticator: Authenticator[F]) =
-    securedEndpoint.get
+    Controller.securedEndpoint.get
       .in(idPath)
       .out(jsonBody[CategoryView])
+      .withAuthenticatedSession
       .serverLogic { session => cid =>
         service
           .get(session.userId, cid)
@@ -54,10 +56,11 @@ final private class CategoryController[F[_]](
       }
 
   private def createCategory(using authenticator: Authenticator[F]) =
-    securedEndpoint.post
+    Controller.securedEndpoint.post
       .in(basePath)
       .in(jsonBody[CreateCategoryRequest])
       .out(statusCode(StatusCode.Created).and(jsonBody[CreateCategoryResponse]))
+      .withAuthenticatedSession
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
@@ -65,10 +68,11 @@ final private class CategoryController[F[_]](
       }
 
   private def updateCategory(using authenticator: Authenticator[F]) =
-    securedEndpoint.put
+    Controller.securedEndpoint.put
       .in(idPath)
       .in(jsonBody[UpdateCategoryRequest])
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => (cid, catView) =>
         F.ensure(catView.pure[F])(IdMismatch)(_.id.value == cid.value) >>
           service
@@ -77,10 +81,11 @@ final private class CategoryController[F[_]](
       }
 
   private def hideCategory(using authenticator: Authenticator[F]) =
-    securedEndpoint.put
+    Controller.securedEndpoint.put
       .in(idPath / "hidden")
       .in(jsonBody[HideCategoryRequest])
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => (cid, hideCat) =>
         service
           .hide(session.userId, cid, hideCat.hidden)
@@ -88,9 +93,10 @@ final private class CategoryController[F[_]](
       }
 
   private def deleteCategory(using authenticator: Authenticator[F]) =
-    securedEndpoint.delete
+    Controller.securedEndpoint.delete
       .in(idPath)
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => cid =>
         service
           .delete(session.userId, cid)

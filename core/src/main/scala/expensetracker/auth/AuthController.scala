@@ -39,9 +39,10 @@ final private class AuthController[F[_]](
   private val userIdPath = userPath / path[String].validate(validId).map((s: String) => UserId(s))(_.value)
 
   private def logout(using authenticator: Authenticator[F]) =
-    securedEndpoint.post
+    Controller.securedEndpoint.post
       .in(basePath / "logout")
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .logout(session.id)
@@ -49,10 +50,11 @@ final private class AuthController[F[_]](
       }
 
   private def changePassword(using authenticator: Authenticator[F]) =
-    securedEndpoint.post
+    Controller.securedEndpoint.post
       .in(userIdPath / "password")
       .in(jsonBody[ChangePasswordRequest])
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
         F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
           service
@@ -61,19 +63,21 @@ final private class AuthController[F[_]](
       }
 
   private def updateSettings(using authenticator: Authenticator[F]) =
-    securedEndpoint.put
+    Controller.securedEndpoint.put
       .in(userIdPath / "settings")
       .in(jsonBody[UpdateUserSettingsRequest])
       .out(statusCode(StatusCode.NoContent))
+      .withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
         F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
           service.updateSettings(uid, req.toDomain).voidResponse
       }
 
   private def getCurrentUser(using authenticator: Authenticator[F]) =
-    securedEndpoint.get
+    Controller.securedEndpoint.get
       .in(userPath)
       .out(jsonBody[UserView])
+      .withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .findUser(session.userId)

@@ -39,30 +39,29 @@ trait Controller[F[_]] extends TapirJsonCirce with TapirSchema with JsonCodecs {
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F]
 
-  protected def securedEndpoint(using
-      F: MonadThrow[F],
-      authenticator: Authenticator[F]
-  ): PartialServerEndpoint[BearerToken, Session, Unit, (StatusCode, ErrorResponse), Unit, Any, F] =
-    Controller.securedEndpoint
-      .serverSecurityLogic(t => authenticator.authenticate(t).mapResponse(identity))
-
   extension [A](fa: F[A])(using F: MonadThrow[F])
     def voidResponse: F[Either[(StatusCode, ErrorResponse), Unit]] = mapResponse(_ => ())
     def mapResponse[B](fab: A => B): F[Either[(StatusCode, ErrorResponse), B]] =
       fa
         .map(fab(_).asRight[(StatusCode, ErrorResponse)])
         .handleError(e => Controller.mapError(e).asLeft[B])
+
+  extension [I, O](se: Endpoint[BearerToken, I, (StatusCode, ErrorResponse), O, Any])
+    def withAuthenticatedSession(using
+        F: MonadThrow[F],
+        auth: Authenticator[F]
+    ): PartialServerEndpoint[BearerToken, Session, I, (StatusCode, ErrorResponse), O, Any, F] =
+      se.serverSecurityLogic(t => auth.authenticate(t).mapResponse(identity))
 }
 
 object Controller {
-  private val bearerToken = auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value)
-  private val error       = statusCode.and(jsonBody[ErrorResponse])
+  private val error = statusCode.and(jsonBody[ErrorResponse])
 
   val publicEndpoint: PublicEndpoint[Unit, (StatusCode, ErrorResponse), Unit, Any] =
     endpoint.errorOut(error)
 
   val securedEndpoint: Endpoint[BearerToken, Unit, (StatusCode, ErrorResponse), Unit, Any] =
-    publicEndpoint.securityIn(bearerToken)
+    publicEndpoint.securityIn(auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value))
 
   def serverOptions[F[_]](using F: Sync[F]): Http4sServerOptions[F, F] = {
     val errorEndpointOut = (e: Throwable) => Some(ValuedEndpointOutput(error, Controller.mapError(e)))
