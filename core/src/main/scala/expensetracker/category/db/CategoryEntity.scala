@@ -1,8 +1,10 @@
 package expensetracker.category.db
 
+import io.circe.Codec
 import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName, CreateCategory}
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
+import mongo4cats.circe.given
 
 import java.time.Instant
 
@@ -14,7 +16,7 @@ final case class CategoryEntity(
     color: String,
     userId: Option[ObjectId],
     lastUpdatedAt: Option[Instant]
-) {
+) derives Codec.AsObject {
   def toDomain: Category =
     Category(
       id = CategoryId(_id),

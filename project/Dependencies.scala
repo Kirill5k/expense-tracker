@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val mongo4cats = "0.4.6"
+    val mongo4cats = "0.4.7"
     val pureConfig = "0.17.1"
     val circe      = "0.14.1"
     val http4s     = "0.23.11"
@@ -59,13 +59,11 @@ object Dependencies {
     }
 
     object tapir {
-      val core        = "com.softwaremill.sttp.tapir" %% "tapir-core"               % Versions.tapir
-      val circe       = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"         % Versions.tapir
-      val http4s      = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"      % Versions.tapir
-      val openapiDocs = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"       % Versions.tapir
-      val openapiYaml = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % Versions.tapir
-      val swagger     = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui"         % Versions.tapir
-      val all         = Seq(core, circe, http4s)
+      val core    = "com.softwaremill.sttp.tapir" %% "tapir-core"              % Versions.tapir
+      val circe   = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % Versions.tapir
+      val http4s  = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % Versions.tapir
+      val swagger = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % Versions.tapir
+      val all     = Seq(core, circe, http4s)
     }
 
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
@@ -93,8 +91,6 @@ object Dependencies {
   )
 
   lazy val openapi = Seq(
-    Libraries.tapir.openapiDocs,
-    Libraries.tapir.openapiYaml,
     Libraries.tapir.swagger
   )
 }

@@ -1,8 +1,10 @@
 package expensetracker.auth.session.db
 
+import io.circe.Codec
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus, IpAddress}
 import mongo4cats.bson.ObjectId
+import mongo4cats.circe.given
 
 import java.time.Instant
 
@@ -14,7 +16,7 @@ final case class SessionEntity(
     status: SessionStatus,
     ipAddress: Option[IpAddress],
     lastAccessedAt: Option[Instant]
-) {
+) derives Codec.AsObject {
   def toDomain: Session =
     Session(
       id = SessionId(_id),

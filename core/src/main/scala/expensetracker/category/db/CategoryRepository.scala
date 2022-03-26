@@ -9,10 +9,8 @@ import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
-import io.circe.generic.auto.*
-import expensetracker.common.json.*
 import mongo4cats.bson.ObjectId
-import mongo4cats.circe.*
+import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
@@ -91,7 +89,7 @@ final private class LiveCategoryRepository[F[_]](
       .map(_ > 0)
 }
 
-object CategoryRepository:
+object CategoryRepository extends MongoJsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F]): F[CategoryRepository[F]] =
     db.getCollectionWithCodec[CategoryEntity]("categories")
       .map(coll => LiveCategoryRepository[F](coll))

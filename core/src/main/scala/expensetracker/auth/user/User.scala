@@ -1,6 +1,8 @@
 package expensetracker.auth.user
 
+import io.circe.Codec
 import expensetracker.common.types.{IdType, StringType}
+import expensetracker.common.json.given
 import squants.market.{Currency, GBP}
 import expensetracker.common.validations.EmailString
 
@@ -21,13 +23,13 @@ object PasswordHash extends StringType[PasswordHash]
 final case class UserName(
     first: String,
     last: String
-)
+) derives Codec.AsObject
 
 final case class UserSettings(
     currency: Currency,
     hideFutureTransactions: Boolean,
     darkMode: Option[Boolean]
-)
+) derives Codec.AsObject
 
 object UserSettings {
   val Default = UserSettings(

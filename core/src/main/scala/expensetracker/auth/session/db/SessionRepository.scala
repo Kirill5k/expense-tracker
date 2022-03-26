@@ -3,12 +3,11 @@ package expensetracker.auth.session.db
 import cats.effect.Async
 import cats.syntax.functor.*
 import expensetracker.auth.user.UserId
-import io.circe.generic.auto.*
 import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus}
 import expensetracker.common.db.Repository
 import expensetracker.common.json.given
 import mongo4cats.database.MongoDatabase
-import mongo4cats.circe.*
+import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.operations.Update
 import mongo4cats.collection.MongoCollection
 
@@ -42,7 +41,7 @@ final private class LiveSessionRepository[F[_]: Async](
     collection.updateMany(userIdEq(aid), invalidateUpdate).void
 }
 
-object SessionRepository:
+object SessionRepository extends MongoJsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F]): F[SessionRepository[F]] =
     db.getCollectionWithCodec[SessionEntity]("sessions")
       .map(_.withAddedCodec[SessionStatus])

@@ -1,7 +1,9 @@
 package expensetracker.auth.user.db
 
+import io.circe.Codec
 import expensetracker.auth.user.*
 import mongo4cats.bson.ObjectId
+import mongo4cats.circe.given
 
 import java.time.Instant
 
@@ -12,7 +14,7 @@ final case class AccountEntity(
     password: String,
     settings: Option[UserSettings],
     registrationDate: Instant
-) {
+) derives Codec.AsObject {
   def toDomain: User =
     User(
       id = UserId(_id),

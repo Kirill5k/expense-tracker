@@ -6,12 +6,10 @@ import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
-import expensetracker.common.json.given
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
-import io.circe.generic.auto.*
-import mongo4cats.circe.*
+import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
@@ -81,7 +79,7 @@ final private class LiveTransactionRepository[F[_]](
       .map(_ > 0)
 }
 
-object TransactionRepository:
+object TransactionRepository extends MongoJsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F]): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
       .map(coll => LiveTransactionRepository[F](coll))

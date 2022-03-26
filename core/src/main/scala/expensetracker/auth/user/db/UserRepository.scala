@@ -9,8 +9,7 @@ import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, Use
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.common.json.given
-import io.circe.generic.auto.*
-import mongo4cats.circe.*
+import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
@@ -64,7 +63,7 @@ final private class LiveUserRepository[F[_]](
       .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
 }
 
-object UserRepository:
+object UserRepository extends MongoJsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F]): F[UserRepository[F]] =
     db.getCollectionWithCodec[AccountEntity]("users")
       .map(_.withAddedCodec[UserSettings])

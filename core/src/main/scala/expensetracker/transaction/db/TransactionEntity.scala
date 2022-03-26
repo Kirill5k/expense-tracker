@@ -1,10 +1,13 @@
 package expensetracker.transaction.db
 
+import io.circe.Codec
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
+import expensetracker.common.json.given
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
 import mongo4cats.bson.ObjectId
-import squants.market._
+import mongo4cats.circe.given
+import squants.market.*
 
 import java.time.{Instant, LocalDate}
 
@@ -18,7 +21,7 @@ final case class TransactionEntity(
     note: Option[String],
     lastUpdatedAt: Option[Instant],
     tags: Option[Set[String]]
-) {
+) derives Codec.AsObject {
   def toDomain: Transaction =
     Transaction(
       id = TransactionId(_id),
