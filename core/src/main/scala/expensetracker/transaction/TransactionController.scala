@@ -166,34 +166,40 @@ object TransactionController extends TapirSchema with TapirJson {
   }
 
   private val basePath = "transactions"
-  private val idPath   = basePath / path[String].validate(Controller.validId).map((s: String) => TransactionId(s))(_.value)
+  private val idPath   = basePath / path[String].validate(Controller.validId).map((s: String) => TransactionId(s))(_.value).name("tx-id")
 
   val createTransactionEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateTransactionRequest])
     .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
+    .description("Create new transaction")
 
   val getAllTransactionsEndpoint = Controller.securedEndpoint.get
     .in(basePath)
     .out(jsonBody[List[TransactionView]])
+    .description("Get all transactions")
 
   val getTransactionByIdEndpoint = Controller.securedEndpoint.get
     .in(idPath)
     .out(jsonBody[TransactionView])
+    .description("Get existing transaction by id")
 
   val updateTransactionEndpoint = Controller.securedEndpoint.put
     .in(idPath)
     .in(jsonBody[UpdateTransactionRequest])
     .out(statusCode(StatusCode.NoContent))
+    .description("Update transaction")
 
   val hideTransactionEndpoint = Controller.securedEndpoint.put
     .in(idPath / "hidden")
     .in(jsonBody[HideTransactionRequest])
     .out(statusCode(StatusCode.NoContent))
+    .description("Change transaction display status")
 
   val deleteTransactionEndpoint = Controller.securedEndpoint.delete
     .in(idPath)
     .out(statusCode(StatusCode.NoContent))
+    .description("Delete existing transaction")
 
   def make[F[_]: Async](service: TransactionService[F]): F[Controller[F]] =
     Monad[F].pure(TransactionController[F](service))

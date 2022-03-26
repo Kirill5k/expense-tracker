@@ -1,9 +1,9 @@
 import com.typesafe.sbt.packager.docker._
 import sbtghactions.JavaSpec
 
-ThisBuild / scalaVersion := "3.1.1"
-ThisBuild / version      := scala.sys.process.Process("git rev-parse HEAD").!!.trim.slice(0, 7)
-ThisBuild / organization := "io.github.kirill5k"
+ThisBuild / scalaVersion                        := "3.1.1"
+ThisBuild / version                             := scala.sys.process.Process("git rev-parse HEAD").!!.trim.slice(0, 7)
+ThisBuild / organization                        := "io.github.kirill5k"
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
 ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("17"))
 
@@ -41,6 +41,15 @@ val core = project
     moduleName           := "expense-tracker-core",
     Docker / packageName := "expense-tracker-core",
     libraryDependencies ++= Dependencies.core ++ Dependencies.test
+  )
+
+val openapi = project
+  .in(file("openapi"))
+  .dependsOn(core)
+  .settings(
+    name       := "expense-tracker-openapi",
+    moduleName := "expense-tracker-openapi",
+    libraryDependencies ++= Dependencies.openapi
   )
 
 val root = project

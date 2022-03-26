@@ -175,36 +175,42 @@ object AuthController extends TapirSchema with TapirJson {
 
   private val basePath   = "auth"
   private val userPath   = basePath / "user"
-  private val userIdPath = userPath / path[String].validate(Controller.validId).map((s: String) => UserId(s))(_.value)
+  private val userIdPath = userPath / path[String].validate(Controller.validId).map((s: String) => UserId(s))(_.value).name("user-id")
 
   val createUserEndpoint = Controller.publicEndpoint.post
     .in(userPath)
     .in(jsonBody[CreateUserRequest])
     .out(statusCode(StatusCode.Created).and(jsonBody[CreateUserResponse]))
+    .description("Register new user")
 
   val loginEndpoint = Controller.publicEndpoint.post
     .in(basePath / "login")
     .in(extractFromRequest(_.connectionInfo.remote.map(ip => IpAddress(ip.getHostName, ip.getPort))))
     .in(jsonBody[LoginRequest])
     .out(jsonBody[LoginResponse])
+    .description("Login with the existing user account")
 
   val getCurrentUserEndpoint = Controller.securedEndpoint.get
     .in(userPath)
     .out(jsonBody[UserView])
+    .description("Get currently logged in user")
 
   val updateUserSettingsEndpoint = Controller.securedEndpoint.put
     .in(userIdPath / "settings")
     .in(jsonBody[UpdateUserSettingsRequest])
     .out(statusCode(StatusCode.NoContent))
+    .description("Update user's settings")
 
   val changePasswordEndpoint = Controller.securedEndpoint.post
     .in(userIdPath / "password")
     .in(jsonBody[ChangePasswordRequest])
     .out(statusCode(StatusCode.NoContent))
+    .description("Change user's password")
 
   val logoutEndpoint = Controller.securedEndpoint.post
     .in(basePath / "logout")
     .out(statusCode(StatusCode.NoContent))
+    .description("Logout and invalidate current session")
 
   def make[F[_]: Async](
       service: AuthService[F],

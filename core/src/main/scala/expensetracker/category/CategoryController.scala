@@ -146,34 +146,40 @@ object CategoryController extends TapirSchema with TapirJson {
   }
 
   private val basePath = "categories"
-  private val idPath   = basePath / path[String].validate(Controller.validId).map((s: String) => CategoryId(s))(_.value)
+  private val idPath   = basePath / path[String].validate(Controller.validId).map((s: String) => CategoryId(s))(_.value).name("cat-id")
 
   val getAllCategoriesEndpoint = Controller.securedEndpoint.get
     .in(basePath)
     .out(jsonBody[List[CategoryView]])
+    .description("Get all categories")
 
   val getCategoryByIdEndpoint = Controller.securedEndpoint.get
     .in(idPath)
     .out(jsonBody[CategoryView])
+    .description("Get category by id")
 
   val createCategoryEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateCategoryRequest])
     .out(statusCode(StatusCode.Created).and(jsonBody[CreateCategoryResponse]))
+    .description("Create new category")
 
   val updateCategoryEndpoint = Controller.securedEndpoint.put
     .in(idPath)
     .in(jsonBody[UpdateCategoryRequest])
     .out(statusCode(StatusCode.NoContent))
+    .description("Update existing category")
 
   val hideCategoryEndpoint = Controller.securedEndpoint.put
     .in(idPath / "hidden")
     .in(jsonBody[HideCategoryRequest])
     .out(statusCode(StatusCode.NoContent))
+    .description("Change category display status")
 
   val deleteCategoryEndpoint = Controller.securedEndpoint.delete
     .in(idPath)
     .out(statusCode(StatusCode.NoContent))
+    .description("Delete existing category")
 
   def make[F[_]: Async](service: CategoryService[F]): F[Controller[F]] =
     Monad[F].pure(CategoryController[F](service))
