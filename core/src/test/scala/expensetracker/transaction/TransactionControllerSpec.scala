@@ -31,7 +31,7 @@ class TransactionControllerSpec extends ControllerSpec {
             |"date": "${Transactions.txdate}",
             |"amount": {"value":15.0,"currency":{"code":"GBP","symbol":"£"}},
             |"note": "test tx",
-            |"tags": ["foo"]
+            |"tags": ["Foo"]
             |}""".stripMargin)
         val req = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
