@@ -4,7 +4,6 @@ import cats.effect.{IO, IOApp}
 import expensetracker.Application.runtime
 import expensetracker.openapi.config.AppConfig
 import org.http4s.blaze.server.BlazeServerBuilder
-import org.http4s.server.Router
 
 object Application extends IOApp.Simple:
   override val run: IO[Unit] =

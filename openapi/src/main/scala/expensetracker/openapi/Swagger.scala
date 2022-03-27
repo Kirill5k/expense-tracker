@@ -6,8 +6,10 @@ import expensetracker.category.CategoryController
 import expensetracker.transaction.TransactionController
 import org.http4s.HttpRoutes
 import sttp.tapir.openapi.Info
+import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
 import sttp.tapir.server.http4s.Http4sServerInterpreter
-import sttp.tapir.swagger.bundle.SwaggerInterpreter
+import sttp.tapir.swagger.SwaggerUI
+import sttp.tapir.openapi.circe.yaml.*
 
 object Swagger {
   private val categories = List(
@@ -42,5 +44,7 @@ object Swagger {
   private val apiInfo = Info("Expense-tracker", "1.0", Some("Expense-tracker API documentation"))
 
   def routes[F[_]: Async]: HttpRoutes[F] =
-    Http4sServerInterpreter[F]().toRoutes(SwaggerInterpreter().fromEndpoints(allEndpoints, apiInfo))
+    val docsAsYaml = OpenAPIDocsInterpreter().toOpenAPI(allEndpoints, apiInfo).toYaml
+    Http4sServerInterpreter[F]().toRoutes(SwaggerUI(docsAsYaml))
+
 }
