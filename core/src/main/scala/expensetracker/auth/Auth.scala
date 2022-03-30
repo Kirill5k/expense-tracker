@@ -16,20 +16,19 @@ import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]: Temporal] private (
-    val service: AuthService[F],
+    val session: SessionService[F],
     val controller: Controller[F]
 )
 
 object Auth {
   def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
-    for {
+    for
       sessRepo <- SessionRepository.make[F](resources.mongo)
       jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)
       sessSvc  <- SessionService.make[F](jwtEnc, sessRepo)
       accRepo  <- UserRepository.make[F](resources.mongo)
       encr     <- PasswordEncryptor.make[F](config)
-      accSvc   <- UserService.make[F](accRepo, encr)
-      authSvc  <- AuthService.make[F](accSvc, sessSvc)
-      authCtrl <- AuthController.make[F](authSvc, dispatcher)
-    } yield Auth[F](authSvc, authCtrl)
+      usrSvc   <- UserService.make[F](accRepo, encr)
+      authCtrl <- AuthController.make[F](usrSvc, sessSvc, dispatcher)
+    yield Auth[F](sessSvc, authCtrl)
 }

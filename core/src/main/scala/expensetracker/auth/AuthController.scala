@@ -9,7 +9,7 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.*
-import expensetracker.auth.session.{CreateSession, IpAddress, Session}
+import expensetracker.auth.session.{CreateSession, IpAddress, Session, SessionService}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.auth.jwt.BearerToken
@@ -27,7 +27,8 @@ import java.time.Instant
 import java.time.temporal.Temporal
 
 final private class AuthController[F[_]](
-    private val service: AuthService[F],
+    private val userService: UserService[F],
+    private val sessionService: SessionService[F],
     private val dispatcher: ActionDispatcher[F]
 )(using
     F: Async[F]
@@ -37,8 +38,8 @@ final private class AuthController[F[_]](
   private def logout(using authenticator: Authenticator[F]) =
     logoutEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
-        service
-          .logout(session.id)
+        sessionService
+          .unauth(session.id)
           .voidResponse
       }
 
@@ -46,8 +47,8 @@ final private class AuthController[F[_]](
     changePasswordEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
         F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
-          service
-            .changePassword(req.toDomain(uid))
+          userService.changePassword(req.toDomain(uid)) >>
+            sessionService.invalidateAll(uid)
             .voidResponse
       }
 
@@ -55,22 +56,22 @@ final private class AuthController[F[_]](
     updateUserSettingsEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
         F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
-          service.updateSettings(uid, req.toDomain).voidResponse
+          userService.updateSettings(uid, req.toDomain).voidResponse
       }
 
   private def getCurrentUser(using authenticator: Authenticator[F]) =
     getCurrentUserEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
-        service
-          .findUser(session.userId)
+        userService
+          .find(session.userId)
           .mapResponse(UserView.from)
       }
 
   private def createUser =
     createUserEndpoint
       .serverLogic { req =>
-        service
-          .createUser(req.userDetails, req.userPassword)
+        userService
+          .create(req.userDetails, req.userPassword)
           .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
           .mapResponse(uid => CreateUserResponse(uid.value))
       }
@@ -79,9 +80,9 @@ final private class AuthController[F[_]](
     loginEndpoint
       .serverLogic { (ip, login) =>
         for {
-          acc  <- service.login(login.toDomain)
+          acc  <- userService.login(login.toDomain)
           time <- F.realTimeInstant
-          res  <- service.createSession(CreateSession(acc.id, ip, time)).mapResponse(LoginResponse.bearer)
+          res  <- sessionService.create(CreateSession(acc.id, ip, time)).mapResponse(LoginResponse.bearer)
         } yield res
       }
 
@@ -108,7 +109,6 @@ object AuthController extends TapirSchema with TapirJson {
   ) derives Codec.AsObject {
     def userDetails: UserDetails =
       UserDetails(UserEmail.from(email), UserName(firstName.value, lastName.value))
-
     def userPassword: Password = Password(password.value)
   }
 
@@ -213,8 +213,9 @@ object AuthController extends TapirSchema with TapirJson {
     .description("Logout and invalidate current session")
 
   def make[F[_]: Async](
-      service: AuthService[F],
+      userService: UserService[F],
+      sessionService: SessionService[F],
       dispatcher: ActionDispatcher[F]
   ): F[Controller[F]] =
-    Monad[F].pure(AuthController[F](service, dispatcher))
+    Monad[F].pure(AuthController[F](userService, sessionService, dispatcher))
 }
