@@ -7,7 +7,7 @@ import mongo4cats.circe.given
 
 import java.time.Instant
 
-final case class AccountEntity(
+final case class UserEntity(
     _id: ObjectId,
     email: String,
     name: UserName,
@@ -26,9 +26,9 @@ final case class AccountEntity(
     )
 }
 
-object AccountEntity {
-  def create(details: UserDetails, password: PasswordHash): AccountEntity =
-    AccountEntity(
+object UserEntity {
+  def create(details: UserDetails, password: PasswordHash): UserEntity =
+    UserEntity(
       ObjectId(),
       details.email.value,
       details.name,

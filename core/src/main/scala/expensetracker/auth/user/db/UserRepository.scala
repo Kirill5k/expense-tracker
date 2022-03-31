@@ -22,7 +22,7 @@ trait UserRepository[F[_]] extends Repository[F]:
   def updatePassword(uid: UserId)(password: PasswordHash): F[Unit]
 
 final private class LiveUserRepository[F[_]](
-    private val collection: MongoCollection[F, AccountEntity]
+    private val collection: MongoCollection[F, UserEntity]
 )(using
   F: Async[F]
 ) extends UserRepository[F] {
@@ -38,7 +38,7 @@ final private class LiveUserRepository[F[_]](
       .count(Filter.eq(Field.Email, details.email.value))
       .flatMap {
         case 0 =>
-          val createAcc = AccountEntity.create(details, password)
+          val createAcc = UserEntity.create(details, password)
           collection.insertOne(createAcc).as(UserId(createAcc._id.toHexString))
         case _ =>
           AccountAlreadyExists(details.email).raiseError[F, UserId]
@@ -65,6 +65,6 @@ final private class LiveUserRepository[F[_]](
 
 object UserRepository extends MongoJsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F]): F[UserRepository[F]] =
-    db.getCollectionWithCodec[AccountEntity]("users")
+    db.getCollectionWithCodec[UserEntity]("users")
       .map(_.withAddedCodec[UserSettings])
       .map(coll => LiveUserRepository[F](coll))

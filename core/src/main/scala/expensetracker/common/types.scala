@@ -1,7 +1,6 @@
 package expensetracker.common
 
 import mongo4cats.bson.ObjectId
-import eu.timepit.refined.types.string.NonEmptyString
 import io.circe.{Decoder, Encoder}
 
 object types {

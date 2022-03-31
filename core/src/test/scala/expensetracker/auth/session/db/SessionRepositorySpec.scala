@@ -2,10 +2,11 @@ package expensetracker.auth.session.db
 
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
-import cats.implicits._
+import cats.syntax.apply.*
+import cats.syntax.option.*
 import expensetracker.MongoOps
 import expensetracker.fixtures.{Sessions, Users}
-import expensetracker.auth.session._
+import expensetracker.auth.session.*
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
@@ -26,11 +27,11 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "create new sessions" in {
       withEmbeddedMongoDb { db =>
-        val result = for {
+        val result = for
           repo <- SessionRepository.make(db)
           sid  <- repo.create(Sessions.create())
           res  <- repo.find(sid)
-        } yield (sid, res)
+        yield (sid, res)
 
         result.map { case (sid, sess) =>
           sess mustBe Session(
@@ -48,10 +49,10 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "return empty option when session does not exist" in {
       withEmbeddedMongoDb { db =>
-        val result = for {
+        val result = for
           repo <- SessionRepository.make(db)
           res  <- repo.find(Sessions.sid)
-        } yield res
+        yield res
 
         result.map(_ mustBe None)
       }
@@ -59,12 +60,12 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "unauth session" in {
       withEmbeddedMongoDb { db =>
-        val result = for {
+        val result = for
           repo <- SessionRepository.make(db)
           sid  <- repo.create(Sessions.create())
           _    <- repo.unauth(sid)
           res  <- repo.find(sid)
-        } yield res
+        yield res
 
         result.map { s =>
           val sess = s.get
@@ -76,13 +77,13 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "invalidate all sessions" in {
       withEmbeddedMongoDb { db =>
-        val result = for {
+        val result = for
           repo <- SessionRepository.make(db)
           sid1 <- repo.create(Sessions.create())
           sid2 <- repo.create(Sessions.create())
           _    <- repo.invalidatedAll(Users.uid1)
           res  <- (repo.find(sid1), repo.find(sid2)).tupled
-        } yield res
+        yield res
 
         result.map {
           case (Some(s1), Some(s2)) =>
@@ -97,12 +98,12 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
     "update session lastAccessedAt field on find" in {
       withEmbeddedMongoDb { db =>
-        val result = for {
+        val result = for
           repo <- SessionRepository.make(db)
           sid  <- repo.create(Sessions.create())
           _    <- repo.find(sid)
           res  <- repo.find(sid)
-        } yield res
+        yield res
 
         result.map { sess =>
           sess.flatMap(_.lastAccessedAt) must not be empty

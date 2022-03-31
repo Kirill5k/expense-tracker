@@ -26,10 +26,10 @@ class SessionServiceSpec extends CatsSpec {
         val repo   = mock[SessionRepository[IO]]
         when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.raiseError(AppError.InvalidJwtToken("error")))
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           sid <- svc.authenticate(bearerToken)
-        } yield sid
+        yield sid
 
         result.attempt.unsafeToFuture().map { res =>
           verifyNoInteractions(repo)
@@ -44,10 +44,10 @@ class SessionServiceSpec extends CatsSpec {
         when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
         when(repo.find(any[SessionId])).thenReturn(IO.pure(None))
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           sid <- svc.authenticate(bearerToken)
-        } yield sid
+        yield sid
 
         result.attempt.unsafeToFuture().map { res =>
           verify(jwtEnc).decode(bearerToken)
@@ -62,10 +62,10 @@ class SessionServiceSpec extends CatsSpec {
         when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
         when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess.copy(userId = Users.uid2))))
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           sid <- svc.authenticate(bearerToken)
-        } yield sid
+        yield sid
 
         result.attempt.unsafeToFuture().map { res =>
           verify(jwtEnc).decode(bearerToken)
@@ -80,10 +80,10 @@ class SessionServiceSpec extends CatsSpec {
         when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
         when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess.copy(active = false))))
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           sid <- svc.authenticate(bearerToken)
-        } yield sid
+        yield sid
 
         result.attempt.unsafeToFuture().map { res =>
           verify(jwtEnc).decode(bearerToken)
@@ -98,10 +98,10 @@ class SessionServiceSpec extends CatsSpec {
         when(jwtEnc.decode(any[BearerToken])).thenReturn(IO.pure(jwtToken))
         when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           sid <- svc.authenticate(bearerToken)
-        } yield sid
+        yield sid
 
         result.unsafeToFuture().map { res =>
           verify(jwtEnc).decode(bearerToken)
@@ -118,10 +118,10 @@ class SessionServiceSpec extends CatsSpec {
         when(repo.create(any[CreateSession])).thenReturn(IO.pure(Sessions.sid))
         when(jwtEnc.encode(any[JwtToken])).thenReturn(IO.pure(BearerToken("token")))
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           tok <- svc.create(Sessions.create())
-        } yield tok
+        yield tok
 
         result.unsafeToFuture().map { res =>
           verify(jwtEnc).encode(JwtToken(Sessions.sid, Users.uid1))
@@ -137,10 +137,10 @@ class SessionServiceSpec extends CatsSpec {
         val repo   = mock[SessionRepository[IO]]
         when(repo.find(any[SessionId])).thenReturn(IO.pure(Some(Sessions.sess)))
 
-        val result = for {
+        val result = for
           svc  <- SessionService.make(jwtEnc, repo)
           sess <- svc.find(Sessions.sid)
-        } yield sess
+        yield sess
 
         result.unsafeToFuture().map { res =>
           verifyNoInteractions(jwtEnc)
@@ -156,10 +156,10 @@ class SessionServiceSpec extends CatsSpec {
         val repo   = mock[SessionRepository[IO]]
         when(repo.unauth(Sessions.sid)).thenReturn(IO.unit)
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           res <- svc.unauth(Sessions.sid)
-        } yield res
+        yield res
 
         result.unsafeToFuture().map { res =>
           verifyNoInteractions(jwtEnc)
@@ -175,10 +175,10 @@ class SessionServiceSpec extends CatsSpec {
         val repo   = mock[SessionRepository[IO]]
         when(repo.invalidatedAll(any[UserId])).thenReturn(IO.unit)
 
-        val result = for {
+        val result = for
           svc <- SessionService.make(jwtEnc, repo)
           res <- svc.invalidateAll(Users.uid1)
-        } yield res
+        yield res
 
         result.unsafeToFuture().map { res =>
           verifyNoInteractions(jwtEnc)

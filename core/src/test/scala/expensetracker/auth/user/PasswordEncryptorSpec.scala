@@ -12,11 +12,11 @@ class PasswordEncryptorSpec extends CatsSpec {
   "A PasswordEncryptor" should {
 
     "hash and validate password with salt" in {
-      val result = for {
+      val result = for
         e       <- PasswordEncryptor.make[IO](authConfig)
         hash    <- e.hash(Password("Password123!"))
         isValid <- e.isValid(Password("Password123!"), hash)
-      } yield isValid
+      yield isValid
 
       result.unsafeToFuture().map { isValid =>
         isValid mustBe true
