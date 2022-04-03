@@ -48,9 +48,7 @@ final private class LiveUserRepository[F[_]](
     collection
       .find(idEq(uid.value))
       .first
-      .flatMap { maybeUser =>
-        F.fromOption(maybeUser.map(_.toDomain), AccountDoesNotExist(uid))
-      }
+      .flatMap(user => F.fromOption(user.map(_.toDomain), AccountDoesNotExist(uid)))
 
   override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
     collection

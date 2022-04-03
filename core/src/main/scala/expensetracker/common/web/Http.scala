@@ -23,7 +23,7 @@ final class Http[F[_]: Async] private (
 ) {
 
   private val routes: HttpRoutes[F] = {
-    given Authenticator[F] = (token: BearerToken) => auth.session.authenticate(token)
+    given Authenticator[F] = auth.authenticator
     val api = auth.controller.routes <+>
       categories.controller.routes <+>
       transactions.controller.routes

@@ -1,6 +1,6 @@
 package expensetracker.auth
 
-import cats.effect.{Async, Temporal}
+import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.Resources
@@ -15,12 +15,12 @@ import jwt.JwtEncoder
 import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
 
-final class Auth[F[_]: Temporal] private (
-    val session: SessionService[F],
+final class Auth[F[_]] private (
+    val authenticator: Authenticator[F],
     val controller: Controller[F]
 )
 
-object Auth {
+object Auth:
   def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
     for
       sessRepo <- SessionRepository.make[F](resources.mongo)
@@ -30,5 +30,4 @@ object Auth {
       encr     <- PasswordEncryptor.make[F](config)
       usrSvc   <- UserService.make[F](accRepo, encr)
       authCtrl <- AuthController.make[F](usrSvc, sessSvc, dispatcher)
-    yield Auth[F](sessSvc, authCtrl)
-}
+    yield Auth[F](sessSvc.authenticate(_), authCtrl)

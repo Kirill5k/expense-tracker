@@ -7,7 +7,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-trait CatsSpec extends AsyncWordSpec with Matchers with MockitoSugar {
-
+trait CatsSpec extends AsyncWordSpec with Matchers with MockitoSugar:
   given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
-}
+

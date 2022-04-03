@@ -36,7 +36,6 @@ final private class LiveActionProcessor[F[_]: Temporal: Logger](
     }
 }
 
-object ActionProcessor {
+object ActionProcessor:
   def make[F[_]: Temporal: Logger](dispatcher: ActionDispatcher[F], catSvc: CategoryService[F]): F[ActionProcessor[F]] =
     Monad[F].pure(new LiveActionProcessor[F](dispatcher, catSvc))
-}

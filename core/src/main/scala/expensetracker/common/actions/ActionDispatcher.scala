@@ -12,15 +12,10 @@ trait ActionDispatcher[F[_]]:
 
 final private class LiveActionDispatcher[F[_]: Functor](
     private val actions: Queue[F, Action]
-) extends ActionDispatcher[F] {
-
-  override def dispatch(action: Action): F[Unit] =
-    actions.offer(action)
-
-  override def stream: Stream[F, Action] =
-    Stream.fromQueueUnterminated(actions)
-}
+) extends ActionDispatcher[F]:
+  override def dispatch(action: Action): F[Unit] = actions.offer(action)
+  override def stream: Stream[F, Action]         = Stream.fromQueueUnterminated(actions)
 
 object ActionDispatcher:
   def make[F[_]: Concurrent]: F[ActionDispatcher[F]] =
-    Queue.unbounded[F, Action].map(q => LiveActionDispatcher[F](q))
+    Queue.bounded[F, Action](1024).map(q => LiveActionDispatcher[F](q))
