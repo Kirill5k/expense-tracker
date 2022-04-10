@@ -112,7 +112,7 @@ object TransactionController extends TapirSchema with TapirJson {
         amount = amount,
         date = date,
         note = note.filter(_.nonEmpty),
-        tags = tags.map(_.toSet.map(_.toLowerCase)).getOrElse(Set.empty)
+        tags = tags.map(_.toSet.map(_.toLowerCase.replaceAll(" ", "-"))).getOrElse(Set.empty)
       )
   }
 

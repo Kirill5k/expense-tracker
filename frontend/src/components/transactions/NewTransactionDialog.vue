@@ -242,7 +242,7 @@ export default {
     save () {
       if (this.$refs.newTransactionForm.validate()) {
         const amount = { value: Number(this.newTransaction.amount), currency: this.currency }
-        const newTx = { ...this.newTransaction, amount }
+        const newTx = { ...this.newTransaction, amount, tags: this.newTransaction.tags.map(this.formatTag) }
         const event = newTx.id ? 'update' : 'save'
         this.$emit(event, newTx)
         this.close()
@@ -251,6 +251,9 @@ export default {
     update (tx) {
       this.newTransaction = { ...tx, amount: tx.amount.value, date: tx.date.slice(0, 10) }
       this.dialog = true
+    },
+    formatTag (tag) {
+      return tag.toLowerCase().replace(/ /g, '-')
     }
   }
 }
