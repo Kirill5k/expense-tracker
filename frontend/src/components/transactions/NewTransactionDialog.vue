@@ -253,7 +253,7 @@ export default {
       this.dialog = true
     },
     formatTag (tag) {
-      return tag.toLowerCase().replace(/ /g, '-')
+      return tag.trim().toLowerCase().replace(/ /g, '-')
     }
   }
 }

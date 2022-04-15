@@ -161,7 +161,7 @@ object TransactionController extends TapirSchema with TapirJson {
         amount = amount,
         date = date,
         note = note,
-        tags = tags.map(_.toSet.map(_.toLowerCase)).getOrElse(Set.empty)
+        tags = tags.map(_.toSet.map(_.trim.toLowerCase)).getOrElse(Set.empty)
       )
   }
 
