@@ -46,10 +46,10 @@ trait Controller[F[_]] extends TapirJson with TapirSchema {
 }
 
 object Controller extends TapirSchema with TapirJson {
-  val validId: Validator[String] = Validator.custom { id =>
-    lazy val error = ValidationError.Custom(id, s"Invalid hexadecimal representation of an id: $id", Nil)
-    Option.when(!ObjectId.isValid(id))(error).toList
-  }
+  val validId: Validator[String] = Validator.custom(
+    id => if (ObjectId.isValid(id)) ValidationResult.Valid else ValidationResult.Invalid(s"Invalid hexadecimal representation of an id: $id"),
+    Some(s"Invalid hexadecimal representation of an id")
+  )
 
   private val error = statusCode.and(jsonBody[ErrorResponse])
 
@@ -59,11 +59,11 @@ object Controller extends TapirSchema with TapirJson {
   val securedEndpoint: Endpoint[BearerToken, Unit, (StatusCode, ErrorResponse), Unit, Any] =
     publicEndpoint.securityIn(auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value))
 
-  def serverOptions[F[_]](using F: Sync[F]): Http4sServerOptions[F, F] = {
+  def serverOptions[F[_]](using F: Sync[F]): Http4sServerOptions[F] = {
     val errorEndpointOut = (e: Throwable) => Some(ValuedEndpointOutput(error, Controller.mapError(e)))
     Http4sServerOptions
-      .customInterceptors[F, F]
-      .exceptionHandler((ctx: ExceptionContext) => errorEndpointOut(ctx.e))
+      .customiseInterceptors[F]
+      .exceptionHandler(ExceptionHandler.pure((ctx: ExceptionContext) => errorEndpointOut(ctx.e)))
       .decodeFailureHandler { (ctx: DecodeFailureContext) =>
         if (ctx.failingInput.toString.matches("Header.Authorization.*")) {
           ctx.failure match
@@ -75,7 +75,7 @@ object Controller extends TapirSchema with TapirJson {
           ctx.failure match
             case DecodeResult.Error(_, e) => errorEndpointOut(e)
             case DecodeResult.InvalidValue(e) =>
-              val msgs = e.collect { case ValidationError.Custom(_, msg, _) => msg }
+              val msgs = e.flatMap(_.customMessage)
               errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))
             case _ => None
         }

@@ -49,7 +49,7 @@ class CategoryControllerSpec extends ControllerSpec {
         val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "foo")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        val responseBody = """{"message":"Invalid authorization header - The given value doesn't start with Bearer"}"""
+        val responseBody = """{"message":"Missing authorization header"}"""
         verifyJsonResponse(res, Status.Forbidden, Some(responseBody))
         verifyNoInteractions(svc)
       }

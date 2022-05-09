@@ -5,10 +5,10 @@ import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.common.validations.{ColorString, EmailString, IdString}
 import squants.Money
 import squants.market.Currency
-import sttp.tapir.generic.SchemaDerivation
 import sttp.tapir.{FieldName, Schema}
 import sttp.tapir.Schema.SName
 import sttp.tapir.SchemaType.{SProduct, SProductField}
+import sttp.tapir.generic.auto.SchemaDerivation
 
 transparent trait TapirSchema extends SchemaDerivation {
   given Schema[IdString]       = Schema.string
