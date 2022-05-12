@@ -10,11 +10,11 @@ object Dependencies {
     val log4cats   = "2.3.1"
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
-    val refined    = "0.9.28"
+    val refined    = "0.9.29"
     val tapir      = "1.0.0-M9"
     val jwt        = "9.0.5"
 
-    val scalaTest = "3.2.11"
+    val scalaTest = "3.2.12"
     val mockito   = "3.2.10.0"
   }
 
