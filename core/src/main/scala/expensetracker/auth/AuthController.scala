@@ -3,6 +3,7 @@ package expensetracker.auth
 import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
+import cats.syntax.apply.*
 import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import eu.timepit.refined.api.Refined
@@ -46,16 +47,15 @@ final private class AuthController[F[_]](
   private def changePassword(using authenticator: Authenticator[F]) =
     changePasswordEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
-        F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
+        F.raiseWhen(uid != session.userId)(SomeoneElsesSession) >>
           userService.changePassword(req.toDomain(uid)) >>
-            sessionService.invalidateAll(uid)
-            .voidResponse
+          sessionService.invalidateAll(uid).voidResponse
       }
 
   private def updateSettings(using authenticator: Authenticator[F]) =
     updateUserSettingsEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
-        F.ensure(uid.pure[F])(SomeoneElsesSession)(_ == session.userId) >>
+        F.raiseWhen(uid != session.userId)(SomeoneElsesSession) >>
           userService.updateSettings(uid, req.toDomain).voidResponse
       }
 
@@ -79,11 +79,11 @@ final private class AuthController[F[_]](
   private def login =
     loginEndpoint
       .serverLogic { (ip, login) =>
-        for {
+        for
           acc  <- userService.login(login.toDomain)
           time <- F.realTimeInstant
           res  <- sessionService.create(CreateSession(acc.id, ip, time)).mapResponse(LoginResponse.bearer)
-        } yield res
+        yield res
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =

@@ -18,12 +18,12 @@ class UserServiceSpec extends CatsSpec {
         when(encr.hash(any[Password])).thenReturn(IO.pure(Users.hash))
         when(repo.create(any[UserDetails], any[PasswordHash])).thenReturn(IO.pure(Users.uid1))
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.create(Users.details, Users.pwd)
-        } yield res
+        yield res
 
-        result.unsafeToFuture().map { res =>
+        result.asserting { res =>
           verify(encr).hash(Users.pwd)
           verify(repo).create(Users.details, Users.hash)
           res mustBe Users.uid1
@@ -36,12 +36,12 @@ class UserServiceSpec extends CatsSpec {
         val (repo, encr) = mocks
         when(repo.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.updateSettings(Users.uid1, UserSettings.Default)
-        } yield res
+        yield res
 
-        result.unsafeToFuture().map { res =>
+        result.asserting { res =>
           verify(repo).updateSettings(Users.uid1, UserSettings.Default)
           verifyNoInteractions(encr)
           res mustBe ()
@@ -59,12 +59,12 @@ class UserServiceSpec extends CatsSpec {
         when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
         when(repo.updatePassword(any[UserId])(any[PasswordHash])).thenReturn(IO.unit)
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.changePassword(cp)
-        } yield res
+        yield res
 
-        result.unsafeToFuture().map { res =>
+        result.asserting { res =>
           verify(repo).find(cp.id)
           verify(encr).isValid(cp.currentPassword, Users.user.password)
           verify(encr).hash(cp.newPassword)
@@ -78,12 +78,12 @@ class UserServiceSpec extends CatsSpec {
         when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.changePassword(cp)
-        } yield res
+        yield res
 
-        result.attempt.unsafeToFuture().map { res =>
+        result.attempt.asserting { res =>
           verify(repo).find(cp.id)
           verify(encr).isValid(cp.currentPassword, Users.user.password)
           verifyNoMoreInteractions(repo, encr)
@@ -97,12 +97,12 @@ class UserServiceSpec extends CatsSpec {
         val (repo, encr) = mocks
         when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.find(Users.uid1)
-        } yield res
+        yield res
 
-        result.unsafeToFuture().map { res =>
+        result.asserting { res =>
           verifyNoInteractions(encr)
           verify(repo).find(Users.uid1)
           res mustBe Users.user
@@ -117,12 +117,12 @@ class UserServiceSpec extends CatsSpec {
         when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(Users.user)))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.login(Login(Users.details.email, Users.pwd))
-        } yield res
+        yield res
 
-        result.unsafeToFuture().map { res =>
+        result.asserting { res =>
           verify(repo).findBy(Users.details.email)
           verify(encr).isValid(Users.pwd, Users.hash)
           res mustBe Users.user
@@ -133,12 +133,12 @@ class UserServiceSpec extends CatsSpec {
         val (repo, encr) = mocks
         when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(None))
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.login(Login(Users.details.email, Users.pwd))
-        } yield res
+        yield res
 
-        result.attempt.unsafeToFuture().map { res =>
+        result.attempt.asserting { res =>
           verify(repo).findBy(Users.details.email)
           verifyNoInteractions(encr)
           res mustBe Left(InvalidEmailOrPassword)
@@ -150,12 +150,12 @@ class UserServiceSpec extends CatsSpec {
         when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(Users.user)))
         when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
 
-        val result = for {
+        val result = for
           service <- UserService.make[IO](repo, encr)
           res     <- service.login(Login(Users.details.email, Users.pwd))
-        } yield res
+        yield res
 
-        result.attempt.unsafeToFuture().map { res =>
+        result.attempt.asserting { res =>
           verify(repo).findBy(Users.details.email)
           verify(encr).isValid(Users.pwd, Users.hash)
           res mustBe Left(InvalidEmailOrPassword)

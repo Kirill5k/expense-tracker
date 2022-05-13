@@ -12,11 +12,10 @@ final class Transactions[F[_]] private (
     val controller: Controller[F]
 )
 
-object Transactions {
+object Transactions:
   def make[F[_]: Async: Logger](resources: Resources[F]): F[Transactions[F]] =
-    for {
+    for
       repo <- TransactionRepository.make[F](resources.mongo)
       svc  <- TransactionService.make[F](repo)
       ctrl <- TransactionController.make[F](svc)
-    } yield new Transactions[F](ctrl)
-}
+    yield Transactions[F](ctrl)

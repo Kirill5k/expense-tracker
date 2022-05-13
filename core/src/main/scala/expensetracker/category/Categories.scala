@@ -16,9 +16,9 @@ final class Categories[F[_]] private (
 
 object Categories {
   def make[F[_]: Async: Logger](resources: Resources[F]): F[Categories[F]] =
-    for {
+    for
       repo <- CategoryRepository.make[F](resources.mongo)
       svc  <- CategoryService.make[F](repo)
       ctrl <- CategoryController.make[F](svc)
-    } yield new Categories[F](svc, ctrl)
+    yield Categories[F](svc, ctrl)
 }

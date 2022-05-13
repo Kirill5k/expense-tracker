@@ -19,12 +19,12 @@ class ActionProcessorSpec extends CatsSpec {
       val catSvc = mocks
       when(catSvc.assignDefault(any[UserId])).thenReturn(IO.unit)
 
-      val result = for {
+      val result = for
         dispatcher <- ActionDispatcher.make[IO]
         processor  <- ActionProcessor.make[IO](dispatcher, catSvc)
         _          <- dispatcher.dispatch(Action.SetupNewUser(Users.uid1))
         res        <- processor.run.interruptAfter(2.second).compile.drain
-      } yield res
+      yield res
 
       result.unsafeToFuture().map { r =>
         verify(catSvc).assignDefault(Users.uid1)
