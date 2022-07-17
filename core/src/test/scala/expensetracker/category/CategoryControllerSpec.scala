@@ -12,10 +12,8 @@ import org.http4s.circe.CirceEntityCodec.*
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
-class CategoryControllerSpec extends ControllerSpec {
-
+class CategoryControllerSpec extends ControllerSpec:
   "A CategoryController" when {
-
     "Authentication fails" should {
       "return error when session has expired" in {
         val svc = mock[CategoryService[IO]]
@@ -267,4 +265,3 @@ class CategoryControllerSpec extends ControllerSpec {
       }
     }
   }
-}

@@ -15,8 +15,7 @@ import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 import java.time.LocalDate
 
-class TransactionControllerSpec extends ControllerSpec {
-
+class TransactionControllerSpec extends ControllerSpec:
   "A TransactionController" when {
     "POST /transactions" should {
       "create new tx" in {
@@ -209,4 +208,3 @@ class TransactionControllerSpec extends ControllerSpec {
       }
     }
   }
-}

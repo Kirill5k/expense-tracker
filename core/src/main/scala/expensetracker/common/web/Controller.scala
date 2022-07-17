@@ -47,7 +47,8 @@ trait Controller[F[_]] extends TapirJson with TapirSchema {
 
 object Controller extends TapirSchema with TapirJson {
   val validId: Validator[String] = Validator.custom(
-    id => if (ObjectId.isValid(id)) ValidationResult.Valid else ValidationResult.Invalid(s"Invalid hexadecimal representation of an id: $id"),
+    id =>
+      if (ObjectId.isValid(id)) ValidationResult.Valid else ValidationResult.Invalid(s"Invalid hexadecimal representation of an id: $id"),
     Some(s"Invalid hexadecimal representation of an id")
   )
 
@@ -83,17 +84,17 @@ object Controller extends TapirSchema with TapirJson {
       .options
   }
 
-  private val FailedRegexValidation = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.".r
-  private val NullFieldValidation   = "Attempt to decode value on failed cursor".r
-  private val EmptyFieldValidation  = "Predicate isEmpty\\(\\) did not fail\\.".r
-  private val IdValidation          = "Predicate failed: \\((.*) is valid id\\).".r
+  private val FailedRegexValidation  = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.".r
+  private val MissingFieldValidation = "Missing required field".r
+  private val EmptyFieldValidation   = "Predicate isEmpty\\(\\) did not fail\\.".r
+  private val IdValidation           = "Predicate failed: \\((.*) is valid id\\).".r
 
   private def formatJsonError(err: JsonDecodeException): String =
     err.errors
       .map { je =>
         je.msg match
           case FailedRegexValidation(value) => s"$value is not a valid ${je.path.head.name}"
-          case NullFieldValidation()        => s"${je.path.head.name} is required"
+          case MissingFieldValidation()     => s"${je.path.head.name} is required"
           case EmptyFieldValidation()       => s"${je.path.head.name} must not be empty"
           case IdValidation(value)          => s"$value is not a valid ${je.path.head.name}"
           case msg if je.path.isEmpty       => s"Invalid message body: Could not decode $msg json"
