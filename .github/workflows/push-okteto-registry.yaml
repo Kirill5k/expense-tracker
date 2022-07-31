@@ -21,7 +21,7 @@ jobs:
 
       - uses: olafurpg/setup-scala@v11
         with:
-          java-version: temurin@1.18
+          java-version: openjdk@1.17.0
       - name: Build and push Core Docker image
         run: sbt docker:publish
 
