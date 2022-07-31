@@ -19,9 +19,9 @@ jobs:
           username: "kirill5k"
           password: ${{ secrets.OKTETO_API_KEY }}
 
-      - uses: olafurpg/setup-scala@v10
+      - uses: olafurpg/setup-scala@v11
         with:
-          java-version: adopt@1.15
+          java-version: temurin@1.18
       - name: Build and push Core Docker image
         run: sbt docker:publish
 
