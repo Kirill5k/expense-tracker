@@ -16,7 +16,7 @@ trait MongoOps {
         "name"   -> name,
         "icon"   -> "icon",
         "color"  -> "#2962FF",
-        "userId" -> uid.map(id => ObjectId(id.value)).orNull
+        "userId" -> uid.map(id => ObjectId(id.value))
       )
     )
 
