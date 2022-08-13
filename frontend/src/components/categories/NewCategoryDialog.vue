@@ -168,7 +168,7 @@ const ICONS = [
   { value: 'mdi-piano' },
   { value: 'mdi-tablet' },
   { value: 'mdi-television' },
-  { value: 'mdi-google-controller' },
+  { value: 'mdi-controller' },
   { value: 'mdi-watch' },
   { header: 'Food, drink', divider: true },
   { value: 'mdi-beer' },
