@@ -8,7 +8,6 @@ import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoe
 import expensetracker.fixtures.{Categories, Sessions, Users}
 import org.http4s.{Method, Request, Status, Uri}
 import org.http4s.implicits.*
-import org.http4s.circe.CirceEntityCodec.*
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
@@ -72,8 +71,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req     = requestWithAuthHeader(uri"/categories", method = Method.POST).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          uri"/categories",
+          method = Method.POST,
+          body = Some(parseJson(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Categories.cid}"}"""))
@@ -86,8 +88,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req     = requestWithAuthHeader(uri"/categories", method = Method.POST).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          uri"/categories",
+          method = Method.POST,
+          body = Some(parseJson(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Conflict, Some("""{"message":"A category with name cat-1 already exists"}"""))
@@ -99,8 +104,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo","color":"#2962FF"}""")
-        val req     = requestWithAuthHeader(uri"/categories", method = Method.POST).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          uri"/categories",
+          method = Method.POST,
+          body = Some(parseJson("""{"name":"cat-1","icon":"icon","kind":"foo","color":"#2962FF"}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(
@@ -116,8 +124,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"income","color":"blue"}""")
-        val req     = requestWithAuthHeader(uri"/categories", method = Method.POST).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          uri"/categories",
+          method = Method.POST,
+          body = Some(parseJson("""{"name":"cat-1","icon":"icon","kind":"income","color":"blue"}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(
@@ -179,9 +190,11 @@ class CategoryControllerSpec extends ControllerSpec:
         when(svc.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
-
-        val reqBody = parseJson("""{"hidden":true}""")
-        val req     = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}/hidden"), Method.PUT).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/categories/${Categories.cid}/hidden"),
+          Method.PUT,
+          body = Some(parseJson("""{"hidden":true}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
@@ -196,9 +209,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody =
-          parseJson(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.PUT).withEntity(reqBody)
+        val req = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
+          method = Method.PUT,
+          body = Some(parseJson(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
+        )
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
@@ -210,8 +225,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson(s"""{"id":"${Categories.cid2}","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req     = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.PUT).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
+          method = Method.PUT,
+          body = Some(parseJson(s"""{"id":"${Categories.cid2}","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
@@ -224,8 +242,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson(s"""{"id":"${Categories.cid}","name":"","icon":"icon","kind":"expense"}""")
-        val req     = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.PUT).withEntity(reqBody)
+        val req     = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
+          method = Method.PUT,
+          body = Some(parseJson(s"""{"id":"${Categories.cid}","name":"","icon":"icon","kind":"expense"}"""))
+        )
         val res     = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"name must not be empty, color is required"}"""
@@ -239,9 +260,11 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody =
-          parseJson(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.PUT).withEntity(reqBody)
+        val req = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
+          method = Method.PUT,
+          body = Some(parseJson(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
+        )
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = s"""{"message":"Category with id ${Categories.cid} does not exist"}"""

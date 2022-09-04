@@ -12,7 +12,7 @@ object Dependencies {
     val bcrypt     = "4.3.0"
     val refined    = "0.10.1"
     val tapir      = "1.0.4"
-    val jwt        = "9.0.6"
+    val jwt        = "9.1.0"
 
     val scalaTest = "3.2.13"
     val mockito   = "3.2.10.0"
@@ -54,8 +54,6 @@ object Dependencies {
 
     object http4s {
       val blaze = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
-      val circe = "org.http4s" %% "http4s-circe"        % Versions.http4s
-      val all   = Seq(blaze, circe)
     }
 
     object tapir {
@@ -76,10 +74,10 @@ object Dependencies {
     Libraries.pureconfig.core,
     Libraries.squants,
     Libraries.jwt,
+    Libraries.http4s.blaze,
     Libraries.bcrypt.cross(CrossVersion.for3Use2_13)
   ) ++
     Libraries.circe.all ++
-    Libraries.http4s.all ++
     Libraries.tapir.all ++
     Libraries.logging.all ++
     Libraries.refined.all

@@ -6,7 +6,6 @@ import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
 import expensetracker.fixtures.{Categories, Sessions, Transactions, Users}
-import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.implicits.*
 import org.http4s.{Method, Request, Status, Uri}
 import squants.market.GBP
@@ -32,7 +31,7 @@ class TransactionControllerSpec extends ControllerSpec:
             |"note": "test tx",
             |"tags": ["Foo"]
             |}""".stripMargin)
-        val req = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
+        val req = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Transactions.txid}"}"""))
@@ -45,7 +44,7 @@ class TransactionControllerSpec extends ControllerSpec:
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
         val reqBody = parseJson("""{"name":"cat-1","icon":"icon","kind":"foo"}""")
-        val req     = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
+        val req     = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res     = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Invalid transaction kind foo, categoryId is required, amount is required, date is required"}"""
@@ -65,7 +64,7 @@ class TransactionControllerSpec extends ControllerSpec:
                                   |"date": "2021-01-01",
                                   |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}}
                                   |}""".stripMargin)
-        val req = requestWithAuthHeader(uri"/transactions", Method.POST).withEntity(reqBody)
+        val req = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.UnprocessableEntity, Some("""{"message":"FOO is not a valid categoryId"}"""))
@@ -123,9 +122,11 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val reqBody = parseJson("""{"hidden":true}""")
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}/hidden"), Method.PUT)
-          .withEntity(reqBody)
+        val req = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/transactions/${Transactions.txid}/hidden"),
+          Method.PUT,
+          body = Some(parseJson("""{"hidden":true}"""))
+        )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
@@ -141,8 +142,11 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT)
-          .withEntity(parseJson(Transactions.txjson))
+        val req = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/transactions/${Transactions.txid}"),
+          Method.PUT,
+          body = Some(parseJson(Transactions.txjson))
+        )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.NoContent, None)
@@ -154,8 +158,11 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val req = requestWithAuthHeader(uri"/transactions/AB0C5342AB0C5342AB0C5342", Method.PUT)
-          .withEntity(parseJson(Transactions.txjson))
+        val req = requestWithAuthHeader(
+          uri"/transactions/AB0C5342AB0C5342AB0C5342",
+          Method.PUT,
+          body = Some(parseJson(Transactions.txjson))
+        )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
@@ -168,8 +175,11 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT)
-          .withEntity(parseJson("""{"id":"BC0C5342AB0C5342AB0C5342","categoryId":"foo"}"""))
+        val req = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/transactions/${Transactions.txid}"),
+          Method.PUT,
+          body = Some(parseJson("""{"id":"BC0C5342AB0C5342AB0C5342","categoryId":"foo"}"""))
+        )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"kind is required, foo is not a valid categoryId, amount is required, date is required"}"""
@@ -183,8 +193,7 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT)
-          .withEntity(parseJson(Transactions.txjson))
+        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT, body = Some(parseJson(Transactions.txjson)))
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = s"""{"message":"Category with id ${Categories.cid} does not exist"}"""
