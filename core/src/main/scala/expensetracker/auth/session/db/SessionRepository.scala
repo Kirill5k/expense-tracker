@@ -8,14 +8,14 @@ import expensetracker.common.db.Repository
 import expensetracker.common.json.given
 import mongo4cats.database.MongoDatabase
 import mongo4cats.circe.MongoJsonCodecs
-import mongo4cats.collection.operations.Update
+import mongo4cats.operations.Update
 import mongo4cats.collection.MongoCollection
 
 trait SessionRepository[F[_]] extends Repository[F]:
   def create(cs: CreateSession): F[SessionId]
   def find(sid: SessionId): F[Option[Session]]
   def unauth(sid: SessionId): F[Unit]
-  def invalidatedAll(aid: UserId): F[Unit]
+  def invalidatedAll(uid: UserId): F[Unit]
 
 final private class LiveSessionRepository[F[_]: Async](
     private val collection: MongoCollection[F, SessionEntity]
@@ -31,14 +31,14 @@ final private class LiveSessionRepository[F[_]: Async](
 
   override def find(sid: SessionId): F[Option[Session]] =
     collection
-      .findOneAndUpdate(idEq(sid.value), Update.currentDate(Field.LastAccessedAt))
+      .findOneAndUpdate(idEq(sid.toObjectId), Update.currentDate(Field.LastAccessedAt))
       .map(_.map(_.toDomain))
 
   override def unauth(sid: SessionId): F[Unit] =
-    collection.updateOne(idEq(sid.value), logoutUpdate).void
+    collection.updateOne(idEq(sid.toObjectId), logoutUpdate).void
 
-  override def invalidatedAll(aid: UserId): F[Unit] =
-    collection.updateMany(userIdEq(aid), invalidateUpdate).void
+  override def invalidatedAll(uid: UserId): F[Unit] =
+    collection.updateMany(userIdEq(uid), invalidateUpdate).void
 }
 
 object SessionRepository extends MongoJsonCodecs:

@@ -10,7 +10,7 @@ import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import mongo4cats.circe.MongoJsonCodecs
-import mongo4cats.collection.operations.Filter
+import mongo4cats.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
@@ -38,14 +38,14 @@ final private class LiveTransactionRepository[F[_]](
 
   override def getAll(uid: UserId): F[List[Transaction]] =
     collection
-      .find(userIdEq(uid).and(notHidden))
+      .find(userIdEq(uid) && notHidden)
       .sortByDesc("date")
       .all
       .map(_.map(_.toDomain).toList)
 
   override def get(uid: UserId, txid: TransactionId): F[Transaction] =
     collection
-      .find(userIdEq(uid).and(idEq(txid.value)))
+      .find(userIdEq(uid).and(idEq(txid.toObjectId)))
       .first
       .flatMap { maybetx =>
         F.fromOption(maybetx.map(_.toDomain), TransactionDoesNotExist(txid))
@@ -54,7 +54,7 @@ final private class LiveTransactionRepository[F[_]](
   override def update(tx: Transaction): F[Unit] =
     collection
       .findOneAndReplace(
-        userIdEq(tx.userId).and(idEq(tx.id.value)),
+        userIdEq(tx.userId) && idEq(tx.id.toObjectId),
         TransactionEntity.from(tx)
       )
       .flatMap { maybetx =>
@@ -63,19 +63,19 @@ final private class LiveTransactionRepository[F[_]](
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete(userIdEq(uid).and(idEq(txid.value)))
+      .findOneAndDelete(userIdEq(uid) && idEq(txid.toObjectId))
       .flatMap { maybetx =>
         F.fromOption(maybetx.void, TransactionDoesNotExist(txid))
       }
 
   override def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
-      .updateOne(userIdEq(uid).and(idEq(txid.value)), updateHidden(hidden))
+      .updateOne(userIdEq(uid) && idEq(txid.toObjectId), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
   override def isHidden(uid: UserId, txid: TransactionId): F[Boolean] =
     collection
-      .count(userIdEq(uid).and(idEq(txid.value)).and(Filter.eq(Field.Hidden, true)))
+      .count(userIdEq(uid) && idEq(txid.toObjectId) && Filter.eq(Field.Hidden, true))
       .map(_ > 0)
 }
 

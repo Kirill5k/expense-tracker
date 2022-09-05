@@ -3,6 +3,7 @@ package expensetracker
 import expensetracker.auth.user.{PasswordHash, UserEmail, UserId}
 import expensetracker.category.CategoryId
 import mongo4cats.bson.{Document, ObjectId}
+import mongo4cats.bson.syntax.*
 
 import java.time.Instant
 
@@ -11,16 +12,16 @@ trait MongoOps {
   def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
     Document(
       Map(
-        "_id"    -> ObjectId(id.value),
-        "kind"   -> "expense",
-        "name"   -> name,
-        "icon"   -> "icon",
-        "color"  -> "#2962FF",
-        "userId" -> uid.map(id => ObjectId(id.value))
+        "_id"    := id.toObjectId,
+        "kind"   := "expense",
+        "name"   := name,
+        "icon"   := "icon",
+        "color"  := "#2962FF",
+        "userId" := uid.map(id => id.toObjectId)
       )
     )
 
-  def accDoc(
+  def userDoc(
       id: UserId,
       email: UserEmail,
       password: PasswordHash = PasswordHash("password"),
@@ -28,11 +29,11 @@ trait MongoOps {
   ): Document =
     Document(
       Map(
-        "_id"              -> ObjectId(id.value),
-        "email"            -> email.value,
-        "password"         -> password.value,
-        "name"             -> Document.parse("""{"first":"John","last":"Bloggs"}"""),
-        "registrationDate" -> registrationDate
+        "_id"              := id.toObjectId,
+        "email"            := email.value,
+        "password"         := password.value,
+        "name"             := Document.parse("""{"first":"John","last":"Bloggs"}"""),
+        "registrationDate" := registrationDate
       )
     )
 }

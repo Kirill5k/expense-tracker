@@ -237,7 +237,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             categories <- db.getCollection("categories")
             _          <- categories.insertMany(List(categoryDoc(Categories.cid, "category-1"), categoryDoc(Categories.cid2, "category-2")))
             accs       <- db.getCollection("accounts")
-            _          <- accs.insertMany(List(accDoc(Users.uid1, UserEmail("acc-1")), accDoc(Users.uid2, UserEmail("acc-2"))))
+            _          <- accs.insertMany(List(userDoc(Users.uid1, UserEmail("acc-1")), userDoc(Users.uid2, UserEmail("acc-2"))))
             res        <- test(db)
           yield res
         }

@@ -217,7 +217,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             categories <- db.getCollection("categories")
             _ <- categories.insertMany(List(categoryDoc(Categories.cid, "c1"), categoryDoc(Categories.cid2, "c2", Some(Users.uid2))))
             accounts <- db.getCollection("accounts")
-            _        <- accounts.insertMany(List(accDoc(Users.uid1, UserEmail("acc1")), accDoc(Users.uid2, UserEmail("acc2"))))
+            _        <- accounts.insertMany(List(userDoc(Users.uid1, UserEmail("acc1")), userDoc(Users.uid2, UserEmail("acc2"))))
             res      <- test(db)
           yield res
         }

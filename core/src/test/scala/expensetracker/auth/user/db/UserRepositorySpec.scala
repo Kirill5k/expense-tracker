@@ -172,7 +172,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
           for
             db   <- client.getDatabase("expense-tracker")
             accs <- db.getCollection("users")
-            _    <- accs.insertOne(accDoc(Users.uid1, Users.details.email, password = Users.hash, registrationDate = Users.regDate))
+            _    <- accs.insertOne(userDoc(Users.uid1, Users.details.email, password = Users.hash, registrationDate = Users.regDate))
             res  <- test(db)
           yield res
         }

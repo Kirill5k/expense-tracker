@@ -10,7 +10,7 @@ import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.common.json.given
 import mongo4cats.circe.MongoJsonCodecs
-import mongo4cats.collection.operations.{Filter, Update}
+import mongo4cats.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
@@ -46,19 +46,19 @@ final private class LiveUserRepository[F[_]](
 
   override def find(uid: UserId): F[User] =
     collection
-      .find(idEq(uid.value))
+      .find(userIdEq(uid))
       .first
       .flatMap(user => F.fromOption(user.map(_.toDomain), AccountDoesNotExist(uid)))
 
-  override def updateSettings(aid: UserId, settings: UserSettings): F[Unit] =
+  override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     collection
-      .updateOne(idEq(aid.value), Update.set("settings", settings))
-      .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
+      .updateOne(userIdEq(uid), Update.set(Field.Settings, settings))
+      .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
 
-  override def updatePassword(aid: UserId)(password: PasswordHash): F[Unit] =
+  override def updatePassword(uid: UserId)(password: PasswordHash): F[Unit] =
     collection
-      .updateOne(idEq(aid.value), Update.set("password", password.value))
-      .flatMap(errorIfNoMatches(AccountDoesNotExist(aid)))
+      .updateOne(userIdEq(uid), Update.set(Field.Password, password.value))
+      .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
 }
 
 object UserRepository extends MongoJsonCodecs:

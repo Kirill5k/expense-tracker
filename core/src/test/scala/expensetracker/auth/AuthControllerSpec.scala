@@ -57,7 +57,11 @@ class AuthControllerSpec extends ControllerSpec {
             |"darkMode":false
             |}""".stripMargin
 
-        val req = requestWithAuthHeader(uri"/auth/user/60e70e87fb134e0c1a271122/settings", Method.PUT, body = Some(parseJson(reqBody)))
+        val req = requestWithAuthHeader(
+          uri"/auth/user/60e70e87fb134e0c1a271122/settings", 
+          Method.PUT, 
+          body = Some(parseJson(reqBody))
+        )
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
         verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))

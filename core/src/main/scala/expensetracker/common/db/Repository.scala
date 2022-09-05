@@ -6,7 +6,7 @@ import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import expensetracker.common.types.IdType
 import mongo4cats.bson.ObjectId
-import mongo4cats.collection.operations.{Filter, Update}
+import mongo4cats.operations.{Filter, Update}
 
 import java.time.Instant
 
@@ -15,6 +15,8 @@ trait Repository[F[_]] {
   protected object Field {
     val Id             = "_id"
     val Name           = "name"
+    val Settings       = "settings"
+    val Password       = "password"
     val UId            = "userId"
     val Email          = "email"
     val Hidden         = "hidden"
@@ -25,10 +27,10 @@ trait Repository[F[_]] {
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)
 
-  private def idEqFilter(name: String, id: Option[String]): Filter = Filter.eq(name, id.map(ObjectId.apply))
-  protected def idEq(id: String): Filter                           = idEqFilter(Field.Id, id.some)
-  protected def userIdEq(aid: Option[UserId]): Filter              = idEqFilter(Field.UId, aid.map(_.value))
-  protected def userIdEq(aid: UserId): Filter                      = idEqFilter(Field.UId, aid.value.some)
+  private def idEqFilter(name: String, id: Option[ObjectId]): Filter = Filter.eq(name, id)
+  protected def idEq(id: ObjectId): Filter                           = idEqFilter(Field.Id, id.some)
+  protected def userIdEq(aid: Option[UserId]): Filter                = idEqFilter(Field.UId, aid.map(_.toObjectId))
+  protected def userIdEq(aid: UserId): Filter                        = idEqFilter(Field.UId, aid.toObjectId.some)
 
   protected def errorIfNoMatches(error: Throwable)(res: UpdateResult)(using F: MonadError[F, Throwable]): F[Unit] =
     F.raiseWhen(res.getMatchedCount == 0)(error)

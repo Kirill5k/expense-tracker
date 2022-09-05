@@ -193,7 +193,11 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.PUT, body = Some(parseJson(Transactions.txjson)))
+        val req = requestWithAuthHeader(
+          Uri.unsafeFromString(s"/transactions/${Transactions.txid}"),
+          Method.PUT,
+          body = Some(parseJson(Transactions.txjson))
+        )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = s"""{"message":"Category with id ${Categories.cid} does not exist"}"""
