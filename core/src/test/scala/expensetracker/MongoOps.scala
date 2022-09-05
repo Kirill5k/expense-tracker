@@ -11,14 +11,12 @@ trait MongoOps {
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
     Document(
-      Map(
-        "_id"    := id.toObjectId,
-        "kind"   := "expense",
-        "name"   := name,
-        "icon"   := "icon",
-        "color"  := "#2962FF",
-        "userId" := uid.map(id => id.toObjectId)
-      )
+      "_id"    := id.toObjectId,
+      "kind"   := "expense",
+      "name"   := name,
+      "icon"   := "icon",
+      "color"  := "#2962FF",
+      "userId" := uid.map(id => id.toObjectId)
     )
 
   def userDoc(
@@ -28,12 +26,10 @@ trait MongoOps {
       registrationDate: Instant = Instant.parse("2021-06-01T00:00:00Z")
   ): Document =
     Document(
-      Map(
-        "_id"              := id.toObjectId,
-        "email"            := email.value,
-        "password"         := password.value,
-        "name"             := Document.parse("""{"first":"John","last":"Bloggs"}"""),
-        "registrationDate" := registrationDate
-      )
+      "_id"              := id.toObjectId,
+      "email"            := email.value,
+      "password"         := password.value,
+      "name"             := Document.parse("""{"first":"John","last":"Bloggs"}"""),
+      "registrationDate" := registrationDate
     )
 }

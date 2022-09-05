@@ -1,7 +1,7 @@
 package expensetracker.auth.user.db
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
@@ -25,9 +25,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
     "find" should {
       "find account by id" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             acc  <- repo.find(Users.uid1)
           yield acc
 
@@ -38,9 +38,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       }
 
       "return error account does not exist" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             acc  <- repo.find(Users.uid2)
           yield acc
 
@@ -51,9 +51,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
     "findBy" should {
       "find account by email" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             acc  <- repo.findBy(Users.details.email)
           yield acc
 
@@ -64,9 +64,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       }
 
       "return empty option when account does not exist" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             acc  <- repo.findBy(UserEmail("acc2@et.com"))
           yield acc
 
@@ -77,9 +77,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
     "updateSettings" should {
       "update account settings" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             _    <- repo.updateSettings(Users.uid1, UserSettings(USD, false, None))
             acc  <- repo.find(Users.uid1)
           yield acc
@@ -91,10 +91,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       }
 
       "return error when account does not exist" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val id = UserId(ObjectId().toHexString)
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             acc  <- repo.updateSettings(id, UserSettings.Default)
           yield acc
 
@@ -105,10 +105,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
     "updatePassword" should {
       "update account password" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val newpwd = PasswordHash("new-password")
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             _    <- repo.updatePassword(Users.uid1)(newpwd)
             acc  <- repo.find(Users.uid1)
           yield acc
@@ -120,10 +120,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       }
 
       "return error when account does not exist" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val id = UserId(ObjectId().toHexString)
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             acc  <- repo.updatePassword(id)(Users.hash)
           yield acc
 
@@ -134,11 +134,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
     "create" should {
       "create new account" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val email = UserEmail("acc2@et.com")
 
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             aid  <- repo.create(Users.details.copy(email = email), Users.hash)
             acc  <- repo.findBy(email)
           yield (aid, acc)
@@ -152,9 +152,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       }
 
       "return error when account already exists" in {
-        withEmbeddedMongoDb { client =>
+        withEmbeddedMongoDb { db =>
           val result = for
-            repo <- UserRepository.make(client)
+            repo <- UserRepository.make(db)
             _    <- repo.create(Users.details, Users.hash)
           yield ()
 
@@ -170,11 +170,11 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
         .use { client =>
           for
-            db   <- client.getDatabase("expense-tracker")
-            accs <- db.getCollection("users")
-            _    <- accs.insertOne(userDoc(Users.uid1, Users.details.email, password = Users.hash, registrationDate = Users.regDate))
-            res  <- test(db)
+            db    <- client.getDatabase("expense-tracker")
+            users <- db.getCollection("users")
+            _     <- users.insertOne(userDoc(Users.uid1, Users.details.email, password = Users.hash, registrationDate = Users.regDate))
+            res   <- test(db)
           yield res
         }
-    }.unsafeToFuture()
+    }.unsafeToFuture()(IORuntime.global)
 }

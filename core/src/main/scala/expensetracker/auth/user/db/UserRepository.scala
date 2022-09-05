@@ -46,18 +46,18 @@ final private class LiveUserRepository[F[_]](
 
   override def find(uid: UserId): F[User] =
     collection
-      .find(userIdEq(uid))
+      .find(idEq(uid.toObjectId))
       .first
       .flatMap(user => F.fromOption(user.map(_.toDomain), AccountDoesNotExist(uid)))
 
   override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     collection
-      .updateOne(userIdEq(uid), Update.set(Field.Settings, settings))
+      .updateOne(idEq(uid.toObjectId), Update.set(Field.Settings, settings))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
 
   override def updatePassword(uid: UserId)(password: PasswordHash): F[Unit] =
     collection
-      .updateOne(userIdEq(uid), Update.set(Field.Password, password.value))
+      .updateOne(idEq(uid.toObjectId), Update.set(Field.Password, password.value))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
 }
 
