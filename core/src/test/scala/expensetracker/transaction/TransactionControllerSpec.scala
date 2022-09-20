@@ -47,7 +47,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req     = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res     = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        val responseBody = """{"message":"Invalid transaction kind foo, categoryId is required, amount is required, date is required"}"""
+        val responseBody = """{"message":"Invalid value foo for enum TransactionKind, Accepted values: expense,income, categoryId is required, amount is required, date is required"}"""
         verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
         verifyNoInteractions(svc)
       }

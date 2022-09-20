@@ -1,7 +1,7 @@
 package expensetracker.auth.session
 
 import expensetracker.auth.user.UserId
-import expensetracker.common.types.IdType
+import expensetracker.common.types.{EnumType, IdType}
 import io.circe.{Decoder, Encoder}
 
 import java.time.Instant
@@ -10,18 +10,9 @@ import scala.util.Try
 opaque type SessionId = String
 object SessionId extends IdType[SessionId]
 
-enum SessionStatus(val value: String):
-  case Authenticated extends SessionStatus("authenticated")
-  case LoggedOut     extends SessionStatus("logged-out")
-  case Invalidated   extends SessionStatus("invalidated")
-
-object SessionStatus {
-  def from(value: String): Either[String, SessionStatus] =
-    SessionStatus.values.find(_.value == value).toRight(s"Unexpected session status $value")
-
-  given Decoder[SessionStatus] = Decoder[String].emap(SessionStatus.from)
-  given Encoder[SessionStatus] = Encoder[String].contramap(_.value)
-}
+object SessionStatus extends EnumType[SessionStatus](() => SessionStatus.values, _.print)
+enum SessionStatus:
+  case Authenticated, LoggedOut, Invalidated
 
 final case class IpAddress(host: String, port: Int)
 object IpAddress {

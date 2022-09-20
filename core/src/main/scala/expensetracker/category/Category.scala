@@ -1,6 +1,6 @@
 package expensetracker.category
 
-import expensetracker.common.types.{IdType, StringType}
+import expensetracker.common.types.{EnumType, IdType, StringType}
 import expensetracker.auth.user.UserId
 import io.circe.{Decoder, Encoder}
 
@@ -22,17 +22,9 @@ object CategoryColor extends StringType[CategoryColor] {
   val DeepPurple = CategoryColor("#6200EA")
 }
 
-enum CategoryKind(val value: String):
-  case Expense extends CategoryKind("expense")
-  case Income  extends CategoryKind("income")
-
-object CategoryKind {
-  def from(value: String): Either[String, CategoryKind] =
-    CategoryKind.values.find(_.value == value).toRight(s"Invalid category kind $value")
-
-  given decodeCategoryKind: Decoder[CategoryKind] = Decoder[String].emap(CategoryKind.from)
-  given encodeCategoryKind: Encoder[CategoryKind] = Encoder[String].contramap(_.value)
-}
+object CategoryKind extends EnumType[CategoryKind](() => CategoryKind.values, _.print)
+enum CategoryKind:
+  case Expense, Income
 
 final case class Category(
     id: CategoryId,

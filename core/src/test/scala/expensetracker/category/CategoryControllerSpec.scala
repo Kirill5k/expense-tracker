@@ -114,7 +114,7 @@ class CategoryControllerSpec extends ControllerSpec:
         verifyJsonResponse(
           res,
           Status.UnprocessableEntity,
-          Some("""{"message":"Invalid category kind foo"}""")
+          Some("""{"message":"Invalid value foo for enum CategoryKind, Accepted values: expense,income"}""")
         )
         verifyNoInteractions(svc)
       }

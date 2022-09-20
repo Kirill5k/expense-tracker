@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
-import expensetracker.common.types.IdType
+import expensetracker.common.types.{EnumType, IdType}
 import io.circe.{Decoder, Encoder}
 import squants.market.Money
 
@@ -11,17 +11,9 @@ import java.time.LocalDate
 opaque type TransactionId = String
 object TransactionId extends IdType[TransactionId]
 
-enum TransactionKind(val value: String):
-  case Expense extends TransactionKind("expense")
-  case Income  extends TransactionKind("income")
-
-object TransactionKind {
-  def from(value: String): Either[String, TransactionKind] =
-    TransactionKind.values.find(_.value == value).toRight(s"Invalid transaction kind $value")
-
-  given Decoder[TransactionKind] = Decoder[String].emap(TransactionKind.from)
-  given Encoder[TransactionKind] = Encoder[String].contramap(_.value)
-}
+object TransactionKind extends EnumType[TransactionKind](() => TransactionKind.values, _.print)
+enum TransactionKind:
+  case Expense, Income
 
 final case class Transaction(
     id: TransactionId,
