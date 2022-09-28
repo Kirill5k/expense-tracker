@@ -1,6 +1,7 @@
 package expensetracker
 
 import cats.effect.{IO, IOApp}
+import com.comcast.ip4s.*
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import expensetracker.common.actions.{ActionDispatcher, ActionProcessor}
@@ -8,7 +9,7 @@ import expensetracker.common.config.AppConfig
 import expensetracker.common.web.Http
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.ember.server.EmberServerBuilder
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import fs2.Stream
@@ -27,11 +28,14 @@ object Application extends IOApp.Simple:
           txs        <- Transactions.make(res)
           http       <- Http.make(health, auth, cats, txs)
           processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
-          server = BlazeServerBuilder[IO]
-            .withExecutionContext(runtime.compute)
-            .bindHttp(config.server.port, config.server.host)
+          server = EmberServerBuilder
+            .default[IO]
+            .withHostOption(Ipv4Address.fromString(config.server.host))
+            .withPort(Port.fromInt(config.server.port).get)
             .withHttpApp(http.app)
-          _ <- Stream(processor.run, server.serve).parJoinUnbounded.compile.drain
+            .build
+            .use(_ => IO.never)
+          _ <- Stream.eval(server).concurrently(processor.run).compile.drain
         yield ()
       }
     yield ()

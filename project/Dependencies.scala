@@ -2,20 +2,20 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val mongo4cats = "0.6.2"
+    val mongo4cats = "0.6.3"
     val pureConfig = "0.17.1"
     val circe      = "0.14.3"
-    val http4s     = "0.23.12"
+    val http4s     = "0.23.16"
     val logback    = "1.4.1"
     val log4cats   = "2.5.0"
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.10.1"
-    val tapir      = "1.1.0"
+    val tapir      = "1.1.1"
     val jwt        = "9.1.1"
 
     val scalaTest = "3.2.13"
-    val mockito   = "3.2.10.0"
+    val mockito   = "3.2.13.0"
   }
 
   object Libraries {
@@ -53,7 +53,7 @@ object Dependencies {
     }
 
     object http4s {
-      val blaze = "org.http4s" %% "http4s-blaze-server" % Versions.http4s
+      val emberServer = "org.http4s" %% "http4s-ember-server" % Versions.http4s
     }
 
     object tapir {
@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
-    val mockito   = "org.scalatestplus" %% "mockito-3-4" % Versions.mockito
+    val mockito   = "org.scalatestplus" %% "mockito-4-6" % Versions.mockito
   }
 
   lazy val core = Seq(
@@ -74,7 +74,7 @@ object Dependencies {
     Libraries.pureconfig.core,
     Libraries.squants,
     Libraries.jwt,
-    Libraries.http4s.blaze,
+    Libraries.http4s.emberServer,
     Libraries.bcrypt.cross(CrossVersion.for3Use2_13)
   ) ++
     Libraries.circe.all ++
