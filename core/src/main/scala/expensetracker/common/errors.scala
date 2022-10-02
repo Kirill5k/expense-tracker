@@ -8,10 +8,9 @@ import pdi.jwt.JwtAlgorithm
 
 object errors {
 
-  sealed trait AppError extends Throwable {
+  sealed trait AppError extends Throwable:
     def message: String
     override def getMessage: String = message
-  }
 
   object AppError {
     sealed trait Unauth        extends AppError

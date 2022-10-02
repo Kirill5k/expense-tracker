@@ -17,7 +17,8 @@ object config {
   ) derives ConfigReader
 
   final case class MongoConfig(
-      connectionUri: String
+      connectionUri: String,
+      databaseName: String
   ) derives ConfigReader
 
   final case class ServerConfig(

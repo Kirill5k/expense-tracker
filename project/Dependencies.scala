@@ -11,11 +11,11 @@ object Dependencies {
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.10.1"
-    val tapir      = "1.1.1"
+    val tapir      = "1.1.2"
     val jwt        = "9.1.1"
 
-    val scalaTest = "3.2.13"
-    val mockito   = "3.2.13.0"
+    val scalaTest = "3.2.14"
+    val mockito   = "3.2.14.0"
   }
 
   object Libraries {
