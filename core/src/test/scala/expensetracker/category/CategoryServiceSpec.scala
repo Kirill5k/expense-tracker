@@ -2,14 +2,14 @@ package expensetracker.category
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.CatsSpec
+import expensetracker.IOWordSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
 import expensetracker.fixtures.{Users, Categories}
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, when}
 
-class CategoryServiceSpec extends CatsSpec {
+class CategoryServiceSpec extends IOWordSpec {
 
   "A CategoryService" should {
     "delete category from db" in {

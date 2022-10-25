@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.CatsSpec
+import expensetracker.IOWordSpec
 import expensetracker.fixtures.{Transactions, Users}
 import expensetracker.auth.user.UserId
 import expensetracker.transaction.db.TransactionRepository
@@ -12,7 +12,7 @@ import org.mockito.Mockito.{verify, when}
 
 import java.time.LocalDate
 
-class TransactionServiceSpec extends CatsSpec {
+class TransactionServiceSpec extends IOWordSpec {
 
   "A TransactionService" should {
     "delete tx from db" in {

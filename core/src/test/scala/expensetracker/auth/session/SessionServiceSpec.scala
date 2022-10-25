@@ -2,7 +2,7 @@ package expensetracker.auth.session
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.CatsSpec
+import expensetracker.IOWordSpec
 import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
@@ -13,7 +13,7 @@ import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 import java.time.Instant
 
-class SessionServiceSpec extends CatsSpec {
+class SessionServiceSpec extends IOWordSpec {
 
   "A SessionService" when {
 

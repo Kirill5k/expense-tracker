@@ -11,7 +11,7 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.concurrent.Future
 
-trait CatsSpec extends AsyncWordSpec with Matchers with MockitoSugar {
+trait IOWordSpec extends AsyncWordSpec with Matchers with MockitoSugar {
   given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   extension [A](io: IO[A])

@@ -2,7 +2,7 @@ package expensetracker.common.actions
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.CatsSpec
+import expensetracker.IOWordSpec
 import expensetracker.fixtures.Users
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryService
@@ -11,7 +11,7 @@ import org.mockito.Mockito.{verify, when}
 
 import scala.concurrent.duration._
 
-class ActionProcessorSpec extends CatsSpec {
+class ActionProcessorSpec extends IOWordSpec {
 
   "An ActionProcessor" should {
 

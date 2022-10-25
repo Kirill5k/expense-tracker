@@ -2,7 +2,7 @@ package expensetracker.auth
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.CatsSpec
+import expensetracker.IOWordSpec
 import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.session.SessionId
 import expensetracker.auth.user.UserId
@@ -13,7 +13,7 @@ import pdi.jwt.algorithms.JwtUnknownAlgorithm
 
 import java.time.Instant
 
-class JwtEncoderSpec extends CatsSpec with JsonCodecs {
+class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
 
   val config  = JwtConfig("HS256", "secret-key")
   val session = JwtToken(SessionId("s1"), UserId("u1"))

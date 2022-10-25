@@ -2,10 +2,10 @@ package expensetracker.auth.user
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.CatsSpec
+import expensetracker.IOWordSpec
 import expensetracker.common.config.{AuthConfig, JwtConfig}
 
-class PasswordEncryptorSpec extends CatsSpec {
+class PasswordEncryptorSpec extends IOWordSpec {
 
   val authConfig = AuthConfig("$2a$10$8K1p/a0dL1LXMIgoEDFrwO", JwtConfig("ALG", "SECRET"))
 
