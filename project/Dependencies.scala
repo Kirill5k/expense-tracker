@@ -11,7 +11,7 @@ object Dependencies {
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.10.1"
-    val tapir      = "1.2.2"
+    val tapir      = "1.2.3"
     val jwt        = "9.1.2"
 
     val scalaTest = "3.2.14"
