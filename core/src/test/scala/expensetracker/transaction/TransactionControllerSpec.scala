@@ -34,7 +34,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Transactions.txid}"}"""))
+        res mustHaveStatus (Status.Created, Some(s"""{"id":"${Transactions.txid}"}"""))
         verify(svc).create(Transactions.create())
       }
 
@@ -47,8 +47,9 @@ class TransactionControllerSpec extends ControllerSpec:
         val req     = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res     = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        val responseBody = """{"message":"Invalid value foo for enum TransactionKind, Accepted values: expense,income, categoryId is required, amount is required, date is required"}"""
-        verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
+        val responseBody =
+          """{"message":"Invalid value foo for enum TransactionKind, Accepted values: expense,income, categoryId is required, amount is required, date is required"}"""
+        res mustHaveStatus (Status.UnprocessableEntity, Some(responseBody))
         verifyNoInteractions(svc)
       }
 
@@ -67,7 +68,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req = requestWithAuthHeader(uri"/transactions", Method.POST, body = Some(reqBody))
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.UnprocessableEntity, Some("""{"message":"FOO is not a valid categoryId"}"""))
+        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"FOO is not a valid categoryId"}"""))
         verifyNoInteractions(svc)
       }
     }
@@ -82,7 +83,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req = requestWithAuthHeader(uri"/transactions", Method.GET)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Ok, Some(s"""[${Transactions.txjson}]"""))
+        res mustHaveStatus (Status.Ok, Some(s"""[${Transactions.txjson}]"""))
         verify(svc).getAll(Users.uid1)
       }
     }
@@ -97,7 +98,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.GET)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Ok, Some(Transactions.txjson))
+        res mustHaveStatus (Status.Ok, Some(Transactions.txjson))
         verify(svc).get(Users.uid1, Transactions.txid)
       }
 
@@ -110,7 +111,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.GET)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NotFound, Some(s"""{"message":"Transaction with id ${Transactions.txid} does not exist"}"""))
+        res mustHaveStatus (Status.NotFound, Some(s"""{"message":"Transaction with id ${Transactions.txid} does not exist"}"""))
         verify(svc).get(Users.uid1, Transactions.txid)
       }
     }
@@ -129,7 +130,7 @@ class TransactionControllerSpec extends ControllerSpec:
         )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(svc).hide(Users.uid1, Transactions.txid, true)
       }
     }
@@ -149,7 +150,7 @@ class TransactionControllerSpec extends ControllerSpec:
         )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(svc).update(Transactions.tx())
       }
 
@@ -166,7 +167,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
-        verifyJsonResponse(res, Status.BadRequest, Some(resBody))
+        res mustHaveStatus (Status.BadRequest, Some(resBody))
         verifyNoInteractions(svc)
       }
 
@@ -183,7 +184,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"kind is required, foo is not a valid categoryId, amount is required, date is required"}"""
-        verifyJsonResponse(res, Status.UnprocessableEntity, Some(resBody))
+        res mustHaveStatus (Status.UnprocessableEntity, Some(resBody))
         verifyNoInteractions(svc)
       }
 
@@ -201,7 +202,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = s"""{"message":"Category with id ${Categories.cid} does not exist"}"""
-        verifyJsonResponse(res, Status.NotFound, Some(resBody))
+        res mustHaveStatus (Status.NotFound, Some(resBody))
         verify(svc).update(Transactions.tx())
       }
     }
@@ -216,7 +217,7 @@ class TransactionControllerSpec extends ControllerSpec:
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions/${Transactions.txid}"), Method.DELETE)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(svc).delete(Users.uid1, Transactions.txid)
       }
     }

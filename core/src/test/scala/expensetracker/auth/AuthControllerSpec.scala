@@ -23,13 +23,12 @@ class AuthControllerSpec extends ControllerSpec {
 
         when(usrSvc.find(any[UserId])).thenReturn(IO.pure(Users.user))
 
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/auth/user", Method.GET)
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        val resBody =
-          s"""{
+        val resBody = s"""{
             |"id":"${Users.uid1}",
             |"email":"${Users.email}",
             |"firstName":"${Users.details.name.first}",
@@ -38,7 +37,7 @@ class AuthControllerSpec extends ControllerSpec {
             |"registrationDate": "${Users.regDate}"
             |}""".stripMargin
 
-        verifyJsonResponse(res, Status.Ok, Some(resBody))
+        res mustHaveStatus (Status.Ok, Some(resBody))
         verify(usrSvc).find(Sessions.sess.userId)
         verifyNoInteractions(disp)
       }
@@ -48,7 +47,7 @@ class AuthControllerSpec extends ControllerSpec {
       "return error when id in path is different from id in session" in {
         val (usrSvc, sessSvc, disp) = mocks
 
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
 
         val reqBody =
           """{
@@ -58,13 +57,13 @@ class AuthControllerSpec extends ControllerSpec {
             |}""".stripMargin
 
         val req = requestWithAuthHeader(
-          uri"/auth/user/60e70e87fb134e0c1a271122/settings", 
-          Method.PUT, 
+          uri"/auth/user/60e70e87fb134e0c1a271122/settings",
+          Method.PUT,
           body = Some(parseJson(reqBody))
         )
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))
+        res mustHaveStatus (Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
@@ -73,7 +72,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         when(usrSvc.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
 
         val reqBody =
           """{
@@ -89,7 +88,7 @@ class AuthControllerSpec extends ControllerSpec {
         )
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(usrSvc).updateSettings(Users.uid1, UserSettings(USD, false, Some(false)))
         verifyNoInteractions(sessSvc, disp)
       }
@@ -99,7 +98,7 @@ class AuthControllerSpec extends ControllerSpec {
       "return error when id in path is different from id in session" in {
         val (usrSvc, sessSvc, disp) = mocks
 
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           uri"/auth/user/60e70e87fb134e0c1a271122/password",
@@ -108,7 +107,7 @@ class AuthControllerSpec extends ControllerSpec {
         )
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))
+        res mustHaveStatus (Status.Forbidden, Some("""{"message":"The current session belongs to a different user"}"""))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
@@ -118,7 +117,7 @@ class AuthControllerSpec extends ControllerSpec {
         when(usrSvc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
         when(sessSvc.invalidateAll(any[UserId])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/auth/user/${Users.uid1}/password"),
@@ -127,7 +126,7 @@ class AuthControllerSpec extends ControllerSpec {
         )
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(usrSvc).changePassword(ChangePassword(Users.uid1, Password("curr-pwd"), Password("new-pwd")))
         verify(sessSvc).invalidateAll(Users.uid1)
         verifyNoInteractions(disp)
@@ -145,11 +144,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withJsonBody(reqBody)
         val res     = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(
-          res,
-          Status.Conflict,
-          Some("""{"message":"An account with email foo@bar.com already exists"}""")
-        )
+        res mustHaveStatus (Status.Conflict, Some("""{"message":"An account with email foo@bar.com already exists"}"""))
         verify(usrSvc).create(
           UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs")),
           Password("pwd")
@@ -164,11 +159,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withJsonBody(reqBody)
         val res     = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(
-          res,
-          Status.UnprocessableEntity,
-          Some("""{"message":"password must not be empty"}""")
-        )
+        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"password must not be empty"}"""))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
@@ -182,7 +173,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/user", method = Method.POST).withJsonBody(reqBody)
         val res     = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Created, Some(s"""{"id":"${Users.uid1}"}"""))
+        res mustHaveStatus (Status.Created, Some(s"""{"id":"${Users.uid1}"}"""))
         verify(usrSvc).create(
           UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs")),
           Password("pwd")
@@ -203,19 +194,19 @@ class AuthControllerSpec extends ControllerSpec {
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Invalid message body: Could not decode expected \" got 'foo}' (line 1, column 2) json"}"""
-        verifyJsonResponse(res, Status.UnprocessableEntity, Some(responseBody))
+        res mustHaveStatus (Status.UnprocessableEntity, Some(responseBody))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
       "return bad req on parsing error" in {
         val (usrSvc, sessSvc, disp) = mocks
 
-        val reqBody  = parseJson("""{"email":"foo","password":""}""")
-        val res      = Request[IO](uri = uri"/auth/login", method = Method.POST).withJsonBody(reqBody)
-        val response = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(res))
+        val reqBody = parseJson("""{"email":"foo","password":""}""")
+        val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withJsonBody(reqBody)
+        val res     = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"foo is not a valid email, password must not be empty"}"""
-        verifyJsonResponse(response, Status.UnprocessableEntity, Some(resBody))
+        res mustHaveStatus (Status.UnprocessableEntity, Some(resBody))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
@@ -228,7 +219,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withJsonBody(reqBody)
         val res     = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Unauthorized, Some("""{"message":"Invalid email or password"}"""))
+        res mustHaveStatus (Status.Unauthorized, Some("""{"message":"Invalid email or password"}"""))
         verify(usrSvc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verifyNoInteractions(sessSvc, disp)
       }
@@ -243,7 +234,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req     = Request[IO](uri = uri"/auth/login", method = Method.POST).withJsonBody(reqBody)
         val res     = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""))
+        res mustHaveStatus (Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""))
         verify(usrSvc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
         verify(sessSvc).create(any[CreateSession])
         verifyNoInteractions(disp)
@@ -259,7 +250,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req = Request[IO](uri = uri"/auth/logout", method = Method.POST)
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some("""{"message":"Missing authorization header"}"""))
+        res mustHaveStatus (Status.Forbidden, Some("""{"message":"Missing authorization header"}"""))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
@@ -271,7 +262,7 @@ class AuthControllerSpec extends ControllerSpec {
         val req = requestWithAuthHeader(uri"/auth/logout", method = Method.POST)
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.Forbidden, Some(s"""{"message":"Session with id ${Sessions.sid} does not exist"}"""))
+        res mustHaveStatus (Status.Forbidden, Some(s"""{"message":"Session with id ${Sessions.sid} does not exist"}"""))
         verifyNoInteractions(usrSvc, sessSvc, disp)
       }
 
@@ -280,12 +271,12 @@ class AuthControllerSpec extends ControllerSpec {
 
         when(sessSvc.unauth(any[SessionId])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/auth/logout", method = Method.POST)
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
 
-        verifyJsonResponse(res, Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(sessSvc).unauth(Sessions.sid)
         verifyNoInteractions(disp)
       }

@@ -2,6 +2,8 @@ package expensetracker
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import expensetracker.auth.Authenticator
+import expensetracker.auth.session.Session
 import io.circe.parser.*
 import io.circe.{Json, JsonObject}
 import org.http4s.{EmptyBody, Header, Headers, Method, Request, Response, Status}
@@ -16,8 +18,7 @@ import scala.io.Source
 
 trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
 
-  extension (r: Request[IO])
-    def withJsonBody(json: Json) = r.withBodyStream(Stream.emits(json.noSpaces.getBytes().toList))
+  extension (r: Request[IO]) def withJsonBody(json: Json) = r.withBodyStream(Stream.emits(json.noSpaces.getBytes().toList))
 
   def requestWithAuthHeader(
       uri: org.http4s.Uri,
@@ -47,6 +48,13 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
       }
       .unsafeRunSync()
 
+  extension (res: IO[Response[IO]])
+    def mustHaveStatus(expectedStatus: Status, expectedBody: Option[String] = None): Assertion =
+      verifyJsonResponse(res, expectedStatus, expectedBody)
+
   def parseJson(jsonString: String): Json =
     parse(jsonString).getOrElse(throw new RuntimeException)
+
+  def failedAuth(error: Throwable): Authenticator[IO]      = _ => IO.raiseError(error)
+  def successfullAuth(session: Session): Authenticator[IO] = _ => IO.pure(session)
 }

@@ -16,7 +16,7 @@ class HealthControllerSpec extends ControllerSpec {
 
   "A HealthController" should {
 
-    given auth: Authenticator[IO] = _ => IO.raiseError(new RuntimeException("shouldn't reach this"))
+    given auth: Authenticator[IO] = failedAuth(new RuntimeException("shouldn't reach this"))
 
     "return status on the app" in {
       val controller = Ref.of[IO, Instant](ts).map(t => new HealthController[IO](t))
@@ -24,7 +24,7 @@ class HealthControllerSpec extends ControllerSpec {
       val request  = Request[IO](uri = uri"/health/status", method = Method.GET, headers = Headers(Raw(CIString("foo"), "bar")))
       val response = controller.flatMap(_.routes.orNotFound.run(request))
 
-      verifyJsonResponse(response, Status.Ok, Some(s"""{"startupTime":"$ts"}"""))
+      response mustHaveStatus (Status.Ok, Some(s"""{"startupTime":"$ts"}"""))
     }
   }
 }
