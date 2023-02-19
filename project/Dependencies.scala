@@ -2,20 +2,20 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val mongo4cats = "0.6.5"
+    val mongo4cats = "0.6.7"
     val pureConfig = "0.17.2"
-    val circe      = "0.14.3"
-    val http4s     = "0.23.16"
+    val circe      = "0.14.4"
+    val http4s     = "0.23.18"
     val logback    = "1.4.5"
     val log4cats   = "2.5.0"
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.10.1"
-    val tapir      = "1.2.4"
-    val jwt        = "9.1.2"
+    val tapir      = "1.2.8"
+    val jwt        = "9.2.0"
 
-    val scalaTest = "3.2.14"
-    val mockito   = "3.2.14.0"
+    val scalaTest = "3.2.15"
+    val mockito   = "3.2.15.0"
   }
 
   object Libraries {

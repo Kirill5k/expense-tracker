@@ -115,7 +115,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
   def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
     withRunningEmbeddedMongo {
       MongoClient
-        .fromConnectionString[IO](s"mongodb://$mongoHost:$mongoPort")
+        .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
         .use { client =>
           client.getDatabase("expense-tracker").flatMap(test)
         }
