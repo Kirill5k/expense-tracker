@@ -28,14 +28,11 @@ object Application extends IOApp.Simple:
           txs        <- Transactions.make(res)
           http       <- Http.make(health, auth, cats, txs)
           processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
-          server = EmberServerBuilder
-            .default[IO]
-            .withHostOption(Ipv4Address.fromString(config.server.host))
-            .withPort(Port.fromInt(config.server.port).get)
-            .withHttpApp(http.app)
-            .build
-            .use(_ => IO.never)
-          _ <- Stream.eval(server).concurrently(processor.run).compile.drain
+          _ <- Server
+            .serve[IO](config.server, http.app)
+            .concurrently(processor.run)
+            .compile
+            .drain
         yield ()
       }
     yield ()
