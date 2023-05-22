@@ -1,12 +1,12 @@
-package expensetracker
+package expensetracker.common.web
 
 import cats.effect.Async
 import com.comcast.ip4s.*
 import expensetracker.common.config.ServerConfig
-import org.http4s.HttpApp
-import org.http4s.ember.server.EmberServerBuilder
 import fs2.Stream
 import fs2.io.net.Network
+import org.http4s.HttpApp
+import org.http4s.ember.server.EmberServerBuilder
 
 import scala.concurrent.duration.*
 

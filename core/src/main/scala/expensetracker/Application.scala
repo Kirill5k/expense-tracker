@@ -6,7 +6,7 @@ import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import expensetracker.common.actions.{ActionDispatcher, ActionProcessor}
 import expensetracker.common.config.AppConfig
-import expensetracker.common.web.Http
+import expensetracker.common.web.{Http, Server}
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
 import org.http4s.ember.server.EmberServerBuilder
@@ -28,8 +28,8 @@ object Application extends IOApp.Simple:
           txs        <- Transactions.make(res)
           http       <- Http.make(health, auth, cats, txs)
           processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
-          _ <- Server
-            .serve[IO](config.server, http.app)
+          _ <- http
+            .serve(config.server)
             .concurrently(processor.run)
             .compile
             .drain

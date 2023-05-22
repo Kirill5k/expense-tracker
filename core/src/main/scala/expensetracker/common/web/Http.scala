@@ -6,6 +6,7 @@ import cats.syntax.semigroupk.*
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.{Auth, Authenticator}
 import expensetracker.category.Categories
+import expensetracker.common.config.ServerConfig
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
 import org.http4s.*
@@ -39,6 +40,8 @@ final class Http[F[_]: Async] private (
     .andThen((http: HttpApp[F]) => ResponseLogger.httpApp(true, true)(http))
 
   val app: HttpApp[F] = loggers(middleware(routes).orNotFound)
+  
+  def serve(config: ServerConfig): fs2.Stream[F, Unit] = Server.serve[F](config, app)
 }
 
 object Http:
