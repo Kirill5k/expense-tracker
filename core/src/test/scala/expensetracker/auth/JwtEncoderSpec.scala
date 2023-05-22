@@ -17,7 +17,9 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
 
   val config  = JwtConfig("HS256", "secret-key")
   val session = JwtToken(SessionId("s1"), UserId("u1"))
-  val jwtToken = BearerToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJzMSIsInVzZXJJZCI6InUxIn0.6mnaHsD11IgZqficW13C9GVOxc9U7ureb8V42EJqlIU")
+  val jwtToken = BearerToken(
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJzMSIsInVzZXJJZCI6InUxIn0.6mnaHsD11IgZqficW13C9GVOxc9U7ureb8V42EJqlIU"
+  )
 
   "A CirceJwtEncoder" should {
 
@@ -62,9 +64,9 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
     }
 
     "return error when unknown algo" in {
-      val result = for
-        _ <- JwtEncoder.circeJwtEncoder[IO](config.copy(alg = "foo"))
-      yield ()
+      val result =
+        for _ <- JwtEncoder.circeJwtEncoder[IO](config.copy(alg = "foo"))
+        yield ()
 
       result.attempt.unsafeToFuture().map { res =>
         res mustBe Left(AppError.InvalidJwtEncryptionAlgorithm(JwtUnknownAlgorithm("FOO")))

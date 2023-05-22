@@ -24,7 +24,7 @@ trait UserRepository[F[_]] extends Repository[F]:
 final private class LiveUserRepository[F[_]](
     private val collection: MongoCollection[F, UserEntity]
 )(using
-  F: Async[F]
+    F: Async[F]
 ) extends UserRepository[F] {
 
   override def findBy(email: UserEmail): F[Option[User]] =

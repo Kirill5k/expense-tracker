@@ -2,7 +2,7 @@ package expensetracker.auth.session.db
 
 import io.circe.Codec
 import expensetracker.auth.user.UserId
-import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus, IpAddress}
+import expensetracker.auth.session.{CreateSession, IpAddress, Session, SessionId, SessionStatus}
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.given
 

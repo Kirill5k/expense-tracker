@@ -26,7 +26,7 @@ trait TransactionRepository[F[_]] extends Repository[F]:
 final private class LiveTransactionRepository[F[_]](
     private val collection: MongoCollection[F, TransactionEntity]
 )(using
-  F: Async[F]
+    F: Async[F]
 ) extends TransactionRepository[F] {
 
   override def create(tx: CreateTransaction): F[TransactionId] = {

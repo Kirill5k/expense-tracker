@@ -2,7 +2,7 @@ package expensetracker.common
 
 import cats.syntax.either.*
 import io.circe.{Decoder, Encoder, Json, JsonObject}
-import squants.market.{Currency, Money, defaultMoneyContext}
+import squants.market.{defaultMoneyContext, Currency, Money}
 
 import scala.util.Try
 

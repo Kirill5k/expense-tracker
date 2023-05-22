@@ -40,7 +40,7 @@ final class Http[F[_]: Async] private (
     .andThen((http: HttpApp[F]) => ResponseLogger.httpApp(true, true)(http))
 
   val app: HttpApp[F] = loggers(middleware(routes).orNotFound)
-  
+
   def serve(config: ServerConfig): fs2.Stream[F, Unit] = Server.serve[F](config, app)
 }
 

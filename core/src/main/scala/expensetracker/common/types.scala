@@ -14,7 +14,7 @@ object types {
         .toRight(
           s"Invalid value $kind for enum ${implicitly[ClassTag[E]].runtimeClass.getSimpleName}, Accepted values: ${enums().map(_.print).mkString(",")}"
         )
-      
+
     given Encoder[E] = Encoder[String].contramap(unwrap(_))
     given Decoder[E] = Decoder[String].emap(from)
 

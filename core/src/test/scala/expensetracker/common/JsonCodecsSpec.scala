@@ -24,7 +24,7 @@ class JsonCodecsSpec extends AnyWordSpec with Matchers with JsonCodecs {
 
   "Id codec" should {
     "decode and encode ids" in {
-      val id = SessionId("FOO")
+      val id   = SessionId("FOO")
       val json = id.asJson.noSpaces
 
       json mustBe """"FOO""""

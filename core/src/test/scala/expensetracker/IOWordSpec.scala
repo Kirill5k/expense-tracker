@@ -21,4 +21,3 @@ trait IOWordSpec extends AsyncWordSpec with Matchers with MockitoSugar {
       io.map(f).unsafeToFuture()(IORuntime.global)
 
 }
-

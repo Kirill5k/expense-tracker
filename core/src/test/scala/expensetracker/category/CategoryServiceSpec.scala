@@ -5,7 +5,7 @@ import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
-import expensetracker.fixtures.{Users, Categories}
+import expensetracker.fixtures.{Categories, Users}
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, when}
 
