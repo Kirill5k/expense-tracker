@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: "core"
-          image: "registry.cloud.okteto.net/expense-tracker-kirill5k/expense-tracker-core:latest"
+          image: "kirill1/expense-tracker-core:latest"
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
