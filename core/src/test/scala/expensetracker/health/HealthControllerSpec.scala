@@ -16,7 +16,7 @@ class HealthControllerSpec extends ControllerSpec {
 
   "A HealthController" should {
 
-    given auth: Authenticator[IO] = failedAuth(new RuntimeException("shouldn't reach this"))
+    given Authenticator[IO] = failedAuth(new RuntimeException("shouldn't reach this"))
 
     "return status on the app" in {
       val controller = new HealthController[IO](ts)
