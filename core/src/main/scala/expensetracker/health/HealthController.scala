@@ -1,7 +1,6 @@
 package expensetracker.health
 
 import cats.effect.Async
-import cats.effect.Ref
 import cats.effect.Temporal
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
@@ -15,13 +14,13 @@ import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 final class HealthController[F[_]: Async](
-    private val startupTime: Ref[F, Instant]
+    private val startupTime: Instant
 ) extends Controller[F] {
 
   private val statusEndpoint: ServerEndpoint[Any, F] = infallibleEndpoint.get
     .in("health" / "status")
     .out(jsonBody[HealthController.AppStatus])
-    .serverLogicSuccess(req => startupTime.get.map(t => HealthController.AppStatus(t)))
+    .serverLogicPure(_ => Right(HealthController.AppStatus(startupTime)))
 
   def routes(using auth: Authenticator[F]): HttpRoutes[F] =
     Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
@@ -29,9 +28,9 @@ final class HealthController[F[_]: Async](
 
 object HealthController:
 
-  final case class AppStatus(startupTime: Instant) derives Codec.AsObject
+  final case class AppStatus(
+      startupTime: Instant
+  ) derives Codec.AsObject
 
   def make[F[_]: Async]: F[Controller[F]] =
-    Temporal[F].realTimeInstant
-      .flatMap(ts => Ref.of(ts))
-      .map(ref => HealthController[F](ref))
+    Temporal[F].realTimeInstant.map(startupTime => HealthController[F](startupTime))
