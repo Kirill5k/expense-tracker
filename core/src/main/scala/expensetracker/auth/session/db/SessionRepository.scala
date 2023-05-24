@@ -6,6 +6,7 @@ import expensetracker.auth.user.UserId
 import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus}
 import expensetracker.common.db.Repository
 import expensetracker.common.json.given
+import expensetracker.common.effects.*
 import mongo4cats.database.MongoDatabase
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.Update
@@ -32,7 +33,7 @@ final private class LiveSessionRepository[F[_]: Async](
   override def find(sid: SessionId): F[Option[Session]] =
     collection
       .findOneAndUpdate(idEq(sid.toObjectId), Update.currentDate(Field.LastAccessedAt))
-      .map(_.map(_.toDomain))
+      .mapOpt(_.toDomain)
 
   override def unauth(sid: SessionId): F[Unit] =
     collection.updateOne(idEq(sid.toObjectId), logoutUpdate).void

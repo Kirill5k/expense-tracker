@@ -9,6 +9,7 @@ import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
+import expensetracker.common.effects.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.Filter
 import mongo4cats.collection.MongoCollection
@@ -41,7 +42,7 @@ final private class LiveTransactionRepository[F[_]](
       .find(userIdEq(uid) && notHidden)
       .sortByDesc("date")
       .all
-      .map(_.map(_.toDomain).toList)
+      .mapList(_.toDomain)
 
   override def get(uid: UserId, txid: TransactionId): F[Transaction] =
     collection

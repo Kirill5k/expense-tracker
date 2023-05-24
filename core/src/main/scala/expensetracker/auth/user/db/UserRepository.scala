@@ -9,6 +9,7 @@ import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, Use
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.common.json.given
+import expensetracker.common.effects.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
@@ -31,7 +32,7 @@ final private class LiveUserRepository[F[_]](
     collection
       .find(Filter.eq(Field.Email, email.value))
       .first
-      .map(_.map(_.toDomain))
+      .mapOpt(_.toDomain)
 
   override def create(details: UserDetails, password: PasswordHash): F[UserId] =
     collection
