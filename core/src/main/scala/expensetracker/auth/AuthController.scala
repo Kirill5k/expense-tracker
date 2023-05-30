@@ -126,10 +126,9 @@ object AuthController extends TapirSchema with TapirJson {
       token_type: String
   ) derives Codec.AsObject
 
-  object LoginResponse {
+  object LoginResponse:
     def bearer(bearerToken: BearerToken): LoginResponse =
       LoginResponse(access_token = bearerToken.value, token_type = "Bearer")
-  }
 
   final case class UserView(
       id: String,
@@ -140,7 +139,7 @@ object AuthController extends TapirSchema with TapirJson {
       registrationDate: Instant
   ) derives Codec.AsObject
 
-  object UserView {
+  object UserView:
     def from(acc: User): UserView =
       UserView(
         acc.id.value,
@@ -150,28 +149,25 @@ object AuthController extends TapirSchema with TapirJson {
         acc.settings,
         acc.registrationDate
       )
-  }
 
   final case class UpdateUserSettingsRequest(
       currency: Currency,
       hideFutureTransactions: Boolean,
       darkMode: Option[Boolean]
-  ) derives Codec.AsObject {
+  ) derives Codec.AsObject:
     def toDomain: UserSettings =
       UserSettings(
         currency,
         hideFutureTransactions = hideFutureTransactions,
         darkMode = darkMode
       )
-  }
 
   final case class ChangePasswordRequest(
       currentPassword: NonEmptyString,
       newPassword: NonEmptyString
-  ) derives Codec.AsObject {
+  ) derives Codec.AsObject:
     def toDomain(id: UserId): ChangePassword =
       ChangePassword(id, Password(currentPassword.value), Password(newPassword.value))
-  }
 
   private val basePath   = "auth"
   private val userPath   = basePath / "user"

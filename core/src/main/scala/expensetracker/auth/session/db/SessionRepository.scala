@@ -25,10 +25,9 @@ final private class LiveSessionRepository[F[_]: Async](
   private val logoutUpdate     = Update.set(Field.Status, SessionStatus.LoggedOut).set("active", false)
   private val invalidateUpdate = Update.set(Field.Status, SessionStatus.Invalidated).set("active", false)
 
-  override def create(cs: CreateSession): F[SessionId] = {
+  override def create(cs: CreateSession): F[SessionId] =
     val createSession = SessionEntity.create(cs)
     collection.insertOne(createSession).as(SessionId(createSession._id.toHexString))
-  }
 
   override def find(sid: SessionId): F[Option[Session]] =
     collection

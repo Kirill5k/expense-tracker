@@ -16,11 +16,14 @@ enum SessionStatus:
 
 final case class IpAddress(host: String, port: Int)
 object IpAddress {
-  inline given Decoder[IpAddress] = Decoder[String].emapTry { ip =>
-    Try(ip.split(":")).map { address =>
-      val host = address.headOption.getOrElse("0.0.0.0")
-      val port = address.drop(1).headOption.getOrElse("80")
-      IpAddress(host, port.toInt)
+  inline given Decoder[IpAddress] = Decoder[String].emap { ip =>
+    val ipAndPort = ip.split(":")
+    if (ipAndPort.length > 2) {
+      Left(s"Invalid representation of IpAddress ${ip}")
+    } else {
+      val host = ipAndPort.headOption.getOrElse("0.0.0.0")
+      val port = ipAndPort.drop(1).headOption.getOrElse("80")
+      Right(IpAddress(host, port.toInt))
     }
   }
   inline given Encoder[IpAddress] = Encoder[String].contramap(ip => s"${ip.host}:${ip.port}")
