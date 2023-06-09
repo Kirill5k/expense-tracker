@@ -12,7 +12,6 @@ import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
 import expensetracker.common.web.Controller
 import jwt.JwtEncoder
-import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]] private (

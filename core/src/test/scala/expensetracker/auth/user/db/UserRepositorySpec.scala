@@ -3,7 +3,7 @@ package expensetracker.auth.user.db
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
-import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, UserId, UserName, UserSettings}
+import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserSettings}
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.fixtures.Users
 import mongo4cats.bson.ObjectId
@@ -14,7 +14,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.USD
 
-import java.time.Instant
 import scala.concurrent.Future
 
 class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {

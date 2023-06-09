@@ -1,16 +1,12 @@
 package expensetracker.transaction
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.fixtures.{Transactions, Users}
 import expensetracker.auth.user.UserId
 import expensetracker.transaction.db.TransactionRepository
-import squants.market.GBP
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, when}
-
-import java.time.LocalDate
 
 class TransactionServiceSpec extends IOWordSpec {
 

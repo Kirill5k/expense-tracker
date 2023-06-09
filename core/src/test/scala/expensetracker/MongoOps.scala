@@ -2,7 +2,7 @@ package expensetracker
 
 import expensetracker.auth.user.{PasswordHash, UserEmail, UserId}
 import expensetracker.category.CategoryId
-import mongo4cats.bson.{Document, ObjectId}
+import mongo4cats.bson.Document
 import mongo4cats.bson.syntax.*
 
 import java.time.Instant

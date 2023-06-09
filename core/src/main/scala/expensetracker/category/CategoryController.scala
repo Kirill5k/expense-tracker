@@ -4,15 +4,12 @@ import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
-import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
-import expensetracker.auth.session.Session
-import expensetracker.auth.jwt.BearerToken
 import expensetracker.category.CategoryController.*
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.validations.*

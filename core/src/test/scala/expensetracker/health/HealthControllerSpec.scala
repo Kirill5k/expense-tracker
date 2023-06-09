@@ -1,6 +1,6 @@
 package expensetracker.health
 
-import cats.effect.{IO, Ref}
+import cats.effect.IO
 import expensetracker.ControllerSpec
 import expensetracker.auth.Authenticator
 import org.http4s.implicits.*

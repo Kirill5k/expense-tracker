@@ -6,7 +6,6 @@ import cats.syntax.functor.*
 import expensetracker.Resources
 import expensetracker.category.db.CategoryRepository
 import expensetracker.common.web.Controller
-import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
 
 final class Categories[F[_]] private (

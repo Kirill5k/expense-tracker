@@ -7,12 +7,9 @@ import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
 import expensetracker.fixtures.{Categories, Sessions, Transactions, Users}
 import org.http4s.implicits.*
-import org.http4s.{Method, Request, Status, Uri}
-import squants.market.GBP
+import org.http4s.{Method, Status, Uri}
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
-
-import java.time.LocalDate
 
 class TransactionControllerSpec extends ControllerSpec:
   "A TransactionController" when {

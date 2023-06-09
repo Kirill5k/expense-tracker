@@ -2,7 +2,7 @@ package expensetracker.auth.session
 
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import cats.{ApplicativeThrow, Monad, MonadThrow}
+import cats.{Monad, MonadThrow}
 import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository

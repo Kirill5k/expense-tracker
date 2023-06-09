@@ -4,11 +4,8 @@ import cats.MonadError
 import cats.syntax.option.*
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
-import expensetracker.common.types.IdType
 import mongo4cats.bson.ObjectId
 import mongo4cats.operations.{Filter, Update}
-
-import java.time.Instant
 
 trait Repository[F[_]] {
 

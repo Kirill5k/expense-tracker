@@ -11,8 +11,6 @@ import expensetracker.common.config.JwtConfig
 import expensetracker.common.errors.AppError
 import pdi.jwt.algorithms.JwtUnknownAlgorithm
 
-import java.time.Instant
-
 class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
 
   val config  = JwtConfig("HS256", "secret-key")

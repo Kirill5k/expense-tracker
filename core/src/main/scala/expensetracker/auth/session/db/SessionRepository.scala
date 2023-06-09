@@ -5,7 +5,6 @@ import cats.syntax.functor.*
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionStatus}
 import expensetracker.common.db.Repository
-import expensetracker.common.json.given
 import expensetracker.common.effects.*
 import mongo4cats.database.MongoDatabase
 import mongo4cats.circe.MongoJsonCodecs

@@ -3,7 +3,6 @@ package expensetracker.health
 import cats.effect.Async
 import cats.syntax.functor.*
 import expensetracker.common.web.Controller
-import org.http4s.HttpRoutes
 
 final class Health[F[_]] private (
     val controller: Controller[F]

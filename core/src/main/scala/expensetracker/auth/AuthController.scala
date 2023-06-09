@@ -3,14 +3,12 @@ package expensetracker.auth
 import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
-import cats.syntax.apply.*
-import cats.syntax.applicative.*
 import cats.syntax.functor.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.user.*
-import expensetracker.auth.session.{CreateSession, IpAddress, Session, SessionService}
+import expensetracker.auth.session.{CreateSession, IpAddress, SessionService}
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.auth.jwt.BearerToken
@@ -25,7 +23,6 @@ import sttp.tapir.*
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import java.time.Instant
-import java.time.temporal.Temporal
 
 final private class AuthController[F[_]](
     private val userService: UserService[F],

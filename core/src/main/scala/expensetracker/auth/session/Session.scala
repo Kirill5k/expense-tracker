@@ -5,7 +5,6 @@ import expensetracker.common.types.{EnumType, IdType}
 import io.circe.{Decoder, Encoder}
 
 import java.time.Instant
-import scala.util.Try
 
 opaque type SessionId = String
 object SessionId extends IdType[SessionId]

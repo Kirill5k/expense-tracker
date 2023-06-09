@@ -1,18 +1,15 @@
 package expensetracker
 
 import cats.effect.{IO, IOApp}
-import com.comcast.ip4s.*
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import expensetracker.common.actions.{ActionDispatcher, ActionProcessor}
 import expensetracker.common.config.AppConfig
-import expensetracker.common.web.{Http, Server}
+import expensetracker.common.web.Http
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
-import org.http4s.ember.server.EmberServerBuilder
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import fs2.Stream
 
 object Application extends IOApp.Simple:
   given log: Logger[IO] = Slf4jLogger.getLogger[IO]

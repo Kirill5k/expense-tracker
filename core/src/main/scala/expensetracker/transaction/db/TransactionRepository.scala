@@ -2,9 +2,7 @@ package expensetracker.transaction.db
 
 import cats.effect.Async
 import cats.syntax.flatMap.*
-import cats.syntax.applicative.*
 import cats.syntax.functor.*
-import cats.syntax.applicativeError.*
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository

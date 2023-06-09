@@ -7,7 +7,6 @@ import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.*
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import expensetracker.fixtures.{Categories, Users}
-import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo

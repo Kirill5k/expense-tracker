@@ -1,7 +1,6 @@
 package expensetracker.auth.user
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.fixtures.Users
 import expensetracker.auth.user.db.UserRepository

@@ -9,10 +9,10 @@ import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmail
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.fixtures.{Sessions, Users}
 import org.http4s.implicits.*
-import org.http4s.{HttpDate, Method, Request, Status, Uri}
+import org.http4s.{Method, Request, Status, Uri}
 import squants.market.USD
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{mock, verify, verifyNoInteractions, when}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 class AuthControllerSpec extends ControllerSpec {
 

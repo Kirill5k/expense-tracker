@@ -4,19 +4,14 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import cats.syntax.apply.*
 import cats.syntax.option.*
-import expensetracker.MongoOps
 import expensetracker.fixtures.{Sessions, Users}
 import expensetracker.auth.session.*
-import expensetracker.auth.user.UserId
-import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 
-import java.time.Instant
-import java.time.temporal.ChronoField
 import scala.concurrent.Future
 
 class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {

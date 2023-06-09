@@ -5,16 +5,13 @@ import cats.effect.Sync
 import cats.syntax.either.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
-import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.Authenticator
 import expensetracker.auth.session.Session
-import expensetracker.common.JsonCodecs
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
 import io.circe.Codec
 import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes
-import sttp.tapir.json.circe.TapirJsonCirce
 import sttp.tapir.*
 import sttp.model.StatusCode
 import sttp.tapir.DecodeResult.Error.JsonDecodeException

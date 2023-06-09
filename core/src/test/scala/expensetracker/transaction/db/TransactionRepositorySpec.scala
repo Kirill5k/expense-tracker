@@ -7,8 +7,7 @@ import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import expensetracker.fixtures.{Categories, Transactions, Users}
-import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
-import mongo4cats.bson.ObjectId
+import expensetracker.transaction.{Transaction, TransactionId, TransactionKind}
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo

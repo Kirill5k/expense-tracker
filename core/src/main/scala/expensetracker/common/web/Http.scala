@@ -3,7 +3,6 @@ package expensetracker.common.web
 import cats.Monad
 import cats.effect.Async
 import cats.syntax.semigroupk.*
-import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.{Auth, Authenticator}
 import expensetracker.category.Categories
 import expensetracker.common.config.ServerConfig

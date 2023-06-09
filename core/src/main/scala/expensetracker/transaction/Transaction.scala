@@ -3,7 +3,6 @@ package expensetracker.transaction
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.types.{EnumType, IdType}
-import io.circe.{Decoder, Encoder}
 import squants.market.Money
 
 import java.time.LocalDate
