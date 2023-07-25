@@ -24,6 +24,7 @@
           <date-period-selector
             :display-date="$store.state.displayDate"
             @update="updateDisplayDate"
+            :disabled="loading"
           />
 
           <transaction-list

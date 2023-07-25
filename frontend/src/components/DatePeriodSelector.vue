@@ -6,6 +6,7 @@
       small
       icon
       @click="goBack"
+      :disabled="disabled"
     >
       <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
@@ -20,6 +21,7 @@
       @input="resetDate"
       dense
       :height="30"
+      :disabled="disabled"
     >
       <template v-slot:selection="{ }">
         <p class="ma-0 mt-1 text-center text-subtitle-2" style="width: 100%">
@@ -33,6 +35,7 @@
       small
       icon
       @click="goForward"
+      :disabled="disabled"
     >
       <v-icon>mdi-chevron-right</v-icon>
     </v-btn>
@@ -53,6 +56,10 @@ export default {
   props: {
     displayDate: {
       type: Object,
+      required: true
+    },
+    disabled: {
+      type: Boolean,
       required: true
     }
   },
