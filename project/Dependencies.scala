@@ -5,17 +5,17 @@ object Dependencies {
     val mongo4cats = "0.6.15"
     val pureConfig = "0.17.4"
     val circe      = "0.14.5"
-    val http4s     = "0.23.19"
+    val http4s     = "0.23.23"
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.11.0"
     val logback    = "1.4.8"
     val log4cats   = "2.6.0"
-    val tapir      = "1.6.0"
-    val jwt        = "9.2.0"
+    val tapir      = "1.6.2"
+    val jwt        = "9.4.3"
 
-    val scalaTest = "3.2.15"
-    val mockito   = "3.2.15.0"
+    val scalaTest = "3.2.16"
+    val mockito   = "3.2.16.0"
   }
 
   object Libraries {
@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
-    val mockito   = "org.scalatestplus" %% "mockito-4-6" % Versions.mockito
+    val mockito   = "org.scalatestplus" %% "mockito-4-11" % Versions.mockito
   }
 
   lazy val core = Seq(
