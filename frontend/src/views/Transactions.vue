@@ -112,6 +112,7 @@ import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 import NewTransactionDialog from '@/components/transactions/NewTransactionDialog'
 import DatePeriodSelector from '@/components/DatePeriodSelector'
 import ActionDispatcher from '@/mixins/dispatcher'
+import DisplayAdjuster from '@/mixins/display'
 
 export default {
   name: 'Transactions',
@@ -122,7 +123,7 @@ export default {
     DatePeriodSelector,
     TransactionsFilter
   },
-  mixins: [ActionDispatcher],
+  mixins: [ActionDispatcher, DisplayAdjuster],
   data: () => ({
     lastDeletedId: null
   }),
@@ -132,10 +133,6 @@ export default {
     },
     currency () {
       return this.$store.state.user.settings.currency
-    },
-    windowHeight () {
-      const height = this.$vuetify.breakpoint.height
-      return this.$vuetify.breakpoint.xs ? height : (height - 100)
     }
   },
   methods: {

@@ -78,6 +78,7 @@ import CategoryList from '@/components/categories/CategoryList'
 import NewCategoryDialog from '@/components/categories/NewCategoryDialog'
 import RemoveCategoryDialog from '@/components/categories/RemoveCategoryDialog'
 import ActionDispatcher from '@/mixins/dispatcher'
+import DisplayAdjuster from '@/mixins/display'
 
 export default {
   name: 'Categories',
@@ -86,7 +87,7 @@ export default {
     NewCategoryDialog,
     RemoveCategoryDialog
   },
-  mixins: [ActionDispatcher],
+  mixins: [ActionDispatcher, DisplayAdjuster],
   data: () => ({
     lastDeletedId: null,
     editable: false,
@@ -101,10 +102,6 @@ export default {
     },
     incomeCats () {
       return this.$store.getters.incomeCats
-    },
-    windowHeight () {
-      const height = this.$vuetify.breakpoint.height
-      return this.$vuetify.breakpoint.xs ? height : (height - 100)
     }
   },
   methods: {

@@ -5,7 +5,7 @@ module.exports = {
   devServer: {
     proxy: {
       '^/api': {
-        target: 'http://localhost:6000',
+        target: 'https://web-expense-tracker-kirill5k.cloud.okteto.net',
         ws: true,
         changeOrigin: true
       }

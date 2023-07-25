@@ -106,6 +106,7 @@ import NewTransactionDialog from '@/components/transactions/NewTransactionDialog
 import TransactionsFilter from '@/components/transactions/TransactionsFilter'
 import CategoryAnalysis from '@/components/analytics/CategoryAnalysis'
 import BalanceAnalysis from '@/components/analytics/BalanceAnalysis'
+import DisplayAdjuster from '@/mixins/display'
 
 export default {
   name: 'Analytics',
@@ -116,16 +117,11 @@ export default {
     NewTransactionDialog,
     TransactionsFilter
   },
+  mixins: [DisplayAdjuster],
   data: () => ({
     loading: false,
     tab: 0
   }),
-  computed: {
-    windowHeight () {
-      const height = this.$vuetify.breakpoint.height
-      return this.$vuetify.breakpoint.xs ? height : (height - 100)
-    }
-  },
   methods: {
     dispatchAction (name, arg) {
       this.loading = true
