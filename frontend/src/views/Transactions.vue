@@ -11,12 +11,14 @@
           <transactions-sorter
             :sort-by="$store.state.sortBy"
             @sort="(sortBy) => $store.commit('sort', sortBy)"
+            :disabled="loading"
           />
           <transactions-filter
             v-if="$store.getters.filteredCats.length"
             :categories="$store.getters.filteredCats"
             :filters="$store.state.filterBy"
             @filter="(filters) => $store.commit('filter', filters)"
+            :disabled="loading"
           />
         </v-card-title>
 

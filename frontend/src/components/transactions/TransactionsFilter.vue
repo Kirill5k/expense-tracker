@@ -3,6 +3,7 @@
     class="transactions-filter"
     header="Filter by"
     icon="mdi-filter-menu-outline"
+    :disabled="disabled"
   >
     <v-list-item
       class="transactions-filter__select-all pt-0"
@@ -70,6 +71,10 @@ export default {
     },
     filters: {
       type: Array,
+      required: true
+    },
+    disabled: {
+      type: Boolean,
       required: true
     }
   },

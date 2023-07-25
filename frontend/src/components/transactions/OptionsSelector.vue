@@ -81,7 +81,7 @@ export default {
     },
     disabled: {
       type: Boolean,
-      default: false
+      required: true
     }
   },
   data: () => ({

@@ -2,6 +2,7 @@
   <options-selector
     header="Sort by"
     icon="mdi-sort"
+    :disabled="disabled"
   >
     <v-list-item-group
       :value="sortBy.index"
@@ -29,6 +30,10 @@ export default {
   props: {
     sortBy: {
       type: Object,
+      required: true
+    },
+    disabled: {
+      type: Boolean,
       required: true
     }
   },
