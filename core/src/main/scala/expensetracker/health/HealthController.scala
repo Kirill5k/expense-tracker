@@ -2,7 +2,6 @@ package expensetracker.health
 
 import cats.effect.Async
 import cats.effect.Temporal
-import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.auth.Authenticator
 import io.circe.Codec
