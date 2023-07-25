@@ -14,6 +14,7 @@
         plain
         v-bind="attrs"
         v-on="on"
+        :disabled="disabled"
       >
         <v-icon>
           {{ icon }}
@@ -36,6 +37,7 @@
     left
     rounded="md"
     :close-on-content-click="false"
+    :disabled="disabled"
   >
     <template v-slot:activator="{ on, attrs }">
       <v-btn
@@ -47,13 +49,13 @@
         plain
         v-bind="attrs"
         v-on="on"
+        :disabled="disabled"
       >
         <v-icon>
           {{ icon }}
         </v-icon>
       </v-btn>
     </template>
-
     <v-list
       class="options-selector__menu"
       dense
@@ -76,6 +78,10 @@ export default {
     icon: {
       type: String,
       required: true
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({
