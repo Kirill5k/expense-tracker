@@ -1,4 +1,4 @@
-import com.typesafe.sbt.packager.docker._
+import com.typesafe.sbt.packager.docker.*
 import sbtghactions.JavaSpec
 
 ThisBuild / scalaVersion                        := "3.3.0"
@@ -6,7 +6,6 @@ ThisBuild / version                             := scala.sys.process.Process("gi
 ThisBuild / organization                        := "io.github.kirill5k"
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
 ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("19"))
-ThisBuild / scalacOptions ++= Seq("-Wunused:all")
 
 val noPublish = Seq(
   publish         := {},
