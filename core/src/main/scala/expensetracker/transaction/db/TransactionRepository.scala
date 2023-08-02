@@ -46,8 +46,9 @@ final private class LiveTransactionRepository[F[_]](
     collection
       .find(userIdEq(uid).and(idEq(txid.toObjectId)))
       .first
+      .mapOpt(_.toDomain)
       .flatMap { maybetx =>
-        F.fromOption(maybetx.map(_.toDomain), TransactionDoesNotExist(txid))
+        F.fromOption(maybetx, TransactionDoesNotExist(txid))
       }
 
   override def update(tx: Transaction): F[Unit] =
@@ -62,9 +63,9 @@ final private class LiveTransactionRepository[F[_]](
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
-      .findOneAndDelete(userIdEq(uid) && idEq(txid.toObjectId))
-      .flatMap { maybetx =>
-        F.fromOption(maybetx.void, TransactionDoesNotExist(txid))
+      .deleteOne(userIdEq(uid) && idEq(txid.toObjectId))
+      .flatMap { result =>
+        F.raiseWhen(result.getDeletedCount == 0)(TransactionDoesNotExist(txid))
       }
 
   override def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =

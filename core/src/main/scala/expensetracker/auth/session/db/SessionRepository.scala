@@ -26,7 +26,9 @@ final private class LiveSessionRepository[F[_]: Async](
 
   override def create(cs: CreateSession): F[SessionId] =
     val createSession = SessionEntity.create(cs)
-    collection.insertOne(createSession).as(SessionId(createSession._id.toHexString))
+    collection
+      .insertOne(createSession)
+      .as(SessionId(createSession._id.toHexString))
 
   override def find(sid: SessionId): F[Option[Session]] =
     collection
@@ -34,10 +36,14 @@ final private class LiveSessionRepository[F[_]: Async](
       .mapOpt(_.toDomain)
 
   override def unauth(sid: SessionId): F[Unit] =
-    collection.updateOne(idEq(sid.toObjectId), logoutUpdate).void
+    collection
+      .updateOne(idEq(sid.toObjectId), logoutUpdate)
+      .void
 
   override def invalidatedAll(uid: UserId): F[Unit] =
-    collection.updateMany(userIdEq(uid), invalidateUpdate).void
+    collection
+      .updateMany(userIdEq(uid), invalidateUpdate)
+      .void
 }
 
 object SessionRepository extends MongoJsonCodecs:

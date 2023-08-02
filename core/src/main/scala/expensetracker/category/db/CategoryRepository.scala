@@ -36,21 +36,20 @@ final private class LiveCategoryRepository[F[_]](
       .find(userIdEq(uid) && notHidden)
       .sortBy(Field.Name)
       .all
-      .map(_.toList.map(_.toDomain))
+      .mapList(_.toDomain)
 
   override def get(uid: UserId, cid: CategoryId): F[Category] =
     collection
       .find(userIdEq(uid) && idEq(cid.toObjectId))
       .first
-      .flatMap { maybeCat =>
-        F.fromOption(maybeCat.map(_.toDomain), CategoryDoesNotExist(cid))
-      }
+      .mapOpt(_.toDomain)
+      .flatMap(cat => F.fromOption(cat, CategoryDoesNotExist(cid)))
 
   override def delete(uid: UserId, cid: CategoryId): F[Unit] =
     collection
-      .findOneAndDelete(userIdEq(uid) && idEq(cid.toObjectId))
-      .flatMap { maybeCat =>
-        F.fromOption(maybeCat.void, CategoryDoesNotExist(cid))
+      .deleteOne(userIdEq(uid) && idEq(cid.toObjectId))
+      .flatMap { result =>
+        F.raiseWhen(result.getDeletedCount == 0)(CategoryDoesNotExist(cid))
       }
 
   override def create(cat: CreateCategory): F[CategoryId] = {

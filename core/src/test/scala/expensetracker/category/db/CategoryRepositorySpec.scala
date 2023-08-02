@@ -1,7 +1,7 @@
 package expensetracker.category.db
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
 import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.*
@@ -220,5 +220,5 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             res      <- test(db)
           yield res
         }
-    }.unsafeToFuture()
+    }.unsafeToFuture()(IORuntime.global)
 }
