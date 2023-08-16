@@ -18,7 +18,6 @@ import org.http4s.HttpRoutes
 import squants.market.Money
 import sttp.model.StatusCode
 import sttp.tapir.*
-import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import java.time.LocalDate
 
@@ -79,7 +78,7 @@ final private class TransactionController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Http4sServerInterpreter[F](Controller.serverOptions).toRoutes(
+    Controller.serverInterpreter[F].toRoutes(
       List(
         getAllTransactions,
         getTransactionById,

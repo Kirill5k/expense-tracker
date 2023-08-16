@@ -20,7 +20,6 @@ import org.http4s.HttpRoutes
 import squants.market.Currency
 import sttp.model.StatusCode
 import sttp.tapir.*
-import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import java.time.Instant
 
@@ -84,7 +83,7 @@ final private class AuthController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Http4sServerInterpreter[F](Controller.serverOptions).toRoutes(
+    Controller.serverInterpreter[F].toRoutes(
       List(
         login,
         createUser,

@@ -1,7 +1,7 @@
 package expensetracker.common.web
 
 import cats.MonadThrow
-import cats.effect.Sync
+import cats.effect.Async
 import cats.syntax.either.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
@@ -16,7 +16,7 @@ import sttp.tapir.*
 import sttp.model.StatusCode
 import sttp.tapir.DecodeResult.Error.JsonDecodeException
 import sttp.tapir.server.PartialServerEndpoint
-import sttp.tapir.server.http4s.Http4sServerOptions
+import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.exception.{ExceptionContext, ExceptionHandler}
 import sttp.tapir.server.model.ValuedEndpointOutput
@@ -57,29 +57,30 @@ object Controller extends TapirSchema with TapirJson {
   val securedEndpoint: Endpoint[BearerToken, Unit, (StatusCode, ErrorResponse), Unit, Any] =
     publicEndpoint.securityIn(auth.bearer[String]().validate(Validator.nonEmptyString).map(BearerToken.apply)(_.value))
 
-  def serverOptions[F[_]](using F: Sync[F]): Http4sServerOptions[F] = {
-    val errorEndpointOut = (e: Throwable) => Some(ValuedEndpointOutput(error, Controller.mapError(e)))
-    Http4sServerOptions
-      .customiseInterceptors[F]
-      .exceptionHandler(ExceptionHandler.pure((ctx: ExceptionContext) => errorEndpointOut(ctx.e)))
-      .decodeFailureHandler { (ctx: DecodeFailureContext) =>
-        if (ctx.failingInput.toString.matches("Header.Authorization.*")) {
-          ctx.failure match
-            case DecodeResult.Error(_, e)     => errorEndpointOut(AppError.InvalidAuthorizationHeader(e.getMessage.trim))
-            case DecodeResult.Missing         => errorEndpointOut(AppError.MissingAuthorizationHeader)
-            case DecodeResult.InvalidValue(_) => errorEndpointOut(AppError.InvalidBearerToken)
-            case _                            => None
-        } else {
-          ctx.failure match
-            case DecodeResult.Error(_, e) => errorEndpointOut(e)
-            case DecodeResult.InvalidValue(e) =>
-              val msgs = e.flatMap(_.customMessage)
-              errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))
-            case _ => None
+  def serverInterpreter[F[_]](using F: Async[F]): Http4sServerInterpreter[F] =
+    Http4sServerInterpreter[F] {
+      val errorEndpointOut = (e: Throwable) => Some(ValuedEndpointOutput(error, Controller.mapError(e)))
+      Http4sServerOptions
+        .customiseInterceptors[F]
+        .exceptionHandler(ExceptionHandler.pure((ctx: ExceptionContext) => errorEndpointOut(ctx.e)))
+        .decodeFailureHandler { (ctx: DecodeFailureContext) =>
+          if (ctx.failingInput.toString.matches("Header.Authorization.*")) {
+            ctx.failure match
+              case DecodeResult.Error(_, e) => errorEndpointOut(AppError.InvalidAuthorizationHeader(e.getMessage.trim))
+              case DecodeResult.Missing => errorEndpointOut(AppError.MissingAuthorizationHeader)
+              case DecodeResult.InvalidValue(_) => errorEndpointOut(AppError.InvalidBearerToken)
+              case _ => None
+          } else {
+            ctx.failure match
+              case DecodeResult.Error(_, e) => errorEndpointOut(e)
+              case DecodeResult.InvalidValue(e) =>
+                val msgs = e.flatMap(_.customMessage)
+                errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))
+              case _ => None
+          }
         }
-      }
-      .options
-  }
+        .options
+    }
 
   private val FailedRegexValidation  = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.".r
   private val MissingFieldValidation = "Missing required field".r

@@ -18,7 +18,6 @@ import io.circe.refined.*
 import org.http4s.HttpRoutes
 import sttp.model.StatusCode
 import sttp.tapir.*
-import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 final private class CategoryController[F[_]](
     private val service: CategoryService[F]
@@ -76,7 +75,7 @@ final private class CategoryController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Http4sServerInterpreter[F](Controller.serverOptions).toRoutes(
+    Controller.serverInterpreter[F].toRoutes(
       List(
         getAllCategories,
         getCategoryById,
