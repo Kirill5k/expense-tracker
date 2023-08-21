@@ -32,7 +32,7 @@ final private class LiveUserService[F[_]](
     repository
       .findBy(login.email)
       .flatMap {
-        case Some(acc) => encryptor.isValid(login.password, acc.password).map(if (_) LoginResult.Success(acc) else LoginResult.Fail)
+        case Some(acc) => F.ifF(encryptor.isValid(login.password, acc.password))(LoginResult.Success(acc), LoginResult.Fail)
         case None      => F.pure(LoginResult.Fail)
       }
       .flatMap {
