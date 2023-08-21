@@ -14,9 +14,12 @@ import scala.concurrent.duration.*
 trait ActionProcessor[F[_]]:
   def run: Stream[F, Unit]
 
-final private class LiveActionProcessor[F[_]: Temporal: Logger](
+final private class LiveActionProcessor[F[_]](
     private val dispatcher: ActionDispatcher[F],
     private val categoryService: CategoryService[F]
+)(using
+    F: Temporal[F],
+    logger: Logger[F]
 ) extends ActionProcessor[F] {
 
   override def run: Stream[F, Unit] =
@@ -28,10 +31,10 @@ final private class LiveActionProcessor[F[_]: Temporal: Logger](
       case Action.SetupNewUser(id) => categoryService.assignDefault(id)
     }).handleErrorWith {
       case error: AppError =>
-        Logger[F].warn(error)(s"domain error while processing action $action")
+        logger.warn(error)(s"domain error while processing action $action")
       case error =>
-        Logger[F].error(error)(s"unexpected error processing action $action") *>
-          Temporal[F].sleep(1.second) *>
+        logger.error(error)(s"unexpected error processing action $action") *>
+          F.sleep(1.second) *>
           dispatcher.dispatch(action)
     }
 }

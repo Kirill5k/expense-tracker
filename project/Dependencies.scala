@@ -1,4 +1,4 @@
-import sbt._
+import sbt.*
 
 object Dependencies {
   object Versions {
@@ -11,7 +11,7 @@ object Dependencies {
     val refined    = "0.11.0"
     val logback    = "1.4.11"
     val log4cats   = "2.6.0"
-    val tapir      = "1.7.0"
+    val tapir      = "1.7.2"
     val jwt        = "9.4.3"
 
     val scalaTest = "3.2.16"

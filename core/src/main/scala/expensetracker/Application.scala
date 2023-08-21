@@ -12,7 +12,7 @@ import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object Application extends IOApp.Simple:
-  given log: Logger[IO] = Slf4jLogger.getLogger[IO]
+  given Logger[IO] = Slf4jLogger.getLogger[IO]
   override val run: IO[Unit] =
     for
       config <- AppConfig.load[IO]
