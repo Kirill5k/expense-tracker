@@ -18,7 +18,7 @@
     <v-divider/>
 
     <v-card-text class="pb-0">
-      <p class="text-subtitle-1 mb-0">Interface</p>
+      <p class="text-subtitle-1 mb-0">Display</p>
       <interface-settings
         v-model="interfacePanel"
         :settings="user.settings"
