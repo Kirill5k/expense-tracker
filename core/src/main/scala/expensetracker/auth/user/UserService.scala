@@ -2,7 +2,6 @@ package expensetracker.auth.user
 
 import cats.MonadError
 import cats.syntax.flatMap.*
-import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
