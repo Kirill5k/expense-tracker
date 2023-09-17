@@ -11,11 +11,11 @@ object Dependencies {
     val refined    = "0.11.0"
     val logback    = "1.4.11"
     val log4cats   = "2.6.0"
-    val tapir      = "1.7.2"
-    val jwt        = "9.4.3"
+    val tapir      = "1.7.3"
+    val jwt        = "9.4.4"
 
-    val scalaTest = "3.2.16"
-    val mockito   = "3.2.16.0"
+    val scalaTest = "3.2.17"
+    val mockito   = "3.2.17.0"
   }
 
   object Libraries {
