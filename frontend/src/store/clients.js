@@ -19,15 +19,17 @@ const notConnectedToTheInternet = () => Promise.reject({
   status: 500
 })
 
+/* eslint-disable */
 export const reject = async res => {
   const text = await res.text()
   try {
     const e = JSON.parse(text)
     return Promise.reject({ message: e.message, status: res.status })
-  } catch(err) {
+  } catch (err) {
     return Promise.reject({ message: 'Server not available. Try again later', status: res.status })
   }
 }
+/* eslint-enable */
 
 class StubClient {
   getUser = () => notConnectedToTheInternet()
