@@ -92,11 +92,14 @@ class TransactionControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-        val req = requestWithAuthHeader(uri"/transactions?from=2022-01-01T00:00:00Z&to=2023-01-01T00:00:00Z", Method.GET)
+        val from = Instant.parse("2022-01-01T00:00:00Z")
+        val to = Instant.parse("2023-01-01T00:00:00Z")
+        
+        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions?from=${from}&to=${to}"), Method.GET)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus(Status.Ok, Some(s"""[${Transactions.txjson}]"""))
-        verify(svc).getAll(Users.uid1, Some(Instant.parse("2022-01-01T00:00:00Z")), Some(Instant.parse("2023-01-01T00:00:00Z")))
+        verify(svc).getAll(Users.uid1, Some(from), Some(to))
       }
     }
 
