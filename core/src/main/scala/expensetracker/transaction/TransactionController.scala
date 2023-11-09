@@ -29,9 +29,9 @@ final private class TransactionController[F[_]](
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
     TransactionController.getAllEndpoint.withAuthenticatedSession
-      .serverLogic { session => _ =>
+      .serverLogic { session => (from, to) =>
         service
-          .getAll(session.userId)
+          .getAll(session.userId, from, to)
           .mapResponse(_.map(TransactionController.TransactionView.from))
       }
 
@@ -90,6 +90,7 @@ final private class TransactionController[F[_]](
 }
 
 object TransactionController extends TapirSchema with TapirJson {
+  import Controller.given
 
   final case class CreateTransactionRequest(
       kind: TransactionKind,

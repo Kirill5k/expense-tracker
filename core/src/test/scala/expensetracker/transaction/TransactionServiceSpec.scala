@@ -62,7 +62,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
       val result = for
         svc <- TransactionService.make[IO](repo)
-        res <- svc.getAll(Users.uid1)
+        res <- svc.getAll(Users.uid1, None, None)
       yield res
 
       result.asserting { res =>

@@ -11,6 +11,8 @@ import org.http4s.{Method, Status, Uri}
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
+import java.time.Instant
+
 class TransactionControllerSpec extends ControllerSpec:
   "A TransactionController" when {
     "POST /transactions" should {
@@ -73,7 +75,7 @@ class TransactionControllerSpec extends ControllerSpec:
     "GET /transactions" should {
       "return user's txs" in {
         val svc = mock[TransactionService[IO]]
-        when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(Transactions.tx())))
+        when(svc.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturn(IO.pure(List(Transactions.tx())))
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
@@ -81,7 +83,20 @@ class TransactionControllerSpec extends ControllerSpec:
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Ok, Some(s"""[${Transactions.txjson}]"""))
-        verify(svc).getAll(Users.uid1)
+        verify(svc).getAll(Users.uid1, None, None)
+      }
+
+      "return user's txs with provided date ranges" in {
+        val svc = mock[TransactionService[IO]]
+        when(svc.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturn(IO.pure(List(Transactions.tx())))
+
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
+        val req = requestWithAuthHeader(uri"/transactions?from=2022-01-01T00:00:00Z&to=2023-01-01T00:00:00Z", Method.GET)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        res mustHaveStatus(Status.Ok, Some(s"""[${Transactions.txjson}]"""))
+        verify(svc).getAll(Users.uid1, Some(Instant.parse("2022-01-01T00:00:00Z")), Some(Instant.parse("2023-01-01T00:00:00Z")))
       }
     }
 

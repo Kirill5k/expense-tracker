@@ -9,17 +9,22 @@ import expensetracker.auth.Authenticator
 import expensetracker.auth.session.Session
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
+import expensetracker.common.time.*
 import io.circe.Codec
 import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes
 import sttp.tapir.*
+import sttp.tapir.Codec as TapirCodec
 import sttp.model.StatusCode
+import sttp.tapir.Codec.PlainCodec
 import sttp.tapir.DecodeResult.Error.JsonDecodeException
 import sttp.tapir.server.PartialServerEndpoint
 import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.exception.{ExceptionContext, ExceptionHandler}
 import sttp.tapir.server.model.ValuedEndpointOutput
+
+import java.time.Instant
 
 final case class ErrorResponse(message: String) derives Codec.AsObject
 
@@ -43,6 +48,9 @@ trait Controller[F[_]] extends TapirJson with TapirSchema {
 }
 
 object Controller extends TapirSchema with TapirJson {
+  inline given instantCodec: PlainCodec[Instant] =
+    TapirCodec.string.mapDecode(d => d.toInstant.fold(DecodeResult.Error(d, _), DecodeResult.Value(_)))(_.toString)
+
   val validId: Validator[String] = Validator.custom(
     id =>
       if (ObjectId.isValid(id)) ValidationResult.Valid else ValidationResult.Invalid(s"Invalid hexadecimal representation of an id: $id"),

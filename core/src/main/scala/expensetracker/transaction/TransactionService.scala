@@ -4,8 +4,10 @@ import cats.Monad
 import expensetracker.transaction.db.TransactionRepository
 import expensetracker.auth.user.UserId
 
+import java.time.Instant
+
 trait TransactionService[F[_]] {
-  def getAll(aid: UserId): F[List[Transaction]]
+  def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(aid: UserId, txid: TransactionId): F[Transaction]
   def delete(aid: UserId, txid: TransactionId): F[Unit]
   def create(tx: CreateTransaction): F[TransactionId]
@@ -19,7 +21,7 @@ final private class LiveTransactionService[F[_]](
   override def create(tx: CreateTransaction): F[TransactionId] =
     repository.create(tx)
 
-  override def getAll(aid: UserId): F[List[Transaction]] =
+  override def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     repository.getAll(aid)
 
   override def get(aid: UserId, txid: TransactionId): F[Transaction] =
