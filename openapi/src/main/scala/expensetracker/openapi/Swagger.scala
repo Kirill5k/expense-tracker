@@ -22,12 +22,12 @@ object Swagger {
   )
 
   private val transactions = List(
-    TransactionController.getAllTransactionsEndpoint,
-    TransactionController.getTransactionByIdEndpoint,
-    TransactionController.createTransactionEndpoint,
-    TransactionController.updateTransactionEndpoint,
-    TransactionController.hideTransactionEndpoint,
-    TransactionController.deleteTransactionEndpoint
+    TransactionController.getAllEndpoint,
+    TransactionController.getByIdEndpoint,
+    TransactionController.createEndpoint,
+    TransactionController.updateEndpoint,
+    TransactionController.hideEndpoint,
+    TransactionController.deleteEndpoint
   )
 
   private val auth = List(

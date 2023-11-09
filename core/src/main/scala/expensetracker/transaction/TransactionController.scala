@@ -19,41 +19,40 @@ import squants.market.Money
 import sttp.model.StatusCode
 import sttp.tapir.*
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 
 final private class TransactionController[F[_]](
     private val service: TransactionService[F]
 )(using
     F: Async[F]
 ) extends Controller[F] {
-  import TransactionController.*
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
-    getAllTransactionsEndpoint.withAuthenticatedSession
+    TransactionController.getAllEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
         service
           .getAll(session.userId)
-          .mapResponse(_.map(TransactionView.from))
+          .mapResponse(_.map(TransactionController.TransactionView.from))
       }
 
   private def getTransactionById(using authenticator: Authenticator[F]) =
-    getTransactionByIdEndpoint.withAuthenticatedSession
+    TransactionController.getByIdEndpoint.withAuthenticatedSession
       .serverLogic { session => txid =>
         service
           .get(session.userId, txid)
-          .mapResponse(TransactionView.from)
+          .mapResponse(TransactionController.TransactionView.from)
       }
 
   private def createTransaction(using authenticator: Authenticator[F]) =
-    createTransactionEndpoint.withAuthenticatedSession
+    TransactionController.createEndpoint.withAuthenticatedSession
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
-          .mapResponse(txid => CreateTransactionResponse(txid.value))
+          .mapResponse(txid => TransactionController.CreateTransactionResponse(txid.value))
       }
 
   private def deleteTransaction(using authenticator: Authenticator[F]) =
-    deleteTransactionEndpoint.withAuthenticatedSession
+    TransactionController.deleteEndpoint.withAuthenticatedSession
       .serverLogic { session => txid =>
         service
           .delete(session.userId, txid)
@@ -61,7 +60,7 @@ final private class TransactionController[F[_]](
       }
 
   private def updateTransaction(using authenticator: Authenticator[F]) =
-    updateTransactionEndpoint.withAuthenticatedSession
+    TransactionController.updateEndpoint.withAuthenticatedSession
       .serverLogic { session => (txid, txView) =>
         F.ensure(txView.pure[F])(IdMismatch)(_.id.value == txid.value) >>
           service
@@ -70,7 +69,7 @@ final private class TransactionController[F[_]](
       }
 
   private def hideTransaction(using authenticator: Authenticator[F]) =
-    hideTransactionEndpoint.withAuthenticatedSession
+    TransactionController.hideEndpoint.withAuthenticatedSession
       .serverLogic { session => (txid, hidetx) =>
         service
           .hide(session.userId, txid, hidetx.hidden)
@@ -164,35 +163,40 @@ object TransactionController extends TapirSchema with TapirJson {
   private val basePath = "transactions"
   private val idPath   = basePath / path[String].validate(Controller.validId).map((s: String) => TransactionId(s))(_.value).name("tx-id")
 
-  val createTransactionEndpoint = Controller.securedEndpoint.post
+  private val getAllQueryParams =
+    query[Option[Instant]]("from")
+      .and(query[Option[Instant]]("to"))
+  
+  val createEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateTransactionRequest])
     .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
     .description("Create new transaction")
 
-  val getAllTransactionsEndpoint = Controller.securedEndpoint.get
+  val getAllEndpoint = Controller.securedEndpoint.get
     .in(basePath)
+    .in(getAllQueryParams)
     .out(jsonBody[List[TransactionView]])
     .description("Get all transactions")
 
-  val getTransactionByIdEndpoint = Controller.securedEndpoint.get
+  val getByIdEndpoint = Controller.securedEndpoint.get
     .in(idPath)
     .out(jsonBody[TransactionView])
     .description("Get existing transaction by id")
 
-  val updateTransactionEndpoint = Controller.securedEndpoint.put
+  val updateEndpoint = Controller.securedEndpoint.put
     .in(idPath)
     .in(jsonBody[UpdateTransactionRequest])
     .out(statusCode(StatusCode.NoContent))
     .description("Update transaction")
 
-  val hideTransactionEndpoint = Controller.securedEndpoint.put
+  val hideEndpoint = Controller.securedEndpoint.put
     .in(idPath / "hidden")
     .in(jsonBody[HideTransactionRequest])
     .out(statusCode(StatusCode.NoContent))
     .description("Change transaction display status")
 
-  val deleteTransactionEndpoint = Controller.securedEndpoint.delete
+  val deleteEndpoint = Controller.securedEndpoint.delete
     .in(idPath)
     .out(statusCode(StatusCode.NoContent))
     .description("Delete existing transaction")
