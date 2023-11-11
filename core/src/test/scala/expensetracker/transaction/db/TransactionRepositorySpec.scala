@@ -29,7 +29,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
         val result = for
           repo <- TransactionRepository.make(client)
           txId <- repo.create(Transactions.create())
-          txs  <- repo.getAll(Users.uid1)
+          txs  <- repo.getAll(Users.uid1, None, None)
         yield (txId, txs)
 
         result.map { case (txId, txs) =>
@@ -46,7 +46,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           repo <- TransactionRepository.make(client)
           _    <- repo.create(Transactions.create())
           _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
-          txs  <- repo.getAll(Users.uid1)
+          txs  <- repo.getAll(Users.uid1, None, None)
         yield txs
 
         result.map { txs =>
@@ -92,7 +92,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           repo <- TransactionRepository.make(client)
           _    <- repo.create(Transactions.create())
           _    <- repo.create(Transactions.create(catid = Categories.cid2, amount = GBP(45.0)))
-          txs  <- repo.getAll(Users.uid2)
+          txs  <- repo.getAll(Users.uid2, None, None)
         yield txs
 
         result.map { txs =>
@@ -108,7 +108,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             repo <- TransactionRepository.make(client)
             txid <- repo.create(Transactions.create())
             _    <- repo.delete(Users.uid1, txid)
-            cats <- repo.getAll(Users.uid1)
+            cats <- repo.getAll(Users.uid1, None, None)
           yield cats
 
           result.map { txs =>
@@ -140,7 +140,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             txid <- repo.create(Transactions.create())
             tx   <- repo.get(Users.uid1, txid)
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
-            txs  <- repo.getAll(Users.uid1)
+            txs  <- repo.getAll(Users.uid1, None, None)
           yield (tx, txs)
 
           result.map { case (tx, txs) =>
@@ -170,7 +170,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             repo <- TransactionRepository.make(client)
             txid <- repo.create(Transactions.create())
             _    <- repo.hide(Users.uid1, txid)
-            txs  <- repo.getAll(Users.uid1)
+            txs  <- repo.getAll(Users.uid1, None, None)
           yield txs
 
           result.map { res =>

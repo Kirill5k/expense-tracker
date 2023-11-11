@@ -21,9 +21,8 @@ final private class LiveTransactionService[F[_]](
   override def create(tx: CreateTransaction): F[TransactionId] =
     repository.create(tx)
 
-  // TODO: pass dates
   override def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
-    repository.getAll(aid)
+    repository.getAll(aid, from, to)
 
   override def get(aid: UserId, txid: TransactionId): F[Transaction] =
     repository.get(aid, txid)

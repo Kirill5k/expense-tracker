@@ -13,9 +13,11 @@ import mongo4cats.operations.Filter
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
+import java.time.Instant
+
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[TransactionId]
-  def getAll(uid: UserId): F[List[Transaction]]
+  def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(uid: UserId, txid: TransactionId): F[Transaction]
   def delete(uid: UserId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
@@ -35,7 +37,7 @@ final private class LiveTransactionRepository[F[_]](
       .as(TransactionId(create._id.toHexString))
   }
 
-  override def getAll(uid: UserId): F[List[Transaction]] =
+  override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
       .find(userIdEq(uid) && notHidden)
       .sortByDesc("date")

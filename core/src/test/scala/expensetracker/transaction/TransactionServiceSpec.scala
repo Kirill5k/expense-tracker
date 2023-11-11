@@ -8,6 +8,8 @@ import expensetracker.transaction.db.TransactionRepository
 import org.mockito.ArgumentMatchers.{any, anyBoolean}
 import org.mockito.Mockito.{verify, when}
 
+import java.time.Instant
+
 class TransactionServiceSpec extends IOWordSpec {
 
   "A TransactionService" should {
@@ -58,15 +60,18 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "retrieve all txs from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.getAll(any[UserId])).thenReturn(IO.pure(List(Transactions.tx())))
+      when(repo.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturn(IO.pure(List(Transactions.tx())))
 
+      val from = Instant.now().minusSeconds(5L)
+      val to = Instant.now().plusSeconds(5L)
+      
       val result = for
         svc <- TransactionService.make[IO](repo)
-        res <- svc.getAll(Users.uid1, None, None)
+        res <- svc.getAll(Users.uid1, Some(from), Some(to))
       yield res
 
       result.asserting { res =>
-        verify(repo).getAll(Users.uid1)
+        verify(repo).getAll(Users.uid1, Some(from), Some(to))
         res mustBe List(Transactions.tx())
       }
     }
