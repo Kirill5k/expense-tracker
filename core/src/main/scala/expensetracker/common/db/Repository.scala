@@ -20,6 +20,7 @@ trait Repository[F[_]] {
     val LastUpdatedAt  = "lastUpdatedAt"
     val Status         = "status"
     val LastAccessedAt = "lastAccessedAt"
+    val Date           = "date"
   }
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)

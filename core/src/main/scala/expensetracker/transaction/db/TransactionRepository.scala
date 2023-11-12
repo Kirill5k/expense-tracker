@@ -39,11 +39,17 @@ final private class LiveTransactionRepository[F[_]](
 
   override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
-      .find(userIdEq(uid) && notHidden)
+      .find(userIdEq(uid) && notHidden && dateRangeSelector(from, to))
       .sortByDesc("date")
       .all
       .mapList(_.toDomain)
 
+  private def dateRangeSelector(from: Option[Instant], to: Option[Instant]): Filter = {
+    val fromFilter = from.map(d => Filter.gte(Field.Date, d))
+    val toFilter = to.map(d => Filter.lt(Field.Date, d))
+    List(fromFilter, toFilter).flatten.foldLeft(Filter.empty)((acc, el) => acc && el)
+  }
+  
   override def get(uid: UserId, txid: TransactionId): F[Transaction] =
     collection
       .find(userIdEq(uid).and(idEq(txid.toObjectId)))
