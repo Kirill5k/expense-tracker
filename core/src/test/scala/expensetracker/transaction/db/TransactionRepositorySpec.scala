@@ -15,7 +15,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
 
-import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers with MongoOps {
@@ -54,6 +55,38 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
           txs.map(_.categoryId) mustBe List(Categories.cid, Categories.cid2)
+        }
+      }
+    }
+
+    "search transactions by date" in {
+      withEmbeddedMongoDb { client =>
+        val result = for
+          repo <- TransactionRepository.make(client)
+          _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(1)))
+          _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(3)))
+          txs  <- repo.getAll(Users.uid1, Some(Instant.now().minus(2, ChronoUnit.DAYS)), None)
+        yield txs
+
+        result.map { txs =>
+          txs must have size 1
+        }
+      }
+    }
+
+    "return empty list when transactions are outside provided date range" in {
+      withEmbeddedMongoDb { client =>
+        val from = Instant.now().minus(10, ChronoUnit.DAYS)
+        val to   = Instant.now().minus(8, ChronoUnit.DAYS)
+        val result = for
+          repo <- TransactionRepository.make(client)
+          _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(1)))
+          _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(3)))
+          txs  <- repo.getAll(Users.uid1, Some(from), Some(to))
+        yield txs
+
+        result.map { txs =>
+          txs mustBe empty
         }
       }
     }
