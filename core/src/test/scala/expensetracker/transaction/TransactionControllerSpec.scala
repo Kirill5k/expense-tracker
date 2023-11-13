@@ -86,6 +86,22 @@ class TransactionControllerSpec extends ControllerSpec:
         verify(svc).getAll(Users.uid1, None, None)
       }
 
+      "return user's txs with provided date and time ranges" in {
+        val svc = mock[TransactionService[IO]]
+        when(svc.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturn(IO.pure(List(Transactions.tx())))
+
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
+        val from = Instant.parse("2022-01-01T00:00:00Z")
+        val to = Instant.parse("2023-01-01T00:00:00Z")
+
+        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions?from=${from}&to=${to}"), Method.GET)
+        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        res mustHaveStatus(Status.Ok, Some(s"""[${Transactions.txjson}]"""))
+        verify(svc).getAll(Users.uid1, Some(from), Some(to))
+      }
+
       "return user's txs with provided date ranges" in {
         val svc = mock[TransactionService[IO]]
         when(svc.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturn(IO.pure(List(Transactions.tx())))
@@ -94,8 +110,8 @@ class TransactionControllerSpec extends ControllerSpec:
 
         val from = Instant.parse("2022-01-01T00:00:00Z")
         val to = Instant.parse("2023-01-01T00:00:00Z")
-        
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/transactions?from=${from}&to=${to}"), Method.GET)
+
+        val req = requestWithAuthHeader(uri"/transactions?from=2022-01-01&to=2023-01-01", Method.GET)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus(Status.Ok, Some(s"""[${Transactions.txjson}]"""))
