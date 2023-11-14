@@ -12,12 +12,14 @@ import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object Application extends IOApp.Simple:
-  given Logger[IO] = Slf4jLogger.getLogger[IO]
+  given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
   override val run: IO[Unit] =
     for
-      config <- AppConfig.load[IO]
+      _      <- logger.info(s"starting expense-tracker-core ${sys.env.getOrElse("VERSION", "")}")
+      config <- logger.info("initialising config") >> AppConfig.load[IO]
       _ <- Resources.make[IO](config).use { res =>
         for
+          _          <- logger.info("created resources")
           dispatcher <- ActionDispatcher.make[IO]
           health     <- Health.make[IO]
           auth       <- Auth.make(config.auth, res, dispatcher)
@@ -25,7 +27,7 @@ object Application extends IOApp.Simple:
           txs        <- Transactions.make(res)
           http       <- Http.make(health, auth, cats, txs)
           processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
-          _ <- http
+          _ <- logger.info("starting http server") >> http
             .serve(config.server)
             .concurrently(processor.run)
             .compile
