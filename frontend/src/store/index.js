@@ -263,7 +263,5 @@ export default new Vuex.Store({
         .then(() => commit('updateTransaction', requestBody))
         .catch(e => handleError(commit, e))
     }
-  },
-  modules: {
   }
 })
