@@ -96,8 +96,8 @@ class BackendClient {
     fetch(`/api/categories/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
       .then(res => res.status === 204 ? requestBody : reject(res))
 
-  getTransactions = (token) =>
-    fetch('/api/transactions', simpleRequest(token))
+  getTransactions = (token, from, to) =>
+    fetch(`/api/transactions${from && to ? `?from=${from.toISOString()}&to=${to.toISOString()}` : ''}`, simpleRequest(token))
       .then(res => res.status === 200 ? res.json() : reject(res))
 
   createTransaction = (token, requestBody) =>

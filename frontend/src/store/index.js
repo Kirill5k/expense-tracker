@@ -140,7 +140,6 @@ export default new Vuex.Store({
       state.transactions = [...state.transactions, tx].sort(txSorts[state.sortBy.field](state.sortBy.desc))
     },
     setDisplayDate (state, newDate) {
-      console.log(newDate)
       state.displayDate = newDate
     },
     hideTransaction (state, { id, hidden }) {
@@ -238,6 +237,13 @@ export default new Vuex.Store({
       return Clients.get(state.isOnline)
         .getTransactions(state.accessToken)
         .then(txs => commit('setTransactions', txs))
+    },
+    getTransactionsWithinSelectedDateRange ({ state, commit }) {
+      commit('loading')
+      return Clients.get(state.isOnline)
+        .getTransactions(state.accessToken, state.displayDate.start, state.displayDate.end)
+        .then(txs => commit('setTransactions', txs))
+        .then(() => commit('loaded'))
     },
     createTransaction ({ state, commit, dispatch }, requestBody) {
       return Clients.get(state.isOnline)
