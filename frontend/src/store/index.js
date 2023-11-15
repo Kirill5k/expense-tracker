@@ -175,11 +175,8 @@ export default new Vuex.Store({
             commit('setAlert', Alerts.SESSION_EXPIRED)
           }
         })
-        .catch(e => {
-          commit('loaded')
-          commit('logout')
-          return handleError(commit, e, true)
-        })
+        .catch(() => commit('logout'))
+        .then(() => commit('loaded'))
     },
     login ({ state, commit, dispatch }, requestBody) {
       return Clients.get(state.isOnline)
