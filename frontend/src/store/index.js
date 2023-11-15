@@ -140,6 +140,7 @@ export default new Vuex.Store({
       state.transactions = [...state.transactions, tx].sort(txSorts[state.sortBy.field](state.sortBy.desc))
     },
     setDisplayDate (state, newDate) {
+      console.log(newDate)
       state.displayDate = newDate
     },
     hideTransaction (state, { id, hidden }) {
@@ -159,11 +160,6 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    loadData ({ commit, dispatch }) {
-      return Promise.all([dispatch('getCategories'), dispatch('getTransactions')])
-        .then(() => commit('loaded'))
-        .catch(() => commit('logout'))
-    },
     getUser ({ state, commit, dispatch }) {
       if (!state.user.id) {
         commit('loading')
@@ -173,7 +169,7 @@ export default new Vuex.Store({
         .then(acc => {
           if (!state.user.id || acc.id === state.user.id) {
             commit('setUser', acc)
-            return dispatch('loadData')
+            return Promise.all([dispatch('getCategories'), dispatch('getTransactions')])
           } else {
             commit('logout')
             commit('setAlert', Alerts.SESSION_EXPIRED)
@@ -181,6 +177,7 @@ export default new Vuex.Store({
         })
         .catch(e => {
           commit('loaded')
+          commit('logout')
           return handleError(commit, e, true)
         })
     },
