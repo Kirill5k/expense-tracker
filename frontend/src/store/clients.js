@@ -13,13 +13,12 @@ const simpleRequest = (token) => {
 }
 const requestWithBody = (reqBody, method, token) => ({ ...simpleRequest(token), method, body: JSON.stringify(reqBody) })
 
-// eslint-disable-next-line
+/* eslint-disable */
 const notConnectedToTheInternet = () => Promise.reject({
   message: 'Unable to complete the action - no internet connection',
   status: 500
 })
 
-/* eslint-disable */
 export const reject = async res => {
   const text = await res.text()
   try {

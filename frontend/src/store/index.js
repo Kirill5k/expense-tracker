@@ -238,12 +238,10 @@ export default new Vuex.Store({
         .getTransactions(state.accessToken)
         .then(txs => commit('setTransactions', txs))
     },
-    getTransactionsWithinSelectedDateRange ({ state, commit }) {
-      commit('loading')
+    getTransactionsWithinDateRange ({ state, commit }, { from, to }) {
       return Clients.get(state.isOnline)
-        .getTransactions(state.accessToken, state.displayDate.start, state.displayDate.end)
+        .getTransactions(state.accessToken, from, to)
         .then(txs => commit('setTransactions', txs))
-        .then(() => commit('loaded'))
     },
     createTransaction ({ state, commit, dispatch }, requestBody) {
       return Clients.get(state.isOnline)
