@@ -23,6 +23,7 @@ import sttp.tapir.server.http4s.{Http4sServerInterpreter, Http4sServerOptions}
 import sttp.tapir.server.interceptor.DecodeFailureContext
 import sttp.tapir.server.interceptor.exception.{ExceptionContext, ExceptionHandler}
 import sttp.tapir.server.model.ValuedEndpointOutput
+import sttp.tapir.server.interceptor.decodefailure.DecodeFailureHandler
 
 import java.time.Instant
 
@@ -71,22 +72,24 @@ object Controller extends TapirSchema with TapirJson {
       Http4sServerOptions
         .customiseInterceptors[F]
         .exceptionHandler(ExceptionHandler.pure((ctx: ExceptionContext) => errorEndpointOut(ctx.e)))
-        .decodeFailureHandler { (ctx: DecodeFailureContext) =>
-          if (ctx.failingInput.toString.matches("Header.Authorization.*")) {
-            ctx.failure match
-              case DecodeResult.Error(_, e) => errorEndpointOut(AppError.InvalidAuthorizationHeader(e.getMessage.trim))
-              case DecodeResult.Missing => errorEndpointOut(AppError.MissingAuthorizationHeader)
-              case DecodeResult.InvalidValue(_) => errorEndpointOut(AppError.InvalidBearerToken)
-              case _ => None
-          } else {
-            ctx.failure match
-              case DecodeResult.Error(_, e) => errorEndpointOut(e)
-              case DecodeResult.InvalidValue(e) =>
-                val msgs = e.flatMap(_.customMessage)
-                errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))
-              case _ => None
+        .decodeFailureHandler(
+          DecodeFailureHandler.pure { (ctx: DecodeFailureContext) =>
+            if (ctx.failingInput.toString.matches("Header.Authorization.*")) {
+              ctx.failure match
+                case DecodeResult.Error(_, e)     => errorEndpointOut(AppError.InvalidAuthorizationHeader(e.getMessage.trim))
+                case DecodeResult.Missing         => errorEndpointOut(AppError.MissingAuthorizationHeader)
+                case DecodeResult.InvalidValue(_) => errorEndpointOut(AppError.InvalidBearerToken)
+                case _                            => None
+            } else {
+              ctx.failure match
+                case DecodeResult.Error(_, e) => errorEndpointOut(e)
+                case DecodeResult.InvalidValue(e) =>
+                  val msgs = e.flatMap(_.customMessage)
+                  errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))
+                case _ => None
+            }
           }
-        }
+        )
         .options
     }
 
