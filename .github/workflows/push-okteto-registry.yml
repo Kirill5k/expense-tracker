@@ -27,5 +27,5 @@ jobs:
 
       - name: Build and push Frontend Docker image
         run: |-
-          docker build -t ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend:latest -t ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend:${GITHUB_SHA::8} frontend/
+          docker build -t ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend:latest -t ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend:${GITHUB_SHA::8} modules/frontend/
           docker push -a ${DOCKER_REPO_URI}/${DOCKER_USERNAME}/expense-tracker-frontend
