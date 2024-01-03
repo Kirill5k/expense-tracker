@@ -14,9 +14,7 @@ services:
       - mongodb
     environment:
       PORT: 8080
-      MONGO_HOST: mongodb
-      MONGO_USER: dbuser
-      MONGO_PASSWORD: dbpassword
+      MONGO_CONNECTION_URI: mongodb://dbuser:dbpassword@mongodb:27017/expense-tracker
 
   expense-tracker-frontend:
     build: ./modules/frontend/
