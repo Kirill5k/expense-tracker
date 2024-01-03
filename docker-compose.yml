@@ -8,15 +8,15 @@ services:
       MONGODB_PASSWORD: dbpassword
       MONGODB_DATABASE: expense-tracker
 
-#  expense-tracker-core:
-#    image: expense-tracker-core:latest
-#    depends_on:
-#      - mongodb
-#    environment:
-#      PORT: 8080
-#      MONGO_HOST: mongodb
-#      MONGO_USER: dbuser
-#      MONGO_PASSWORD: dbpassword
+  expense-tracker-core:
+    image: expense-tracker-core:latest
+    depends_on:
+      - mongodb
+    environment:
+      PORT: 8080
+      MONGO_HOST: mongodb
+      MONGO_USER: dbuser
+      MONGO_PASSWORD: dbpassword
 
   expense-tracker-frontend:
     build: ./modules/frontend/
