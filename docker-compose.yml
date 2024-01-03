@@ -1,11 +1,6 @@
 version: '3'
 services:
 
-  redis:
-    image: bitnami/redis:latest
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-
   mongodb:
     image: bitnami/mongodb:latest
     environment:
@@ -13,11 +8,19 @@ services:
       MONGODB_PASSWORD: dbpassword
       MONGODB_DATABASE: expense-tracker
 
-  expense-tracker-core:
-    image: expense-tracker-core:latest
-    depends_on:
-      - mongo-warehouse
+#  expense-tracker-core:
+#    image: expense-tracker-core:latest
+#    depends_on:
+#      - mongodb
+#    environment:
+#      PORT: 8080
+#      MONGO_HOST: mongodb
+#      MONGO_USER: dbuser
+#      MONGO_PASSWORD: dbpassword
+
+  expense-tracker-frontend:
+    build: ./modules/frontend/
     environment:
-      MONGO_HOST: mongodb
-      MONGO_USER: dbuser
-      MONGO_PASSWORD: dbpassword
+      EXPENSE_TRACKER_CORE_URL: http://expense-tracker-core:8080
+    ports:
+      - "3000:80"
