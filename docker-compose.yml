@@ -18,6 +18,8 @@ services:
 
   expense-tracker-frontend:
     build: ./modules/frontend/
+    depends_on:
+      - expense-tracker-core
     environment:
       EXPENSE_TRACKER_CORE_URL: http://expense-tracker-core:8080
     ports:
