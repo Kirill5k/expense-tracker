@@ -1,22 +1,16 @@
 version: "3.8"
 
-networks:
-  app-tier:
-    driver: bridge
-
 services:
 
   mongodb:
-    image: bitnami/mongodb:latest
+    image: mongo:latest
+    restart: always
     environment:
-      MONGODB_USERNAME: dbuser
-      MONGODB_PASSWORD: dbpassword
-      MONGODB_DATABASE: expense-tracker
-      MONGODB_PORT_NUMBER: "27017"
+      MONGO_INITDB_ROOT_USERNAME: dbuser
+      MONGO_INITDB_ROOT_PASSWORD: dbpassword
+      MONGO_INITDB_DATABASE: expense-tracker
     ports:
       - "27017:27017"
-    networks:
-      - app-tier
 
   expense-tracker-core:
     image: expense-tracker-core:latest
@@ -24,9 +18,7 @@ services:
       - mongodb
     environment:
       PORT: 8080
-      MONGO_CONNECTION_URI: mongodb://dbuser:dbpassword@mongodb:27017/expense-tracker
-    networks:
-      - app-tier
+      MONGO_CONNECTION_URI: mongodb://dbuser:dbpassword@mongodb:27017
 
   expense-tracker-frontend:
     build: ./modules/frontend/
@@ -36,5 +28,3 @@ services:
       EXPENSE_TRACKER_CORE_URL: http://expense-tracker-core:8080
     ports:
       - "8000:80"
-    networks:
-      - app-tier
