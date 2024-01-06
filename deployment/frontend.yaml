@@ -31,6 +31,9 @@ spec:
         - name: "frontend"
           image: "registry.cloud.okteto.net/expense-tracker-kirill5k/expense-tracker-frontend:latest"
           imagePullPolicy: Always
+          env:
+            - name: EXPENSE_TRACKER_CORE_URL
+              value: "http://expense-tracker-core:8080"
           ports:
             - containerPort: 80
           resources:
