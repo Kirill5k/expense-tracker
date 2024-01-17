@@ -5,6 +5,9 @@ import scala.concurrent.duration.*
 import scala.util.Try
 
 object time {
+  extension (ts: Instant)
+    def durationBetween(otherTs: Instant): FiniteDuration = math.abs(otherTs.toEpochMilli - ts.toEpochMilli).millis
+  
   extension (dateString: String)
     def toInstant: Either[Throwable, Instant] =
       val localDate = dateString.length match

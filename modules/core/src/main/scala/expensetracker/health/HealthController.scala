@@ -5,7 +5,8 @@ import cats.effect.Temporal
 import cats.syntax.functor.*
 import expensetracker.auth.Authenticator
 import io.circe.Codec
-import expensetracker.common.web.Controller
+import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
+
 import java.time.Instant
 import org.http4s.HttpRoutes
 import sttp.tapir.*
@@ -25,11 +26,20 @@ final class HealthController[F[_]: Async](
     Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
 }
 
-object HealthController:
+object HealthController extends TapirSchema with TapirJson {
 
   final case class AppStatus(
-      startupTime: Instant
+      service: String,
+      startupTime: Instant,
+      upTime: String,
+      appVersion: Option[String],
+      serverIpAddress: String
   ) derives Codec.AsObject
+
+  val statusEndpoint = infallibleEndpoint.get
+    .in("health" / "status")
+    .out(jsonBody[AppStatus])
 
   def make[F[_]: Async]: F[Controller[F]] =
     Temporal[F].realTimeInstant.map(startupTime => HealthController[F](startupTime))
+}
