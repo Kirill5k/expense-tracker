@@ -3,7 +3,7 @@ package expensetracker.health
 import cats.effect.IO
 import expensetracker.{ControllerSpec, MockClock}
 import expensetracker.auth.Authenticator
-import expensetracker.common.Clock
+import expensetracker.common.time.Clock
 import org.http4s.implicits.*
 import org.http4s.*
 

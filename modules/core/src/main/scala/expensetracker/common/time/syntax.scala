@@ -1,10 +1,10 @@
-package expensetracker.common
+package expensetracker.common.time
 
 import java.time.Instant
 import scala.concurrent.duration.*
 import scala.util.Try
 
-object time {
+object syntax {
   extension (ts: Instant)
     def durationBetween(otherTs: Instant): FiniteDuration = math.abs(otherTs.toEpochMilli - ts.toEpochMilli).millis
   

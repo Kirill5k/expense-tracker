@@ -4,8 +4,8 @@ import cats.effect.Async
 import cats.syntax.functor.*
 import cats.syntax.flatMap.*
 import expensetracker.auth.Authenticator
-import expensetracker.common.Clock
-import expensetracker.common.time.*
+import expensetracker.common.time.syntax.*
+import expensetracker.common.time.Clock
 import io.circe.Codec
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 

@@ -1,8 +1,8 @@
-package expensetracker.common
+package expensetracker.common.time
 
 import cats.effect.Temporal
 import cats.syntax.functor.*
-import expensetracker.common.time.*
+import expensetracker.common.time.syntax.*
 
 import java.time.Instant
 import scala.concurrent.duration.*

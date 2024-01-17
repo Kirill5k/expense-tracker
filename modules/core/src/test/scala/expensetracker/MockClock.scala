@@ -1,8 +1,8 @@
 package expensetracker
 
 import cats.Monad
-import expensetracker.common.Clock
-import expensetracker.common.time.*
+import expensetracker.common.time.syntax.*
+import expensetracker.common.time.Clock
 
 import java.time.Instant
 import scala.concurrent.duration.*

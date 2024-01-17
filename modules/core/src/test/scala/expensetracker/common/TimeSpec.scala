@@ -2,7 +2,7 @@ package expensetracker.common
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import expensetracker.common.time.*
+import expensetracker.common.time.syntax.*
 
 import java.time.Instant
 import scala.concurrent.duration.*
