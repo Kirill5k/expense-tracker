@@ -1,9 +1,9 @@
-package expensetracker.common
+package expensetracker.common.effects
 
 import cats.Functor
 import cats.syntax.functor.*
 
-object effects {
+object syntax {
 
   extension [F[_], A](fo: F[Option[A]])
     def mapOpt[B](f: A => B)(using F: Functor[F]): F[Option[B]] =

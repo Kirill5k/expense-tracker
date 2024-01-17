@@ -7,7 +7,7 @@ import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
-import expensetracker.common.effects.*
+import expensetracker.common.effects.syntax.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.Filter
 import mongo4cats.collection.MongoCollection
