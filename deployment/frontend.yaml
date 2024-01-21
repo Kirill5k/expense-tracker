@@ -36,11 +36,11 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "0.2"
+              memory: "16Mi"
+              cpu: "0.05"
             limits:
-              memory: "512Mi"
-              cpu: "0.5"
+              memory: "32Mi"
+              cpu: "0.1"
           readinessProbe:
             httpGet:
               scheme: HTTP
@@ -48,3 +48,10 @@ spec:
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /index.html
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 60

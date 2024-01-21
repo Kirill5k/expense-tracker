@@ -41,18 +41,20 @@ spec:
                 name: "expense-tracker-secret"
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "0.2"
+              memory: "194Mi"
+              cpu: "0.05gst"
             limits:
-              memory: "512Mi"
-              cpu: "0.5"
+              memory: "256Mi"
+              cpu: "0.1"
           readinessProbe:
             httpGet:
               path: /health/status
               port: 8080
-            periodSeconds: 60
+            periodSeconds: 15
+            initialDelaySeconds: 20
           livenessProbe:
             httpGet:
               path: /health/status
               port: 8080
             periodSeconds: 60
+            initialDelaySeconds: 20
