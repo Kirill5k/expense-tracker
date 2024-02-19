@@ -9,7 +9,7 @@ object Dependencies {
     val squants    = "1.8.3"
     val bcrypt     = "4.3.0"
     val refined    = "0.11.1"
-    val logback    = "1.4.14"
+    val logback    = "1.5.0"
     val log4cats   = "2.6.0"
     val tapir      = "1.9.9"
     val jwt        = "10.0.0"
@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
-    val mockito   = "org.scalatestplus" %% "mockito-4-11" % Versions.mockito
+    val mockito   = "org.scalatestplus" %% "mockito-5-8" % Versions.mockito
   }
 
   lazy val core = Seq(
