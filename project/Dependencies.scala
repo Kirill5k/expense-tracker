@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
-    val mockito   = "org.scalatestplus" %% "mockito-5-8" % Versions.mockito
+    val mockito   = "org.scalatestplus" %% "mockito-4-11" % Versions.mockito
   }
 
   lazy val core = Seq(
