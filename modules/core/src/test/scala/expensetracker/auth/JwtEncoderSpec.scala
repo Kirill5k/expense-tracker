@@ -1,7 +1,6 @@
 package expensetracker.auth
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.session.SessionId
@@ -27,7 +26,7 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
         jwtToken <- encoder.encode(session)
       yield jwtToken
 
-      result.unsafeToFuture().map(_ mustBe jwtToken)
+      result.asserting(_ mustBe jwtToken)
     }
 
     "decode jwt token" in {
@@ -36,7 +35,7 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
         accessToken <- encoder.decode(jwtToken)
       yield accessToken
 
-      result.unsafeToFuture().map(_ mustBe session)
+      result.asserting(_ mustBe session)
     }
 
     "return error when invalid jwt token" in {
@@ -45,8 +44,8 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
         accessToken <- encoder.decode(BearerToken("foo-bar"))
       yield accessToken
 
-      result.attempt.unsafeToFuture().map { res =>
-        res mustBe Left(AppError.InvalidJwtToken("Expected token [foo-bar] to be composed of 2 or 3 parts separated by dots."))
+      result.assertError {
+        AppError.InvalidJwtToken("Expected token [foo-bar] to be composed of 2 or 3 parts separated by dots.")
       }
     }
 
@@ -56,8 +55,8 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
         accessToken <- encoder.decode(BearerToken("IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"))
       yield accessToken
 
-      result.attempt.unsafeToFuture().map { res =>
-        res mustBe Left(AppError.InvalidJwtToken("""expected whitespace or eof got ',"iat"...' (line 1, column 11)"""))
+      result.assertError {
+        AppError.InvalidJwtToken("""expected whitespace or eof got ',"iat"...' (line 1, column 11)""")
       }
     }
 
@@ -66,8 +65,8 @@ class JwtEncoderSpec extends IOWordSpec with JsonCodecs {
         for _ <- JwtEncoder.circeJwtEncoder[IO](config.copy(alg = "foo"))
         yield ()
 
-      result.attempt.unsafeToFuture().map { res =>
-        res mustBe Left(AppError.InvalidJwtEncryptionAlgorithm(JwtUnknownAlgorithm("FOO")))
+      result.assertError {
+        AppError.InvalidJwtEncryptionAlgorithm(JwtUnknownAlgorithm("FOO"))
       }
     }
   }

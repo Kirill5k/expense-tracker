@@ -1,7 +1,6 @@
 package expensetracker.common.actions
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.fixtures.Users
 import expensetracker.auth.user.UserId
@@ -26,7 +25,7 @@ class ActionProcessorSpec extends IOWordSpec {
         res        <- processor.run.interruptAfter(2.second).compile.drain
       yield res
 
-      result.unsafeToFuture().map { r =>
+      result.asserting { r =>
         verify(catSvc).assignDefault(Users.uid1)
         r mustBe ()
       }

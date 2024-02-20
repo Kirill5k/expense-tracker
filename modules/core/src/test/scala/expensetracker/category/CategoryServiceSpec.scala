@@ -1,7 +1,6 @@
 package expensetracker.category
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
@@ -21,7 +20,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.delete(Users.uid1, Categories.cid)
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).delete(Users.uid1, Categories.cid)
         res mustBe ()
       }
@@ -36,7 +35,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.getAll(Users.uid1)
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).getAll(Users.uid1)
         res mustBe List(Categories.cat())
       }
@@ -51,7 +50,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.get(Users.uid1, Categories.cid)
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).get(Users.uid1, Categories.cid)
         res mustBe Categories.cat()
       }
@@ -66,7 +65,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.create(Categories.create())
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).create(Categories.create())
         res mustBe Categories.cid
       }
@@ -81,7 +80,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.update(Categories.cat())
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).update(Categories.cat())
         res mustBe ()
       }
@@ -96,7 +95,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.assignDefault(Users.uid1)
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).assignDefault(Users.uid1)
         res mustBe ()
       }
@@ -111,7 +110,7 @@ class CategoryServiceSpec extends IOWordSpec {
         res <- svc.hide(Users.uid1, Categories.cid, true)
       yield res
 
-      result.unsafeToFuture().map { res =>
+      result.asserting { res =>
         verify(repo).hide(Users.uid1, Categories.cid, true)
         res mustBe ()
       }

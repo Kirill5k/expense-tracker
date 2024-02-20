@@ -1,7 +1,6 @@
 package expensetracker.auth.user
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import expensetracker.IOWordSpec
 import expensetracker.common.config.{AuthConfig, JwtConfig}
 
@@ -18,9 +17,7 @@ class PasswordEncryptorSpec extends IOWordSpec {
         isValid <- e.isValid(Password("Password123!"), hash)
       yield isValid
 
-      result.unsafeToFuture().map { isValid =>
-        isValid mustBe true
-      }
+      result.asserting(_ mustBe true)
     }
   }
 }

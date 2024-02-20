@@ -17,6 +17,8 @@ trait IOWordSpec extends AsyncWordSpec with Matchers with MockitoSugar {
   extension [A](io: IO[A])
     def assertVoid: Future[Assertion] =
       asserting(_ mustBe ())
+    def assertError(e: => Throwable): Future[Assertion] =
+      io.attempt.asserting(_ mustBe Left(e))
     def asserting(f: A => Assertion): Future[Assertion] =
       io.map(f).unsafeToFuture()(IORuntime.global)
 
