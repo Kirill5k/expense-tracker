@@ -2,26 +2,30 @@ import sbt.*
 
 object Dependencies {
   object Versions {
-    val mongo4cats = "0.7.2"
-    val pureConfig = "0.17.5"
-    val circe      = "0.14.6"
-    val http4s     = "0.23.25"
-    val squants    = "1.8.3"
-    val bcrypt     = "4.3.0"
-    val refined    = "0.11.1"
-    val logback    = "1.5.0"
-    val log4cats   = "2.6.0"
-    val tapir      = "1.9.9"
-    val jwt        = "10.0.0"
-
-    val scalaTest = "3.2.18"
-    val mockito   = "3.2.17.0"
+    val mongo4cats  = "0.7.2"
+    val commonScala = "0.1.10"
+    val pureConfig  = "0.17.5"
+    val circe       = "0.14.6"
+    val http4s      = "0.23.25"
+    val squants     = "1.8.3"
+    val bcrypt      = "4.3.0"
+    val refined     = "0.11.1"
+    val logback     = "1.5.0"
+    val log4cats    = "2.6.0"
+    val tapir       = "1.9.9"
+    val jwt         = "10.0.0"
   }
 
   object Libraries {
     val squants = "org.typelevel"        %% "squants"      % Versions.squants
     val bcrypt  = "com.github.t3hnar"    %% "scala-bcrypt" % Versions.bcrypt
     val jwt     = "com.github.jwt-scala" %% "jwt-circe"    % Versions.jwt
+
+    object commonScala {
+      val cats     = "io.github.kirill5k" %% "common-cats"      % Versions.commonScala
+      val syntax   = "io.github.kirill5k" %% "common-syntax"    % Versions.commonScala
+      val catsTest = "io.github.kirill5k" %% "common-cats-test" % Versions.commonScala
+    }
 
     object mongo4cats {
       val core     = "io.github.kirill5k" %% "mongo4cats-core"     % Versions.mongo4cats
@@ -64,11 +68,11 @@ object Dependencies {
       val all     = Seq(core, circe, http4s)
     }
 
-    val scalaTest = "org.scalatest"     %% "scalatest"   % Versions.scalaTest
-    val mockito   = "org.scalatestplus" %% "mockito-4-11" % Versions.mockito
   }
 
   lazy val core = Seq(
+    Libraries.commonScala.syntax,
+    Libraries.commonScala.cats,
     Libraries.mongo4cats.core,
     Libraries.mongo4cats.circe,
     Libraries.pureconfig.core,
@@ -83,9 +87,8 @@ object Dependencies {
     Libraries.refined.all
 
   lazy val test = Seq(
-    Libraries.scalaTest           % Test,
-    Libraries.mockito             % Test,
-    Libraries.mongo4cats.embedded % Test
+    Libraries.commonScala.catsTest % Test,
+    Libraries.mongo4cats.embedded  % Test
   )
 
   lazy val openapi = Seq(
