@@ -16,7 +16,7 @@ import fs2.Stream
 
 trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
 
-  extension (r: Request[IO]) def withJsonBody(json: Json) = r.withBodyStream(Stream.emits(json.noSpaces.getBytes().toList))
+  extension (r: Request[IO]) def withJsonBody(json: Json): r.Self = r.withBodyStream(Stream.emits(json.noSpaces.getBytes().toList))
 
   def requestWithAuthHeader(
       uri: org.http4s.Uri,
@@ -54,5 +54,5 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
     parse(jsonString).getOrElse(throw new RuntimeException)
 
   def failedAuth(error: Throwable): Authenticator[IO]      = _ => IO.raiseError(error)
-  def successfullAuth(session: Session): Authenticator[IO] = _ => IO.pure(session)
+  def successfulAuth(session: Session): Authenticator[IO] = _ => IO.pure(session)
 }

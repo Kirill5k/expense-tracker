@@ -23,7 +23,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         when(usrSvc.find(any[UserId])).thenReturn(IO.pure(Users.user))
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/auth/user", Method.GET)
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))
@@ -47,7 +47,7 @@ class AuthControllerSpec extends ControllerSpec {
       "return error when id in path is different from id in session" in {
         val (usrSvc, sessSvc, disp) = mocks
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val reqBody =
           """{
@@ -72,7 +72,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         when(usrSvc.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val reqBody =
           """{
@@ -98,7 +98,7 @@ class AuthControllerSpec extends ControllerSpec {
       "return error when id in path is different from id in session" in {
         val (usrSvc, sessSvc, disp) = mocks
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           uri"/auth/user/60e70e87fb134e0c1a271122/password",
@@ -117,7 +117,7 @@ class AuthControllerSpec extends ControllerSpec {
         when(usrSvc.changePassword(any[ChangePassword])).thenReturn(IO.unit)
         when(sessSvc.invalidateAll(any[UserId])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/auth/user/${Users.uid1}/password"),
@@ -271,7 +271,7 @@ class AuthControllerSpec extends ControllerSpec {
 
         when(sessSvc.unauth(any[SessionId])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/auth/logout", method = Method.POST)
         val res = AuthController.make[IO](usrSvc, sessSvc, disp).flatMap(_.routes.orNotFound.run(req))

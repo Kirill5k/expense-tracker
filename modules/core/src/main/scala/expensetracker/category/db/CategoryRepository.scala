@@ -8,7 +8,7 @@ import expensetracker.category.{Category, CategoryId, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
-import expensetracker.common.effects.syntax.*
+import kirill5k.common.cats.syntax.applicative.*
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.Filter

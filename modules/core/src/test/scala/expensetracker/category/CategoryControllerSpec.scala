@@ -29,7 +29,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return error empty bearer token" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "Bearer ")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
@@ -41,7 +41,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return error on missing bearer token" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "foo")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
@@ -54,7 +54,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return error on missing auth header" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = Request[IO](uri = uri"/categories", method = Method.GET)
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
@@ -69,7 +69,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.create(any[CreateCategory])).thenReturn(IO.pure(Categories.cid))
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           uri"/categories",
@@ -86,7 +86,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.create(any[CreateCategory])).thenReturn(IO.raiseError(CategoryAlreadyExists(Categories.cname)))
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           uri"/categories",
@@ -102,7 +102,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return 422 when invalid kind passed" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           uri"/categories",
@@ -119,7 +119,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return 422 when invalid color passed" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           uri"/categories",
@@ -138,7 +138,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(Categories.cat())))
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(uri"/categories", method = Method.GET)
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
@@ -154,7 +154,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.get(any[UserId], any[CategoryId])).thenReturn(IO.pure(Categories.cat()))
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.GET)
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
@@ -182,7 +182,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/categories/${Categories.cid}/hidden"),
           Method.PUT,
@@ -200,7 +200,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.update(any[Category])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/categories/${Categories.cid}"),
@@ -217,7 +217,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return 400 when provided ids do not match" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/categories/${Categories.cid}"),
@@ -234,7 +234,7 @@ class CategoryControllerSpec extends ControllerSpec:
       "return 422 when request has validation errors" in {
         val svc = mock[CategoryService[IO]]
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/categories/${Categories.cid}"),
@@ -252,7 +252,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.update(any[Category])).thenReturn(IO.raiseError(CategoryDoesNotExist(Categories.cid)))
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(
           Uri.unsafeFromString(s"/categories/${Categories.cid}"),
@@ -273,7 +273,7 @@ class CategoryControllerSpec extends ControllerSpec:
         val svc = mock[CategoryService[IO]]
         when(svc.delete(any[UserId], any[CategoryId])).thenReturn(IO.unit)
 
-        given auth: Authenticator[IO] = successfullAuth(Sessions.sess)
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
         val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.DELETE)
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
