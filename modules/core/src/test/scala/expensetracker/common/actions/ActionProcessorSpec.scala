@@ -7,10 +7,14 @@ import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryService
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class ActionProcessorSpec extends IOWordSpec {
+
+  given Logger[IO] = Slf4jLogger.getLogger[IO]
 
   "An ActionProcessor" should {
 
