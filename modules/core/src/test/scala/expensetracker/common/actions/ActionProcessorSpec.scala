@@ -1,12 +1,10 @@
 package expensetracker.common.actions
 
 import cats.effect.IO
-import expensetracker.IOWordSpec
+import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.fixtures.Users
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryService
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 

@@ -1,12 +1,10 @@
 package expensetracker.auth.user
 
 import cats.effect.IO
-import expensetracker.IOWordSpec
+import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.fixtures.Users
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 
 class UserServiceSpec extends IOWordSpec {
 

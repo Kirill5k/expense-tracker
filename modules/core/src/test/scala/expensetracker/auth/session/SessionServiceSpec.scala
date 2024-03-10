@@ -1,14 +1,12 @@
 package expensetracker.auth.session
 
 import cats.effect.IO
-import expensetracker.IOWordSpec
+import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.auth.jwt.{BearerToken, JwtEncoder, JwtToken}
 import expensetracker.auth.user.UserId
 import expensetracker.auth.session.db.SessionRepository
 import expensetracker.common.errors.AppError
 import expensetracker.fixtures.{Sessions, Users}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
 import java.time.Instant
 

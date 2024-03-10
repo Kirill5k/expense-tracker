@@ -1,12 +1,11 @@
 package expensetracker.category
 
 import cats.effect.IO
-import expensetracker.IOWordSpec
+import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
 import expensetracker.fixtures.{Categories, Users}
-import org.mockito.ArgumentMatchers.{any, anyBoolean}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.anyBoolean
 
 class CategoryServiceSpec extends IOWordSpec {
 

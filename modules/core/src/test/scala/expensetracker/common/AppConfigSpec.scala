@@ -2,7 +2,7 @@ package expensetracker.common
 
 import cats.effect.IO
 import config.AppConfig
-import expensetracker.IOWordSpec
+import kirill5k.common.cats.test.IOWordSpec
 
 class AppConfigSpec extends IOWordSpec {
 

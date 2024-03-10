@@ -1,7 +1,7 @@
 package expensetracker.auth.user
 
 import cats.effect.IO
-import expensetracker.IOWordSpec
+import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.common.config.{AuthConfig, JwtConfig}
 
 class PasswordEncryptorSpec extends IOWordSpec {
