@@ -9,7 +9,7 @@ import expensetracker.auth.Authenticator
 import expensetracker.auth.session.Session
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.common.errors.AppError
-import expensetracker.common.time.syntax.*
+import kirill5k.common.syntax.time.*
 import io.circe.Codec
 import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes

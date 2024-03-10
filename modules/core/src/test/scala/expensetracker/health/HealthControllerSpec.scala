@@ -1,9 +1,9 @@
 package expensetracker.health
 
 import cats.effect.IO
-import expensetracker.{ControllerSpec, MockClock}
+import expensetracker.ControllerSpec
 import expensetracker.auth.Authenticator
-import expensetracker.common.time.Clock
+import kirill5k.common.cats.Clock
 import org.http4s.implicits.*
 import org.http4s.*
 
@@ -15,7 +15,7 @@ class HealthControllerSpec extends ControllerSpec {
   val ipAddress = "127.0.0.1"
   val ts = Instant.parse("2020-01-01T00:00:00Z")
 
-  given clock: Clock[IO] = MockClock[IO](ts)
+  given clock: Clock[IO] = Clock.mock[IO](ts)
 
   "A HealthController" should {
     given Authenticator[IO] = _ => IO.raiseError(new RuntimeException())
