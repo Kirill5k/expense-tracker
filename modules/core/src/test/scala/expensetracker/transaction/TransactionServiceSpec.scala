@@ -5,7 +5,6 @@ import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.fixtures.{Transactions, Users}
 import expensetracker.auth.user.UserId
 import expensetracker.transaction.db.TransactionRepository
-import org.mockito.ArgumentMatchers.anyBoolean
 
 import java.time.Instant
 

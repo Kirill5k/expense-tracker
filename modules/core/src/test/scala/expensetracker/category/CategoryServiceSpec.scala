@@ -5,7 +5,6 @@ import kirill5k.common.cats.test.IOWordSpec
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
 import expensetracker.fixtures.{Categories, Users}
-import org.mockito.ArgumentMatchers.anyBoolean
 
 class CategoryServiceSpec extends IOWordSpec {
 

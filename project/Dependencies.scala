@@ -3,10 +3,9 @@ import sbt.*
 object Dependencies {
   object Versions {
     val mongo4cats  = "0.7.2"
-    val commonScala = "0.1.10"
+    val commonScala = "0.1.12"
     val pureConfig  = "0.17.5"
     val circe       = "0.14.6"
-    val http4s      = "0.23.25"
     val squants     = "1.8.3"
     val bcrypt      = "4.3.0"
     val refined     = "0.11.1"
@@ -23,6 +22,7 @@ object Dependencies {
 
     object commonScala {
       val cats     = "io.github.kirill5k" %% "common-cats"      % Versions.commonScala
+      val http4s   = "io.github.kirill5k" %% "common-http4s"    % Versions.commonScala
       val syntax   = "io.github.kirill5k" %% "common-syntax"    % Versions.commonScala
       val catsTest = "io.github.kirill5k" %% "common-cats-test" % Versions.commonScala
     }
@@ -56,10 +56,6 @@ object Dependencies {
       val all  = Seq(core)
     }
 
-    object http4s {
-      val emberServer = "org.http4s" %% "http4s-ember-server" % Versions.http4s
-    }
-
     object tapir {
       val core    = "com.softwaremill.sttp.tapir" %% "tapir-core"              % Versions.tapir
       val circe   = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % Versions.tapir
@@ -73,12 +69,12 @@ object Dependencies {
   lazy val core = Seq(
     Libraries.commonScala.syntax,
     Libraries.commonScala.cats,
+    Libraries.commonScala.http4s,
     Libraries.mongo4cats.core,
     Libraries.mongo4cats.circe,
     Libraries.pureconfig.core,
     Libraries.squants,
     Libraries.jwt,
-    Libraries.http4s.emberServer,
     Libraries.bcrypt.cross(CrossVersion.for3Use2_13)
   ) ++
     Libraries.circe.all ++
