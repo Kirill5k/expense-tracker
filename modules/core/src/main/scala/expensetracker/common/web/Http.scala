@@ -8,8 +8,8 @@ import expensetracker.category.Categories
 import expensetracker.common.config.ServerConfig
 import expensetracker.health.Health
 import expensetracker.transaction.Transactions
+import kirill5k.common.http4s.Server
 import org.http4s.*
-import org.http4s.implicits.*
 import org.http4s.server.Router
 import org.http4s.server.middleware.*
 
@@ -35,12 +35,12 @@ final class Http[F[_]: Async] private (
     .andThen((http: HttpRoutes[F]) => CORS.policy.withAllowOriginAll.withAllowCredentials(false).apply(http))
     .andThen((http: HttpRoutes[F]) => Timeout(60.seconds)(http))
 
-  private val loggers: HttpApp[F] => HttpApp[F] = { (http: HttpApp[F]) => RequestLogger.httpApp(true, true)(http) }
-    .andThen((http: HttpApp[F]) => ResponseLogger.httpApp(true, true)(http))
+  private val loggers: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => RequestLogger.httpRoutes(true, true)(http) }
+    .andThen((http: HttpRoutes[F]) => ResponseLogger.httpRoutes(true, true)(http))
 
-  val app: HttpApp[F] = loggers(middleware(routes).orNotFound)
+  val app: HttpRoutes[F] = loggers(middleware(routes))
 
-  def serve(config: ServerConfig): fs2.Stream[F, Unit] = Server.serve[F](config, app)
+  def serve(config: ServerConfig): fs2.Stream[F, Unit] = Server.serveEmber(config, app)
 }
 
 object Http:

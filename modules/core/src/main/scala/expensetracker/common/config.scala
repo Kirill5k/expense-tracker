@@ -1,6 +1,7 @@
 package expensetracker.common
 
 import cats.effect.kernel.Sync
+import kirill5k.common.http4s.Server
 import pureconfig.*
 import pureconfig.generic.derivation.default.*
 
@@ -25,6 +26,11 @@ object config {
       host: String,
       port: Int
   ) derives ConfigReader
+
+  object ServerConfig {
+    given Conversion[ServerConfig, Server.Config] =
+      (sc: ServerConfig) => Server.Config(sc.host, sc.port)
+  }
 
   final case class AppConfig(
       server: ServerConfig,
