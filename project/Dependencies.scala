@@ -3,7 +3,7 @@ import sbt.*
 object Dependencies {
   object Versions {
     val mongo4cats  = "0.7.2"
-    val commonScala = "0.1.12"
+    val commonScala = "0.1.13"
     val pureConfig  = "0.17.5"
     val circe       = "0.14.6"
     val squants     = "1.8.3"
@@ -21,10 +21,10 @@ object Dependencies {
     val jwt     = "com.github.jwt-scala" %% "jwt-circe"    % Versions.jwt
 
     object commonScala {
-      val cats     = "io.github.kirill5k" %% "common-cats"      % Versions.commonScala
-      val http4s   = "io.github.kirill5k" %% "common-http4s"    % Versions.commonScala
-      val syntax   = "io.github.kirill5k" %% "common-syntax"    % Versions.commonScala
-      val catsTest = "io.github.kirill5k" %% "common-cats-test" % Versions.commonScala
+      val cats       = "io.github.kirill5k" %% "common-cats"        % Versions.commonScala
+      val http4s     = "io.github.kirill5k" %% "common-http4s"      % Versions.commonScala
+      val syntax     = "io.github.kirill5k" %% "common-syntax"      % Versions.commonScala
+      val http4sTest = "io.github.kirill5k" %% "common-http4s-test" % Versions.commonScala
     }
 
     object mongo4cats {
@@ -83,8 +83,8 @@ object Dependencies {
     Libraries.refined.all
 
   lazy val test = Seq(
-    Libraries.commonScala.catsTest % Test,
-    Libraries.mongo4cats.embedded  % Test
+    Libraries.commonScala.http4sTest % Test,
+    Libraries.mongo4cats.embedded    % Test
   )
 
   lazy val openapi = Seq(
