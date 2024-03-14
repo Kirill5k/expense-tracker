@@ -1,16 +1,16 @@
 package expensetracker.health
 
 import cats.effect.IO
-import expensetracker.ControllerSpec
 import expensetracker.auth.Authenticator
 import kirill5k.common.cats.Clock
+import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.implicits.*
 import org.http4s.*
 
 import java.time.Instant
 import scala.concurrent.duration.*
 
-class HealthControllerSpec extends ControllerSpec {
+class HealthControllerSpec extends HttpRoutesWordSpec {
 
   val ipAddress = "127.0.0.1"
   val ts = Instant.parse("2020-01-01T00:00:00Z")
