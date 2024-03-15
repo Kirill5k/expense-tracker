@@ -1,17 +1,16 @@
 package expensetracker.category
 
 import cats.effect.IO
-import expensetracker.ControllerSpec
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
+import expensetracker.auth.session.Session
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist, ExpiredSession}
 import expensetracker.fixtures.{Categories, Sessions, Users}
+import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.{Method, Request, Status, Uri}
 import org.http4s.implicits.*
-import org.mockito.ArgumentMatchers.{any, anyBoolean}
-import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 
-class CategoryControllerSpec extends ControllerSpec:
+class CategoryControllerSpec extends HttpRoutesWordSpec:
   "A CategoryController" when {
     "Authentication fails" should {
       "return error when session has expired" in {
@@ -19,7 +18,7 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = failedAuth(ExpiredSession)
 
-        val req = requestWithAuthHeader(uri"/categories")
+        val req = Request[IO](Method.GET, uri"/categories").withAuthHeader()
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Forbidden, Some("""{"message":"Session has expired"}"""))
@@ -31,7 +30,7 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "Bearer ")
+        val req = Request[IO](Method.GET, uri"/categories").withAuthHeader("Bearer ")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Forbidden, Some("""{"message":"Invalid Bearer token"}"""))
@@ -43,7 +42,7 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(uri"/categories", authHeaderValue = "foo")
+        val req = Request[IO](Method.GET, uri"/categories").withAuthHeader("foo")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Missing authorization header"}"""
@@ -67,15 +66,13 @@ class CategoryControllerSpec extends ControllerSpec:
     "POST /categories" should {
       "create new cat and return 201 on success" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.create(any[CreateCategory])).thenReturn(IO.pure(Categories.cid))
+        when(svc.create(any[CreateCategory])).thenReturnIO(Categories.cid)
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          uri"/categories",
-          method = Method.POST,
-          body = Some(parseJson(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
-        )
+        val req = Request[IO](Method.POST, uri"/categories")
+          .withAuthHeader()
+          .withBody(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Created, Some(s"""{"id":"${Categories.cid}"}"""))
@@ -84,15 +81,13 @@ class CategoryControllerSpec extends ControllerSpec:
 
       "return 409 when cat name is taken" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.create(any[CreateCategory])).thenReturn(IO.raiseError(CategoryAlreadyExists(Categories.cname)))
+        when(svc.create(any[CreateCategory])).thenRaiseError(CategoryAlreadyExists(Categories.cname))
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          uri"/categories",
-          method = Method.POST,
-          body = Some(parseJson(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
-        )
+        val req = Request[IO](Method.POST, uri"/categories")
+          .withAuthHeader()
+          .withBody(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Conflict, Some("""{"message":"A category with name cat-1 already exists"}"""))
@@ -104,11 +99,9 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          uri"/categories",
-          method = Method.POST,
-          body = Some(parseJson("""{"name":"cat-1","icon":"icon","kind":"foo","color":"#2962FF"}"""))
-        )
+        val req = Request[IO](Method.POST, uri"/categories")
+          .withAuthHeader()
+          .withBody("""{"name":"cat-1","icon":"icon","kind":"foo","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Invalid value foo for enum CategoryKind, Accepted values: expense,income"}"""
@@ -121,11 +114,9 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          uri"/categories",
-          method = Method.POST,
-          body = Some(parseJson("""{"name":"cat-1","icon":"icon","kind":"income","color":"blue"}"""))
-        )
+        val req = Request[IO](Method.POST, uri"/categories")
+          .withAuthHeader()
+          .withBody("""{"name":"cat-1","icon":"icon","kind":"income","color":"blue"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"blue is not a valid color"}"""))
@@ -136,11 +127,11 @@ class CategoryControllerSpec extends ControllerSpec:
     "GET /categories" should {
       "return user's categories" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.getAll(any[UserId])).thenReturn(IO.pure(List(Categories.cat())))
+        when(svc.getAll(any[UserId])).thenReturnIO(List(Categories.cat()))
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(uri"/categories", method = Method.GET)
+        val req = Request[IO](Method.GET, uri"/categories").withAuthHeader()
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = s"""[{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}]"""
@@ -152,11 +143,11 @@ class CategoryControllerSpec extends ControllerSpec:
     "GET /categories/:id" should {
       "return user's category by id" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.get(any[UserId], any[CategoryId])).thenReturn(IO.pure(Categories.cat()))
+        when(svc.get(any[UserId], any[CategoryId])).thenReturnIO(Categories.cat())
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.GET)
+        val req = Request[IO](Method.GET, Uri.unsafeFromString(s"/categories/${Categories.cid}")).withAuthHeader()
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""
@@ -169,7 +160,7 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = failedAuth(new RuntimeException(""))
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/foo"), method = Method.GET)
+        val req = Request[IO](Method.GET, uri"/categories/foo").withAuthHeader()
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"Invalid hexadecimal representation of an id: foo"}"""))
@@ -183,11 +174,10 @@ class CategoryControllerSpec extends ControllerSpec:
         when(svc.hide(any[UserId], any[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
-        val req = requestWithAuthHeader(
-          Uri.unsafeFromString(s"/categories/${Categories.cid}/hidden"),
-          Method.PUT,
-          body = Some(parseJson("""{"hidden":true}"""))
-        )
+
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/categories/${Categories.cid}/hidden"))
+          .withAuthHeader()
+          .withBody("""{"hidden":true}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.NoContent, None)
@@ -202,12 +192,9 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
-          method = Method.PUT,
-          body =
-            Some(parseJson(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
-        )
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/categories/${Categories.cid}"))
+          .withAuthHeader()
+          .withBody(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.NoContent, None)
@@ -219,11 +206,9 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
-          method = Method.PUT,
-          body = Some(parseJson(s"""{"id":"${Categories.cid2}","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}"""))
-        )
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/categories/${Categories.cid}"))
+          .withAuthHeader()
+          .withBody(s"""{"id":"${Categories.cid2}","name":"c2","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"The id supplied in the path does not match with the id in the request body"}"""
@@ -236,11 +221,9 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
-          method = Method.PUT,
-          body = Some(parseJson(s"""{"id":"${Categories.cid}","name":"","icon":"icon","kind":"expense"}"""))
-        )
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/categories/${Categories.cid}"))
+          .withAuthHeader()
+          .withBody(s"""{"id":"${Categories.cid}","name":"","icon":"icon","kind":"expense"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"name must not be empty, color is required"}"""
@@ -254,12 +237,9 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(
-          Uri.unsafeFromString(s"/categories/${Categories.cid}"),
-          method = Method.PUT,
-          body =
-            Some(parseJson(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}"""))
-        )
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/categories/${Categories.cid}"))
+          .withAuthHeader()
+          .withBody(s"""{"id":"${Categories.cid}","name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = s"""{"message":"Category with id ${Categories.cid} does not exist"}"""
@@ -275,11 +255,14 @@ class CategoryControllerSpec extends ControllerSpec:
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
-        val req = requestWithAuthHeader(Uri.unsafeFromString(s"/categories/${Categories.cid}"), method = Method.DELETE)
+        val req = Request[IO](Method.DELETE, Uri.unsafeFromString(s"/categories/${Categories.cid}")).withAuthHeader()
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.NoContent, None)
         verify(svc).delete(Users.uid1, Categories.cid)
       }
     }
+
+    def failedAuth(error: Throwable): Authenticator[IO]     = _ => IO.raiseError(error)
+    def successfulAuth(session: Session): Authenticator[IO] = _ => IO.pure(session)
   }

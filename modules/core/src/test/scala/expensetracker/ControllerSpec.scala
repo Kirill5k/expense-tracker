@@ -2,8 +2,6 @@ package expensetracker
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import expensetracker.auth.Authenticator
-import expensetracker.auth.session.Session
 import io.circe.parser.*
 import io.circe.Json
 import org.http4s.{EmptyBody, Header, Headers, Method, Request, Response, Status}
@@ -19,8 +17,8 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
   extension (r: Request[IO]) def withJsonBody(json: Json): r.Self = r.withBodyStream(Stream.emits(json.noSpaces.getBytes().toList))
 
   def requestWithAuthHeader(
-      uri: org.http4s.Uri,
       method: org.http4s.Method = Method.GET,
+      uri: org.http4s.Uri,
       authHeaderValue: String = "Bearer token",
       body: Option[Json] = None
   ): Request[IO] =
@@ -53,6 +51,4 @@ trait ControllerSpec extends AnyWordSpec with MockitoSugar with Matchers {
   def parseJson(jsonString: String): Json =
     parse(jsonString).getOrElse(throw new RuntimeException)
 
-  def failedAuth(error: Throwable): Authenticator[IO]      = _ => IO.raiseError(error)
-  def successfulAuth(session: Session): Authenticator[IO] = _ => IO.pure(session)
 }
