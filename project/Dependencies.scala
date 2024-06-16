@@ -4,14 +4,14 @@ object Dependencies {
   object Versions {
     val mongo4cats  = "0.7.6"
     val commonScala = "0.1.17"
-    val pureConfig  = "0.17.6"
+    val pureConfig  = "0.17.7"
     val circe       = "0.14.7"
     val squants     = "1.8.3"
     val bcrypt      = "4.3.0"
-    val refined     = "0.11.1"
+    val refined     = "0.11.2"
     val logback     = "1.5.6"
     val log4cats    = "2.7.0"
-    val tapir       = "1.10.8"
+    val tapir       = "1.10.9"
     val jwt         = "10.0.1"
   }
 
