@@ -59,6 +59,23 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
       }
     }
 
+    "return existing transactions with categories from db" in {
+      withEmbeddedMongoDb { client =>
+        val result = for
+          repo <- TransactionRepository.make(client)
+          _ <- repo.create(Transactions.create())
+          _ <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
+          txs <- repo.getAllWithCategories(Users.uid1, None, None)
+        yield txs
+
+        result.map { txs =>
+          txs must have size 2
+          txs.map(_.categoryId) mustBe List(Categories.cid, Categories.cid2)
+          txs.flatMap(_.category.map(_.id)) mustBe List(Categories.cid, Categories.cid2)
+        }
+      }
+    }
+
     "search transactions by date" in {
       withEmbeddedMongoDb { client =>
         val result = for

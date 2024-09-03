@@ -9,7 +9,7 @@ import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import kirill5k.common.cats.syntax.applicative.*
 import mongo4cats.circe.MongoJsonCodecs
-import mongo4cats.operations.Filter
+import mongo4cats.operations.{Aggregate, Filter, Sort}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
@@ -18,6 +18,7 @@ import java.time.Instant
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[TransactionId]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
+  def getAllWithCategories(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(uid: UserId, txid: TransactionId): F[Transaction]
   def delete(uid: UserId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
@@ -44,12 +45,24 @@ final private class LiveTransactionRepository[F[_]](
       .all
       .mapList(_.toDomain)
 
+  override def getAllWithCategories(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
+    collection
+      .aggregate[TransactionEntity](
+        Aggregate
+          .matchBy(userIdEq(uid) && notHidden && dateRangeSelector(from, to))
+          .sort(Sort.desc(Field.Date))
+          .lookup("categories", Field.CId, Field.Id, Field.Category)
+          .unwind("$" + Field.Category)
+      )
+      .all
+      .mapList(_.toDomain)
+
   private def dateRangeSelector(from: Option[Instant], to: Option[Instant]): Filter = {
     val fromFilter = from.map(d => Filter.gte(Field.Date, d))
-    val toFilter = to.map(d => Filter.lt(Field.Date, d))
+    val toFilter   = to.map(d => Filter.lt(Field.Date, d))
     List(fromFilter, toFilter).flatten.foldLeft(Filter.empty)((acc, el) => acc && el)
   }
-  
+
   override def get(uid: UserId, txid: TransactionId): F[Transaction] =
     collection
       .find(userIdEq(uid).and(idEq(txid.toObjectId)))

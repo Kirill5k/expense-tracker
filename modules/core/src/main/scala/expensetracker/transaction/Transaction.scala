@@ -1,7 +1,7 @@
 package expensetracker.transaction
 
 import expensetracker.auth.user.UserId
-import expensetracker.category.CategoryId
+import expensetracker.category.{Category, CategoryId}
 import expensetracker.common.types.{EnumType, IdType}
 import squants.market.Money
 
@@ -22,7 +22,8 @@ final case class Transaction(
     amount: Money,
     date: LocalDate,
     note: Option[String],
-    tags: Set[String]
+    tags: Set[String],
+    category: Option[Category] = None
 )
 
 final case class CreateTransaction(

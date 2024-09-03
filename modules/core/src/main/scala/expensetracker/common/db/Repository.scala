@@ -8,19 +8,21 @@ import mongo4cats.bson.ObjectId
 import mongo4cats.operations.{Filter, Update}
 
 trait Repository[F[_]] {
-
+  
   protected object Field {
     val Id             = "_id"
     val Name           = "name"
     val Settings       = "settings"
     val Password       = "password"
     val UId            = "userId"
+    val CId            = "categoryId"
     val Email          = "email"
     val Hidden         = "hidden"
     val LastUpdatedAt  = "lastUpdatedAt"
     val Status         = "status"
     val LastAccessedAt = "lastAccessedAt"
     val Date           = "date"
+    val Category       = "category"
   }
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)
