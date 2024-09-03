@@ -27,6 +27,6 @@ object Auth:
       sessSvc  <- SessionService.make[F](jwtEnc, sessRepo)
       accRepo  <- UserRepository.make[F](resources.mongo)
       encr     <- PasswordEncryptor.make[F](config)
-      usrSvc   <- UserService.make[F](accRepo, encr)
-      authCtrl <- AuthController.make[F](usrSvc, sessSvc, dispatcher)
+      usrSvc   <- UserService.make[F](accRepo, encr, dispatcher)
+      authCtrl <- AuthController.make[F](usrSvc, sessSvc)
     yield Auth[F](sessSvc.authenticate(_), authCtrl)

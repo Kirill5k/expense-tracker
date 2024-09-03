@@ -84,7 +84,7 @@ final private class LiveCategoryRepository[F[_]](
 
   override def isHidden(uid: UserId, cid: CategoryId): F[Boolean] =
     collection
-      .count(userIdEq(uid) && idEq(cid.toObjectId) && Filter.eq(Field.Hidden, true))
+      .count(userIdEq(uid) && idEq(cid.toObjectId) && isHidden)
       .map(_ > 0)
 }
 

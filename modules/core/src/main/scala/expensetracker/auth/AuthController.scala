@@ -7,11 +7,10 @@ import cats.syntax.functor.*
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.string.MatchesRegex
 import eu.timepit.refined.types.string.NonEmptyString
-import expensetracker.auth.user.*
-import expensetracker.auth.session.{CreateSession, IpAddress, SessionService}
-import expensetracker.common.actions.{Action, ActionDispatcher}
-import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.auth.jwt.BearerToken
+import expensetracker.auth.session.{CreateSession, IpAddress, SessionService}
+import expensetracker.auth.user.*
+import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import io.circe.Codec
@@ -25,8 +24,7 @@ import java.time.Instant
 
 final private class AuthController[F[_]](
     private val userService: UserService[F],
-    private val sessionService: SessionService[F],
-    private val dispatcher: ActionDispatcher[F]
+    private val sessionService: SessionService[F]
 )(using
     F: Async[F]
 ) extends Controller[F] {
@@ -68,7 +66,6 @@ final private class AuthController[F[_]](
       .serverLogic { req =>
         userService
           .create(req.userDetails, req.userPassword)
-          .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
           .mapResponse(uid => CreateUserResponse(uid.value))
       }
 
@@ -206,8 +203,7 @@ object AuthController extends TapirSchema with TapirJson {
 
   def make[F[_]: Async](
       userService: UserService[F],
-      sessionService: SessionService[F],
-      dispatcher: ActionDispatcher[F]
+      sessionService: SessionService[F]
   ): F[Controller[F]] =
-    Monad[F].pure(AuthController[F](userService, sessionService, dispatcher))
+    Monad[F].pure(AuthController[F](userService, sessionService))
 }

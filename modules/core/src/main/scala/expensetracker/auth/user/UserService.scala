@@ -1,14 +1,10 @@
 package expensetracker.auth.user
 
-import cats.MonadError
+import cats.{MonadError, MonadThrow}
 import cats.syntax.flatMap.*
-import cats.syntax.applicativeError.*
 import expensetracker.auth.user.db.UserRepository
-import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
-
-enum LoginResult:
-  case Fail
-  case Success(user: User)
+import expensetracker.common.actions.{Action, ActionDispatcher}
+import expensetracker.common.errors.AppError
 
 trait UserService[F[_]]:
   def create(details: UserDetails, password: Password): F[UserId]
@@ -19,13 +15,21 @@ trait UserService[F[_]]:
 
 final private class LiveUserService[F[_]](
     private val repository: UserRepository[F],
-    private val encryptor: PasswordEncryptor[F]
+    private val encryptor: PasswordEncryptor[F],
+    private val dispatcher: ActionDispatcher[F]
 )(using
     F: MonadError[F, Throwable]
 ) extends UserService[F] {
 
+  private enum LoginResult:
+    case Fail
+    case Success(user: User)
+
   override def create(details: UserDetails, password: Password): F[UserId] =
-    encryptor.hash(password).flatMap(h => repository.create(details, h))
+    encryptor
+      .hash(password)
+      .flatMap(h => repository.create(details, h))
+      .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
 
   override def login(login: Login): F[User] =
     repository
@@ -35,7 +39,7 @@ final private class LiveUserService[F[_]](
         case None      => F.pure(LoginResult.Fail)
       }
       .flatMap {
-        case LoginResult.Fail       => InvalidEmailOrPassword.raiseError[F, User]
+        case LoginResult.Fail       => F.raiseError(AppError.InvalidEmailOrPassword)
         case LoginResult.Success(a) => F.pure(a)
       }
 
@@ -50,7 +54,7 @@ final private class LiveUserService[F[_]](
       .find(cp.id)
       .flatMap(acc => encryptor.isValid(cp.currentPassword, acc.password))
       .flatMap {
-        case false => InvalidPassword.raiseError[F, PasswordHash]
+        case false => F.raiseError(AppError.InvalidPassword)
         case true  => encryptor.hash(cp.newPassword)
       }
       .flatMap(repository.updatePassword(cp.id))
@@ -58,5 +62,11 @@ final private class LiveUserService[F[_]](
 }
 
 object UserService:
-  def make[F[_]](repo: UserRepository[F], encr: PasswordEncryptor[F])(using F: MonadError[F, Throwable]): F[UserService[F]] =
-    F.pure(LiveUserService[F](repo, encr))
+  def make[F[_]](
+      repo: UserRepository[F],
+      encr: PasswordEncryptor[F],
+      disp: ActionDispatcher[F]
+  )(using
+      F: MonadThrow[F]
+  ): F[UserService[F]] =
+    F.pure(LiveUserService[F](repo, encr, disp))

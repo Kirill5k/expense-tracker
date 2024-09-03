@@ -8,7 +8,7 @@ import mongo4cats.bson.ObjectId
 import mongo4cats.operations.{Filter, Update}
 
 trait Repository[F[_]] {
-  
+
   protected object Field {
     val Id             = "_id"
     val Name           = "name"
@@ -26,6 +26,7 @@ trait Repository[F[_]] {
   }
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)
+  protected val isHidden: Filter  = Filter.eq(Field.Hidden, true)
 
   private def idEqFilter(name: String, id: Option[ObjectId]): Filter = Filter.eq(name, id)
   protected def idEq(id: ObjectId): Filter                           = idEqFilter(Field.Id, id.some)
