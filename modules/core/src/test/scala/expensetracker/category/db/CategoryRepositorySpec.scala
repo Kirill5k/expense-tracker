@@ -143,7 +143,6 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           yield cats
 
           result.map { cats =>
-            cats must have size 2
             cats.map(_.name) mustBe List(CategoryName("c1"), CategoryName("c2"))
             cats.flatMap(_.userId) mustBe List(Users.uid2, Users.uid2)
           }
@@ -187,8 +186,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           yield cats
 
           result.map { cats =>
-            cats must have size 1
-            cats.head mustBe update
+            cats mustBe List(update)
           }
         }
       }
