@@ -4,7 +4,6 @@ import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
-import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
@@ -140,7 +139,7 @@ object TransactionController extends TapirSchema with TapirJson {
   final case class HideTransactionRequest(hidden: Boolean) derives Codec.AsObject
 
   final case class UpdateTransactionRequest(
-      id: NonEmptyString,
+      id: IdString,
       kind: TransactionKind,
       categoryId: IdString,
       amount: Money,
