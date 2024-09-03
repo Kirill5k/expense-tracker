@@ -23,10 +23,10 @@ object Application extends IOApp.Simple:
           dispatcher <- ActionDispatcher.make[IO]
           health     <- Health.make[IO]
           auth       <- Auth.make(config.auth, res, dispatcher)
-          cats       <- Categories.make(res)
+          cats       <- Categories.make(res, dispatcher)
           txs        <- Transactions.make(res)
           http       <- Http.make(health, auth, cats, txs)
-          processor  <- ActionProcessor.make[IO](dispatcher, cats.service)
+          processor  <- ActionProcessor.make[IO](dispatcher, cats.service, txs.service)
           _ <- logger.info("starting http server") >> http
             .serve(config.server)
             .concurrently(processor.run)

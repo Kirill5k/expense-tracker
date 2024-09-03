@@ -242,6 +242,21 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           }
         }
       }
+
+      "update hidden field of a tx by category id" in {
+        withEmbeddedMongoDb { client =>
+          val result = for
+            repo <- TransactionRepository.make(client)
+            txid <- repo.create(Transactions.create())
+            _ <- repo.hide(Categories.cid, true)
+            txs <- repo.getAll(Users.uid1, None, None)
+          yield txs
+
+          result.map { res =>
+            res mustBe Nil
+          }
+        }
+      }
     }
 
     "isHidden" should {

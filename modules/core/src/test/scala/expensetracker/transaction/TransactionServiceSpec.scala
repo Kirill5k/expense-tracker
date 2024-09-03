@@ -2,8 +2,9 @@ package expensetracker.transaction
 
 import cats.effect.IO
 import kirill5k.common.cats.test.IOWordSpec
-import expensetracker.fixtures.{Transactions, Users}
+import expensetracker.fixtures.{Categories, Transactions, Users}
 import expensetracker.auth.user.UserId
+import expensetracker.category.CategoryId
 import expensetracker.transaction.db.TransactionRepository
 
 import java.time.Instant
@@ -102,6 +103,21 @@ class TransactionServiceSpec extends IOWordSpec {
       result.asserting { res =>
         verify(repo).hide(Users.uid1, Transactions.txid, true)
         res mustBe ()
+      }
+    }
+
+    "hide a tx by category" in {
+      val repo = mock[TransactionRepository[IO]]
+      when(repo.hide(any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+
+      val result = for
+        svc <- TransactionService.make[IO](repo)
+        res <- svc.hide(Categories.cid, true)
+      yield res
+
+      result.asserting { res =>
+        verify(repo).hide(Categories.cid, true)
+        res mustBe()
       }
     }
   }

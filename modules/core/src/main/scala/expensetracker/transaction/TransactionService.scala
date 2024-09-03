@@ -3,6 +3,7 @@ package expensetracker.transaction
 import cats.Monad
 import expensetracker.transaction.db.TransactionRepository
 import expensetracker.auth.user.UserId
+import expensetracker.category.CategoryId
 
 import java.time.Instant
 
@@ -13,6 +14,7 @@ trait TransactionService[F[_]] {
   def create(tx: CreateTransaction): F[TransactionId]
   def update(tx: Transaction): F[Unit]
   def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
+  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
 }
 
 final private class LiveTransactionService[F[_]](
@@ -35,6 +37,9 @@ final private class LiveTransactionService[F[_]](
 
   override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     repository.hide(aid, txid, hidden)
+
+  override def hide(cid: CategoryId, hidden: Boolean): F[Unit] =
+    repository.hide(cid, hidden)
 }
 
 object TransactionService:

@@ -64,9 +64,7 @@ final private class LiveCategoryRepository[F[_]](
   override def update(cat: Category): F[Unit] =
     collection
       .replaceOne(userIdEq(cat.userId) && idEq(cat.id.toObjectId), CategoryEntity.from(cat))
-      .flatMap { res =>
-        F.raiseWhen(res.getMatchedCount == 0)(AppError.CategoryDoesNotExist(cat.id))
-      }
+      .flatMap(errorIfNoMatches(AppError.CategoryDoesNotExist(cat.id)))
 
   override def assignDefault(uid: UserId): F[Unit] =
     collection

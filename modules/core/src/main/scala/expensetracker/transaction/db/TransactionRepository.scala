@@ -5,6 +5,7 @@ import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.auth.user.UserId
+import expensetracker.category.CategoryId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import kirill5k.common.cats.syntax.applicative.*
@@ -23,6 +24,7 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def delete(uid: UserId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
+  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
 
 final private class LiveTransactionRepository[F[_]](
@@ -94,6 +96,11 @@ final private class LiveTransactionRepository[F[_]](
       .updateOne(userIdEq(uid) && idEq(txid.toObjectId), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
+  override def hide(cid: CategoryId, hidden: Boolean): F[Unit] =
+    collection
+      .updateMany(Filter.eq(Field.CId, cid.toObjectId), updateHidden(hidden))
+      .void
+  
   override def isHidden(uid: UserId, txid: TransactionId): F[Boolean] =
     collection
       .count(userIdEq(uid) && idEq(txid.toObjectId) && Filter.eq(Field.Hidden, true))

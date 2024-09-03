@@ -9,6 +9,7 @@ import expensetracker.transaction.db.TransactionRepository
 import org.typelevel.log4cats.Logger
 
 final class Transactions[F[_]] private (
+    val service: TransactionService[F],
     val controller: Controller[F]
 )
 
@@ -18,4 +19,4 @@ object Transactions:
       repo <- TransactionRepository.make[F](resources.mongo)
       svc  <- TransactionService.make[F](repo)
       ctrl <- TransactionController.make[F](svc)
-    yield Transactions[F](ctrl)
+    yield Transactions[F](svc, ctrl)

@@ -1,8 +1,10 @@
 package expensetracker.category
 
 import cats.Monad
+import cats.syntax.flatMap.*
 import expensetracker.auth.user.UserId
 import expensetracker.category.db.CategoryRepository
+import expensetracker.common.actions.{Action, ActionDispatcher}
 
 trait CategoryService[F[_]] {
   def update(cat: Category): F[Unit]
@@ -14,8 +16,9 @@ trait CategoryService[F[_]] {
   def hide(uid: UserId, cid: CategoryId, hidden: Boolean): F[Unit]
 }
 
-final private class LiveCategoryService[F[_]](
-    private val repository: CategoryRepository[F]
+final private class LiveCategoryService[F[_]: Monad](
+    private val repository: CategoryRepository[F],
+    private val dispatcher: ActionDispatcher[F]
 ) extends CategoryService[F] {
 
   override def getAll(uid: UserId): F[List[Category]] =
@@ -37,9 +40,10 @@ final private class LiveCategoryService[F[_]](
     repository.assignDefault(uid)
 
   override def hide(uid: UserId, cid: CategoryId, hidden: Boolean): F[Unit] =
-    repository.hide(uid: UserId, cid: CategoryId, hidden: Boolean)
+    repository.hide(uid: UserId, cid: CategoryId, hidden: Boolean) >>
+      dispatcher.dispatch(Action.HideTransactionsByCategory(cid, hidden))
 }
 
 object CategoryService:
-  def make[F[_]: Monad](repository: CategoryRepository[F]): F[CategoryService[F]] =
-    Monad[F].pure(LiveCategoryService[F](repository))
+  def make[F[_]: Monad](repo: CategoryRepository[F], disp: ActionDispatcher[F]): F[CategoryService[F]] =
+    Monad[F].pure(LiveCategoryService[F](repo, disp))
