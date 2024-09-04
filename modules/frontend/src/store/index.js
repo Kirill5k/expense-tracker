@@ -168,7 +168,8 @@ export default new Vuex.Store({
         .then(acc => {
           if (!state.user.id || acc.id === state.user.id) {
             commit('setUser', acc)
-            return Promise.all([dispatch('getCategories'), dispatch('getTransactions')])
+            commit('setCategories', acc.categories)
+            return dispatch('getTransactions')
           } else {
             commit('logout')
             commit('setAlert', Alerts.SESSION_EXPIRED)
@@ -215,11 +216,6 @@ export default new Vuex.Store({
         .createCategory(state.accessToken, requestBody)
         .then(cat => commit('addCategory', cat))
         .catch(e => handleError(commit, e))
-    },
-    getCategories ({ state, commit }) {
-      return Clients.get(state.isOnline)
-        .getCategories(state.accessToken)
-        .then(cats => commit('setCategories', cats))
     },
     hideCategory ({ state, commit }, { id, hidden }) {
       return Clients.get(state.isOnline)

@@ -37,7 +37,6 @@ class StubClient {
   updateUserSettings = () => notConnectedToTheInternet()
   changeUserPassword = () => notConnectedToTheInternet()
   logout = () => notConnectedToTheInternet()
-  getCategories = () => notConnectedToTheInternet()
   createCategory = () => notConnectedToTheInternet()
   getCategory = () => notConnectedToTheInternet()
   hideCategory = () => notConnectedToTheInternet()
@@ -51,7 +50,7 @@ class StubClient {
 
 class BackendClient {
   getUser = (token) =>
-    fetch('/api/auth/user', simpleRequest(token))
+    fetch('/api/auth/user?expanded=true', simpleRequest(token))
       .then(res => res.status === 200 ? res.json() : reject(res))
 
   login = (requestBody) =>
@@ -74,14 +73,10 @@ class BackendClient {
     fetch('/api/auth/logout', requestWithBody({}, 'POST', token))
       .then(res => res.status === 204 ? {} : reject(res))
 
-  getCategories = (token) =>
-    fetch('/api/categories', simpleRequest(token))
-      .then(res => res.status === 200 ? res.json() : reject(res))
-
   createCategory = (token, requestBody) =>
     fetch('/api/categories', requestWithBody(requestBody, 'POST', token))
       .then(res => res.status === 201 ? res.json() : reject(res))
-      .then(res => this.getCategory(token, res.id))
+      .then(res => this.getCategory(token, res.id)) // TODO: remove this line
 
   getCategory = (token, id) =>
     fetch(`/api/categories/${id}`, simpleRequest(token))
@@ -96,7 +91,7 @@ class BackendClient {
       .then(res => res.status === 204 ? requestBody : reject(res))
 
   getTransactions = (token, from, to) =>
-    fetch(`/api/transactions${from && to ? `?from=${from.toISOString()}&to=${to.toISOString()}` : ''}`, simpleRequest(token))
+    fetch(`/api/transactions?expanded=true${from && to ? `&from=${from.toISOString()}&to=${to.toISOString()}` : ''}`, simpleRequest(token))
       .then(res => res.status === 200 ? res.json() : reject(res))
 
   createTransaction = (token, requestBody) =>
