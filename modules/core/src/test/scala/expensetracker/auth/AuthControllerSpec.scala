@@ -38,6 +38,31 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
         res mustHaveStatus (Status.Ok, Some(resBody))
         verify(usrSvc).find(Sessions.sess.userId)
       }
+
+      "return expanded version of current account" in {
+        val (usrSvc, sessSvc) = mocks
+
+        when(usrSvc.findWithCategories(any[UserId])).thenReturnIO(Users.user)
+
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
+
+        val req = Request[IO](Method.GET, uri"/auth/user?expanded=true").withAuthHeader()
+        val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
+
+        val resBody =
+          s"""{
+             |"id":"${Users.uid1}",
+             |"email":"${Users.email}",
+             |"firstName":"${Users.details.name.first}",
+             |"lastName":"${Users.details.name.last}",
+             |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
+             |"registrationDate": "${Users.regDate}",
+             |"categories": null
+             |}""".stripMargin
+
+        res mustHaveStatus(Status.Ok, Some(resBody))
+        verify(usrSvc).findWithCategories(Sessions.sess.userId)
+      }
     }
 
     "PUT /auth/user/:id/settings" should {

@@ -56,10 +56,11 @@ final private class AuthController[F[_]](
 
   private def getCurrentUser(using authenticator: Authenticator[F]) =
     getCurrentUserEndpoint.withAuthenticatedSession
-      .serverLogic { session => _ =>
-        userService
-          .find(session.userId)
-          .mapResponse(UserView.from)
+      .serverLogic { session => expanded =>
+        val user = expanded match
+          case Some(true) => userService.findWithCategories(session.userId)
+          case _          => userService.find(session.userId)
+        user.mapResponse(UserView.from)
       }
 
   private def createUser =
@@ -81,16 +82,18 @@ final private class AuthController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Controller.serverInterpreter[F].toRoutes(
-      List(
-        login,
-        createUser,
-        getCurrentUser,
-        updateSettings,
-        changePassword,
-        logout
+    Controller
+      .serverInterpreter[F]
+      .toRoutes(
+        List(
+          login,
+          createUser,
+          getCurrentUser,
+          updateSettings,
+          changePassword,
+          logout
+        )
       )
-    )
 }
 
 object AuthController extends TapirSchema with TapirJson {
@@ -184,6 +187,7 @@ object AuthController extends TapirSchema with TapirJson {
 
   val getCurrentUserEndpoint = Controller.securedEndpoint.get
     .in(userPath)
+    .in(query[Option[Boolean]]("expanded").description("When true, returned user with include additional information, such as categories"))
     .out(jsonBody[UserView])
     .description("Get currently logged in user")
 

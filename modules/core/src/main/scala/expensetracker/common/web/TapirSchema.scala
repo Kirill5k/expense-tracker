@@ -17,8 +17,7 @@ transparent trait TapirSchema extends SchemaDerivation {
   given Schema[NonEmptyString] = Schema.string
   given Schema[EmailString]    = Schema.string
 
-  given Schema[CategoryKind] =
-    Schema.derivedEnumeration[CategoryKind].defaultStringBased
+  given Schema[CategoryKind] = Schema.derivedEnumeration[CategoryKind].defaultStringBased
 
   given Schema[Currency] = Schema(
     SProduct(
