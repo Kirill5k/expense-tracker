@@ -11,7 +11,7 @@ import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.session.{CreateSession, IpAddress, SessionService}
 import expensetracker.auth.user.*
 import expensetracker.category.CategoryController.CategoryView
-import expensetracker.common.errors.AppError.SomeoneElsesSession
+import expensetracker.common.errors.AppError
 import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import io.circe.Codec
@@ -42,7 +42,7 @@ final private class AuthController[F[_]](
   private def changePassword(using authenticator: Authenticator[F]) =
     changePasswordEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
-        F.raiseWhen(uid != session.userId)(SomeoneElsesSession) >>
+        F.raiseWhen(uid != session.userId)(AppError.SomeoneElsesSession) >>
           userService.changePassword(req.toDomain(uid)) >>
           sessionService.invalidateAll(uid).voidResponse
       }
@@ -50,7 +50,7 @@ final private class AuthController[F[_]](
   private def updateSettings(using authenticator: Authenticator[F]) =
     updateUserSettingsEndpoint.withAuthenticatedSession
       .serverLogic { session => (uid, req) =>
-        F.raiseWhen(uid != session.userId)(SomeoneElsesSession) >>
+        F.raiseWhen(uid != session.userId)(AppError.SomeoneElsesSession) >>
           userService.updateSettings(uid, req.toDomain).voidResponse
       }
 
