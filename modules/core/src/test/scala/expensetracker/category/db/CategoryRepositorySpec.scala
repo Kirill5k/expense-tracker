@@ -27,8 +27,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           val create = Categories.create()
           val result = for
             repo <- CategoryRepository.make(client)
-            id   <- repo.create(create)
-            cat  <- repo.get(Users.uid1, id)
+            newCat   <- repo.create(create)
+            cat  <- repo.get(Users.uid1, newCat.id)
           yield cat
 
           result.map { cat =>

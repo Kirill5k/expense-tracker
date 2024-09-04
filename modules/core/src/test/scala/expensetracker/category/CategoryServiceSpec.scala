@@ -61,8 +61,9 @@ class CategoryServiceSpec extends IOWordSpec {
     }
 
     "create new category in db" in {
+      val cat = Categories.cat()
       val (repo, disp) = mocks
-      when(repo.create(any[CreateCategory])).thenReturnIO(Categories.cid)
+      when(repo.create(any[CreateCategory])).thenReturnIO(cat)
 
       val result = for
         svc <- CategoryService.make[IO](repo, disp)
@@ -72,7 +73,7 @@ class CategoryServiceSpec extends IOWordSpec {
       result.asserting { res =>
         verify(repo).create(Categories.create())
         verifyNoInteractions(disp)
-        res mustBe Categories.cid
+        res mustBe cat
       }
     }
 

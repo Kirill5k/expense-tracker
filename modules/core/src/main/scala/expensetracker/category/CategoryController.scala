@@ -46,7 +46,7 @@ final private class CategoryController[F[_]](
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
-          .mapResponse(cid => CreateCategoryResponse(cid.value))
+          .mapResponse(CategoryView.from)
       }
 
   private def updateCategory(using authenticator: Authenticator[F]) =
@@ -104,9 +104,7 @@ object CategoryController extends TapirSchema with TapirJson {
         userId = aid
       )
   }
-
-  final case class CreateCategoryResponse(id: String) derives Codec.AsObject
-
+  
   final case class UpdateCategoryRequest(
       id: NonEmptyString,
       kind: CategoryKind,
@@ -156,7 +154,7 @@ object CategoryController extends TapirSchema with TapirJson {
   val createCategoryEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateCategoryRequest])
-    .out(statusCode(StatusCode.Created).and(jsonBody[CreateCategoryResponse]))
+    .out(statusCode(StatusCode.Created).and(jsonBody[CategoryView]))
     .description("Create new category")
 
   val updateCategoryEndpoint = Controller.securedEndpoint.put

@@ -66,7 +66,7 @@ class CategoryControllerSpec extends HttpRoutesWordSpec:
     "POST /categories" should {
       "create new cat and return 201 on success" in {
         val svc = mock[CategoryService[IO]]
-        when(svc.create(any[CreateCategory])).thenReturnIO(Categories.cid)
+        when(svc.create(any[CreateCategory])).thenReturnIO(Categories.cat())
 
         given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
 
@@ -75,7 +75,15 @@ class CategoryControllerSpec extends HttpRoutesWordSpec:
           .withBody(s"""{"name":"${Categories.cname}","icon":"icon","kind":"expense","color":"#2962FF"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.Created, Some(s"""{"id":"${Categories.cid}"}"""))
+        val resBody =
+          s"""{
+             |"id":"${Categories.cid}",
+             |"name":"${Categories.cname}",
+             |"icon":"icon",
+             |"kind":"expense",
+             |"color":"#2962FF"
+             |}""".stripMargin
+        res mustHaveStatus (Status.Created, Some(resBody))
         verify(svc).create(Categories.create())
       }
 

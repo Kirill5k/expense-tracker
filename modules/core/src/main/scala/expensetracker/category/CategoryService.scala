@@ -8,7 +8,7 @@ import expensetracker.common.actions.{Action, ActionDispatcher}
 
 trait CategoryService[F[_]] {
   def update(cat: Category): F[Unit]
-  def create(cat: CreateCategory): F[CategoryId]
+  def create(cat: CreateCategory): F[Category]
   def get(uid: UserId, cid: CategoryId): F[Category]
   def getAll(uid: UserId): F[List[Category]]
   def delete(uid: UserId, cid: CategoryId): F[Unit]
@@ -30,7 +30,7 @@ final private class LiveCategoryService[F[_]: Monad](
   override def update(cat: Category): F[Unit] =
     repository.update(cat)
 
-  override def create(cat: CreateCategory): F[CategoryId] =
+  override def create(cat: CreateCategory): F[Category] =
     repository.create(cat)
 
   override def get(uid: UserId, cid: CategoryId): F[Category] =

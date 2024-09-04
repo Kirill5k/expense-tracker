@@ -16,7 +16,7 @@ import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
 trait CategoryRepository[F[_]] extends Repository[F]:
-  def create(cat: CreateCategory): F[CategoryId]
+  def create(cat: CreateCategory): F[Category]
   def update(cat: Category): F[Unit]
   def get(uid: UserId, cid: CategoryId): F[Category]
   def getAll(uid: UserId): F[List[Category]]
@@ -52,12 +52,12 @@ final private class LiveCategoryRepository[F[_]](
         F.raiseWhen(result.getDeletedCount == 0)(AppError.CategoryDoesNotExist(cid))
       }
 
-  override def create(cat: CreateCategory): F[CategoryId] = {
+  override def create(cat: CreateCategory): F[Category] = {
     val newCat = CategoryEntity.from(cat)
     collection
       .count(userIdEq(cat.userId) && notHidden && Filter.regex(Field.Name, "(?i)^" + newCat.name + "$"))
       .flatMap {
-        case 0 => collection.insertOne(newCat).as(CategoryId(newCat._id.toHexString))
+        case 0 => collection.insertOne(newCat).as(newCat.toDomain)
         case _ => F.raiseError(AppError.CategoryAlreadyExists(cat.name))
       }
   }
