@@ -2,6 +2,7 @@ package expensetracker.auth.user.db
 
 import io.circe.Codec
 import expensetracker.auth.user.*
+import expensetracker.category.db.CategoryEntity
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.given
 
@@ -13,7 +14,8 @@ final case class UserEntity(
     name: UserName,
     password: String,
     settings: Option[UserSettings],
-    registrationDate: Instant
+    registrationDate: Instant,
+    categories: Option[List[CategoryEntity]] = None
 ) derives Codec.AsObject {
   def toDomain: User =
     User(
@@ -22,7 +24,8 @@ final case class UserEntity(
       name = name,
       password = PasswordHash(password),
       settings = settings.getOrElse(UserSettings.Default),
-      registrationDate = registrationDate
+      registrationDate = registrationDate,
+      categories = categories.map(_.map(_.toDomain))
     )
 }
 

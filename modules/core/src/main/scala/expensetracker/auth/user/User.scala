@@ -1,5 +1,6 @@
 package expensetracker.auth.user
 
+import expensetracker.category.Category
 import io.circe.Codec
 import expensetracker.common.types.{IdType, StringType}
 import expensetracker.common.json.given
@@ -45,7 +46,8 @@ final case class User(
     name: UserName,
     password: PasswordHash,
     settings: UserSettings,
-    registrationDate: Instant
+    registrationDate: Instant,
+    categories: Option[List[Category]] = None
 )
 
 final case class UserDetails(

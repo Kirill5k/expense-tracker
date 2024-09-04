@@ -9,14 +9,15 @@ import java.time.Instant
 
 trait MongoOps {
 
-  def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None): Document =
+  def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None, hidden: Option[Boolean] = None): Document =
     Document(
       "_id"    := id.toObjectId,
       "kind"   := "expense",
       "name"   := name,
       "icon"   := "icon",
       "color"  := "#2962FF",
-      "userId" := uid.map(id => id.toObjectId)
+      "userId" := uid.map(id => id.toObjectId),
+      "hidden" := hidden
     )
 
   def userDoc(

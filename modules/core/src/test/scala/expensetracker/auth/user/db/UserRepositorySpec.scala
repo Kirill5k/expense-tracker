@@ -4,8 +4,9 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserSettings}
+import expensetracker.category.CategoryName
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
-import expensetracker.fixtures.Users
+import expensetracker.fixtures.{Categories, Users}
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
@@ -44,6 +45,35 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
           yield acc
 
           result.attempt.map(_ mustBe Left(AccountDoesNotExist(Users.uid2)))
+        }
+      }
+    }
+
+    "findWithCategories" should {
+      "return error account does not exist" in {
+        withEmbeddedMongoDb { db =>
+          val result = for
+            repo <- UserRepository.make(db)
+            acc <- repo.find(Users.uid2)
+          yield acc
+
+          result.attempt.map(_ mustBe Left(AccountDoesNotExist(Users.uid2)))
+        }
+      }
+
+      "find account by id with its categories" in {
+        withEmbeddedMongoDb { db =>
+          val result = for
+            repo <- UserRepository.make(db)
+            acc  <- repo.findWithCategories(Users.uid1)
+          yield acc
+
+          result.map { acc =>
+            acc.id mustBe Users.uid1
+            acc.categories mustBe defined
+            acc.categories.get must have size 1
+            acc.categories.get.head.name mustBe CategoryName("category-1")
+          }
         }
       }
     }
@@ -169,7 +199,14 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
         .use { client =>
           for
-            db    <- client.getDatabase("expense-tracker")
+            db         <- client.getDatabase("expense-tracker")
+            categories <- db.getCollection("categories")
+            _ <- categories.insertMany(
+              List(
+                categoryDoc(Categories.cid, "category-1", Some(Users.uid1)),
+                categoryDoc(Categories.cid2, "category-2", Some(Users.uid1), Some(true))
+              )
+            )
             users <- db.getCollection("users")
             _     <- users.insertOne(userDoc(Users.uid1, Users.details.email, password = Users.hash, registrationDate = Users.regDate))
             res   <- test(db)
