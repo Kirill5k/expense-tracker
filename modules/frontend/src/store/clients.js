@@ -76,7 +76,7 @@ class BackendClient {
   createCategory = (token, requestBody) =>
     fetch('/api/categories', requestWithBody(requestBody, 'POST', token))
       .then(res => res.status === 201 ? res.json() : reject(res))
-      .then(res => this.getCategory(token, res.id)) // TODO: remove this line
+      .then(res => this.getCategory(token, res.id)) // TODO: remove getCategory call
 
   getCategory = (token, id) =>
     fetch(`/api/categories/${id}`, simpleRequest(token))
