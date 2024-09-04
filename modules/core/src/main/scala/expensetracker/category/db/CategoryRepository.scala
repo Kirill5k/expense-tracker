@@ -8,6 +8,7 @@ import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
 import kirill5k.common.cats.syntax.applicative.*
+import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.Filter
@@ -41,8 +42,8 @@ final private class LiveCategoryRepository[F[_]](
     collection
       .find(userIdEq(uid) && idEq(cid.toObjectId))
       .first
-      .mapOpt(_.toDomain)
-      .flatMap(cat => F.fromOption(cat, AppError.CategoryDoesNotExist(cid)))
+      .unwrapOpt(AppError.CategoryDoesNotExist(cid))
+      .map(_.toDomain)
 
   override def delete(uid: UserId, cid: CategoryId): F[Unit] =
     collection

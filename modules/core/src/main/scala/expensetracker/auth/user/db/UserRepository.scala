@@ -8,6 +8,7 @@ import expensetracker.auth.user.{PasswordHash, User, UserDetails, UserEmail, Use
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import kirill5k.common.cats.syntax.applicative.*
+import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
@@ -47,7 +48,8 @@ final private class LiveUserRepository[F[_]](
     collection
       .find(idEq(uid.toObjectId))
       .first
-      .flatMap(user => F.fromOption(user.map(_.toDomain), AccountDoesNotExist(uid)))
+      .unwrapOpt(AccountDoesNotExist(uid))
+      .map(_.toDomain)
 
   override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     collection

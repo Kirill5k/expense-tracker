@@ -9,6 +9,7 @@ import expensetracker.category.CategoryId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import kirill5k.common.cats.syntax.applicative.*
+import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.{Aggregate, Filter, Sort}
 import mongo4cats.collection.MongoCollection
@@ -70,9 +71,7 @@ final private class LiveTransactionRepository[F[_]](
       .find(userIdEq(uid).and(idEq(txid.toObjectId)))
       .first
       .mapOpt(_.toDomain)
-      .flatMap { maybetx =>
-        F.fromOption(maybetx, TransactionDoesNotExist(txid))
-      }
+      .unwrapOpt(TransactionDoesNotExist(txid))
 
   override def update(tx: Transaction): F[Unit] =
     collection
@@ -80,9 +79,8 @@ final private class LiveTransactionRepository[F[_]](
         userIdEq(tx.userId) && idEq(tx.id.toObjectId),
         TransactionEntity.from(tx)
       )
-      .flatMap { maybetx =>
-        F.fromOption(maybetx.void, TransactionDoesNotExist(tx.id))
-      }
+      .unwrapOpt(TransactionDoesNotExist(tx.id))
+      .void
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
@@ -100,7 +98,7 @@ final private class LiveTransactionRepository[F[_]](
     collection
       .updateMany(Filter.eq(Field.CId, cid.toObjectId), updateHidden(hidden))
       .void
-  
+
   override def isHidden(uid: UserId, txid: TransactionId): F[Boolean] =
     collection
       .count(userIdEq(uid) && idEq(txid.toObjectId) && Filter.eq(Field.Hidden, true))
