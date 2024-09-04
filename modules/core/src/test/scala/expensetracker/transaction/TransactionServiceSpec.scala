@@ -14,7 +14,7 @@ class TransactionServiceSpec extends IOWordSpec {
   "A TransactionService" should {
     "delete tx from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.delete(any[UserId], any[TransactionId])).thenReturn(IO.unit)
+      when(repo.delete(any[UserId], any[TransactionId])).thenReturnUnit
 
       val result = for
         svc <- TransactionService.make[IO](repo)
@@ -29,7 +29,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "update tx in db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.update(any[Transaction])).thenReturn(IO.unit)
+      when(repo.update(any[Transaction])).thenReturnUnit
 
       val result = for
         svc <- TransactionService.make[IO](repo)
@@ -44,7 +44,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "retrieve tx by id from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.get(any[UserId], any[TransactionId])).thenReturn(IO.pure(Transactions.tx()))
+      when(repo.get(any[UserId], any[TransactionId])).thenReturnIO(Transactions.tx())
 
       val result = for
         svc <- TransactionService.make[IO](repo)
@@ -59,7 +59,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "retrieve all txs from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturn(IO.pure(List(Transactions.tx())))
+      when(repo.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturnIO(List(Transactions.tx()))
 
       val from = Instant.now().minusSeconds(5L)
       val to = Instant.now().plusSeconds(5L)
@@ -75,9 +75,27 @@ class TransactionServiceSpec extends IOWordSpec {
       }
     }
 
+    "retrieve all txs from db with categories" in {
+      val repo = mock[TransactionRepository[IO]]
+      when(repo.getAllWithCategories(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturnIO(List(Transactions.tx()))
+
+      val from = Instant.now().minusSeconds(5L)
+      val to = Instant.now().plusSeconds(5L)
+
+      val result = for
+        svc <- TransactionService.make[IO](repo)
+        res <- svc.getAllWithCategories(Users.uid1, Some(from), Some(to))
+      yield res
+
+      result.asserting { res =>
+        verify(repo).getAllWithCategories(Users.uid1, Some(from), Some(to))
+        res mustBe List(Transactions.tx())
+      }
+    }
+
     "create new tx in db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.create(any[CreateTransaction])).thenReturn(IO.pure(Transactions.txid))
+      when(repo.create(any[CreateTransaction])).thenReturnIO(Transactions.txid)
 
       val create = Transactions.create()
       val result = for
@@ -93,7 +111,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "hide a tx in db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturn(IO.unit)
+      when(repo.hide(any[UserId], any[TransactionId], anyBoolean)).thenReturnUnit
 
       val result = for
         svc <- TransactionService.make[IO](repo)
@@ -108,7 +126,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "hide a tx by category" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.hide(any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+      when(repo.hide(any[CategoryId], anyBoolean)).thenReturnUnit
 
       val result = for
         svc <- TransactionService.make[IO](repo)

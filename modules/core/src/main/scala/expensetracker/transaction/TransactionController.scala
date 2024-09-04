@@ -6,6 +6,7 @@ import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
+import expensetracker.category.CategoryController.CategoryView
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
@@ -28,10 +29,11 @@ final private class TransactionController[F[_]](
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
     TransactionController.getAllEndpoint.withAuthenticatedSession
-      .serverLogic { session => (from, to) =>
-        service
-          .getAll(session.userId, from, to)
-          .mapResponse(_.map(TransactionController.TransactionView.from))
+      .serverLogic { session => (from, to, expanded) =>
+        val txs = expanded match
+          case Some(true) => service.getAllWithCategories(session.userId, from, to)
+          case _          => service.getAll(session.userId, from, to)
+        txs.mapResponse(_.map(TransactionController.TransactionView.from))
       }
 
   private def getTransactionById(using authenticator: Authenticator[F]) =
@@ -76,16 +78,18 @@ final private class TransactionController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Controller.serverInterpreter[F].toRoutes(
-      List(
-        getAllTransactions,
-        getTransactionById,
-        createTransaction,
-        updateTransaction,
-        hideTransaction,
-        deleteTransaction
+    Controller
+      .serverInterpreter[F]
+      .toRoutes(
+        List(
+          getAllTransactions,
+          getTransactionById,
+          createTransaction,
+          updateTransaction,
+          hideTransaction,
+          deleteTransaction
+        )
       )
-    )
 }
 
 object TransactionController extends TapirSchema with TapirJson {
@@ -120,7 +124,8 @@ object TransactionController extends TapirSchema with TapirJson {
       amount: Money,
       date: LocalDate,
       note: Option[String],
-      tags: Set[String]
+      tags: Set[String],
+      category: Option[CategoryView]
   ) derives Codec.AsObject
 
   object TransactionView {
@@ -132,7 +137,8 @@ object TransactionController extends TapirSchema with TapirJson {
         amount = tx.amount,
         date = tx.date,
         note = tx.note,
-        tags = tx.tags
+        tags = tx.tags,
+        category = tx.category.map(CategoryView.from)
       )
   }
 
@@ -166,7 +172,8 @@ object TransactionController extends TapirSchema with TapirJson {
   private val getAllQueryParams =
     query[Option[Instant]]("from")
       .and(query[Option[Instant]]("to"))
-  
+      .and(query[Option[Boolean]]("expanded").description("When true, each returned transaction will include its respective category obj"))
+
   val createEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateTransactionRequest])

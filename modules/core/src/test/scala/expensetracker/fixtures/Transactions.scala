@@ -46,6 +46,7 @@ object Transactions {
        |    },
        |    "date" : "${Transactions.txdate}",
        |    "note" : "test tx",
-       |    "tags" : ["foo"]
+       |    "tags" : ["foo"],
+       |    "category" : null
        |  }""".stripMargin
 }

@@ -9,6 +9,7 @@ import java.time.Instant
 
 trait TransactionService[F[_]] {
   def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
+  def getAllWithCategories(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(aid: UserId, txid: TransactionId): F[Transaction]
   def delete(aid: UserId, txid: TransactionId): F[Unit]
   def create(tx: CreateTransaction): F[TransactionId]
@@ -25,6 +26,9 @@ final private class LiveTransactionService[F[_]](
 
   override def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     repository.getAll(aid, from, to)
+
+  override def getAllWithCategories(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
+    repository.getAllWithCategories(aid, from, to)
 
   override def get(aid: UserId, txid: TransactionId): F[Transaction] =
     repository.get(aid, txid)
