@@ -2,6 +2,7 @@ package expensetracker.common.web
 
 import cats.syntax.option.*
 import eu.timepit.refined.types.string.NonEmptyString
+import expensetracker.category.CategoryKind
 import expensetracker.common.validations.{ColorString, EmailString, IdString}
 import squants.Money
 import squants.market.Currency
@@ -15,6 +16,9 @@ transparent trait TapirSchema extends SchemaDerivation {
   given Schema[ColorString]    = Schema.string
   given Schema[NonEmptyString] = Schema.string
   given Schema[EmailString]    = Schema.string
+
+  given Schema[CategoryKind] =
+    Schema.derivedEnumeration[CategoryKind].defaultStringBased
 
   given Schema[Currency] = Schema(
     SProduct(

@@ -14,8 +14,8 @@ class UserServiceSpec extends IOWordSpec {
     "create" should {
       "return account id on success" in {
         val (repo, encr, disp) = mocks
-        when(encr.hash(any[Password])).thenReturn(IO.pure(Users.hash))
-        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturn(IO.pure(Users.uid1))
+        when(encr.hash(any[Password])).thenReturnIO(Users.hash)
+        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturnIO(Users.uid1)
         when(disp.dispatch(any[Action])).thenReturnUnit
 
         val result = for
@@ -35,7 +35,7 @@ class UserServiceSpec extends IOWordSpec {
     "updateSettings" should {
       "return unit on success" in {
         val (repo, encr, disp) = mocks
-        when(repo.updateSettings(any[UserId], any[UserSettings])).thenReturn(IO.unit)
+        when(repo.updateSettings(any[UserId], any[UserSettings])).thenReturnUnit
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -55,10 +55,10 @@ class UserServiceSpec extends IOWordSpec {
 
       "return unit on success" in {
         val (repo, encr, disp) = mocks
-        when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
+        when(encr.isValid(any[Password], any[PasswordHash])).thenReturnIO(true)
         when(encr.hash(any[Password])).thenReturn(IO.pure(Users.hash))
-        when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
-        when(repo.updatePassword(any[UserId])(any[PasswordHash])).thenReturn(IO.unit)
+        when(repo.find(any[UserId])).thenReturnIO(Users.user)
+        when(repo.updatePassword(any[UserId])(any[PasswordHash])).thenReturnUnit
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -77,8 +77,8 @@ class UserServiceSpec extends IOWordSpec {
 
       "return error when passwords do not match" in {
         val (repo, encr, disp) = mocks
-        when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
-        when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
+        when(repo.find(any[UserId])).thenReturnIO(Users.user)
+        when(encr.isValid(any[Password], any[PasswordHash])).thenReturnIO(false)
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -97,7 +97,7 @@ class UserServiceSpec extends IOWordSpec {
     "find" should {
       "return account on success" in {
         val (repo, encr, disp) = mocks
-        when(repo.find(any[UserId])).thenReturn(IO.pure(Users.user))
+        when(repo.find(any[UserId])).thenReturnIO(Users.user)
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -112,12 +112,30 @@ class UserServiceSpec extends IOWordSpec {
       }
     }
 
+    "findWithCategories" should {
+      "return account on success" in {
+        val (repo, encr, disp) = mocks
+        when(repo.findWithCategories(any[UserId])).thenReturnIO(Users.user)
+
+        val result = for
+          service <- UserService.make[IO](repo, encr, disp)
+          res <- service.findWithCategories(Users.uid1)
+        yield res
+
+        result.asserting { res =>
+          verifyNoInteractions(encr, disp)
+          verify(repo).findWithCategories(Users.uid1)
+          res mustBe Users.user
+        }
+      }
+    }
+
     "login" should {
 
       "return account on success" in {
         val (repo, encr, disp) = mocks
-        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(Users.user)))
-        when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(true))
+        when(repo.findBy(any[UserEmail])).thenReturnSome(Users.user)
+        when(encr.isValid(any[Password], any[PasswordHash])).thenReturnIO(true)
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -134,7 +152,7 @@ class UserServiceSpec extends IOWordSpec {
 
       "return error when account does not exist" in {
         val (repo, encr, disp) = mocks
-        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(None))
+        when(repo.findBy(any[UserEmail])).thenReturnNone
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -150,8 +168,8 @@ class UserServiceSpec extends IOWordSpec {
 
       "return error when password doesn't match" in {
         val (repo, encr, disp) = mocks
-        when(repo.findBy(any[UserEmail])).thenReturn(IO.pure(Some(Users.user)))
-        when(encr.isValid(any[Password], any[PasswordHash])).thenReturn(IO.pure(false))
+        when(repo.findBy(any[UserEmail])).thenReturnSome(Users.user)
+        when(encr.isValid(any[Password], any[PasswordHash])).thenReturnIO(false)
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)

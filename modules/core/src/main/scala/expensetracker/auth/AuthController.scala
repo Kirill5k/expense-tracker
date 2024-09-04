@@ -10,6 +10,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.session.{CreateSession, IpAddress, SessionService}
 import expensetracker.auth.user.*
+import expensetracker.category.CategoryController.CategoryView
 import expensetracker.common.errors.AppError.SomeoneElsesSession
 import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
@@ -129,7 +130,8 @@ object AuthController extends TapirSchema with TapirJson {
       lastName: String,
       email: String,
       settings: UserSettings,
-      registrationDate: Instant
+      registrationDate: Instant,
+      categories: Option[List[CategoryView]]
   ) derives Codec.AsObject
 
   object UserView:
@@ -140,7 +142,8 @@ object AuthController extends TapirSchema with TapirJson {
         acc.name.last,
         acc.email.value,
         acc.settings,
-        acc.registrationDate
+        acc.registrationDate,
+        acc.categories.map(_.map(CategoryView.from))
       )
 
   final case class UpdateUserSettingsRequest(
