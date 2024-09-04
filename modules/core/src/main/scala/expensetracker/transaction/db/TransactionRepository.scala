@@ -3,6 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
+import cats.syntax.applicativeError.*
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
@@ -11,6 +12,7 @@ import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.circe.MongoJsonCodecs
+import mongo4cats.client.ClientSession
 import mongo4cats.operations.{Aggregate, Filter, Sort}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
@@ -29,16 +31,22 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
 
 final private class LiveTransactionRepository[F[_]](
-    private val collection: MongoCollection[F, TransactionEntity]
+    private val collection: MongoCollection[F, TransactionEntity],
+    private val clientSession: ClientSession[F]
 )(using
     F: Async[F]
 ) extends TransactionRepository[F] {
 
   override def create(tx: CreateTransaction): F[TransactionId] = {
+    clientSession.startTransaction
     val create = TransactionEntity.create(tx)
     collection
       .insertOne(create)
       .as(TransactionId(create._id.toHexString))
+      .flatTap(_ => clientSession.commitTransaction)
+      .onError {
+        case _ => clientSession.abortTransaction
+      }
   }
 
   override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
@@ -106,6 +114,6 @@ final private class LiveTransactionRepository[F[_]](
 }
 
 object TransactionRepository extends MongoJsonCodecs:
-  def make[F[_]: Async](db: MongoDatabase[F]): F[TransactionRepository[F]] =
+  def make[F[_]: Async](db: MongoDatabase[F], cs: ClientSession[F]): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
-      .map(coll => LiveTransactionRepository[F](coll))
+      .map(coll => LiveTransactionRepository[F](coll, cs))
