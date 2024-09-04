@@ -16,7 +16,7 @@ final class Transactions[F[_]] private (
 object Transactions:
   def make[F[_]: Async: Logger](resources: Resources[F]): F[Transactions[F]] =
     for
-      repo <- TransactionRepository.make[F](resources.mongo)
+      repo <- TransactionRepository.make[F](resources.mongoDb)
       svc  <- TransactionService.make[F](repo)
       ctrl <- TransactionController.make[F](svc)
     yield Transactions[F](svc, ctrl)

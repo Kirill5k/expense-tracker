@@ -22,10 +22,10 @@ final class Auth[F[_]] private (
 object Auth:
   def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
     for
-      sessRepo <- SessionRepository.make[F](resources.mongo)
+      sessRepo <- SessionRepository.make[F](resources.mongoDb)
       jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)
       sessSvc  <- SessionService.make[F](jwtEnc, sessRepo)
-      accRepo  <- UserRepository.make[F](resources.mongo)
+      accRepo  <- UserRepository.make[F](resources.mongoDb)
       encr     <- PasswordEncryptor.make[F](config)
       usrSvc   <- UserService.make[F](accRepo, encr, dispatcher)
       authCtrl <- AuthController.make[F](usrSvc, sessSvc)
