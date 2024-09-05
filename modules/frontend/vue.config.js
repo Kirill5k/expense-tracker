@@ -5,7 +5,7 @@ module.exports = {
   devServer: {
     proxy: {
       '^/api': {
-        target: 'https://web-expense-tracker-kirill5k.cloud.okteto.net',
+        target: 'https://expense-tracker-core.onrender.com',
         ws: true,
         changeOrigin: true
       }
