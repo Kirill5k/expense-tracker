@@ -49,9 +49,9 @@
 
           <v-select
             name="category"
-            v-model="newTransaction.categoryId"
-            :rules="rules.category"
-            :items="selectItems"
+            v-model="newTransaction.category"
+            :rules="validationRules.category"
+            :items="categorySelectItems"
             label="Category"
             required
           >
@@ -73,7 +73,7 @@
             type="number"
             min="0.01"
             :prepend-icon="'mdi-currency-' + currency.code.toLowerCase()"
-            :rules="rules.amount"
+            :rules="validationRules.amount"
           />
 
           <v-menu
@@ -88,7 +88,7 @@
               <v-text-field
                 name="date"
                 v-model="formattedDate"
-                :rules="rules.date"
+                :rules="validationRules.date"
                 label="Date"
                 prepend-icon="mdi-calendar"
                 readonly
@@ -136,7 +136,7 @@
             counter
             label="Note"
             v-model="newTransaction.note"
-            :rules="rules.note"
+            :rules="validationRules.note"
           ></v-textarea>
         </v-form>
       </v-card-text>
@@ -188,7 +188,7 @@ export default {
     datePicker: false,
     valid: true,
     newTransaction: {},
-    rules: {
+    validationRules: {
       category: [v => !!v || 'Please select a category'],
       date: [v => !!v || 'Please select the date when this transaction has occurred'],
       amount: [
@@ -200,9 +200,9 @@ export default {
     }
   }),
   computed: {
-    selectItems () {
+    categorySelectItems () {
       const raw = this.newTransaction.kind === 'expense' ? this.expenseCats : this.incomeCats
-      return raw.map(c => ({ value: c.id, text: { ...c } }))
+      return raw.map(c => ({ value: c, text: { ...c } }))
     },
     formattedDate () {
       if (this.newTransaction.date) {
@@ -215,9 +215,10 @@ export default {
   },
   watch: {
     'newTransaction.kind' () {
-      const catId = this.newTransaction.categoryId
-      if (catId !== null && this.selectItems.find(i => i.value === catId) === undefined) {
+      const catId = this.newTransaction?.category?.id
+      if (catId && this.categorySelectItems.find(i => i.value.id === catId) === undefined) {
         this.newTransaction.categoryId = null
+        this.newTransaction.category = null
       }
     }
   },
@@ -226,6 +227,7 @@ export default {
       this.newTransaction = {
         id: undefined,
         categoryId: null,
+        category: null,
         amount: null,
         date: new Date().toISOString().slice(0, 10),
         kind: 'expense',
@@ -241,8 +243,9 @@ export default {
     },
     save () {
       if (this.$refs.newTransactionForm.validate()) {
+        const categoryId = this.newTransaction?.category?.id
         const amount = { value: Number(this.newTransaction.amount), currency: this.currency }
-        const newTx = { ...this.newTransaction, amount, tags: this.newTransaction.tags.map(this.formatTag) }
+        const newTx = { ...this.newTransaction, amount, categoryId, tags: this.newTransaction.tags.map(this.formatTag) }
         const event = newTx.id ? 'update' : 'save'
         this.$emit(event, newTx)
         this.close()
