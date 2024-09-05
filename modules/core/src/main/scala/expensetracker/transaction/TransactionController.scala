@@ -11,6 +11,7 @@ import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.common.validations.*
+import expensetracker.transaction.TransactionController.TransactionView
 import org.bson.types.ObjectId
 import io.circe.Codec
 import io.circe.refined.*
@@ -49,7 +50,7 @@ final private class TransactionController[F[_]](
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
-          .mapResponse(tx => TransactionController.CreateTransactionResponse(tx.id.value))
+          .mapResponse(TransactionView.from)
       }
 
   private def deleteTransaction(using authenticator: Authenticator[F]) =
@@ -114,9 +115,7 @@ object TransactionController extends TapirSchema with TapirJson {
         tags = tags.map(_.toSet.map(_.toLowerCase.replaceAll(" ", "-"))).getOrElse(Set.empty)
       )
   }
-
-  final case class CreateTransactionResponse(id: String) derives Codec.AsObject
-
+  
   final case class TransactionView(
       id: String,
       kind: TransactionKind,
@@ -178,7 +177,7 @@ object TransactionController extends TapirSchema with TapirJson {
   val createEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateTransactionRequest])
-    .out(statusCode(StatusCode.Created).and(jsonBody[CreateTransactionResponse]))
+    .out(statusCode(StatusCode.Created).and(jsonBody[TransactionView]))
     .description("Create new transaction")
 
   val getAllEndpoint = Controller.securedEndpoint.get

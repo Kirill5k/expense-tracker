@@ -35,7 +35,7 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
           )
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.Created, Some(s"""{"id":"${Transactions.txid}"}"""))
+        res mustHaveStatus (Status.Created, Some(Transactions.txjson))
         verify(svc).create(Transactions.create())
       }
 
