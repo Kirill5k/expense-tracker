@@ -173,7 +173,6 @@ object TransactionController extends TapirSchema with TapirJson {
       .and(query[Option[Instant]]("to"))
       .and(query[Option[Boolean]]("expanded").description("When true, each returned transaction will include its respective category obj"))
 
-  // TODO: should return full transaction
   val createEndpoint = Controller.securedEndpoint.post
     .in(basePath)
     .in(jsonBody[CreateTransactionRequest])

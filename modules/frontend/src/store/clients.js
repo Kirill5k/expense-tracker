@@ -38,12 +38,10 @@ class StubClient {
   changeUserPassword = () => notConnectedToTheInternet()
   logout = () => notConnectedToTheInternet()
   createCategory = () => notConnectedToTheInternet()
-  getCategory = () => notConnectedToTheInternet()
   hideCategory = () => notConnectedToTheInternet()
   updateCategory = () => notConnectedToTheInternet()
   getTransactions = () => notConnectedToTheInternet()
   createTransaction = () => notConnectedToTheInternet()
-  getTransaction = () => notConnectedToTheInternet()
   hideTransaction = () => notConnectedToTheInternet()
   updateTransaction = () => notConnectedToTheInternet()
 }
@@ -76,11 +74,6 @@ class BackendClient {
   createCategory = (token, requestBody) =>
     fetch('/api/categories', requestWithBody(requestBody, 'POST', token))
       .then(res => res.status === 201 ? res.json() : reject(res))
-      .then(res => this.getCategory(token, res.id)) // TODO: remove getCategory call
-
-  getCategory = (token, id) =>
-    fetch(`/api/categories/${id}`, simpleRequest(token))
-      .then(res => res.status === 200 ? res.json() : reject(res))
 
   hideCategory = (token, { id, hidden }) =>
     fetch(`/api/categories/${id}/hidden`, requestWithBody({ hidden }, 'PUT', token))
@@ -97,11 +90,6 @@ class BackendClient {
   createTransaction = (token, requestBody) =>
     fetch('/api/transactions', requestWithBody(requestBody, 'POST', token))
       .then(res => res.status === 201 ? res.json() : reject(res))
-      .then(res => this.getTransaction(token, res.id))
-
-  getTransaction = (token, id) =>
-    fetch(`/api/transactions/${id}`, simpleRequest(token))
-      .then(res => res.status === 200 ? res.json() : reject(res))
 
   hideTransaction = (token, { id, hidden }) =>
     fetch(`/api/transactions/${id}/hidden`, requestWithBody({ hidden }, 'PUT', token))
