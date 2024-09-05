@@ -8,6 +8,7 @@ import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.db.Repository
+import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
@@ -20,7 +21,7 @@ import mongo4cats.database.MongoDatabase
 import java.time.Instant
 
 trait TransactionRepository[F[_]] extends Repository[F]:
-  def create(tx: CreateTransaction): F[TransactionId]
+  def create(tx: CreateTransaction): F[Transaction]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def getAllWithCategories(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(uid: UserId, txid: TransactionId): F[Transaction]
@@ -32,23 +33,31 @@ trait TransactionRepository[F[_]] extends Repository[F]:
 
 final private class LiveTransactionRepository[F[_]](
     private val collection: MongoCollection[F, TransactionEntity],
-    private val clientSession: ClientSession[F]
+    private val session: ClientSession[F],
+    private val acid: Boolean
 )(using
     F: Async[F]
 ) extends TransactionRepository[F] {
 
-  override def create(tx: CreateTransaction): F[TransactionId] = {
-    clientSession.startTransaction >> {
-      val create = TransactionEntity.create(tx)
-      collection
-        .insertOne(create)
-        .as(TransactionId(create._id.toHexString))
-        .flatTap(_ => clientSession.commitTransaction)
-        .onError {
-          case _ => clientSession.abortTransaction
-        }
+  private val findWithCategory = (filter: Filter) =>
+    Aggregate
+      .matchBy(filter)
+      .sort(Sort.desc(Field.Date))
+      .lookup("categories", Field.CId, Field.Id, Field.Category)
+      .unwind("$" + Field.Category)
+
+  override def create(ctx: CreateTransaction): F[Transaction] =
+    (for
+      _ <- session.startTransaction
+      create = TransactionEntity.create(ctx)
+      res <- if acid then collection.insertOne(session, create) else collection.insertOne(create)
+      agg = findWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
+      tx <- if acid then collection.aggregate[TransactionEntity](session, agg).first else collection.aggregate[TransactionEntity](agg).first
+      _  <- F.raiseWhen(tx.isEmpty || tx.get.category.isEmpty)(AppError.CategoryDoesNotExist(ctx.categoryId))
+      _  <- session.commitTransaction
+    yield tx.get.toDomain).onError { case _ =>
+      session.abortTransaction
     }
-  }
 
   override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
@@ -59,13 +68,7 @@ final private class LiveTransactionRepository[F[_]](
 
   override def getAllWithCategories(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
-      .aggregate[TransactionEntity](
-        Aggregate
-          .matchBy(userIdEq(uid) && notHidden && dateRangeSelector(from, to))
-          .sort(Sort.desc(Field.Date))
-          .lookup("categories", Field.CId, Field.Id, Field.Category)
-          .unwind("$" + Field.Category)
-      )
+      .aggregate[TransactionEntity](findWithCategory(userIdEq(uid) && notHidden && dateRangeSelector(from, to)))
       .all
       .mapList(_.toDomain)
 
@@ -115,6 +118,6 @@ final private class LiveTransactionRepository[F[_]](
 }
 
 object TransactionRepository extends MongoJsonCodecs:
-  def make[F[_]: Async](db: MongoDatabase[F], cs: ClientSession[F]): F[TransactionRepository[F]] =
+  def make[F[_]: Async](db: MongoDatabase[F], cs: ClientSession[F], acid: Boolean = true): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
-      .map(coll => LiveTransactionRepository[F](coll, cs))
+      .map(coll => LiveTransactionRepository[F](coll, cs, acid))

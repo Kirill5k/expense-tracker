@@ -15,8 +15,9 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
   "A TransactionController" when {
     "POST /transactions" should {
       "create new tx" in {
+        val tx = Transactions.tx()
         val svc = mock[TransactionService[IO]]
-        when(svc.create(any[CreateTransaction])).thenReturnIO(Transactions.txid)
+        when(svc.create(any[CreateTransaction])).thenReturnIO(tx)
 
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 

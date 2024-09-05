@@ -5,9 +5,11 @@ import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
 import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.CategoryId
+import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import expensetracker.fixtures.{Categories, Transactions, Users}
 import expensetracker.transaction.{Transaction, TransactionId, TransactionKind}
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.{ClientSession, MongoClient}
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
@@ -23,34 +25,41 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
 
   override protected val mongoPort: Int = 12349
 
-  "A TransactionRepository" should {
+  "A TransactionRepository" when {
 
-    "create new transaction and return id" in {
-      withEmbeddedMongoDb { case (db, sess) =>
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
-          txId <- repo.create(Transactions.create())
-          txs  <- repo.getAll(Users.uid1, None, None)
-        yield (txId, txs)
+    "create" should {
+      "create new transaction and return it with category" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            txs  <- repo.getAllWithCategories(Users.uid1, None, None)
+          yield {
+            txs must have size 1
+            tx mustBe txs.head
+          }
+        }
+      }
 
-        result.map { case (txId, txs) =>
-          txs must have size 1
-          val tx = txs.head
-          tx.id mustBe txId
+      "return an error when trying to create a transaction with invalid category" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            catid = CategoryId(ObjectId.gen)
+            res <- repo.create(Transactions.create(catid = catid)).attempt
+          yield res mustBe Left(AppError.CategoryDoesNotExist(catid))
         }
       }
     }
 
     "return existing transactions from db" in {
       withEmbeddedMongoDb { case (db, sess) =>
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
+        for
+          repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create())
           _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
           txs  <- repo.getAll(Users.uid1, None, None)
-        yield txs
-
-        result.map { txs =>
+        yield {
           txs must have size 2
           txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
@@ -62,7 +71,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
     "return existing transactions with categories from db" in {
       withEmbeddedMongoDb { case (db, sess) =>
         val result = for
-          repo <- TransactionRepository.make(db, sess)
+          repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create())
           _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
           txs  <- repo.getAllWithCategories(Users.uid1, None, None)
@@ -78,16 +87,12 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
 
     "search transactions by date" in {
       withEmbeddedMongoDb { case (db, sess) =>
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
+        for
+          repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(1)))
           _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(3)))
           txs  <- repo.getAll(Users.uid1, Some(Instant.now().minus(2, ChronoUnit.DAYS)), None)
-        yield txs
-
-        result.map { txs =>
-          txs must have size 1
-        }
+        yield txs must have size 1
       }
     }
 
@@ -95,89 +100,65 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
       withEmbeddedMongoDb { case (db, sess) =>
         val from = Instant.now().minus(10, ChronoUnit.DAYS)
         val to   = Instant.now().minus(8, ChronoUnit.DAYS)
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
+        for
+          repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(1)))
           _    <- repo.create(Transactions.create(date = Transactions.txdate.minusDays(3)))
           txs  <- repo.getAll(Users.uid1, Some(from), Some(to))
-        yield txs
-
-        result.map { txs =>
-          txs mustBe empty
-        }
+        yield txs mustBe empty
       }
     }
 
     "return tx by id from db" in {
       withEmbeddedMongoDb { case (db, sess) =>
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
-          id   <- repo.create(Transactions.create())
-          tx   <- repo.get(Users.uid1, id)
-        yield tx
-
-        result.map { tx =>
-          tx.userId mustBe Users.uid1
-        }
+        for
+          repo  <- TransactionRepository.make(db, sess, false)
+          newTx <- repo.create(Transactions.create())
+          tx    <- repo.get(Users.uid1, newTx.id)
+        yield tx.userId mustBe Users.uid1
       }
     }
 
     "return error when tx does not exist" in {
       withEmbeddedMongoDb { case (db, sess) =>
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
-          id   <- repo.create(Transactions.create())
-          err  <- repo.get(Users.uid2, id).attempt
-        yield (id, err)
-
-        result.map { case (id, err) =>
-          err mustBe Left(TransactionDoesNotExist(id))
-        }
+        for
+          repo <- TransactionRepository.make(db, sess, false)
+          tx   <- repo.create(Transactions.create())
+          err  <- repo.get(Users.uid2, tx.id).attempt
+        yield err mustBe Left(TransactionDoesNotExist(tx.id))
       }
     }
 
     "not return transactions that belong to other accounts" in {
       withEmbeddedMongoDb { case (db, sess) =>
-        val result = for
-          repo <- TransactionRepository.make(db, sess)
+        for
+          repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create())
           _    <- repo.create(Transactions.create(catid = Categories.cid2, amount = GBP(45.0)))
           txs  <- repo.getAll(Users.uid2, None, None)
-        yield txs
-
-        result.map { txs =>
-          txs must have size 0
-        }
+        yield txs must have size 0
       }
     }
 
     "delete" should {
       "remove account's transaction" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            _    <- repo.delete(Users.uid1, txid)
-            cats <- repo.getAll(Users.uid1, None, None)
-          yield cats
-
-          result.map { txs =>
-            txs must have size 0
-          }
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            _    <- repo.delete(Users.uid1, tx.id)
+            txs  <- repo.getAll(Users.uid1, None, None)
+          yield txs must have size 0
         }
       }
 
       "return error if userId doesn't match" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            res  <- repo.delete(Users.uid2, txid).attempt
-          yield (txid, res)
-
-          result.map { case (txid, res) =>
-            res mustBe Left(TransactionDoesNotExist(txid))
-          }
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            res  <- repo.delete(Users.uid2, tx.id).attempt
+          yield res mustBe Left(TransactionDoesNotExist(tx.id))
         }
       }
     }
@@ -185,30 +166,21 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
     "update" should {
       "update existing tx" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            tx   <- repo.get(Users.uid1, txid)
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
             txs  <- repo.getAll(Users.uid1, None, None)
-          yield (tx, txs)
-
-          result.map { case (tx, txs) =>
-            txs mustBe List(tx.copy(amount = GBP(25.0)))
-          }
+          yield txs mustBe List(tx.copy(category = None, amount = GBP(25.0)))
         }
       }
 
       "return error when tx does not exist" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            res  <- repo.update(Transactions.tx())
-          yield res
-
-          result.attempt.map { res =>
-            res mustBe Left(TransactionDoesNotExist(Transactions.txid))
-          }
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            res  <- repo.update(Transactions.tx()).attempt
+          yield res mustBe Left(TransactionDoesNotExist(Transactions.txid))
         }
       }
     }
@@ -216,45 +188,33 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
     "hide" should {
       "update hidden field of a tx" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            _    <- repo.hide(Users.uid1, txid)
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            _    <- repo.hide(Users.uid1, tx.id)
             txs  <- repo.getAll(Users.uid1, None, None)
-          yield txs
-
-          result.map { res =>
-            res mustBe Nil
-          }
+          yield txs mustBe Nil
         }
       }
 
       "return error when tx does not exist" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            res  <- repo.hide(Users.uid2, txid).attempt
-          yield (txid, res)
-
-          result.map { case (txid, res) =>
-            res mustBe Left(TransactionDoesNotExist(txid))
-          }
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            res  <- repo.hide(Users.uid2, tx.id).attempt
+          yield res mustBe Left(TransactionDoesNotExist(tx.id))
         }
       }
 
       "update hidden field of a tx by category id" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            _    <- repo.create(Transactions.create())
             _    <- repo.hide(Categories.cid, true)
             txs  <- repo.getAll(Users.uid1, None, None)
-          yield txs
-
-          result.map { res =>
-            res mustBe Nil
-          }
+          yield txs mustBe Nil
         }
       }
     }
@@ -262,30 +222,22 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
     "isHidden" should {
       "return status of a hidden tx" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            _    <- repo.hide(Users.uid1, txid)
-            txs  <- repo.isHidden(Users.uid1, txid)
-          yield txs
-
-          result.map { res =>
-            res mustBe true
-          }
+          for
+            repo   <- TransactionRepository.make(db, sess, false)
+            tx     <- repo.create(Transactions.create())
+            _      <- repo.hide(Users.uid1, tx.id)
+            hidden <- repo.isHidden(Users.uid1, tx.id)
+          yield hidden mustBe true
         }
       }
 
       "return status of a displayed tx" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val result = for
-            repo <- TransactionRepository.make(db, sess)
-            txid <- repo.create(Transactions.create())
-            txs  <- repo.isHidden(Users.uid1, txid)
-          yield txs
-
-          result.map { res =>
-            res mustBe false
-          }
+          for
+            repo   <- TransactionRepository.make(db, sess, false)
+            tx     <- repo.create(Transactions.create())
+            hidden <- repo.isHidden(Users.uid1, tx.id)
+          yield hidden mustBe false
         }
       }
     }

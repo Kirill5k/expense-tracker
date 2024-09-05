@@ -12,7 +12,7 @@ trait TransactionService[F[_]] {
   def getAllWithCategories(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(aid: UserId, txid: TransactionId): F[Transaction]
   def delete(aid: UserId, txid: TransactionId): F[Unit]
-  def create(tx: CreateTransaction): F[TransactionId]
+  def create(tx: CreateTransaction): F[Transaction]
   def update(tx: Transaction): F[Unit]
   def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
@@ -21,7 +21,7 @@ trait TransactionService[F[_]] {
 final private class LiveTransactionService[F[_]](
     private val repository: TransactionRepository[F]
 ) extends TransactionService[F] {
-  override def create(tx: CreateTransaction): F[TransactionId] =
+  override def create(tx: CreateTransaction): F[Transaction] =
     repository.create(tx)
 
   override def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =

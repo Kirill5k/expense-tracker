@@ -59,11 +59,11 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "retrieve all txs from db" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturnIO(List(Transactions.tx()))
+      when(repo.getAll(any[UserId], anyOpt[Instant], anyOpt[Instant])).thenReturnIO(List(Transactions.tx()))
 
       val from = Instant.now().minusSeconds(5L)
-      val to = Instant.now().plusSeconds(5L)
-      
+      val to   = Instant.now().plusSeconds(5L)
+
       val result = for
         svc <- TransactionService.make[IO](repo)
         res <- svc.getAll(Users.uid1, Some(from), Some(to))
@@ -77,10 +77,10 @@ class TransactionServiceSpec extends IOWordSpec {
 
     "retrieve all txs from db with categories" in {
       val repo = mock[TransactionRepository[IO]]
-      when(repo.getAllWithCategories(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturnIO(List(Transactions.tx()))
+      when(repo.getAllWithCategories(any[UserId], anyOpt[Instant], anyOpt[Instant])).thenReturnIO(List(Transactions.tx()))
 
       val from = Instant.now().minusSeconds(5L)
-      val to = Instant.now().plusSeconds(5L)
+      val to   = Instant.now().plusSeconds(5L)
 
       val result = for
         svc <- TransactionService.make[IO](repo)
@@ -94,8 +94,9 @@ class TransactionServiceSpec extends IOWordSpec {
     }
 
     "create new tx in db" in {
+      val tx   = Transactions.tx()
       val repo = mock[TransactionRepository[IO]]
-      when(repo.create(any[CreateTransaction])).thenReturnIO(Transactions.txid)
+      when(repo.create(any[CreateTransaction])).thenReturnIO(tx)
 
       val create = Transactions.create()
       val result = for
@@ -105,7 +106,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
       result.asserting { res =>
         verify(repo).create(create)
-        res mustBe Transactions.txid
+        res mustBe tx
       }
     }
 
@@ -135,7 +136,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
       result.asserting { res =>
         verify(repo).hide(Categories.cid, true)
-        res mustBe()
+        res mustBe ()
       }
     }
   }

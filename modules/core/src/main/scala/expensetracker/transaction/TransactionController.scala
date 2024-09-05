@@ -49,7 +49,7 @@ final private class TransactionController[F[_]](
       .serverLogic { session => req =>
         service
           .create(req.toDomain(session.userId))
-          .mapResponse(txid => TransactionController.CreateTransactionResponse(txid.value))
+          .mapResponse(tx => TransactionController.CreateTransactionResponse(tx.id.value))
       }
 
   private def deleteTransaction(using authenticator: Authenticator[F]) =
