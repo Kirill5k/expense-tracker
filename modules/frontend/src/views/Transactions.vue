@@ -30,8 +30,6 @@
           />
 
           <transaction-list
-            :categories="$store.getters.catsByIds"
-            :sort-by="$store.state.sortBy"
             :items="transactions"
             :window-height="windowHeight"
             @edit="edit"

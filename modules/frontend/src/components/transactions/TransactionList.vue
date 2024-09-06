@@ -92,18 +92,6 @@ export default {
       type: Array,
       required: true
     },
-    editable: {
-      type: Boolean,
-      default: false
-    },
-    categories: {
-      type: Object,
-      required: true
-    },
-    sortBy: {
-      type: Object,
-      required: true
-    },
     windowHeight: {
       type: Number,
       required: true
@@ -116,9 +104,9 @@ export default {
     tableData () {
       return this.items.map((item, i) => ({
         id: item.id,
-        color: this.categories[item.categoryId].color,
-        icon: this.categories[item.categoryId].icon,
-        tx: { name: this.categories[item.categoryId].name, note: item.note, displayDate: this.formatTxDate(item), date: item.date, tags: item.tags },
+        color: item.category.color,
+        icon: item.category.icon,
+        tx: { name: item.category.name, note: item.note, displayDate: this.formatTxDate(item), date: item.date, tags: item.tags },
         amount: { value: item.amount.value, kind: item.kind, currency: item.amount.currency.code },
         original: item,
         last: i === this.items.length - 1

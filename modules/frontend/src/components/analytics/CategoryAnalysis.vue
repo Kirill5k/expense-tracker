@@ -70,6 +70,7 @@ export default {
     }
   },
   computed: {
+    // TODO: remove this.categories. use tx.category instead
     breakdown () {
       const grouped = this.transactions.reduce((acc, tx) => {
         const catId = tx.categoryId
