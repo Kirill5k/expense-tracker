@@ -70,13 +70,10 @@ export default new Vuex.Store({
     filteredCats: state => state.categories.filter(c => c.hidden !== true),
     incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
     expenseCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'expense'),
-    catsByIds: (state, getters) => getters.filteredCats.reduce((acc, el) => {
-      acc[el.id] = el
-      return acc
-    }, {}),
     filteredTransactions: state => state.transactions
       .filter(t => state.filterBy.includes(t.categoryId))
       .filter(t => t.hidden !== true)
+      .filter(t => t.category.hidden !== true)
       .filter(t => t.amount.currency.code === state.user.settings.currency.code)
       .filter(t => state.user.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
     displayedTransactions: (state, getters) => withinDates(getters.filteredTransactions, state.displayDate),
@@ -127,11 +124,14 @@ export default new Vuex.Store({
       state.filterBy = [...state.filterBy, category.id]
     },
     updateCategory (state, updatedCategory) {
-      state.categories = state.categories.map(c => c.id === updatedCategory.id ? updatedCategory : c)
+      const catId = updatedCategory.id
+      state.categories = state.categories.map(c => c.id === catId ? updatedCategory : c)
+      state.transactions = state.transactions.map(tx => tx.categoryId === catId ? {...tx, category: updatedCategory} : tx)
     },
     hideCategory (state, { id, hidden }) {
       state.categories = state.categories.map(cat => cat.id === id ? { ...cat, hidden } : cat)
       state.filterBy = hidden ? state.filterBy.filter(c => c !== id) : [...state.filterBy, id]
+      state.transactions = state.transactions.map(t => t.categoryId === id ? {...t, category: {...t.category, hidden}} : t)
     },
     setTransactions (state, txs) {
       state.transactions = txs

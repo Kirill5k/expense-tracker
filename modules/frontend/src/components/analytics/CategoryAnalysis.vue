@@ -48,10 +48,6 @@ export default {
       type: Array,
       required: true
     },
-    categories: {
-      type: Object,
-      required: true
-    },
     windowHeight: {
       type: Number,
       required: true
@@ -70,12 +66,11 @@ export default {
     }
   },
   computed: {
-    // TODO: remove this.categories. use tx.category instead
     breakdown () {
       const grouped = this.transactions.reduce((acc, tx) => {
         const catId = tx.categoryId
         if (!acc[catId]) {
-          acc[catId] = { count: 0, total: 0, ...this.categories[catId] }
+          acc[catId] = { count: 0, total: 0, ...tx.category }
         }
         acc[catId] = { ...acc[catId], count: acc[catId].count + 1, total: tx.amount.value + acc[catId].total }
         return acc
