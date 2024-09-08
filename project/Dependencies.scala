@@ -2,16 +2,16 @@ import sbt.*
 
 object Dependencies {
   object Versions {
-    val mongo4cats  = "0.7.9"
+    val mongo4cats  = "0.7.10"
     val commonScala = "0.1.21"
     val pureConfig  = "0.17.7"
-    val circe       = "0.14.9"
+    val circe       = "0.14.10"
     val squants     = "1.8.3"
     val bcrypt      = "4.3.0"
     val refined     = "0.11.2"
-    val logback     = "1.5.7"
+    val logback     = "1.5.8"
     val log4cats    = "2.7.0"
-    val tapir       = "1.11.1"
+    val tapir       = "1.11.2"
     val jwt         = "10.0.1"
   }
 
