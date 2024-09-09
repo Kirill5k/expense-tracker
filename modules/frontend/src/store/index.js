@@ -126,12 +126,12 @@ export default new Vuex.Store({
     updateCategory (state, updatedCategory) {
       const catId = updatedCategory.id
       state.categories = state.categories.map(c => c.id === catId ? updatedCategory : c)
-      state.transactions = state.transactions.map(tx => tx.categoryId === catId ? {...tx, category: updatedCategory} : tx)
+      state.transactions = state.transactions.map(tx => tx.categoryId === catId ? { ...tx, category: updatedCategory } : tx)
     },
     hideCategory (state, { id, hidden }) {
       state.categories = state.categories.map(cat => cat.id === id ? { ...cat, hidden } : cat)
       state.filterBy = hidden ? state.filterBy.filter(c => c !== id) : [...state.filterBy, id]
-      state.transactions = state.transactions.map(t => t.categoryId === id ? {...t, category: {...t.category, hidden}} : t)
+      state.transactions = state.transactions.map(t => t.categoryId === id ? { ...t, category: { ...t.category, hidden } } : t)
     },
     setTransactions (state, txs) {
       state.transactions = txs
