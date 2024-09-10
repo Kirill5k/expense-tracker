@@ -2,14 +2,7 @@
   "name": "expense-tracker",
   "main": "expo-router/entry",
   "version": "1.0.0",
-  "scripts": {
-    "start": "expo start",
-    "android": "DARK_MODE=media DARK_MODE=media expo run:android",
-    "ios": "DARK_MODE=media DARK_MODE=media expo run:ios",
-    "web": "DARK_MODE=media DARK_MODE=media expo start --web",
-    "test": "jest --watchAll",
-    "postinstall": "patch-package"
-  },
+gl
   "jest": {
     "preset": "jest-expo"
   },

@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { vstackStyle } from './styles';
 
-const VStack = React.forwardRef<React.ElementRef(
+const VStack = React.forwardRef(
   ({ className, space, reversed, ...props }, ref) => {
     return (
       <View
