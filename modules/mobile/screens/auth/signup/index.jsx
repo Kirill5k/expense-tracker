@@ -5,7 +5,6 @@ import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { LinkText } from "@/components/ui/link";
-// import Link from "@unitools/link";
 import { Link, router } from 'expo-router';
 import {
   FormControl,
@@ -37,7 +36,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle } from "lucide-react-native";
 import { GoogleIcon } from "@/assets/icons/google";
 import { Pressable } from "@/components/ui/pressable";
-// import useRouter from "@unitools/router";
 import { AuthLayout } from "../layout";
 
 const signUpSchema = z.object({
@@ -48,20 +46,14 @@ const signUpSchema = z.object({
       .regex(new RegExp(".*[A-Z].*"), "One uppercase character")
       .regex(new RegExp(".*[a-z].*"), "One lowercase character")
       .regex(new RegExp(".*\\d.*"), "One number")
-      .regex(
-          new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"),
-          "One special character"
-      ),
+      .regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character"),
   confirmpassword: z
       .string()
       .min(6, "Must be at least 8 characters in length")
       .regex(new RegExp(".*[A-Z].*"), "One uppercase character")
       .regex(new RegExp(".*[a-z].*"), "One lowercase character")
       .regex(new RegExp(".*\\d.*"), "One number")
-      .regex(
-          new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"),
-          "One special character"
-      ),
+      .regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character"),
   rememberme: z.boolean().optional(),
 });
 
@@ -71,9 +63,7 @@ const SignUpWithLeftBackground = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    resolver: zodResolver(signUpSchema),
-  });
+  } = useForm({resolver: zodResolver(signUpSchema)});
   const toast = useToast();
 
   const onSubmit = (data) => {
@@ -105,29 +95,15 @@ const SignUpWithLeftBackground = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleState = () => {
-    setShowPassword((showState) => {
-      return !showState;
-    });
-  };
-  const handleConfirmPwState = () => {
-    setShowConfirmPassword((showState) => {
-      return !showState;
-    });
-  };
   const handleKeyPress = () => {
     Keyboard.dismiss();
     handleSubmit(onSubmit)();
   };
-  // const router = useRouter();
+
   return (
       <VStack className="max-w-[440px] w-full" space="md">
         <VStack className="md:items-center" space="md">
-          <Pressable
-              onPress={() => {
-                router.back();
-              }}
-          >
+          <Pressable onPress={() => router.back()}>
             <Icon
                 as={ArrowLeftIcon}
                 className="md:hidden stroke-background-800"
@@ -138,7 +114,7 @@ const SignUpWithLeftBackground = () => {
             <Heading className="md:text-center" size="3xl">
               Sign up
             </Heading>
-            <Text>Sign up and start using gluestack</Text>
+            <Text>Sign up and start using Expense-Tracker</Text>
           </VStack>
         </VStack>
         <VStack className="w-full">
@@ -152,14 +128,9 @@ const SignUpWithLeftBackground = () => {
                   defaultValue=""
                   control={control}
                   rules={{
-                    validate: async (value) => {
-                      try {
-                        await signUpSchema.parseAsync({ email: value });
-                        return true;
-                      } catch (error) {
-                        return error.message;
-                      }
-                    },
+                    validate: email => signUpSchema.parseAsync({ email })
+                        .then(() => true)
+                        .catch(e => e.message),
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                       <Input>
@@ -192,16 +163,9 @@ const SignUpWithLeftBackground = () => {
                   name="password"
                   control={control}
                   rules={{
-                    validate: async (value) => {
-                      try {
-                        await signUpSchema.parseAsync({
-                          password: value,
-                        });
-                        return true;
-                      } catch (error) {
-                        return error.message;
-                      }
-                    },
+                    validate: password => signUpSchema.parseAsync({password})
+                        .then(() => true)
+                        .catch(e => e.message),
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                       <Input>
@@ -215,7 +179,7 @@ const SignUpWithLeftBackground = () => {
                             returnKeyType="done"
                             type={showPassword ? "text" : "password"}
                         />
-                        <InputSlot onPress={handleState} className="pr-3">
+                        <InputSlot onPress={() => setShowPassword((s) => !s)} className="pr-3">
                           <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
                         </InputSlot>
                       </Input>
@@ -237,16 +201,9 @@ const SignUpWithLeftBackground = () => {
                   name="confirmpassword"
                   control={control}
                   rules={{
-                    validate: async (value) => {
-                      try {
-                        await signUpSchema.parseAsync({
-                          password: value,
-                        });
-                        return true;
-                      } catch (error) {
-                        return error.message;
-                      }
-                    },
+                    validate: password => signUpSchema.parseAsync({password})
+                        .then(() => true)
+                        .catch(e => e.message),
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                       <Input>
@@ -261,7 +218,7 @@ const SignUpWithLeftBackground = () => {
                             type={showConfirmPassword ? "text" : "password"}
                         />
 
-                        <InputSlot onPress={handleConfirmPwState} className="pr-3">
+                        <InputSlot onPress={() => setShowConfirmPassword(s => !s)} className="pr-3">
                           <InputIcon
                               as={showConfirmPassword ? EyeIcon : EyeOffIcon}
                           />

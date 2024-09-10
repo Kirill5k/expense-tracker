@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
-import { Heading } from "@/components/ui/heading";
-import { Text } from "@/components/ui/text";
-import { LinkText } from "@/components/ui/link";
-import { Link, router } from 'expo-router';
+import React, {useState} from "react";
+import {Toast, ToastTitle, useToast} from "@/components/ui/toast";
+import {HStack} from "@/components/ui/hstack";
+import {VStack} from "@/components/ui/vstack";
+import {Heading} from "@/components/ui/heading";
+import {Text} from "@/components/ui/text";
+import {LinkText} from "@/components/ui/link";
+import {Link, router} from 'expo-router';
 import {
   FormControl,
   FormControlError,
@@ -14,7 +14,7 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/components/ui/form-control";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import {Input, InputField, InputIcon, InputSlot} from "@/components/ui/input";
 import {
   Checkbox,
   CheckboxIcon,
@@ -28,15 +28,15 @@ import {
   EyeOffIcon,
   Icon,
 } from "@/components/ui/icon";
-import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
-import { Keyboard } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertTriangle } from "lucide-react-native";
-import { GoogleIcon } from "@/assets/icons/google";
-import { Pressable } from "@/components/ui/pressable";
-import { AuthLayout } from "../layout";
+import {Button, ButtonText, ButtonIcon} from "@/components/ui/button";
+import {Keyboard} from "react-native";
+import {useForm, Controller} from "react-hook-form";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {AlertTriangle} from "lucide-react-native";
+import {GoogleIcon} from "@/assets/icons/google";
+import {Pressable} from "@/components/ui/pressable";
+import {AuthLayout} from "../layout";
 
 const USERS = [
   {
@@ -68,24 +68,22 @@ const LoginWithLeftBackground = () => {
   const onSubmit = (data) => {
     const user = USERS.find((element) => element.email === data.email);
     if (user) {
-      if (user.password !== data.password)
-        setIsValid({ email: true, password: false });
-      else {
-        setIsValid({ email: true, password: true });
+      if (user.password !== data.password) {
+        setIsValid({email: true, password: false});
+      } else {
+        setIsValid({email: true, password: true});
         toast.show({
           placement: "bottom right",
-          render: ({ id }) => {
-            return (
-                <Toast nativeID={id} variant="accent" action="success">
-                  <ToastTitle>Logged in successfully!</ToastTitle>
-                </Toast>
-            );
-          },
+          render: ({id}) => (
+              <Toast nativeID={id} variant="accent" action="success">
+                <ToastTitle>Logged in successfully!</ToastTitle>
+              </Toast>
+          ),
         });
         reset();
       }
     } else {
-      setIsValid({ email: false, password: true });
+      setIsValid({email: false, password: true});
     }
   };
   const [showPassword, setShowPassword] = useState(false);
@@ -126,11 +124,11 @@ const LoginWithLeftBackground = () => {
                   name="email"
                   control={control}
                   rules={{
-                    validate: (email) => loginSchema.parseAsync({ email })
+                    validate: (email) => loginSchema.parseAsync({email})
                         .then(() => true)
                         .catch((e) => e.message)
                   }}
-                  render={({ field: { onChange, onBlur, value } }) => (
+                  render={({field: {onChange, onBlur, value}}) => (
                       <Input>
                         <InputField
                             placeholder="Enter email"
@@ -144,7 +142,7 @@ const LoginWithLeftBackground = () => {
                   )}
               />
               <FormControlError>
-                <FormControlErrorIcon as={AlertTriangle} />
+                <FormControlErrorIcon as={AlertTriangle}/>
                 <FormControlErrorText>
                   {formState.errors?.email?.message || (!isValid.email && "Email ID not found")}
                 </FormControlErrorText>
@@ -162,11 +160,11 @@ const LoginWithLeftBackground = () => {
                   name="password"
                   control={control}
                   rules={{
-                    validate: password => loginSchema.parseAsync({ password })
+                    validate: password => loginSchema.parseAsync({password})
                         .then(() => true)
                         .catch(e => e.message)
                   }}
-                  render={({ field: { onChange, onBlur, value } }) => (
+                  render={({field: {onChange, onBlur, value}}) => (
                       <Input>
                         <InputField
                             type={showPassword ? "text" : "password"}
@@ -178,13 +176,13 @@ const LoginWithLeftBackground = () => {
                             returnKeyType="done"
                         />
                         <InputSlot onPress={() => setShowPassword((s) => !s)} className="pr-3">
-                          <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+                          <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}/>
                         </InputSlot>
                       </Input>
                   )}
               />
               <FormControlError>
-                <FormControlErrorIcon as={AlertTriangle} />
+                <FormControlErrorIcon as={AlertTriangle}/>
                 <FormControlErrorText>
                   {formState.errors?.password?.message || (!isValid.password && "Password was incorrect")}
                 </FormControlErrorText>
@@ -195,7 +193,7 @@ const LoginWithLeftBackground = () => {
                   name="rememberme"
                   defaultValue={false}
                   control={control}
-                  render={({ field: { onChange, value } }) => (
+                  render={({field: {onChange, value}}) => (
                       <Checkbox
                           size="sm"
                           value="Remember me"
@@ -204,7 +202,7 @@ const LoginWithLeftBackground = () => {
                           aria-label="Remember me"
                       >
                         <CheckboxIndicator>
-                          <CheckboxIcon as={CheckIcon} />
+                          <CheckboxIcon as={CheckIcon}/>
                         </CheckboxIndicator>
                         <CheckboxLabel>Remember me</CheckboxLabel>
                       </Checkbox>
@@ -225,12 +223,13 @@ const LoginWithLeftBackground = () => {
                 variant="outline"
                 action="secondary"
                 className="w-full gap-1"
-                onPress={() => {}}
+                onPress={() => {
+                }}
             >
               <ButtonText className="font-medium">
                 Continue with Google
               </ButtonText>
-              <ButtonIcon as={GoogleIcon} />
+              <ButtonIcon as={GoogleIcon}/>
             </Button>
           </VStack>
           <HStack className="self-center" space="sm">
@@ -252,7 +251,7 @@ const LoginWithLeftBackground = () => {
 export const SignIn = () => {
   return (
       <AuthLayout>
-        <LoginWithLeftBackground />
+        <LoginWithLeftBackground/>
       </AuthLayout>
   );
 };
