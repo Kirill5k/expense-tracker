@@ -54,13 +54,13 @@ function RootLayoutNav() {
   const isDark = colorScheme === ' dark'
 
   return (
-      <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
-        <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{headerShown: false}}>
-            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-            <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
-          </Stack>
-        </ThemeProvider>
-      </GluestackUIProvider>
-  )
+    <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
+      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{headerShown: false}}>
+          <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+          <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
+        </Stack>
+      </ThemeProvider>
+    </GluestackUIProvider>
+  );
 }
