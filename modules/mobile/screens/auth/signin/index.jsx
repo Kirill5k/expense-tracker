@@ -5,7 +5,6 @@ import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { LinkText } from "@/components/ui/link";
-// import Link from "@unitools/link";
 import { Link, router } from 'expo-router';
 import {
   FormControl,
@@ -37,7 +36,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle } from "lucide-react-native";
 import { GoogleIcon } from "@/assets/icons/google";
 import { Pressable } from "@/components/ui/pressable";
-// import useRouter from "@unitools/router";
 import { AuthLayout } from "../layout";
 
 const USERS = [
@@ -62,27 +60,18 @@ const loginSchema = z.object({
 });
 
 const LoginWithLeftBackground = () => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(loginSchema),
-  });
+  const {control, handleSubmit, reset, formState} = useForm({resolver: zodResolver(loginSchema)});
+
   const toast = useToast();
-  const [validated, setValidated] = useState({
-    emailValid: true,
-    passwordValid: true,
-  });
+  const [isValid, setIsValid] = useState({email: true, password: true,});
 
   const onSubmit = (data) => {
     const user = USERS.find((element) => element.email === data.email);
     if (user) {
       if (user.password !== data.password)
-        setValidated({ emailValid: true, passwordValid: false });
+        setIsValid({ email: true, password: false });
       else {
-        setValidated({ emailValid: true, passwordValid: true });
+        setIsValid({ email: true, password: true });
         toast.show({
           placement: "bottom right",
           render: ({ id }) => {
@@ -96,29 +85,20 @@ const LoginWithLeftBackground = () => {
         reset();
       }
     } else {
-      setValidated({ emailValid: false, passwordValid: true });
+      setIsValid({ email: false, password: true });
     }
   };
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleState = () => {
-    setShowPassword((showState) => {
-      return !showState;
-    });
-  };
   const handleKeyPress = () => {
     Keyboard.dismiss();
     handleSubmit(onSubmit)();
   };
-  // const router = useRouter();
+
   return (
       <VStack className="max-w-[440px] w-full" space="md">
         <VStack className="md:items-center" space="md">
-          <Pressable
-              onPress={() => {
-                router.back();
-              }}
-          >
+          <Pressable onPress={() => router.back()}>
             <Icon
                 as={ArrowLeftIcon}
                 className="md:hidden text-background-800"
@@ -129,13 +109,13 @@ const LoginWithLeftBackground = () => {
             <Heading className="md:text-center" size="3xl">
               Log in
             </Heading>
-            <Text>Login to start using gluestack</Text>
+            <Text>Login to start using Expense-Tracker</Text>
           </VStack>
         </VStack>
         <VStack className="w-full">
           <VStack space="xl" className="w-full">
             <FormControl
-                isInvalid={!!errors?.email || !validated.emailValid}
+                isInvalid={!!formState.errors?.email || !isValid.email}
                 className="w-full"
             >
               <FormControlLabel>
@@ -146,14 +126,9 @@ const LoginWithLeftBackground = () => {
                   name="email"
                   control={control}
                   rules={{
-                    validate: async (value) => {
-                      try {
-                        await loginSchema.parseAsync({ email: value });
-                        return true;
-                      } catch (error) {
-                        return error.message;
-                      }
-                    },
+                    validate: (email) => loginSchema.parseAsync({ email })
+                        .then(() => true)
+                        .catch((e) => e.message)
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                       <Input>
@@ -171,14 +146,12 @@ const LoginWithLeftBackground = () => {
               <FormControlError>
                 <FormControlErrorIcon as={AlertTriangle} />
                 <FormControlErrorText>
-                  {errors?.email?.message ||
-                      (!validated.emailValid && "Email ID not found")}
+                  {formState.errors?.email?.message || (!isValid.email && "Email ID not found")}
                 </FormControlErrorText>
               </FormControlError>
             </FormControl>
-            {/* Label Message */}
             <FormControl
-                isInvalid={!!errors.password || !validated.passwordValid}
+                isInvalid={!!formState.errors.password || !isValid.password}
                 className="w-full"
             >
               <FormControlLabel>
@@ -189,14 +162,9 @@ const LoginWithLeftBackground = () => {
                   name="password"
                   control={control}
                   rules={{
-                    validate: async (value) => {
-                      try {
-                        await loginSchema.parseAsync({ password: value });
-                        return true;
-                      } catch (error) {
-                        return error.message;
-                      }
-                    },
+                    validate: password => loginSchema.parseAsync({ password })
+                        .then(() => true)
+                        .catch(e => e.message)
                   }}
                   render={({ field: { onChange, onBlur, value } }) => (
                       <Input>
@@ -209,7 +177,7 @@ const LoginWithLeftBackground = () => {
                             onSubmitEditing={handleKeyPress}
                             returnKeyType="done"
                         />
-                        <InputSlot onPress={handleState} className="pr-3">
+                        <InputSlot onPress={() => setShowPassword((s) => !s)} className="pr-3">
                           <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
                         </InputSlot>
                       </Input>
@@ -218,12 +186,11 @@ const LoginWithLeftBackground = () => {
               <FormControlError>
                 <FormControlErrorIcon as={AlertTriangle} />
                 <FormControlErrorText>
-                  {errors?.password?.message ||
-                      (!validated.passwordValid && "Password was incorrect")}
+                  {formState.errors?.password?.message || (!isValid.password && "Password was incorrect")}
                 </FormControlErrorText>
               </FormControlError>
             </FormControl>
-            <HStack className="w-full justify-between ">
+            <HStack className="w-full justify-between">
               <Controller
                   name="rememberme"
                   defaultValue={false}
