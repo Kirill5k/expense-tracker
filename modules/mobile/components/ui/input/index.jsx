@@ -160,7 +160,7 @@ cssInterop(UIInput.Icon, {
   },
 });
 
-const Input = React.forwardRef<React.ElementRef(
+const Input = React.forwardRef(
   ({ className, variant = 'outline', size = 'md', ...props }, ref) => {
     return (
       <UIInput

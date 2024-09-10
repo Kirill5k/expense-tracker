@@ -2,7 +2,7 @@ import React from 'react';
 import { Text as RNText } from 'react-native';
 import { textStyle } from './styles';
 
-const Text = React.forwardRef<React.ElementRef(
+const Text = React.forwardRef(
   (
     {
       className,
