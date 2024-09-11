@@ -1,4 +1,4 @@
-import Config from 'react-native-config'
+import config from '@/config'
 
 const DEFAULT_REQUEST_PARAMS = {
   mode: 'cors',
@@ -7,7 +7,7 @@ const DEFAULT_REQUEST_PARAMS = {
 }
 
 const dispatchReq = (path, request, params = {}) => {
-  let fullUrl = `${Config.API_URL}/${path}`
+  let fullUrl = `${config.apiUrl}/${path}`
   const args = Object.entries(params).map(([k, v]) => v ? `${k}=${v}` : '').join('&')
   if (args) {
     fullUrl += `?${args}`

@@ -1,4 +1,4 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import Clients from './clients'
 
 const useStore = create((set, get) => ({
