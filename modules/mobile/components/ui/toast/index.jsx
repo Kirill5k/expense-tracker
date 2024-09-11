@@ -14,10 +14,7 @@ import { withStyleContextAndStates } from '@gluestack-ui/nativewind-utils/withSt
 export const useToast = createToastHook(Motion.View, AnimatePresence);
 const SCOPE = 'TOAST';
 export const UIToast = createToast({
-  Root:
-    Platform.OS === 'web'
-      ? withStyleContext(View, SCOPE)
-      : withStyleContextAndStates(View, SCOPE),
+  Root: Platform.OS === 'web' ? withStyleContext(View, SCOPE) : withStyleContextAndStates(View, SCOPE),
   Title: Text,
   Description: Text,
 });

@@ -37,21 +37,7 @@ import {AlertTriangle} from "lucide-react-native";
 import {GoogleIcon} from "@/assets/icons/google";
 import {Pressable} from "@/components/ui/pressable";
 import {AuthLayout} from "../layout";
-
-const USERS = [
-  {
-    email: "gabrial@gmail.com",
-    password: "Gabrial@123",
-  },
-  {
-    email: "tom@gmail.com",
-    password: "Tom@123",
-  },
-  {
-    email: "thomas@gmail.com",
-    password: "Thomas@1234",
-  },
-];
+import useStore from "@/store";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
@@ -59,13 +45,13 @@ const loginSchema = z.object({
   rememberme: z.boolean().optional(),
 });
 
-const LoginWithLeftBackground = () => {
+const LoginForm = ({onSubmit}) => {
   const {control, handleSubmit, reset, formState} = useForm({resolver: zodResolver(loginSchema)});
 
   const toast = useToast();
   const [isValid, setIsValid] = useState({email: true, password: true,});
 
-  const onSubmit = (data) => {
+  const _onSubmit = (data) => {
     const user = USERS.find((element) => element.email === data.email);
     if (user) {
       if (user.password !== data.password) {
@@ -249,9 +235,13 @@ const LoginWithLeftBackground = () => {
 };
 
 export const SignIn = () => {
+  const { login } = useStore();
+
+
+
   return (
       <AuthLayout>
-        <LoginWithLeftBackground/>
+        <LoginForm onSubmit={login}/>
       </AuthLayout>
   );
 };
