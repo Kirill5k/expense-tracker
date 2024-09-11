@@ -48,30 +48,6 @@ const loginSchema = z.object({
 const LoginForm = ({onSubmit}) => {
   const {control, handleSubmit, reset, formState} = useForm({resolver: zodResolver(loginSchema)});
 
-  const toast = useToast();
-  const [isValid, setIsValid] = useState({email: true, password: true,});
-
-  const _onSubmit = (data) => {
-    const user = USERS.find((element) => element.email === data.email);
-    if (user) {
-      if (user.password !== data.password) {
-        setIsValid({email: true, password: false});
-      } else {
-        setIsValid({email: true, password: true});
-        toast.show({
-          placement: "bottom right",
-          render: ({id}) => (
-              <Toast nativeID={id} variant="accent" action="success">
-                <ToastTitle>Logged in successfully!</ToastTitle>
-              </Toast>
-          ),
-        });
-        reset();
-      }
-    } else {
-      setIsValid({email: false, password: true});
-    }
-  };
   const [showPassword, setShowPassword] = useState(false);
 
   const handleKeyPress = () => {
@@ -99,7 +75,7 @@ const LoginForm = ({onSubmit}) => {
         <VStack className="w-full">
           <VStack space="xl" className="w-full">
             <FormControl
-                isInvalid={!!formState.errors?.email || !isValid.email}
+                isInvalid={!!formState.errors?.email}
                 className="w-full"
             >
               <FormControlLabel>
@@ -130,12 +106,12 @@ const LoginForm = ({onSubmit}) => {
               <FormControlError>
                 <FormControlErrorIcon as={AlertTriangle}/>
                 <FormControlErrorText>
-                  {formState.errors?.email?.message || (!isValid.email && "Email ID not found")}
+                  {formState.errors?.email?.message}
                 </FormControlErrorText>
               </FormControlError>
             </FormControl>
             <FormControl
-                isInvalid={!!formState.errors.password || !isValid.password}
+                isInvalid={!!formState.errors.password}
                 className="w-full"
             >
               <FormControlLabel>
@@ -170,7 +146,7 @@ const LoginForm = ({onSubmit}) => {
               <FormControlError>
                 <FormControlErrorIcon as={AlertTriangle}/>
                 <FormControlErrorText>
-                  {formState.errors?.password?.message || (!isValid.password && "Password was incorrect")}
+                  {formState.errors?.password?.message}
                 </FormControlErrorText>
               </FormControlError>
             </FormControl>
@@ -236,8 +212,6 @@ const LoginForm = ({onSubmit}) => {
 
 export const SignIn = () => {
   const { login } = useStore();
-
-
 
   return (
       <AuthLayout>
