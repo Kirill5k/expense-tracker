@@ -29,7 +29,10 @@ const useStore = create((set, get) => ({
         set({alert: Alerts.SESSION_EXPIRED})
       }
     } catch (e) {
-      get().setErrorAlert(e.message)
+      if (!e.status) {
+        get().setErrorAlert(e.message)
+      }
+      // TODO: Maybe clear user
     } finally {
       set({isLoading: false})
     }
@@ -42,7 +45,7 @@ const useStore = create((set, get) => ({
       set({accessToken: access_token})
       set({alert: Alerts.LOGIN_SUCCESS})
     } catch (err) {
-      if (err.status) {
+      if (err.status === 401) {
         return Promise.reject(new Error(err.message))
       } else {
         get().setErrorAlert(err.message)

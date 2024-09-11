@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import colors from "tailwindcss/colors";
 import {HStack} from "@/components/ui/hstack";
 import {VStack} from "@/components/ui/vstack";
 import {Heading} from "@/components/ui/heading";
@@ -55,13 +56,18 @@ const LoginForm = ({onSubmit}) => {
     setLoginError('')
     onSubmit(data)
         .then(() => reset())
-        .catch(e => setLoginError(e))
+        .catch(e => {
+          console.log(e.message)
+          setLoginError(e.message)
+        })
         .then(() => setLoading(false))
   }
 
   const handleKeyPress = () => {
-    Keyboard.dismiss();
-    handleSubmit(handleFormSubmit)();
+    if (!loading) {
+      Keyboard.dismiss();
+      handleSubmit(handleFormSubmit)();
+    }
   };
 
   return (
@@ -120,7 +126,7 @@ const LoginForm = ({onSubmit}) => {
               </FormControlError>
             </FormControl>
             <FormControl
-                isInvalid={!!formState.errors.password}
+                isInvalid={!!formState.errors.password || !!loginError}
                 className="w-full"
             >
               <FormControlLabel>
@@ -189,7 +195,7 @@ const LoginForm = ({onSubmit}) => {
           <VStack className="w-full my-7 " space="lg">
             <Button className="w-full" onPress={handleSubmit(handleFormSubmit)} isDisabled={loading}>
               {loading && <ButtonSpinner color={colors.gray[400]} />}
-              <ButtonText className="font-medium">{loading ? 'Logging you in' : 'Log in'}</ButtonText>
+              <ButtonText className="font-medium">{loading ? 'Logging you in...' : 'Log in'}</ButtonText>
             </Button>
             <Button
                 variant="outline"

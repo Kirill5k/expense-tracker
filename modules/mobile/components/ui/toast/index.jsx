@@ -204,7 +204,6 @@ export const withToast = (ChildComponent) => {
     const toast = useToast();
 
     React.useEffect(() => {
-      console.log('useEffect', toastType, toastMessage)
       if (toastMessage) {
         const newId = Math.random()
         setToastId(newId)
@@ -220,8 +219,6 @@ export const withToast = (ChildComponent) => {
           ),
           onCloseComplete: onToastClose,
         });
-      } else if (!toastMessage && toast.isActive(toastId)) {
-        toast.close(toastId)
       }
     }, [toastMessage]);
 
