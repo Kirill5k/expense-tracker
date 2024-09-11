@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {Toast, ToastTitle, useToast} from "@/components/ui/toast";
 import {HStack} from "@/components/ui/hstack";
 import {VStack} from "@/components/ui/vstack";
 import {Heading} from "@/components/ui/heading";
@@ -28,7 +27,7 @@ import {
   EyeOffIcon,
   Icon,
 } from "@/components/ui/icon";
-import {Button, ButtonText, ButtonIcon} from "@/components/ui/button";
+import {Button, ButtonText, ButtonIcon, ButtonSpinner} from "@/components/ui/button";
 import {Keyboard} from "react-native";
 import {useForm, Controller} from "react-hook-form";
 import {z} from "zod";
@@ -47,12 +46,22 @@ const loginSchema = z.object({
 
 const LoginForm = ({onSubmit}) => {
   const {control, handleSubmit, reset, formState} = useForm({resolver: zodResolver(loginSchema)});
-
+  const [loginError, setLoginError] = useState('')
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false)
+
+  const handleFormSubmit = (data) => {
+    setLoading(true)
+    setLoginError('')
+    onSubmit(data)
+        .then(() => reset())
+        .catch(e => setLoginError(e))
+        .then(() => setLoading(false))
+  }
 
   const handleKeyPress = () => {
     Keyboard.dismiss();
-    handleSubmit(onSubmit)();
+    handleSubmit(handleFormSubmit)();
   };
 
   return (
@@ -146,7 +155,7 @@ const LoginForm = ({onSubmit}) => {
               <FormControlError>
                 <FormControlErrorIcon as={AlertTriangle}/>
                 <FormControlErrorText>
-                  {formState.errors?.password?.message}
+                  {formState.errors?.password?.message || loginError}
                 </FormControlErrorText>
               </FormControlError>
             </FormControl>
@@ -178,16 +187,15 @@ const LoginForm = ({onSubmit}) => {
             </HStack>
           </VStack>
           <VStack className="w-full my-7 " space="lg">
-            <Button className="w-full" onPress={handleSubmit(onSubmit)}>
-              <ButtonText className="font-medium">Log in</ButtonText>
+            <Button className="w-full" onPress={handleSubmit(handleFormSubmit)} isDisabled={loading}>
+              {loading && <ButtonSpinner color={colors.gray[400]} />}
+              <ButtonText className="font-medium">{loading ? 'Logging you in' : 'Log in'}</ButtonText>
             </Button>
             <Button
                 variant="outline"
                 action="secondary"
                 className="w-full gap-1"
-                onPress={() => {
-                }}
-            >
+                onPress={() => {}}>
               <ButtonText className="font-medium">
                 Continue with Google
               </ButtonText>

@@ -2,17 +2,6 @@ import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
 
-const handleError = (get, { status, message }, rethrow = false) => {
-  if (status === 403) {
-    get().clearUser()
-  } else {
-    get().setErrorAlert(message)
-  }
-  if (rethrow) {
-    return Promise.reject(new Error(message))
-  }
-}
-
 const useStore = create((set, get) => ({
   alert: null,
   isOnline: true,
@@ -40,7 +29,6 @@ const useStore = create((set, get) => ({
         set({alert: Alerts.SESSION_EXPIRED})
       }
     } catch (e) {
-      get().clearUser()
       get().setErrorAlert(e.message)
     } finally {
       set({isLoading: false})
@@ -52,8 +40,13 @@ const useStore = create((set, get) => ({
       set({isLoading: true})
       const {access_token} = await Clients.get(get().isOnline).login(creds)
       set({accessToken: access_token})
+      set({alert: Alerts.LOGIN_SUCCESS})
     } catch (err) {
-      return handleError(get, err, true)
+      if (err.status) {
+        return Promise.reject(new Error(err.message))
+      } else {
+        get().setErrorAlert(err.message)
+      }
     } finally {
       set({isLoading: false})
     }
