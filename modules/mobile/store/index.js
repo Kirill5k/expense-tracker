@@ -2,12 +2,22 @@ import { create } from 'zustand'
 import Clients from './clients'
 
 const useStore = create((set, get) => ({
+  alert: {
+    type: 'error',
+    message: null,
+    show: false
+  },
   isOnline: true,
   isLoading: false,
   isAuthenticated: false,
   accessToken: null,
   user: {},
-  resetUser: () => set({
+  clearAlert: () => set({
+    type: 'error',
+    message: null,
+    show: false
+  }),
+  clearUser: () => set({
     isAuthenticated: false,
     accessToken: null,
     user: {},
@@ -23,11 +33,11 @@ const useStore = create((set, get) => ({
             set({user, categories: user.categories})
             // TODO: get transactions
           } else {
-            get().resetUser()
+            get().clearUser()
             // TODO: display alerts
           }
         })
-        .catch(() => get().resetUser())
+        .catch(() => get().clearUser())
         .then(() => set({isLoading: false}))
   }
 }));
