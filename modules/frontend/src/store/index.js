@@ -151,7 +151,7 @@ export default new Vuex.Store({
     logout (state) {
       state.isAuthenticated = false
       state.accessToken = null
-      state.transaction = []
+      state.transactions = []
       state.categories = []
       state.user = {}
       state.displayDate = {}
