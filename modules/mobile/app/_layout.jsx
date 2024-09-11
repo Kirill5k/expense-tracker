@@ -55,12 +55,22 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === ' dark'
 
+  return (
+    <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
+      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+        <ScreenStackWithToast/>
+      </ThemeProvider>
+    </GluestackUIProvider>
+  );
+}
+
+const ScreenStackWithToast = () => {
   const { alert, clearAlert } = useStore();
   const [toastId, setToastId] = useState(0)
   const toast = useToast();
 
   useEffect(() => {
-    console.log('useEffect-toas', alert)
+    console.log('useEffect', alert)
     if (alert) {
       const newId = Math.random()
       setToastId(newId)
@@ -82,16 +92,9 @@ function RootLayoutNav() {
   }, [alert]);
 
   return (
-    <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
-      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{headerShown: false}}>
-          <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-          <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
-          <Stack.Screen name="auth/signin" />
-          <Stack.Screen name="auth/signup" />
-          <Stack.Screen name="auth/forgot-password" />
-        </Stack>
-      </ThemeProvider>
-    </GluestackUIProvider>
-  );
+      <Stack screenOptions={{headerShown: false}}>
+        <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+        <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
+      </Stack>
+  )
 }
