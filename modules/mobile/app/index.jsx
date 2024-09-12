@@ -23,10 +23,7 @@ const Index = () => {
           <Button onPress={() => router.push("auth/signup")}>
             <ButtonText>Sign Up</ButtonText>
           </Button>
-          <Button onPress={() => router.push("(tabs)")}>
-            <ButtonText>Tabs</ButtonText>
-          </Button>
-          <Button onPress={() => router.push("(dashboard)")}>
+          <Button onPress={() => router.push("/analytics")}>
             <ButtonText>Dashboard</ButtonText>
           </Button>
         </VStack>

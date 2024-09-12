@@ -6,7 +6,7 @@ import {Tabs} from 'expo-router';
 import React from "react";
 
 const tabs = [
-  {icon: 'chart-bar', text: 'Analytics', path: 'index'},
+  {icon: 'chart-bar', text: 'Analytics', path: 'analytics'},
   {icon: 'bank-transfer', text: 'Transactions', path: 'transactions'},
   {icon: 'shape', text: 'Categories', path: 'categories'},
   {icon: 'account-cog', text: 'Settings', path: 'settings'}

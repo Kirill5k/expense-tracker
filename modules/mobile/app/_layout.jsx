@@ -67,7 +67,6 @@ function RootLayoutNav() {
           >
             <Stack.Screen name="(dashboard)"/>
             <Stack.Screen name="auth/signup"/>
-            <Stack.Screen name="(tabs)"/>
           </StackWithToast>
         </ThemeProvider>
       </GluestackUIProvider>
