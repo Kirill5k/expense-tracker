@@ -56,11 +56,11 @@ const LoginForm = ({onSubmit}) => {
     setLoginError('')
     onSubmit(data)
         .then(() => reset())
-        .catch(e => {
-          console.log(e.message)
-          setLoginError(e.message)
+        .catch(e => setLoginError(e.message))
+        .then(() => {
+          setLoading(false)
+          //router.push('/') //TODO: Navigate to analytics/transactions
         })
-        .then(() => setLoading(false))
   }
 
   const handleKeyPress = () => {

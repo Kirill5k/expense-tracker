@@ -6,11 +6,13 @@ import { VStack } from "@/components/ui/vstack";
 import useStore from "@/store";
 
 const Index = () => {
-  const { getUser } = useStore();
+  const { getUser, accessToken } = useStore();
 
   useEffect(() => {
-    getUser()
-  }, [])
+    if (accessToken) {
+      getUser()
+    }
+  }, [accessToken])
 
   return (
       <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">
