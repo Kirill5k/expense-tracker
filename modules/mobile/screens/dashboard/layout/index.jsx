@@ -1,29 +1,18 @@
-import {useState} from "react";
-import {Box} from "@/components/ui/box";
-import {VStack} from "@/components/ui/vstack";
-import {HStack} from "@/components/ui/hstack";
 import {SafeAreaView} from "@/components/ui/safe-area-view";
-import {BarChartIcon} from "@/assets/icons/bar-chart";
-import {BankTransferIcon} from "@/assets/icons/bank-transfer";
-import {ProfileIcon} from "@/assets/icons/profile";
-import {ShapeIcon} from "@/assets/icons/shape";
-import MobileFooter from "./mobile-footer";
-import MobileHeader from "./mobile-header";
-import WebHeader from "./web-header";
-import Sidebar from "./sidebar";
+import {useColorScheme} from '@/components/useColorScheme';
+import colors from '@/constants/colors';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import {Tabs} from 'expo-router';
+import React from "react";
 
-const bottomTabs = [
-  {icon: BarChartIcon, text: 'Analytics', path: '/dashboard/analytics'},
-  {icon: BankTransferIcon, text: 'Transactions', path: '/dashboard/transactions'},
-  {icon: ShapeIcon, text: 'Categories', path: '/dashboard/categories'},
-  {icon: ProfileIcon, text: 'Settings', path: '/dashboard/settings'}
+const tabs = [
+  {icon: 'chart-bar', text: 'Analytics', path: 'index'},
+  {icon: 'bank-transfer', text: 'Transactions', path: 'transactions'},
+  {icon: 'shape', text: 'Categories', path: 'categories'},
+  {icon: 'account-cog', text: 'Settings', path: 'settings'}
 ]
 
-const DashboardLayout = ({children, title, showSidebar = true}) => {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(showSidebar);
-
-  return (
-      <SafeAreaView className="w-full h-full">
+/* OLD LAYOUT
         <VStack className="h-full w-full bg-background-0">
           <Box className="md:hidden">
             <MobileHeader title={title}/>
@@ -41,6 +30,40 @@ const DashboardLayout = ({children, title, showSidebar = true}) => {
           </VStack>
         </VStack>
         <MobileFooter tabs={bottomTabs}/>
+ */
+
+const DashboardLayout = () => {
+  const colorScheme = useColorScheme();
+
+  return (
+      <SafeAreaView className="w-full h-full">
+        <Tabs
+            screenOptions={{
+              tabBarActiveTintColor: colors[colorScheme || 'light'].text,
+              // Disable the static render of the header on web
+              // to prevent a hydration error in React Navigation v6.
+              headerShown: false,
+              tabBarStyle: { marginBottom: 5 }
+            }}
+        >
+          {tabs.map((tab, i) => (
+              <Tabs.Screen
+                  key={i}
+                  name={tab.path}
+                  options={{
+                    title: tab.text,
+                    tabBarIcon: ({ color }) => (
+                        <MaterialCommunityIcons
+                            name={tab.icon}
+                            size={28}
+                            style={{ marginBottom: -3 }}
+                            color={color}
+                        />
+                    ),
+                  }}
+              />
+          ))}
+        </Tabs>
       </SafeAreaView>
   );
 };
