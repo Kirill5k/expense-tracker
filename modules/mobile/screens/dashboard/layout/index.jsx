@@ -34,7 +34,7 @@ const tabs = [
 
 const DashboardLayout = () => {
   const colorScheme = useColorScheme();
-
+  // docs: https://reactnavigation.org/docs/bottom-tab-navigator/#options
   return (
       <SafeAreaView className="w-full h-full">
         <Tabs
