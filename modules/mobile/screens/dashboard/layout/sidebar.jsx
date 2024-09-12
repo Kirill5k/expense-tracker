@@ -16,12 +16,12 @@ const Sidebar = ({tabs}) => {
         {tabs.map((tab, index) => (
                 <Pressable
                     key={index}
-                    className={`hover:bg-background-50 text-typography-500 m-2 p-2 w-12 h-12}`}
+                    className="hover:bg-background-50"
                     onPress={() => router.push(tab.path)}
                 >
                   <Icon
                       as={tab.icon}
-                      className={`w-[55px] h-9 stroke-background-800 ${isActive(tab) ? "fill-background-800" : "fill-none"}`}
+                      className={`w-[55px] h-9 ${isActive(tab) ? 'text-typography-900 stroke-background-900' : 'text-typography-400 stroke-background-400'}`}
                   />
                 </Pressable>
             )

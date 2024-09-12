@@ -19,7 +19,7 @@ const bottomTabs = [
   {icon: ProfileIcon, text: 'Settings', path: '/dashboard/settings'}
 ]
 
-const DashboardLayout = ({children, showSidebar, title}) => {
+const DashboardLayout = ({children, title, showSidebar = true}) => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(showSidebar);
 
   return (

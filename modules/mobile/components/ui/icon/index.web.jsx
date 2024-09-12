@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { createIcon } from '@gluestack-ui/icon';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
-import { VariantProps } from '@gluestack-ui/nativewind-utils';
 
 const accessClassName = (style) => {
   const obj = style[0];
@@ -123,6 +122,12 @@ const createIconUI = ({ ...props }) => {
   });
 };
 export { createIconUI as createIcon };
+
+export const createIconFromSvg = ({viewBox, path}) => createIcon({
+  Root: Svg,
+  viewBox,
+  path
+})
 
 // All Icons
 const AddIcon = createIcon({

@@ -22,17 +22,17 @@ const MobileFooter = ({tabs}) => {
         {tabs.map((tab, index) => {
               return (
                   <Pressable
-                      className="px-0.5 flex-1 flex-col items-center w-10 h-10"
+                      className="px-0.5 flex-1 flex-col items-center"
                       key={index}
                       onPress={() => router.push(tab.path)}
                   >
                     <Icon
                         as={tab.icon}
-                        size="sm"
-                        className=""
+                        size="xl"
+                        className={isActive(tab) ? 'text-typography-1000' : 'text-typography-400'}
                     />
                     <Text
-                        className={`text-xs text-center ${isActive(tab) ? 'text-typography-1000' : 'text-typography-600'}`}>
+                        className={`text-xs text-center ${isActive(tab) ? 'text-typography-1000' : 'text-typography-400'}`}>
                       {tab.text}
                     </Text>
                   </Pressable>
