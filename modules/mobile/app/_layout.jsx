@@ -19,7 +19,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'dashboard/analytics',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -54,22 +54,23 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === ' dark'
-  const { alert, clearAlert } = useStore();
+  const {alert, clearAlert} = useStore();
 
   return (
-    <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
-      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-        <StackWithToast
-            screenOptions={{headerShown: false}}
-            onToastClose={clearAlert}
-            toastType={alert?.type}
-            toastMessage={alert?.message}
-        >
-          <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-          <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
-        </StackWithToast>
-      </ThemeProvider>
-    </GluestackUIProvider>
+      <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
+        <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+          <StackWithToast
+              screenOptions={{headerShown: false}}
+              onToastClose={clearAlert}
+              toastType={alert?.type}
+              toastMessage={alert?.message}
+          >
+            <Stack.Screen name="auth/signin" options={{headerShown: false}}/>
+            <Stack.Screen name="auth/signup" options={{headerShown: false}}/>
+            <Stack.Screen name="dashboard/analytics" options={{headerShown: false}}/>
+          </StackWithToast>
+        </ThemeProvider>
+      </GluestackUIProvider>
   );
 }
 

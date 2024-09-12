@@ -1,25 +1,48 @@
-import { VStack } from "@/components/ui/vstack";
-import { SafeAreaView } from "@/components/ui/safe-area-view";
-import { ScrollView } from "@/components/ui/scroll-view";
+import {useState} from "react";
+import {Box} from "@/components/ui/box";
+import {VStack} from "@/components/ui/vstack";
+import {HStack} from "@/components/ui/hstack";
+import {SafeAreaView} from "@/components/ui/safe-area-view";
+import {BarChartIcon} from "@/assets/icons/bar-chart";
+import {BankTransferIcon} from "@/assets/icons/bank-transfer";
+import {ProfileIcon} from "@/assets/icons/profile";
+import {ShapeIcon} from "@/assets/icons/shape";
+import MobileFooter from "./mobile-footer";
+import MobileHeader from "./mobile-header";
+import WebHeader from "./web-header";
+import Sidebar from "./sidebar";
 
 const bottomTabs = [
-  {iconName: Home}
+  {icon: BarChartIcon, text: 'Analytics', path: '/dashboard/analytics'},
+  {icon: BankTransferIcon, text: 'Transactions', path: '/dashboard/transactions'},
+  {icon: ShapeIcon, text: 'Categories', path: '/dashboard/categories'},
+  {icon: ProfileIcon, text: 'Settings', path: '/dashboard/settings'}
 ]
 
+const DashboardLayout = ({children, showSidebar, title}) => {
+  const [isSidebarVisible, setIsSidebarVisible] = useState(showSidebar);
 
-export const DashboardLayout = (props) => {
   return (
       <SafeAreaView className="w-full h-full">
-        <ScrollView
-            className="w-full h-full"
-            contentContainerStyle={{ flexGrow: 1 }}
-        >
-          <VStack className="w-full h-full bg-background-0 flex-grow justify-center">
-            <VStack className="md:items-center md:justify-center flex-1 w-full p-9 md:gap-10 gap-16 md:m-auto md:w-[500px] h-full">
-              {props.children}
-            </VStack>
+        <VStack className="h-full w-full bg-background-0">
+          <Box className="md:hidden">
+            <MobileHeader title={title}/>
+          </Box>
+          <Box className="hidden md:flex">
+            <WebHeader onSidebarToggle={() => setIsSidebarVisible(!isSidebarVisible)} title={title}/>
+          </Box>
+          <VStack className="h-full w-full">
+            <HStack className="h-full w-full">
+              <Box className="hidden md:flex h-full">
+                {isSidebarVisible && <Sidebar tabs={bottomTabs}/>}
+              </Box>
+              <VStack className="w-full">{children}</VStack>
+            </HStack>
           </VStack>
-        </ScrollView>
+        </VStack>
+        <MobileFooter tabs={bottomTabs}/>
       </SafeAreaView>
   );
 };
+
+export default DashboardLayout
