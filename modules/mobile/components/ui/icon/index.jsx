@@ -114,11 +114,11 @@ export const Icon = React.forwardRef(
   }
 );
 
-export const MaterialIcon = ({code, displaySize, displayColor}) => (
+export const MaterialIcon = ({code, dsize, dcolor}) => (
     <MaterialCommunityIcons
-        name={code}
-        size={displaySize}
-        color={displayColor}
+        name={code.replace('mdi-', '')}
+        size={dsize}
+        color={dcolor}
     />
 )
 
