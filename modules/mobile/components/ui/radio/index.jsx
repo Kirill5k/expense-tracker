@@ -156,7 +156,7 @@ cssInterop(IconWrapper, {
   },
 });
 
-const Radio = React.forwardRef<React.ElementRef(
+const Radio = React.forwardRef(
   ({ className, size = 'md', ...props }, ref) => {
     return (
       <UIRadio
