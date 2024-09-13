@@ -4,6 +4,7 @@ import { createIcon } from '@gluestack-ui/icon';
 import { Path, Svg } from 'react-native-svg';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import { cssInterop } from 'nativewind';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const PrimitiveIcon = React.forwardRef(
   (
@@ -112,6 +113,14 @@ export const Icon = React.forwardRef(
     );
   }
 );
+
+export const MaterialIcon = ({code, displaySize, displayColor}) => (
+    <MaterialCommunityIcons
+        name={code}
+        size={displaySize}
+        color={displayColor}
+    />
+)
 
 const createIconUI = ({ ...props }) => {
   const UIIconCreateIcon = createIcon({ Root: Svg, ...props });

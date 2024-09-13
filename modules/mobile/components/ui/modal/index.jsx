@@ -90,7 +90,7 @@ const modalFooterStyle = tva({
   base: 'flex-row justify-end items-center gap-2',
 });
 
-const Modal = React.forwardRe(
+const Modal = React.forwardRef(
   ({ className, size = 'md', ...props }, ref) => (
     <UIModal
       ref={ref}

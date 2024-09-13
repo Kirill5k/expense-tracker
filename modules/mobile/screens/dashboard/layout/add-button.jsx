@@ -1,14 +1,6 @@
 import {Fab, FabIcon} from "@/components/ui/fab";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import {MaterialIcon} from "@/components/ui/icon/index";
 import colors from '@/constants/colors';
-
-const Icon = ({mode}) => (
-    <MaterialCommunityIcons
-        name="plus"
-        size={18}
-        color={colors[mode].text}
-    />
-)
 
 const AddButton = ({onPress, mode}) => {
   return (
@@ -18,9 +10,11 @@ const AddButton = ({onPress, mode}) => {
           className="bg-background-50"
       >
         <FabIcon
-            as={Icon}
+            as={MaterialIcon}
             className="fill-typography-50 text-primary-100"
-            mode={mode}
+            code="plus"
+            displaySize={18}
+            displayColor={colors[mode].text}
         />
       </Fab>
   )

@@ -1,3 +1,4 @@
+import React, {useState} from 'react'
 import {VStack} from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Box } from "@/components/ui/box";
@@ -5,6 +6,7 @@ import { Heading } from "@/components/ui/heading";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { ScrollView } from "@/components/ui/scroll-view";
 import TransactionList from './transaction-list'
+import TransactionModal from './transaction-modal'
 import AddButton from '@/screens/dashboard/layout/add-button'
 
 const transactions = [
@@ -623,7 +625,9 @@ const transactions = [
 ]
 
 export const Transactions = () => {
+  const [showModal, setShowModal] = useState(false)
   //TODO: Get mode from state
+  const mode = 'light'
   return (
       <VStack
           className="p-4 pb-0 md:px-10 md:pt-6 md:pb-0 h-full w-full max-w-[1500px] self-center bg-background-0"
@@ -634,8 +638,13 @@ export const Transactions = () => {
         </Heading>
         <TransactionList items={transactions}/>
         <AddButton
-            onPress={() => console.log('adding new tx')}
-            mode="light"
+            onPress={() => setShowModal(true)}
+            mode={mode}
+        />
+        <TransactionModal
+            mode={mode}
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
         />
       </VStack>
   )
