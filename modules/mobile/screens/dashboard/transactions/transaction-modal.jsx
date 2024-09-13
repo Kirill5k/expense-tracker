@@ -10,9 +10,9 @@ import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/compon
 import {Heading} from "@/components/ui/heading";
 import {HStack} from "@/components/ui/hstack";
 import {VStack} from "@/components/ui/vstack";
-import {Button, ButtonText} from "@/components/ui/button";
+import {Button, ButtonText, ButtonIcon} from "@/components/ui/button";
 import {Box} from "@/components/ui/box";
-import {CircleIcon} from "@/components/ui/icon";
+import {CircleIcon, MaterialIcon} from "@/components/ui/icon";
 import {
   FormControl,
   FormControlError,
@@ -28,7 +28,8 @@ import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Keyboard} from "react-native";
 import {AlertTriangle} from "lucide-react-native";
-import React from "react";
+import React, {useState} from "react";
+import {Popover, PopoverBackdrop, PopoverContent, PopoverBody} from "@/components/ui/popover";
 
 const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
@@ -42,30 +43,12 @@ const transactionSchema = z.object({
   note: z.string().optional(),
 });
 
-/*
-<RadioGroup value={values} onChange={setValues}>
-      <HStack space="2xl">
-        <Radio value="Credit Card">
-          <RadioIndicator>
-            <RadioIcon as={CircleIcon} />
-          </RadioIndicator>
-          <RadioLabel>Credit Card</RadioLabel>
-        </Radio>
-        <Radio value="Cash On Delivery">
-          <RadioIndicator>
-            <RadioIcon as={CircleIcon} />
-          </RadioIndicator>
-          <RadioLabel>Cash On Delivery</RadioLabel>
-        </Radio>
-      </HStack>
-    </RadioGroup>
- */
-
 const TransactionForm = ({onSubmit}) => {
   const {control, handleSubmit, reset, formState} = useForm({resolver: zodResolver(transactionSchema)});
 
   const handleFormSubmit = (data) => {
     console.log(data)
+    reset()
   }
 
   const handleKeyPress = () => {
@@ -73,31 +56,36 @@ const TransactionForm = ({onSubmit}) => {
     handleSubmit(handleFormSubmit)();
   };
 
+  /*
+  TODO:
+   - kind on change -> clear category
+   */
+
   return (
-      <VStack space="xl" className="w-full">
-        <FormControl isInvalid={!!formState.errors.email}>
+      <VStack space="md" className="w-full">
+        <FormControl isInvalid={!!formState.errors.kind}>
           <Controller
               name="kind"
               defaultValue="expense"
               control={control}
               rules={{
-                validate: kind => transactionSchema.parseAsync({ kind })
+                validate: kind => transactionSchema.parseAsync({kind})
                     .then(() => true)
                     .catch(e => e.message),
               }}
-              render={({ field: { onChange, onBlur, value } }) => (
+              render={({field: {onChange, onBlur, value}}) => (
                   <RadioGroup value={value} onChange={onChange}>
                     <HStack space="md">
                       <Radio value="expense" size="md">
                         <RadioLabel className="p-1">Expense</RadioLabel>
                         <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
+                          <RadioIcon as={CircleIcon}/>
                         </RadioIndicator>
                       </Radio>
                       <Radio value="income" size="md">
                         <RadioLabel className="p-1">Income</RadioLabel>
                         <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
+                          <RadioIcon as={CircleIcon}/>
                         </RadioIndicator>
                       </Radio>
                     </HStack>
@@ -105,9 +93,66 @@ const TransactionForm = ({onSubmit}) => {
               )}
           />
           <FormControlError>
-            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorIcon size="md" as={AlertTriangle}/>
             <FormControlErrorText>
-              {formState.errors?.email?.message}
+              {formState.errors?.kind?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+        <FormControl isInvalid={!!formState.errors.category}>
+          <Controller
+              name="category"
+              defaultValue={null}
+              control={control}
+              rules={{
+                validate: kind => transactionSchema.parseAsync({kind})
+                    .then(() => true)
+                    .catch(e => e.message),
+              }}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <Popover
+                      offset={-32}
+                      size="sm"
+                      isOpen={openCategorySelect}
+                      onOpen={() => setOpenCategorySelect(true)}
+                      onClose={() => setOpenCategorySelect(false)}
+                      trigger={(triggerProps) => {
+                        return (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                action="secondary"
+                                className="justify-between"
+                                {...triggerProps}
+                            >
+                              <ButtonText>Category</ButtonText>
+                              {openCategorySelect && <ButtonIcon as={MaterialIcon} code="chevron-up"/>}
+                              {!openCategorySelect && <ButtonIcon as={MaterialIcon} code="chevron-down"/>}
+                            </Button>
+                        )
+                      }}
+                  >
+                    <PopoverBackdrop/>
+                    <PopoverContent className="bg-background-100 w-full max-w-[660px] p-0 shadow-hard-5">
+                      <PopoverBody>
+                        <Button className="w-full" onPress={() => onChange('Option 1')}>
+                          <ButtonText>Option 1</ButtonText>
+                        </Button>
+                        <Button onPress={() => onChange('Option 2')}>
+                          <ButtonText>Option 2</ButtonText>
+                        </Button>
+                        <Button onPress={() => onChange('Option 3')}>
+                          <ButtonText>Option 3</ButtonText>
+                        </Button>
+                      </PopoverBody>
+                    </PopoverContent>
+                  </Popover>
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle}/>
+            <FormControlErrorText>
+              {formState.errors?.category?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>

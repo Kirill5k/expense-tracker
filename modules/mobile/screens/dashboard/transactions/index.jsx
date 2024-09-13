@@ -8,6 +8,7 @@ import { ScrollView } from "@/components/ui/scroll-view";
 import TransactionList from './transaction-list'
 import TransactionModal from './transaction-modal'
 import AddButton from '@/screens/dashboard/layout/add-button'
+import Select from "@/components/custom/select";
 
 const transactions = [
   {
@@ -624,8 +625,127 @@ const transactions = [
   }
 ]
 
+const categories = [
+  {
+    id: "61041a74937c172e4baaa550",
+    name: "Holidays",
+    icon: "mdi-bag-carry-on",
+    kind: "expense",
+    color: "#00BFA5"
+  },
+  {
+    id: "61041a74937c172e4baaa54c",
+    name: "Health",
+    icon: "mdi-pill",
+    kind: "expense",
+    color: "#00E5FF"
+  },
+  {
+    id: "61041a74937c172e4baaa54b",
+    name: "Transport",
+    icon: "mdi-bus",
+    kind: "expense",
+    color: "#FF6D00"
+  },
+  {
+    id: "61041a74937c172e4baaa548",
+    name: "Utilities",
+    icon: "mdi-home",
+    kind: "expense",
+    color: "#AEEA00"
+  },
+  {
+    id: "61041a74937c172e4baaa547",
+    name: "Shopping",
+    icon: "mdi-shopping",
+    kind: "expense",
+    color: "#C51162"
+  },
+  {
+    id: "61041a74937c172e4baaa54a",
+    name: "Transfer",
+    icon: "mdi-send",
+    kind: "expense",
+    color: "#6200EA"
+  },
+  {
+    id: "61041a74937c172e4baaa553",
+    name: "Investments",
+    icon: "mdi-chart-areaspline",
+    kind: "income",
+    color: "#2962FF"
+  },
+  {
+    id: "61041a74937c172e4baaa551",
+    name: "Bills",
+    icon: "mdi-gauge",
+    kind: "expense",
+    color: "#304FFE"
+  },
+  {
+    id: "61041a74937c172e4baaa552",
+    name: "Salary",
+    icon: "mdi-bank",
+    kind: "income",
+    color: "#00C853"
+  },
+  {
+    id: "61041a74937c172e4baaa555",
+    name: "Entertainment",
+    icon: "mdi-drama-masks",
+    kind: "expense",
+    color: "#D500F9"
+  },
+  {
+    id: "61041a74937c172e4baaa546",
+    name: "Groceries",
+    icon: "mdi-cart",
+    kind: "expense",
+    color: "#EBFE30"
+  },
+  {
+    id: "61041a74937c172e4baaa549",
+    name: "Restaraunts",
+    icon: "mdi-silverware",
+    kind: "expense",
+    color: "#FFC400"
+  },
+  {
+    id: "61041a74937c172e4baaa54d",
+    name: "General",
+    icon: "mdi-cash",
+    kind: "expense",
+    color: "#AA00FF"
+  },
+  {
+    id: "61041a74937c172e4baaa554",
+    name: "Savings",
+    icon: "mdi-piggy-bank",
+    kind: "income",
+    color: "#FF6F00"
+  },
+  {
+    id: "6104f79c01728b1b40758bb6",
+    name: "Ebay / cex",
+    icon: "mdi-controller-classic",
+    kind: "expense",
+    color: "#EE0000"
+  },
+  {
+    id: "61b2f47a188fc576d4652eab",
+    name: "Present",
+    icon: "mdi-wallet-giftcard",
+    kind: "expense",
+    color: "#EE00EB"
+  }
+]
+
 export const Transactions = () => {
   const [showModal, setShowModal] = useState(false)
+  const [selVal, setSelVal] = useState(null)
+
+  const catItems = categories.map(c => ({name: c.name, value: c, icon: c.icon}))
+
   //TODO: Get mode from state
   const mode = 'light'
   return (
@@ -636,6 +756,11 @@ export const Transactions = () => {
         <Heading size="2xl" className="font-roboto">
           Transactions
         </Heading>
+        <Select
+            items={catItems}
+            value={selVal}
+            onSelect={setSelVal}
+        />
         <TransactionList items={transactions}/>
         <AddButton
             onPress={() => setShowModal(true)}

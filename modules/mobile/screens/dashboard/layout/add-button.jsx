@@ -13,8 +13,8 @@ const AddButton = ({onPress, mode}) => {
             as={MaterialIcon}
             className="fill-typography-50 text-primary-100"
             code="plus"
-            displaySize={18}
-            displayColor={colors[mode].text}
+            dsize={18}
+            dcolor={colors[mode].text}
         />
       </Fab>
   )
