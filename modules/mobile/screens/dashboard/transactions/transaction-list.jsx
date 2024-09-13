@@ -46,7 +46,7 @@ const TransactionGroup = ({items}) => {
                     {tx.tags.map(t => (
                         <Text
                             key={t}
-                            className="rounded-lg border border-secondary-400 text-typography-900 text-xs font-medium px-1"
+                            className="rounded-lg border border-secondary-300 text-typography-700 text-xs font-medium px-1"
                         >
                           {t}
                         </Text>

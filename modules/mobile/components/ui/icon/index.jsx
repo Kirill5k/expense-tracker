@@ -140,12 +140,14 @@ const AddIcon = createIcon({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        color="currentColor"
       />
       <Path
         d="M5 12H19"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        color="currentColor"
       />
     </>
   ),
