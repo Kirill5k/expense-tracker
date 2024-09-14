@@ -21,7 +21,7 @@ import {Keyboard} from "react-native";
 import {AlertTriangle} from "lucide-react-native";
 import CategorySelect from "@/components/category/select";
 
-const emptyCategory = {id: '', name: 'name', kind: 'expense', color: '#000', icon: ''}
+const emptyCategory = {id: '', name: '', kind: 'expense', color: '#000', icon: ''}
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -49,7 +49,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
     formState,
     setValue,
     watch
-  } = useForm({resolver: zodResolver(transactionSchema)});
+  } = useForm({defaultValues: {kind: 'expense', category: null}, resolver: zodResolver(transactionSchema)});
 
   const [categories, setCategories] = useState(expenseCategories)
 
@@ -64,6 +64,11 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
       setValue('category', null)
     }
   }, [txKind]);
+
+  const values = watch()
+  useEffect(() => {
+    console.log('cat', values)
+  }, [values])
 
   const handleFormSubmit = (data) => {
     console.log(data)
@@ -82,11 +87,6 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               name="kind"
               defaultValue="expense"
               control={control}
-              rules={{
-                validate: kind => transactionSchema.parseAsync({kind})
-                    .then(() => true)
-                    .catch(e => e.message),
-              }}
               render={({field: {onChange, onBlur, value}}) => (
                   <RadioGroup value={value} onChange={onChange}>
                     <HStack space="md">
@@ -116,15 +116,8 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
         <FormControl isInvalid={!!formState.errors.category}>
           <Controller
               name="category"
-              defaultValue={null}
               control={control}
-              rules={{
-                validate: category => transactionSchema.passthrough()
-                    .parseAsync({category: category || {}})
-                    .then(() => true)
-                    .catch(e => e.message),
-              }}
-              render={({field: {onChange, onBlur, value}}) => (
+              render={({field: {onChange, value}}) => (
                   <CategorySelect
                       items={categories}
                       value={value}
@@ -144,11 +137,6 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               name="amount"
               defaultValue=""
               control={control}
-              rules={{
-                validate: amount => transactionSchema.parseAsync({amount})
-                    .then(() => true)
-                    .catch(e => e.message),
-              }}
               render={({field: {onChange, onBlur, value}}) => (
                   <Input
                       variant="outline"
