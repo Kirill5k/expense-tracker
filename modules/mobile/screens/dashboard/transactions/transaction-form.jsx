@@ -21,20 +21,35 @@ import {Keyboard} from "react-native";
 import {AlertTriangle} from "lucide-react-native";
 import CategorySelect from "@/components/category/select";
 
+const emptyCategory = {id: '', name: 'name', kind: 'expense', color: '#000', icon: ''}
+
+const categorySchema = z.object({
+  id: z.string().min(1, 'Category ID is required'),
+  name: z.string().min(1, 'Category name is required'),
+  kind: z.enum(['expense', 'income']),
+  color: z.string().min(1, 'Category color is required'),
+  icon: z.string().min(1, 'Category icon is required'),
+})
+
 const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
-  category: z.object({
-    id: z.string().min(1, 'Category ID is required'),
-    name: z.string().min(1, 'Category name is required'),
-  }).refine((cat) => cat.id && cat.name, {message: 'Category is required'}),
+  category: z.preprocess(c => c || emptyCategory,
+      categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   date: z.string().refine((val) => isValid(parseISO(val)), {message: 'Invalid date format'}),
-  amount: z.number().positive('Please specify the correct amount'),
+  amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
   tags: z.array(z.string()).optional(),
   note: z.string().optional(),
 });
 
 const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currency = '£'}) => {
-  const {control, handleSubmit, reset, formState, setValue, watch} = useForm({resolver: zodResolver(transactionSchema)});
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState,
+    setValue,
+    watch
+  } = useForm({resolver: zodResolver(transactionSchema)});
 
   const [categories, setCategories] = useState(expenseCategories)
 
@@ -92,8 +107,8 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               )}
           />
           <FormControlError>
-            <FormControlErrorIcon size="md" as={AlertTriangle}/>
-            <FormControlErrorText>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
               {formState.errors?.kind?.message}
             </FormControlErrorText>
           </FormControlError>
@@ -104,7 +119,8 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               defaultValue={null}
               control={control}
               rules={{
-                validate: kind => transactionSchema.parseAsync({kind})
+                validate: category => transactionSchema.passthrough()
+                    .parseAsync({category: category || {}})
                     .then(() => true)
                     .catch(e => e.message),
               }}
@@ -117,8 +133,8 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               )}
           />
           <FormControlError>
-            <FormControlErrorIcon size="md" as={AlertTriangle}/>
-            <FormControlErrorText>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
               {formState.errors?.category?.message}
             </FormControlErrorText>
           </FormControlError>
@@ -126,7 +142,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
         <FormControl isInvalid={!!formState.errors.amount}>
           <Controller
               name="amount"
-              defaultValue={null}
+              defaultValue=""
               control={control}
               rules={{
                 validate: amount => transactionSchema.parseAsync({amount})
@@ -138,8 +154,8 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
                       variant="outline"
                       size="sm"
                   >
-                    <InputSlot className="pl-4">
-                      <Text className="text-primary-500">{currency}</Text>
+                    <InputSlot>
+                      <Text className="px-1 pl-5 text-xl text-primary-500">{currency}</Text>
                     </InputSlot>
                     <InputField
                         inputMode="numeric"
@@ -157,8 +173,8 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               )}
           />
           <FormControlError>
-            <FormControlErrorIcon size="md" as={AlertTriangle}/>
-            <FormControlErrorText>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
               {formState.errors?.amount?.message}
             </FormControlErrorText>
           </FormControlError>
