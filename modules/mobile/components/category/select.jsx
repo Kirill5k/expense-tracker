@@ -5,7 +5,7 @@ import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
 import colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
 
-const CategorySelect = ({items, value, onSelect, mode = 'light'}) => {
+const CategorySelect = ({items, value, onSelect, mode}) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const itemsByIds = createLookup(items, c => c.id)
   const [selected, setSelected] = React.useState(value?.id ? new Set([value.id]) : new Set([]))

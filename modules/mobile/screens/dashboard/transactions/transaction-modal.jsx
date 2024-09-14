@@ -14,7 +14,7 @@ import {Box} from "@/components/ui/box";
 import TransactionForm from "./transaction-form";
 
 
-const TransactionModal = ({isOpen, onClose, transaction, currency, incomeCategories, expenseCategories}) => {
+const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}) => {
   return (
       <Box>
         <Modal
@@ -33,6 +33,8 @@ const TransactionModal = ({isOpen, onClose, transaction, currency, incomeCategor
             <ModalBody className="mb-0">
               <VStack space="md">
                 <TransactionForm
+                    mode="light"
+                    currency="£"
                     expenseCategories={expenseCategories}
                     incomeCategories={incomeCategories}
                 />

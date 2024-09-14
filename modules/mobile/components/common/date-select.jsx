@@ -1,18 +1,24 @@
 import React, {useState} from 'react'
+import DateTimePicker from 'react-native-ui-datepicker'
 import {Button, ButtonIcon, ButtonText} from "../ui/button";
+import {Box} from "../ui/box";
 import {MaterialIcon} from "../ui/icon";
+import {Modal, ModalBackdrop, ModalContent, ModalBody} from "../ui/modal";
 import colors from '@/constants/colors'
+import dayjs from 'dayjs'
+import {format} from 'date-fns'
 
-const DatePicker = ({value, onChange, mode}) => {
+const DateSelect = ({value, onSelect, mode}) => {
   const [show, setShow] = useState(false)
 
   return (
-      <Box>
+      <>
         <Button
             size="sm"
             variant="outline"
             action="secondary"
             className="justify-between align-center"
+            onPress={() => setShow(true)}
         >
           <ButtonIcon
               as={MaterialIcon}
@@ -21,19 +27,58 @@ const DatePicker = ({value, onChange, mode}) => {
               dsize={20}
               className="flex-grow-0"
           />
-          <ButtonText className={`flex-grow ${value?.icon ? 'px-2' : 'px-1'}`}>
-            {value?.name ? value.name : 'Category'}
+          <ButtonText className="flex-grow px-2">
+            {format(value, 'dd/MM/yyyy')}
           </ButtonText>
           <ButtonIcon
               className="flex-grow-0"
               as={MaterialIcon}
-              code={isOpen ? 'chevron-up' : 'chevron-down'}
+              code={show ? 'chevron-up' : 'chevron-down'}
               dcolor={value ? colors[mode].tabIconSelected : colors[mode].text}
           />
         </Button>
-      </Box>
+        <Modal
+            isOpen={show}
+            onClose={() => setShow(false)}
+            size="md"
+        >
+          <ModalBackdrop/>
+          <ModalContent className="px-1 py-0 my-0">
+            <ModalBody>
+              <DateTimePicker
+                  mode="single"
+                  date={dayjs(value)}
+                  onChange={(params) => {
+                    onSelect(params.date.toDate())
+                    setTimeout(() => setShow(false), 200)
+                  }}
+                  headerButtonColor={colors[mode].tint}
+                  selectedItemColor={colors[mode].tint}
+                  selectedTextStyle={{
+                    fontWeight: 'bold',
+                    color: colors[mode].background,
+                  }}
+              />
+              <Box className="ml-auto">
+                <Button
+                    size="xs"
+                    action="secondary"
+                    className={`mx-3 ${mode === 'light' ? 'bg-blue-600' : 'bg-blue-300'}`}
+                    onPress={() => {
+                      onSelect(new Date())
+                      setShow(false)
+                    }}
+                >
+                  <ButtonText>
+                    Today
+                  </ButtonText>
+                </Button>
+              </Box>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </>
   )
-
 }
 
-export default DatePicker
+export default DateSelect

@@ -14,12 +14,12 @@ import {
 } from "@/components/ui/form-control";
 import {Input, InputField, InputIcon, InputSlot} from "@/components/ui/input";
 import {z} from "zod"
-import {parseISO, isValid} from 'date-fns'
 import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Keyboard} from "react-native";
 import {AlertTriangle} from "lucide-react-native";
 import CategorySelect from "@/components/category/select";
+import DateSelect from "@/components/common/date-select";
 
 const emptyCategory = {id: '', name: '', kind: 'expense', color: '#000', icon: ''}
 
@@ -35,13 +35,13 @@ const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
   category: z.preprocess(c => c || emptyCategory,
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
-  date: z.string().refine((val) => isValid(parseISO(val)), {message: 'Invalid date format'}),
+  date: z.date().refine((val) => val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
   tags: z.array(z.string()).optional(),
   note: z.string().optional(),
 });
 
-const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currency = '£'}) => {
+const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currency, mode}) => {
   const {
     control,
     handleSubmit,
@@ -49,7 +49,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
     formState,
     setValue,
     watch
-  } = useForm({defaultValues: {kind: 'expense', category: null}, resolver: zodResolver(transactionSchema)});
+  } = useForm({defaultValues: {date: new Date(), kind: 'expense', category: null}, resolver: zodResolver(transactionSchema)});
 
   const [categories, setCategories] = useState(expenseCategories)
 
@@ -119,6 +119,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               control={control}
               render={({field: {onChange, value}}) => (
                   <CategorySelect
+                      mode={mode}
                       items={categories}
                       value={value}
                       onSelect={onChange}
@@ -164,6 +165,25 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
               {formState.errors?.amount?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+        <FormControl isInvalid={!!formState.errors.date}>
+          <Controller
+              name="date"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <DateSelect
+                      mode={mode}
+                      value={value}
+                      onSelect={onChange}
+                  />
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.date?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
