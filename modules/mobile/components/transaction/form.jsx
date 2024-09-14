@@ -3,14 +3,12 @@ import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/compon
 import {Text} from "@/components/ui/text";
 import {HStack} from "@/components/ui/hstack";
 import {VStack} from "@/components/ui/vstack";
-import {CircleIcon, MaterialIcon} from "@/components/ui/icon";
+import {CircleIcon} from "@/components/ui/icon";
 import {
   FormControl,
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
-  FormControlLabel,
-  FormControlLabelText,
 } from "@/components/ui/form-control";
 import {Textarea, TextareaInput} from "@/components/ui/textarea";
 import {Input, InputField, InputSlot} from "@/components/ui/input";
@@ -21,6 +19,7 @@ import {Keyboard} from "react-native";
 import {AlertTriangle} from "lucide-react-native";
 import CategorySelect from "@/components/category/select";
 import DateSelect from "@/components/common/date-select";
+import TagsInput from "@/components/common/tags-input";
 
 const emptyCategory = {id: '', name: '', kind: 'expense', color: '#000', icon: ''}
 
@@ -42,6 +41,8 @@ const transactionSchema = z.object({
   note: z.string().max(40, "Note is too long").optional(),
 });
 
+const defaultTransactionValues = {date: new Date(), kind: 'expense', category: null, tags: []}
+
 const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currency, mode}) => {
   const {
     control,
@@ -50,7 +51,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
     formState,
     setValue,
     watch
-  } = useForm({defaultValues: {date: new Date(), kind: 'expense', category: null}, resolver: zodResolver(transactionSchema)});
+  } = useForm({defaultValues: defaultTransactionValues, resolver: zodResolver(transactionSchema)});
 
   const [categories, setCategories] = useState(expenseCategories)
 
@@ -188,6 +189,26 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
+        <FormControl isInvalid={!!formState.errors.tags}>
+          <Controller
+              name="tags"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <TagsInput
+                    placeholder="Tags"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.tags?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
         <FormControl isInvalid={!!formState.errors.note}>
           <Controller
               name="note"
@@ -195,7 +216,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
               render={({field: {onChange, onBlur, value}}) => (
                   <Textarea
                       size="sm"
-                      className="max-h-14 py-0 px-3"
+                      className="h-14 py-0 px-3"
                   >
                     <TextareaInput
                         placeholder="Note"

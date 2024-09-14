@@ -23,8 +23,8 @@ const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}
         <ModalBackdrop/>
         <ModalContent className="p-4">
           <ModalHeader>
-            <Heading size="sm" className="font-semibold">
-              Transaction
+            <Heading size="md" className="font-semibold">
+              New Transaction
             </Heading>
           </ModalHeader>
           <ModalBody className="mb-0">
@@ -37,7 +37,7 @@ const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}
               />
             </VStack>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="pt-3">
             <Button
                 size="xs"
                 variant="outline"
@@ -45,6 +45,12 @@ const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}
                 onPress={onClose}
             >
               <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button
+                size="xs"
+                onPress={onClose}
+            >
+              <ButtonText>Create</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>
