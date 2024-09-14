@@ -12,7 +12,8 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/components/ui/form-control";
-import {Input, InputField, InputIcon, InputSlot} from "@/components/ui/input";
+import {Textarea, TextareaInput} from "@/components/ui/textarea";
+import {Input, InputField, InputSlot} from "@/components/ui/input";
 import {z} from "zod"
 import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -38,7 +39,7 @@ const transactionSchema = z.object({
   date: z.date().refine((val) => val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
   tags: z.array(z.string()).optional(),
-  note: z.string().optional(),
+  note: z.string().max(40, "Note is too long").optional(),
 });
 
 const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currency, mode}) => {
@@ -184,6 +185,32 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
               {formState.errors?.date?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+        <FormControl isInvalid={!!formState.errors.note}>
+          <Controller
+              name="note"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <Textarea
+                      size="sm"
+                      className="max-h-14 py-0 px-3"
+                  >
+                    <TextareaInput
+                        placeholder="Note"
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        onSubmitEditing={handleKeyPress}
+                    />
+                  </Textarea>
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.note?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
