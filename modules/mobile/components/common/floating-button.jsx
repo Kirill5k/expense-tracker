@@ -1,8 +1,8 @@
 import {Fab, FabIcon} from "@/components/ui/fab";
-import {MaterialIcon} from "@/components/ui/icon/index";
+import {MaterialIcon} from "@/components/ui/icon";
 import colors from '@/constants/colors';
 
-const AddButton = ({onPress, mode}) => {
+const FloatingButton = ({onPress, mode, iconCode}) => {
   return (
       <Fab
           onPress={onPress}
@@ -12,7 +12,7 @@ const AddButton = ({onPress, mode}) => {
         <FabIcon
             as={MaterialIcon}
             className="fill-typography-50 text-primary-100"
-            code="plus"
+            code={iconCode}
             dsize={18}
             dcolor={colors[mode].text}
         />
@@ -20,4 +20,4 @@ const AddButton = ({onPress, mode}) => {
   )
 }
 
-export default AddButton
+export default FloatingButton

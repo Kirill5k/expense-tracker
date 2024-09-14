@@ -7,7 +7,7 @@ import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { ScrollView } from "@/components/ui/scroll-view";
 import TransactionList from './transaction-list'
 import TransactionModal from './transaction-modal'
-import AddButton from '@/screens/dashboard/layout/add-button'
+import FloatingButton from '@/components/common/floating-button'
 
 const transactions = [
   {
@@ -756,9 +756,10 @@ export const Transactions = () => {
           Transactions
         </Heading>
         <TransactionList items={transactions}/>
-        <AddButton
+        <FloatingButton
             onPress={() => setShowModal(true)}
             mode={mode}
+            iconCode={"plus"}
         />
         <TransactionModal
             expenseCategories={expenseCategories}
