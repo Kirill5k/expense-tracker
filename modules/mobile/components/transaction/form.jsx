@@ -3,6 +3,7 @@ import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/compon
 import {Text} from "@/components/ui/text";
 import {HStack} from "@/components/ui/hstack";
 import {VStack} from "@/components/ui/vstack";
+import {Button, ButtonText} from "@/components/ui/button";
 import {CircleIcon} from "@/components/ui/icon";
 import {
   FormControl,
@@ -21,8 +22,6 @@ import CategorySelect from "@/components/category/select";
 import DateSelect from "@/components/common/date-select";
 import TagsInput from "@/components/common/tags-input";
 
-const emptyCategory = {id: '', name: '', kind: 'expense', color: '#000', icon: ''}
-
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
   name: z.string().min(1, 'Category name is required'),
@@ -33,7 +32,7 @@ const categorySchema = z.object({
 
 const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
-  category: z.preprocess(c => c || emptyCategory,
+  category: z.preprocess(c => c || {id: '', name: '', kind: 'expense', color: '#000', icon: ''},
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   date: z.date().refine((val) => val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
@@ -41,9 +40,7 @@ const transactionSchema = z.object({
   note: z.string().max(40, "Note is too long").optional(),
 });
 
-const defaultTransactionValues = {date: new Date(), kind: 'expense', category: null, tags: []}
-
-const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currency, mode}) => {
+const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
   const {
     control,
     handleSubmit,
@@ -51,29 +48,37 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
     formState,
     setValue,
     watch
-  } = useForm({defaultValues: defaultTransactionValues, resolver: zodResolver(transactionSchema)});
+  } = useForm({
+    defaultValues: {
+      date: transaction?.date || new Date(),
+      kind: transaction?.kind || 'expense',
+      category: transaction?.category || null,
+      amount: transaction?.amount?.value?.toFixed(2),
+      tags: transaction?.tags || [],
+      note: transaction?.note
+    },
+    resolver: zodResolver(transactionSchema)
+  });
 
-  const [categories, setCategories] = useState(expenseCategories)
+  const [categories, setCategories] = useState(transaction?.kind === 'income' ? incomeCategories : expenseCategories)
+  const [loaded, setLoaded] = useState(false)
 
   const txKind = watch('kind')
   useEffect(() => {
-    if (txKind === 'income') {
+    if (txKind === 'income' && loaded) {
       setCategories(incomeCategories)
       setValue('category', null)
     }
-    if (txKind === 'expense') {
+    if (txKind === 'expense' && loaded) {
       setCategories(expenseCategories)
       setValue('category', null)
     }
+    setLoaded(true)
   }, [txKind]);
-
-  const values = watch()
-  useEffect(() => {
-    console.log('cat', values)
-  }, [values])
 
   const handleFormSubmit = (data) => {
     console.log(data)
+    onSubmit(data)
     reset()
   }
 
@@ -146,7 +151,7 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
                       size="sm"
                   >
                     <InputSlot>
-                      <Text className="px-1 pl-5 text-xl text-primary-500">{currency}</Text>
+                      <Text className="pr-1 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
                     <InputField
                         inputMode="numeric"
@@ -235,6 +240,22 @@ const TransactionForm = ({onSubmit, incomeCategories, expenseCategories, currenc
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
+        <HStack space="md" className="justify-end">
+          <Button
+              size="xs"
+              variant="outline"
+              action="secondary"
+              onPress={onCancel}
+          >
+            <ButtonText>Cancel</ButtonText>
+          </Button>
+          <Button
+              size="xs"
+              onPress={handleSubmit(handleFormSubmit)}
+          >
+            <ButtonText>Save</ButtonText>
+          </Button>
+        </HStack>
       </VStack>
   )
 }

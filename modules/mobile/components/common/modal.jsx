@@ -4,13 +4,11 @@ import {
   ModalBackdrop,
   ModalContent,
   ModalHeader,
-  ModalBody,
-  ModalFooter
+  ModalBody
 } from "@/components/ui/modal";
 import {Heading} from "@/components/ui/heading";
-import {Button, ButtonText} from "@/components/ui/button";
 
-const Modal = ({isOpen, onClose, onSuccess, headerTitle, successButtonTitle, children}) => {
+const Modal = ({isOpen, onClose, headerTitle, children}) => {
   return (
       <GSModal
           size="md"
@@ -28,22 +26,6 @@ const Modal = ({isOpen, onClose, onSuccess, headerTitle, successButtonTitle, chi
           <ModalBody className="mb-0">
             {children}
           </ModalBody>
-          <ModalFooter className="pt-3">
-            <Button
-                size="xs"
-                variant="outline"
-                action="secondary"
-                onPress={onClose}
-            >
-              <ButtonText>Cancel</ButtonText>
-            </Button>
-            <Button
-                size="xs"
-                onPress={onSuccess}
-            >
-              <ButtonText>{successButtonTitle}</ButtonText>
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </GSModal>
   )

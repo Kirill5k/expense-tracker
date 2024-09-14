@@ -1,10 +1,6 @@
 import React, {useState} from 'react'
 import {VStack} from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
-import { Box } from "@/components/ui/box";
-import { Heading } from "@/components/ui/heading";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { ScrollView } from "@/components/ui/scroll-view";
+import {Heading} from "@/components/ui/heading";
 import TransactionList from './transaction-list'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
@@ -742,11 +738,12 @@ const categories = [
 
 export const Transactions = () => {
   const [showModal, setShowModal] = useState(false)
+  const [txToUpdate, setTxToUpdate] = useState(null)
 
   const incomeCategories = categories.filter(c => c.kind === 'income')
   const expenseCategories = categories.filter(c => c.kind === 'expense')
 
-  //TODO: Get mode from state
+  //TODO: Get mode from state, Get currency from state
   const mode = 'light'
   return (
       <VStack
@@ -758,25 +755,38 @@ export const Transactions = () => {
         </Heading>
         <TransactionList
             items={transactions}
-            onItemPress={tx => console.log(tx)}
+            onItemPress={tx => {
+              setTxToUpdate(tx)
+              setShowModal(true)
+            }}
         />
         <FloatingButton
-            onPress={() => setShowModal(true)}
+            onPress={() => {
+              setTxToUpdate(null)
+              setShowModal(true)
+            }}
             mode={mode}
             iconCode={"plus"}
         />
         <Modal
-            headerTitle="New Transaction"
-            successButtonTitle="Save"
+            headerTitle={txToUpdate?.id ? 'Edit Transaction' : 'New Transaction'}
             isOpen={showModal}
-            onClose={() => setShowModal(false)}
-            onSuccess={() => setShowModal(false)}
+            onClose={() => {
+              setTxToUpdate(null)
+              setShowModal(false)
+            }}
         >
           <TransactionForm
               mode={mode}
-              currency="£"
+              transaction={txToUpdate}
+              currency={{code: 'GBP', symbol: '£'}}
               expenseCategories={expenseCategories}
               incomeCategories={incomeCategories}
+              onCancel={() => {
+                setTxToUpdate(null)
+                setShowModal(false)
+              }}
+              onSubmit={tx => console.log(tx)}
           />
         </Modal>
       </VStack>
