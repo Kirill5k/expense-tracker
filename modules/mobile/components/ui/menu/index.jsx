@@ -6,9 +6,10 @@ import { cssInterop } from 'nativewind';
 import { Pressable, Text, Platform, View } from 'react-native';
 import { Motion, AnimatePresence } from '@legendapp/motion';
 import { withStates } from '@gluestack-ui/nativewind-utils/withStates';
+import {ScrollView} from "@legendapp/motion/src/AnimatedComponents";
 
 const menuStyle = tva({
-  base: 'rounded-md bg-background-0 border border-outline-100 p-1 shadow-hard-5',
+  base: 'rounded-md bg-background-0 border border-outline-100 p-1 shadow-hard-5 max-h-80 overflow-y-auto',
 });
 
 const menuItemStyle = tva({
@@ -103,7 +104,7 @@ const Separator = React.forwardRef(
 );
 
 export const UIMenu = createMenu({
-  Root: Motion.View,
+  Root: Motion.ScrollView,
   Item: Platform.OS === 'web' ? Item : withStates(Item),
   Label: Text,
   Backdrop: BackdropPressable,

@@ -1,3 +1,4 @@
+import React, {useState, useEffect} from "react";
 import {
   Modal,
   ModalBackdrop,
@@ -28,8 +29,7 @@ import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Keyboard} from "react-native";
 import {AlertTriangle} from "lucide-react-native";
-import React, {useState} from "react";
-import {Popover, PopoverBackdrop, PopoverContent, PopoverBody} from "@/components/ui/popover";
+import CategorySelect from "@/components/category/select";
 
 const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
@@ -43,8 +43,22 @@ const transactionSchema = z.object({
   note: z.string().optional(),
 });
 
-const TransactionForm = ({onSubmit}) => {
-  const {control, handleSubmit, reset, formState} = useForm({resolver: zodResolver(transactionSchema)});
+const TransactionForm = ({onSubmit, incomeCategories, expenseCategories}) => {
+  const {control, handleSubmit, reset, formState, setValue, watch} = useForm({resolver: zodResolver(transactionSchema)});
+
+  const [categories, setCategories] = useState(expenseCategories)
+
+  const txKind = watch('kind')
+  useEffect(() => {
+    if (txKind === 'income') {
+      setCategories(incomeCategories)
+      setValue('category', null)
+    }
+    if (txKind === 'expense') {
+      setCategories(expenseCategories)
+      setValue('category', null)
+    }
+  }, [txKind]);
 
   const handleFormSubmit = (data) => {
     console.log(data)
@@ -110,43 +124,11 @@ const TransactionForm = ({onSubmit}) => {
                     .catch(e => e.message),
               }}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Popover
-                      offset={-32}
-                      size="sm"
-                      isOpen={openCategorySelect}
-                      onOpen={() => setOpenCategorySelect(true)}
-                      onClose={() => setOpenCategorySelect(false)}
-                      trigger={(triggerProps) => {
-                        return (
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                action="secondary"
-                                className="justify-between"
-                                {...triggerProps}
-                            >
-                              <ButtonText>Category</ButtonText>
-                              {openCategorySelect && <ButtonIcon as={MaterialIcon} code="chevron-up"/>}
-                              {!openCategorySelect && <ButtonIcon as={MaterialIcon} code="chevron-down"/>}
-                            </Button>
-                        )
-                      }}
-                  >
-                    <PopoverBackdrop/>
-                    <PopoverContent className="bg-background-100 w-full max-w-[660px] p-0 shadow-hard-5">
-                      <PopoverBody>
-                        <Button className="w-full" onPress={() => onChange('Option 1')}>
-                          <ButtonText>Option 1</ButtonText>
-                        </Button>
-                        <Button onPress={() => onChange('Option 2')}>
-                          <ButtonText>Option 2</ButtonText>
-                        </Button>
-                        <Button onPress={() => onChange('Option 3')}>
-                          <ButtonText>Option 3</ButtonText>
-                        </Button>
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
+                  <CategorySelect
+                      items={categories}
+                      value={value}
+                      onSelect={onChange}
+                  />
               )}
           />
           <FormControlError>
@@ -160,7 +142,7 @@ const TransactionForm = ({onSubmit}) => {
   )
 }
 
-const TransactionModal = ({isOpen, onClose, transaction, currency, categories}) => {
+const TransactionModal = ({isOpen, onClose, transaction, currency, incomeCategories, expenseCategories}) => {
   return (
       <Box>
         <Modal
@@ -178,7 +160,10 @@ const TransactionModal = ({isOpen, onClose, transaction, currency, categories}) 
             </ModalHeader>
             <ModalBody className="mb-0">
               <VStack space="md">
-                <TransactionForm/>
+                <TransactionForm
+                    expenseCategories={expenseCategories}
+                    incomeCategories={incomeCategories}
+                />
               </VStack>
             </ModalBody>
             <ModalFooter>

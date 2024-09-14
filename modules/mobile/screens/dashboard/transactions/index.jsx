@@ -8,7 +8,6 @@ import { ScrollView } from "@/components/ui/scroll-view";
 import TransactionList from './transaction-list'
 import TransactionModal from './transaction-modal'
 import AddButton from '@/screens/dashboard/layout/add-button'
-import Select from "@/components/custom/select";
 
 const transactions = [
   {
@@ -742,9 +741,9 @@ const categories = [
 
 export const Transactions = () => {
   const [showModal, setShowModal] = useState(false)
-  const [selVal, setSelVal] = useState(null)
 
-  const catItems = categories.map(c => ({name: c.name, value: c, icon: c.icon}))
+  const incomeCategories = categories.filter(c => c.kind === 'income')
+  const expenseCategories = categories.filter(c => c.kind === 'expense')
 
   //TODO: Get mode from state
   const mode = 'light'
@@ -756,17 +755,14 @@ export const Transactions = () => {
         <Heading size="2xl" className="font-roboto">
           Transactions
         </Heading>
-        <Select
-            items={catItems}
-            value={selVal}
-            onSelect={setSelVal}
-        />
         <TransactionList items={transactions}/>
         <AddButton
             onPress={() => setShowModal(true)}
             mode={mode}
         />
         <TransactionModal
+            expenseCategories={expenseCategories}
+            incomeCategories={incomeCategories}
             mode={mode}
             isOpen={showModal}
             onClose={() => setShowModal(false)}
