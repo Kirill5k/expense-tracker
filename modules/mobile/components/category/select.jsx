@@ -37,8 +37,8 @@ const CategorySelect = ({items, value, onSelect, mode = 'light'}) => {
                     dsize={20}
                     className="flex-grow-0"
                 />}
-                <ButtonText className={`flex-grow ${value?.icon ? 'px-2' : ''}`}>
-                  {value ? value.name : 'Category'}
+                <ButtonText className={`flex-grow ${value?.icon ? 'px-2' : 'px-1'}`}>
+                  {value?.name ? value.name : 'Category'}
                 </ButtonText>
                 <ButtonIcon
                     className="flex-grow-0"
