@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Modal,
+  Modal as GSModal,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
@@ -8,13 +8,11 @@ import {
   ModalFooter
 } from "@/components/ui/modal";
 import {Heading} from "@/components/ui/heading";
-import {VStack} from "@/components/ui/vstack";
 import {Button, ButtonText} from "@/components/ui/button";
-import TransactionForm from "@/components/transaction/form";
 
-const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}) => {
+const Modal = ({isOpen, onClose, onSuccess, headerTitle, successButtonTitle, children}) => {
   return (
-      <Modal
+      <GSModal
           size="md"
           isOpen={isOpen}
           onClose={onClose}
@@ -24,18 +22,11 @@ const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}
         <ModalContent className="p-4">
           <ModalHeader>
             <Heading size="md" className="font-semibold">
-              New Transaction
+              {headerTitle}
             </Heading>
           </ModalHeader>
           <ModalBody className="mb-0">
-            <VStack space="md">
-              <TransactionForm
-                  mode="light"
-                  currency="£"
-                  expenseCategories={expenseCategories}
-                  incomeCategories={incomeCategories}
-              />
-            </VStack>
+            {children}
           </ModalBody>
           <ModalFooter className="pt-3">
             <Button
@@ -48,14 +39,14 @@ const TransactionModal = ({isOpen, onClose, incomeCategories, expenseCategories}
             </Button>
             <Button
                 size="xs"
-                onPress={onClose}
+                onPress={onSuccess}
             >
-              <ButtonText>Create</ButtonText>
+              <ButtonText>{successButtonTitle}</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </GSModal>
   )
 }
 
-export default TransactionModal
+export default Modal

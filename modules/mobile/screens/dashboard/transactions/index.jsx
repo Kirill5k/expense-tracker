@@ -6,8 +6,9 @@ import { Heading } from "@/components/ui/heading";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { ScrollView } from "@/components/ui/scroll-view";
 import TransactionList from './transaction-list'
-import TransactionModal from './transaction-modal'
 import FloatingButton from '@/components/common/floating-button'
+import Modal from '@/components/common/modal'
+import TransactionForm from '@/components/transaction/form'
 
 const transactions = [
   {
@@ -755,19 +756,29 @@ export const Transactions = () => {
         <Heading size="2xl" className="font-roboto">
           Transactions
         </Heading>
-        <TransactionList items={transactions}/>
+        <TransactionList
+            items={transactions}
+            onItemPress={tx => console.log(tx)}
+        />
         <FloatingButton
             onPress={() => setShowModal(true)}
             mode={mode}
             iconCode={"plus"}
         />
-        <TransactionModal
-            expenseCategories={expenseCategories}
-            incomeCategories={incomeCategories}
-            mode={mode}
+        <Modal
+            headerTitle="New Transaction"
+            successButtonTitle="Save"
             isOpen={showModal}
             onClose={() => setShowModal(false)}
-        />
+            onSuccess={() => setShowModal(false)}
+        >
+          <TransactionForm
+              mode={mode}
+              currency="£"
+              expenseCategories={expenseCategories}
+              incomeCategories={incomeCategories}
+          />
+        </Modal>
       </VStack>
   )
 }

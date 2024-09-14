@@ -8,16 +8,11 @@ import {Avatar} from "@/components/ui/avatar";
 import {Pressable} from "@/components/ui/pressable"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {groupBy} from "@/utils/arrays";
+import {calcTotal, formatAmount} from "@/utils/transactions";
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
-const TransactionGroup = ({items}) => {
+const TransactionGroup = ({items, onItemPress}) => {
   const [isPressed, setIsPressed] = useState(null)
-
-  const formatAmount = (tx) => {
-    const currencySymbol = tx.amount.currency.symbol;
-    const amount = tx.amount.value
-    return `${tx.kind === 'expense' ? '-' : '+'}${currencySymbol}${Math.abs(amount).toFixed(2)}`;
-  }
 
   return (
       <VStack className="rounded-xl bg-background-50 p-1" space="sm">
@@ -27,7 +22,7 @@ const TransactionGroup = ({items}) => {
                 onPressIn={() => setIsPressed(tx.id)}
                 onPressOut={() => setIsPressed(null)}
                 className={`rounded-xl hover:bg-background-100 ${isPressed === tx.id ? 'bg-background-200' : ''}`}
-                onPress={() => console.log(tx.id)}
+                onPress={() => onItemPress(tx)}
             >
               <HStack className="items-center px-2 py-2">
                 <Avatar size="sm" style={{backgroundColor: tx.category.color}}>
@@ -53,7 +48,8 @@ const TransactionGroup = ({items}) => {
                     ))}
                   </HStack>}
                 </VStack>
-                <Text className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${tx.kind === 'expense' ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'}`}>
+                <Text className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${tx.kind === 'expense'
+                    ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'}`}>
                   {formatAmount(tx)}
                 </Text>
               </HStack>
@@ -63,7 +59,7 @@ const TransactionGroup = ({items}) => {
   )
 }
 
-const TransactionList = ({items}) => {
+const TransactionList = ({items, onItemPress}) => {
   const groupedItems = groupBy(items, i => i.date)
 
   const formatDate = (isoDate) => {
@@ -77,33 +73,22 @@ const TransactionList = ({items}) => {
     return format(date, 'd MMMM')
   }
 
-  const calcTotal = (transactions) => {
-    if (!transactions.length) {
-      return '0';
-    }
-
-    const currencySymbol = transactions[0].amount.currency.symbol;
-    const total = transactions.reduce((acc, transaction) => {
-      const value = transaction.amount.value;
-      return transaction.kind === 'expense' ? acc - value : acc + value;
-    }, 0);
-
-    return `${total < 0 ? '-' : '+'}${currencySymbol}${Math.abs(total).toFixed(2)}`;
-  }
-
   return (
       <ScrollView
           className="max-w-[600px] flex-1"
           showsVerticalScrollIndicator={false}
       >
         <VStack className="w-full mb-2" space="xl">
-          {Object.entries(groupedItems).map(([date, txs]) => (
+          {Object.entries(groupedItems).map(([date, txGroup]) => (
               <VStack key={date}>
                 <HStack className="flex items-center justify-between">
                   <Heading size="xs" className="mb-1">{formatDate(date)}</Heading>
-                  <Text className="text-xs">{calcTotal(txs)}</Text>
+                  <Text className="text-xs">{calcTotal(txGroup)}</Text>
                 </HStack>
-                <TransactionGroup items={txs}/>
+                <TransactionGroup
+                    items={txGroup}
+                    onItemPress={onItemPress}
+                />
               </VStack>
           ))}
         </VStack>
