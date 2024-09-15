@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {VStack} from "@/components/ui/vstack";
+import {Box} from "@/components/ui/box";
 import {Heading} from "@/components/ui/heading";
 import {Divider} from "@/components/ui/divider";
 import {ScrollView} from "@/components/ui/scroll-view";
@@ -9,6 +10,8 @@ import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionForm from '@/components/transaction/form'
 import TransactionList from '@/components/transaction/list'
 import useStore from '@/store'
+import * as Progress from 'react-native-progress'
+import colors from '@/constants/colors'
 
 export const Transactions = () => {
   const [loading, setLoading] = useState(false)
@@ -38,8 +41,7 @@ export const Transactions = () => {
 
   /*
   TODO:
-   - Add loader/spinner
-   - Sort and Filter transactions
+   - Filter transactions
    */
 
   return (
@@ -59,6 +61,7 @@ export const Transactions = () => {
         <ScrollView
             className="max-w-[600px] flex-1"
             showsVerticalScrollIndicator={false}
+            stickyHeaderIndices={[0]}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 40) {
                 setHeaderSize('2xl')
@@ -67,6 +70,19 @@ export const Transactions = () => {
               }
             }}
         >
+          <Box>
+            {loading && <Progress.Bar
+                height={3}
+                animationType="decay"
+                borderRadius={0}
+                borderWidth={0}
+                indeterminateAnimationDuration={250}
+                width={null}
+                indeterminate={true}
+                color={colors[mode].tint}
+                borderColor={colors[mode].tint}
+            />}
+          </Box>
           <TransactionList
               disabled={loading}
               items={displayedTransactions}
