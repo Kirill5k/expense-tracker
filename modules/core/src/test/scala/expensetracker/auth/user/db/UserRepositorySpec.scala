@@ -2,6 +2,7 @@ package expensetracker.auth.user.db
 
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
+import de.flapdoodle.embed.mongo.distribution.Version
 import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserSettings}
 import expensetracker.category.CategoryName
@@ -19,7 +20,8 @@ import scala.concurrent.Future
 
 class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
-  override protected val mongoPort: Int = 12346
+  override protected val mongoPort: Int        = 12346
+  override protected val mongoVersion: Version = Version.V6_0_2
 
   "An UserRepository" when {
 
@@ -54,7 +56,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
-            acc <- repo.find(Users.uid2)
+            acc  <- repo.find(Users.uid2)
           yield acc
 
           result.attempt.map(_ mustBe Left(AccountDoesNotExist(Users.uid2)))

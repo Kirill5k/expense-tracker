@@ -69,6 +69,14 @@ final private class LiveUserRepository[F[_]](
               )
             )
           )
+          .addFields(
+            "categories" -> Document(
+              "$sortArray" := Document(
+                "input" := "$categories",
+                "sortBy" := Document("name" := 1)
+              )
+            )
+          )
       )
       .first
       .unwrapOpt(AccountDoesNotExist(uid))
