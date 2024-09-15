@@ -2,6 +2,23 @@ import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
 
+const handleError = (get, err, rethrow = false) => {
+  console.log('error', err)
+  if (err.status === 403) {
+    get().clearUser()
+  } else {
+    get().setErrorAlert(err.message)
+  }
+  if (rethrow) {
+    return Promise.reject(new Error(err.message))
+  }
+}
+
+const txSorts = {
+  date: (desc) => (a, b) => desc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date),
+  amount: (desc) => (a, b) => desc ? a.amount.value - b.amount.value : b.amount.value - a.amount.value
+}
+
 const filtered = (txs, user) => {
   const now = new Date()
   return txs
@@ -33,6 +50,16 @@ const useStore = create((set, get) => ({
     const filteredTransactions = filtered(transactions, get().user)
     const displayedTransactions = withinDates(filteredTransactions, get().displayDate)
     set({transactions, filteredTransactions, displayedTransactions})
+  },
+  addUpdatedTransaction: (updatedTx) => {
+    const transactions = get()
+        .transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
+        .sort(txSorts.date(true))
+    get().setTransactions(transactions)
+  },
+  addCreatedTransaction: (newTx) => {
+    const transactions = [newTx, ...get().transactions].sort(txSorts.date(true))
+    get().setTransactions(transactions)
   },
   alert: null,
   isOnline: true,
@@ -96,7 +123,17 @@ const useStore = create((set, get) => ({
     } finally {
       set({isLoading: false})
     }
-  }
+  },
+  updateTransaction: (tx) => Clients
+      .get(get().isOnline)
+      .updateTransaction(get().accessToken, tx)
+      .then(() => get().addUpdatedTransaction(tx))
+      .catch(err => handleError(get, err)),
+  createTransaction: (tx) => Clients
+      .get(get().isOnline)
+      .createTransaction(get().accessToken, tx)
+      .then(tx => get().addCreatedTransaction(tx))
+      .catch(err => handleError(get, err)),
 }));
 
 export default useStore;

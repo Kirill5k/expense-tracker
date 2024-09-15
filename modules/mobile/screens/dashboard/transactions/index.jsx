@@ -11,6 +11,7 @@ import TransactionForm from '@/components/transaction/form'
 import useStore from '@/store'
 
 export const Transactions = () => {
+  const [loading, setLoading] = useState(false)
   const [headerSize, setHeaderSize] = useState("2xl")
   const [showModal, setShowModal] = useState(false)
   const [txToUpdate, setTxToUpdate] = useState(null)
@@ -22,13 +23,23 @@ export const Transactions = () => {
     incomeCategories,
     expenseCategories,
     displayDate,
-    setDisplayDate
+    setDisplayDate,
+    createTransaction,
+    updateTransaction,
   } = useStore()
+
+  const handleFormSubmit = (tx) => {
+    setTxToUpdate(null)
+    setShowModal(false)
+    setLoading(true)
+    const res = tx.id ? updateTransaction(tx) : createTransaction(tx)
+    return res.then(() => setLoading(false))
+  }
 
   /*
   TODO:
    - Add loader/spinner
-   - Create/update transactions
+   - Sort and Filter transactions
    */
 
   return (
@@ -39,6 +50,7 @@ export const Transactions = () => {
           Transactions
         </Heading>
         <DatePeriodSelect
+            disabled={loading}
             mode={mode}
             value={displayDate}
             onSelect={setDisplayDate}
@@ -82,14 +94,14 @@ export const Transactions = () => {
           <TransactionForm
               mode={mode}
               transaction={txToUpdate}
-              currency={user.settings.currency}
+              currency={user?.settings?.currency}
               expenseCategories={expenseCategories}
               incomeCategories={incomeCategories}
               onCancel={() => {
                 setTxToUpdate(null)
                 setShowModal(false)
               }}
-              onSubmit={tx => console.log(tx)}
+              onSubmit={handleFormSubmit}
           />
         </Modal>
       </VStack>

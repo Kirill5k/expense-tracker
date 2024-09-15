@@ -16,6 +16,7 @@ import {
 import {Textarea, TextareaInput} from "@/components/ui/textarea";
 import {Input, InputField, InputSlot} from "@/components/ui/input";
 import {z} from "zod"
+import {format} from 'date-fns'
 import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Keyboard} from "react-native";
@@ -52,12 +53,12 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
     watch
   } = useForm({
     defaultValues: {
-      date: transaction?.date || new Date(),
+      date: transaction?.date ? new Date(transaction.date) : new Date(),
       kind: transaction?.kind || 'expense',
       category: transaction?.category || null,
       amount: transaction?.amount?.value?.toFixed(2),
       tags: transaction?.tags || [],
-      note: transaction?.note
+      note: transaction?.note || ''
     },
     resolver: zodResolver(transactionSchema)
   });
@@ -79,9 +80,18 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
   }, [txKind]);
 
   const handleFormSubmit = (data) => {
-    console.log(data)
-    onSubmit(data)
     reset()
+    const tx = {
+      ...transaction,
+      ...data,
+      categoryId: data.category.id,
+      date: format(data.date, 'yyyy-MM-dd'),
+      amount: {
+        currency,
+        value: parseFloat(data.amount)
+      }
+    }
+    onSubmit(tx)
   }
 
   const handleKeyPress = () => {
