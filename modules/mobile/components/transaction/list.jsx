@@ -1,22 +1,23 @@
 import React, {useState} from "react"
-import {VStack} from "@/components/ui/vstack";
-import {HStack} from "@/components/ui/hstack";
-import {Text} from "@/components/ui/text";
-import {Heading} from "@/components/ui/heading";
-import {Avatar} from "@/components/ui/avatar";
+import {VStack} from "@/components/ui/vstack"
+import {HStack} from "@/components/ui/hstack"
+import {Text} from "@/components/ui/text"
+import {Heading} from "@/components/ui/heading"
+import {Avatar} from "@/components/ui/avatar"
 import {Pressable} from "@/components/ui/pressable"
 import {MaterialIcon} from "@/components/ui/icon"
-import {groupBy} from "@/utils/arrays";
-import {calcTotal, formatAmount} from "@/utils/transactions";
+import {groupBy} from "@/utils/arrays"
+import {calcTotal, formatAmount} from "@/utils/transactions"
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
-const TransactionGroup = ({items, onItemPress}) => {
+const TransactionGroup = ({disabled, items, onItemPress}) => {
   const [isPressed, setIsPressed] = useState(null)
 
   return (
       <VStack className="rounded-xl bg-background-50 p-1" space="sm">
         {items.map(tx => (
             <Pressable
+                disabled={disabled}
                 key={tx.id}
                 onPressIn={() => setIsPressed(tx.id)}
                 onPressOut={() => setIsPressed(null)}
@@ -58,7 +59,7 @@ const TransactionGroup = ({items, onItemPress}) => {
   )
 }
 
-const TransactionList = ({items, onItemPress}) => {
+const TransactionList = ({disabled, items, onItemPress}) => {
   const groupedItems = groupBy(items, i => i.date)
 
   const formatDate = (isoDate) => {
@@ -81,6 +82,7 @@ const TransactionList = ({items, onItemPress}) => {
                 <Text className="text-xs">{calcTotal(txGroup)}</Text>
               </HStack>
               <TransactionGroup
+                  disabled={disabled}
                   items={txGroup}
                   onItemPress={onItemPress}
               />

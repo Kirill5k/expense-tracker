@@ -3,11 +3,11 @@ import {VStack} from "@/components/ui/vstack";
 import {Heading} from "@/components/ui/heading";
 import {Divider} from "@/components/ui/divider";
 import {ScrollView} from "@/components/ui/scroll-view";
-import TransactionList from './transaction-list'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionForm from '@/components/transaction/form'
+import TransactionList from '@/components/transaction/list'
 import useStore from '@/store'
 
 export const Transactions = () => {
@@ -68,6 +68,7 @@ export const Transactions = () => {
             }}
         >
           <TransactionList
+              disabled={loading}
               items={displayedTransactions}
               onItemPress={tx => {
                 setTxToUpdate(tx)
