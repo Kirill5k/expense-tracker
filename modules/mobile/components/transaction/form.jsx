@@ -10,6 +10,8 @@ import {
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
+  FormControlHelper,
+  FormControlHelperText
 } from "@/components/ui/form-control";
 import {Textarea, TextareaInput} from "@/components/ui/textarea";
 import {Input, InputField, InputSlot} from "@/components/ui/input";
@@ -207,6 +209,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
                   />
               )}
           />
+          <FormControlHelper>
+            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each tag</FormControlHelperText>
+          </FormControlHelper>
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
@@ -221,7 +226,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               render={({field: {onChange, onBlur, value}}) => (
                   <Textarea
                       size="sm"
-                      className="h-14 py-0 px-3"
+                      className="h-18 py-0 px-3"
                   >
                     <TextareaInput
                         placeholder="Note"

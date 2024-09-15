@@ -15,7 +15,7 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'sm'}) => {
 
   const handleTextChange = (text) => {
     if (text.includes(',')) {
-      updateTags([...currentTags, ...text.split(',').filter(t => t.length > 0)])
+      updateTags([...currentTags, ...text.split(',').map(t => t.trim()).filter(t => t.length > 0)])
       setLatestTag('')
     } else {
       setLatestTag(text)
@@ -28,7 +28,9 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'sm'}) => {
 
   const handleKeyPress = (key) => {
     if (key === 'Backspace' && latestTag === '') {
+      const tagToRemove = currentTags[currentTags.length - 1]
       removeTag(currentTags.length - 1)
+      setLatestTag(tagToRemove)
     }
   }
 
