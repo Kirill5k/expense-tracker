@@ -1,9 +1,11 @@
 import React, {useState} from 'react'
 import {VStack} from "@/components/ui/vstack";
 import {Heading} from "@/components/ui/heading";
+import {Divider} from "@/components/ui/divider";
 import TransactionList from './transaction-list'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
+import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionForm from '@/components/transaction/form'
 
 const transactions = [
@@ -739,20 +741,32 @@ const categories = [
 export const Transactions = () => {
   const [showModal, setShowModal] = useState(false)
   const [txToUpdate, setTxToUpdate] = useState(null)
+  const [displayDate, setDisplayDate] = useState(null)
 
   const incomeCategories = categories.filter(c => c.kind === 'income')
   const expenseCategories = categories.filter(c => c.kind === 'expense')
 
-  //TODO: Get mode from state, Get currency from state
+  /*
+  TODO:
+   - Get mode from state,
+   - Get currency from state
+   - Add loader/spinner
+   - Get display date from state
+   */
   const mode = 'light'
   return (
       <VStack
           className="p-4 pb-0 md:px-10 md:pt-6 md:pb-0 h-full w-full max-w-[1500px] self-center bg-background-0"
-          space="xl"
       >
         <Heading size="2xl" className="font-roboto">
           Transactions
         </Heading>
+        <DatePeriodSelect
+            mode={mode}
+            value={displayDate}
+            onSelect={setDisplayDate}
+        />
+        <Divider/>
         <TransactionList
             items={transactions}
             onItemPress={tx => {

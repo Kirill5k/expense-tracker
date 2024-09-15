@@ -78,7 +78,7 @@ const TransactionList = ({items, onItemPress}) => {
           className="max-w-[600px] flex-1"
           showsVerticalScrollIndicator={false}
       >
-        <VStack className="w-full mb-2" space="xl">
+        <VStack className="w-full py-2" space="xl">
           {Object.entries(groupedItems).map(([date, txGroup]) => (
               <VStack key={date}>
                 <HStack className="flex items-center justify-between">

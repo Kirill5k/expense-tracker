@@ -9,11 +9,14 @@ export const calcTotal = (transactions) => {
     return transaction.kind === 'expense' ? acc - value : acc + value;
   }, 0);
 
-  return `${total < 0 ? '-' : '+'}${currencySymbol}${Math.abs(total).toFixed(2)}`;
+  return printAmount(total, currencySymbol)
 }
 
 export const formatAmount = (tx) => {
   const currencySymbol = tx.amount.currency.symbol;
-  const amount = tx.amount.value
-  return `${tx.kind === 'expense' ? '-' : '+'}${currencySymbol}${Math.abs(amount).toFixed(2)}`;
+  const amount = tx.kind === 'expense' ? (0 - tx.amount.value) : tx.amount.value
+  return printAmount(amount, currencySymbol)
 }
+
+const printAmount = (total, currencySymbol) =>
+    `${total < 0 ? '-' : '+'}${currencySymbol}${Math.abs(total).toFixed(2)}`
