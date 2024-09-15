@@ -9,6 +9,7 @@ import {useEffect} from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import useStore from "@/store";
 import 'react-native-reanimated';
+import {categories, transactions} from "./test-data";
 
 import {useColorScheme} from '@/components/useColorScheme';
 
@@ -54,7 +55,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === ' dark'
-  const { alert, clearAlert } = useStore();
+  const { alert, clearAlert, setCategories, setTransactions } = useStore();
+
+  useEffect(() => {
+    setCategories(categories)
+    setTransactions(transactions)
+  }, []);
 
   return (
       <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>

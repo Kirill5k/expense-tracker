@@ -103,6 +103,7 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
                     variant="link"
                     action="primary"
                     onPress={goBack}
+                    isDisabled={disabled}
                 >
                   <ButtonIcon
                       as={MaterialIcon}
@@ -116,6 +117,7 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
                     variant="link"
                     action="primary"
                     className="w-40"
+                    isDisabled={disabled}
                     {...triggerProps}
                 >
                   <ButtonText>
@@ -132,6 +134,7 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
                     variant="link"
                     action="primary"
                     onPress={goForward}
+                    isDisabled={disabled}
                 >
                   <ButtonIcon
                       as={MaterialIcon}

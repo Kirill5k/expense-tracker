@@ -114,13 +114,17 @@ export const Icon = React.forwardRef(
   }
 );
 
-export const MaterialIcon = ({code, dsize, dcolor}) => (
-    <MaterialCommunityIcons
-        name={code.replace('mdi-', '')}
-        size={dsize}
-        color={dcolor}
-    />
-)
+export const MaterialIcon = ({code, dsize, dcolor}) => {
+  const strippedCode = code.replace('mdi-', '')
+
+  return (
+      <MaterialCommunityIcons
+          name={strippedCode === 'controller' ? 'google-controller' : strippedCode}
+          size={dsize}
+          color={dcolor}
+      />
+  )
+}
 
 const createIconUI = ({ ...props }) => {
   const UIIconCreateIcon = createIcon({ Root: Svg, ...props });
