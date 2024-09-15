@@ -93,7 +93,7 @@ const useStore = create((set, get) => ({
       if (!get().user?.id || get().user?.id === user.id) {
         set({user})
         get().setCategories(user.categories)
-        // TODO: get transactions
+        await get().getTransactions()
       } else {
         get().clearUser()
         set({alert: Alerts.SESSION_EXPIRED})
@@ -124,6 +124,11 @@ const useStore = create((set, get) => ({
       set({isLoading: false})
     }
   },
+  getTransactions: () => Clients
+      .get(get().isOnline)
+      .getTransactions(get().accessToken)
+      .then(txs => get().setTransactions(txs))
+      .catch(err => handleError(get, err)),
   updateTransaction: (tx) => Clients
       .get(get().isOnline)
       .updateTransaction(get().accessToken, tx)

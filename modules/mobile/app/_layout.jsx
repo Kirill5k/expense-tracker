@@ -10,7 +10,6 @@ import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
 import useStore from '@/store'
-import {categories, transactions} from "./test-data";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -54,12 +53,7 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === ' dark'
-  const { alert, clearAlert, setTransactions, accessToken, getUser } = useStore();
-
-  //TODO: use effect on accessToken
-  useEffect(() => {
-    setTransactions(transactions)
-  }, []);
+  const { alert, clearAlert, accessToken, getUser } = useStore();
 
   useEffect(() => {
     if (accessToken != null) {

@@ -57,10 +57,7 @@ const LoginForm = ({onSubmit}) => {
     onSubmit(data)
         .then(() => reset())
         .catch(e => setLoginError(e.message))
-        .then(() => {
-          setLoading(false)
-          //router.push('/') //TODO: Navigate to analytics/transactions
-        })
+        .then(() => setLoading(false))
   }
 
   const handleKeyPress = () => {

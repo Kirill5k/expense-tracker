@@ -115,11 +115,14 @@ export const Icon = React.forwardRef(
 );
 
 export const MaterialIcon = ({code, dsize, dcolor}) => {
-  const strippedCode = code.replace('mdi-', '')
+  let strippedCode = code.replace('mdi-', '')
+  if (strippedCode === 'controller') {
+    strippedCode = 'google-controller'
+  }
 
   return (
       <MaterialCommunityIcons
-          name={strippedCode === 'controller' ? 'google-controller' : strippedCode}
+          name={strippedCode}
           size={dsize}
           color={dcolor}
       />

@@ -5,7 +5,7 @@ import {Text} from "@/components/ui/text";
 import {Heading} from "@/components/ui/heading";
 import {Avatar} from "@/components/ui/avatar";
 import {Pressable} from "@/components/ui/pressable"
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import {MaterialIcon} from "@/components/ui/icon"
 import {groupBy} from "@/utils/arrays";
 import {calcTotal, formatAmount} from "@/utils/transactions";
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
@@ -25,10 +25,10 @@ const TransactionGroup = ({items, onItemPress}) => {
             >
               <HStack className="items-center px-2 py-2">
                 <Avatar size="sm" style={{backgroundColor: tx.category.color}}>
-                  <MaterialCommunityIcons
-                      name={tx.category.icon.replaceAll('mdi-', '')}
-                      size={20}
-                      color="white"
+                  <MaterialIcon
+                      code={tx.category.icon}
+                      dsize={20}
+                      dcolor="white"
                   />
                 </Avatar>
                 <VStack className="mx-2">
