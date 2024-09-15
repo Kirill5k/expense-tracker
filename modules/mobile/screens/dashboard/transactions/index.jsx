@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {VStack} from "@/components/ui/vstack";
 import {Heading} from "@/components/ui/heading";
 import {Divider} from "@/components/ui/divider";
+import {ScrollView} from "@/components/ui/scroll-view";
 import TransactionList from './transaction-list'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
@@ -739,6 +740,7 @@ const categories = [
 ]
 
 export const Transactions = () => {
+  const [headerSize, setHeaderSize] = useState("2xl")
   const [showModal, setShowModal] = useState(false)
   const [txToUpdate, setTxToUpdate] = useState(null)
   const [displayDate, setDisplayDate] = useState(null)
@@ -758,7 +760,7 @@ export const Transactions = () => {
       <VStack
           className="p-4 pb-0 md:px-10 md:pt-6 md:pb-0 h-full w-full max-w-[1500px] self-center bg-background-0"
       >
-        <Heading size="2xl" className="font-roboto">
+        <Heading size={headerSize} className="font-roboto">
           Transactions
         </Heading>
         <DatePeriodSelect
@@ -767,13 +769,25 @@ export const Transactions = () => {
             onSelect={setDisplayDate}
         />
         <Divider/>
-        <TransactionList
-            items={transactions}
-            onItemPress={tx => {
-              setTxToUpdate(tx)
-              setShowModal(true)
+        <ScrollView
+            className="max-w-[600px] flex-1"
+            showsVerticalScrollIndicator={false}
+            onScroll={({nativeEvent}) => {
+              if (nativeEvent.contentOffset.y <= 40) {
+                setHeaderSize('2xl')
+              } else {
+                setHeaderSize('sm')
+              }
             }}
-        />
+        >
+          <TransactionList
+              items={transactions}
+              onItemPress={tx => {
+                setTxToUpdate(tx)
+                setShowModal(true)
+              }}
+          />
+        </ScrollView>
         <FloatingButton
             onPress={() => {
               setTxToUpdate(null)

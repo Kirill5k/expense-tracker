@@ -226,7 +226,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               render={({field: {onChange, onBlur, value}}) => (
                   <Textarea
                       size="sm"
-                      className="h-18 py-0 px-3"
+                      className="h-14 py-0 px-3"
                   >
                     <TextareaInput
                         placeholder="Note"

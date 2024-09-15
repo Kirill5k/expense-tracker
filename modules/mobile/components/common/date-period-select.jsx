@@ -124,7 +124,7 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
                   <ButtonIcon
                       as={MaterialIcon}
                       code={isOpen ? 'chevron-up' : 'chevron-down'}
-                      dcolor={value?.range ? colors[mode].tabIconSelected : colors[mode].text}
+                      dcolor={colors[mode].text}
                   />
                 </Button>
                 <Button

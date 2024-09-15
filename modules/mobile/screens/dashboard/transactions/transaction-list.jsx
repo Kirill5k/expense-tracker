@@ -3,7 +3,6 @@ import {VStack} from "@/components/ui/vstack";
 import {HStack} from "@/components/ui/hstack";
 import {Text} from "@/components/ui/text";
 import {Heading} from "@/components/ui/heading";
-import {ScrollView} from "@/components/ui/scroll-view";
 import {Avatar} from "@/components/ui/avatar";
 import {Pressable} from "@/components/ui/pressable"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -74,25 +73,20 @@ const TransactionList = ({items, onItemPress}) => {
   }
 
   return (
-      <ScrollView
-          className="max-w-[600px] flex-1"
-          showsVerticalScrollIndicator={false}
-      >
-        <VStack className="w-full py-2" space="xl">
-          {Object.entries(groupedItems).map(([date, txGroup]) => (
-              <VStack key={date}>
-                <HStack className="flex items-center justify-between">
-                  <Heading size="xs" className="mb-1">{formatDate(date)}</Heading>
-                  <Text className="text-xs">{calcTotal(txGroup)}</Text>
-                </HStack>
-                <TransactionGroup
-                    items={txGroup}
-                    onItemPress={onItemPress}
-                />
-              </VStack>
-          ))}
-        </VStack>
-      </ScrollView>
+      <VStack className="w-full py-2" space="xl">
+        {Object.entries(groupedItems).map(([date, txGroup]) => (
+            <VStack key={date}>
+              <HStack className="flex items-center justify-between">
+                <Heading size="xs" className="mb-1">{formatDate(date)}</Heading>
+                <Text className="text-xs">{calcTotal(txGroup)}</Text>
+              </HStack>
+              <TransactionGroup
+                  items={txGroup}
+                  onItemPress={onItemPress}
+              />
+            </VStack>
+        ))}
+      </VStack>
   )
 }
 
