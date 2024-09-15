@@ -43,22 +43,26 @@ const useStore = create((set, get) => ({
     const expenseCategories = categories.filter(c => c.kind === 'expense')
     set({incomeCategories, expenseCategories, categories})
   },
+  displayDate: null,
+  setDisplayDate: (displayDate) => {
+    const displayedTransactions = withinDates(get().filteredTransactions, displayDate).sort(txSorts.date(true))
+    set({displayDate, displayedTransactions})
+  },
   transactions: [],
   filteredTransactions: [],
   displayedTransactions: [],
   setTransactions: (transactions) => {
     const filteredTransactions = filtered(transactions, get().user)
-    const displayedTransactions = withinDates(filteredTransactions, get().displayDate)
+    const displayedTransactions = withinDates(filteredTransactions, get().displayDate).sort(txSorts.date(true))
     set({transactions, filteredTransactions, displayedTransactions})
   },
   addUpdatedTransaction: (updatedTx) => {
     const transactions = get()
         .transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
-        .sort(txSorts.date(true))
     get().setTransactions(transactions)
   },
   addCreatedTransaction: (newTx) => {
-    const transactions = [newTx, ...get().transactions].sort(txSorts.date(true))
+    const transactions = [newTx, ...get().transactions]
     get().setTransactions(transactions)
   },
   alert: null,
@@ -72,11 +76,6 @@ const useStore = create((set, get) => ({
       currency: {code: 'GBP', symbol: '£'},
       darkMode: null
     }
-  },
-  displayDate: null,
-  setDisplayDate: (displayDate) => {
-    const displayedTransactions = withinDates(get().filteredTransactions, displayDate)
-    set({displayDate, displayedTransactions})
   },
   setErrorAlert: (message) => set({alert: {type: 'error', message}}),
   clearAlert: () => set({alert: null}),
@@ -99,10 +98,8 @@ const useStore = create((set, get) => ({
         set({alert: Alerts.SESSION_EXPIRED})
       }
     } catch (e) {
-      if (!e.status) {
-        get().setErrorAlert(e.message)
-      }
-      // TODO: Maybe clear user
+      get().setErrorAlert(e.message)
+      get().clearUser()
     } finally {
       set({isLoading: false})
     }

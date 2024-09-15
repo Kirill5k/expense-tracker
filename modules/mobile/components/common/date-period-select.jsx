@@ -63,16 +63,19 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
 
   const resetDate = (range) => {
     const newDateRange = newDisplayDateForToday(range)
-    onSelect(newDateRange)
+    const previous = incrementBy(newDateRange, -1)
+    onSelect({...newDateRange, previous})
   }
 
   const goBack = () => {
     const newDateRange = incrementBy(value, -1)
-    onSelect(newDateRange)
+    const previous = incrementBy(newDateRange, -1)
+    onSelect({...newDateRange, previous})
   }
   const goForward = () => {
+    const previous = {...value}
     const newDateRange = incrementBy(value, 1)
-    onSelect(newDateRange)
+    onSelect({...newDateRange, previous})
   }
 
   useEffect(() => {
