@@ -11,7 +11,8 @@ import TransactionForm from '@/components/transaction/form'
 import TransactionList from '@/components/transaction/list'
 import useStore from '@/store'
 import * as Progress from 'react-native-progress'
-import colors from '@/constants/colors'
+import Colors from '@/constants/colors'
+import Classes from '@/constants/classes'
 
 export const Transactions = () => {
   const [loading, setLoading] = useState(false)
@@ -41,13 +42,11 @@ export const Transactions = () => {
 
   /*
   TODO:
-   - Filter transactions
+   - Filter and search transactions
    */
 
   return (
-      <VStack
-          className="px-4 pt-2 pb-0 md:px-10 md:pt-6 md:pb-0 h-full w-full max-w-[1500px] self-center bg-background-0"
-      >
+      <VStack className={Classes.dashboardLayout}>
         <Heading size={headerSize} className="font-roboto">
           Transactions
         </Heading>
@@ -79,8 +78,8 @@ export const Transactions = () => {
                 indeterminateAnimationDuration={250}
                 width={null}
                 indeterminate={true}
-                color={colors[mode].tint}
-                borderColor={colors[mode].tint}
+                color={Colors[mode].tint}
+                borderColor={Colors[mode].tint}
             />}
           </Box>
           <TransactionList
