@@ -1,30 +1,26 @@
-import React, {useState} from "react"
-import {VStack} from "@/components/ui/vstack"
-import {HStack} from "@/components/ui/hstack"
-import {Text} from "@/components/ui/text"
-import {Heading} from "@/components/ui/heading"
-import {Avatar} from "@/components/ui/avatar"
-import {Pressable} from "@/components/ui/pressable"
-import {MaterialIcon} from "@/components/ui/icon"
-import {groupBy} from "@/utils/arrays"
-import {calcTotal, formatAmount} from "@/utils/transactions"
+import React from 'react'
+import {VStack} from '@/components/ui/vstack'
+import {HStack} from '@/components/ui/hstack'
+import {Text} from '@/components/ui/text'
+import {Heading} from '@/components/ui/heading'
+import {Avatar} from '@/components/ui/avatar'
+import {MaterialIcon} from '@/components/ui/icon'
+import ListItemPressable from '@/components/common/list-item-pressable'
+import {groupBy} from '@/utils/arrays'
+import {calcTotal, formatAmount} from '@/utils/transactions'
+import Classes from '@/constants/classes'
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
 const TransactionGroup = ({disabled, items, onItemPress}) => {
-  const [isPressed, setIsPressed] = useState(null)
-
   return (
-      <VStack className="rounded-xl bg-background-50 p-1" space="sm">
+      <VStack className={Classes.listLayout} space="sm">
         {items.map(tx => (
-            <Pressable
+            <ListItemPressable
                 disabled={disabled}
                 key={tx.id}
-                onPressIn={() => setIsPressed(tx.id)}
-                onPressOut={() => setIsPressed(null)}
-                className={`rounded-xl hover:bg-background-100 ${isPressed === tx.id ? 'bg-background-200' : ''}`}
                 onPress={() => onItemPress(tx)}
             >
-              <HStack className="items-center px-2 py-2">
+              <HStack className="items-center p-2">
                 <Avatar size="sm" style={{backgroundColor: tx.category.color}}>
                   <MaterialIcon
                       code={tx.category.icon}
@@ -33,16 +29,13 @@ const TransactionGroup = ({disabled, items, onItemPress}) => {
                   />
                 </Avatar>
                 <VStack className="mx-2">
-                  <Text className="font-semibold text-typography-900 line-clamp-1 p-0 m-0 text-sm">
+                  <Text className={Classes.listItemMainText}>
                     {tx.category.name}
                   </Text>
                   {tx.note && <Text className="line-clamp-1 text-sm">{tx.note}</Text>}
                   {tx.tags.length > 0 && <HStack space="xs" className="mt-1">
                     {tx.tags.map(t => (
-                        <Text
-                            key={t}
-                            className="rounded-lg border border-secondary-300 text-typography-700 text-xs font-medium px-1"
-                        >
+                        <Text key={t} className={Classes.listItemTag}>
                           {t}
                         </Text>
                     ))}
@@ -53,7 +46,7 @@ const TransactionGroup = ({disabled, items, onItemPress}) => {
                   {formatAmount(tx)}
                 </Text>
               </HStack>
-            </Pressable>
+            </ListItemPressable>
         ))}
       </VStack>
   )
