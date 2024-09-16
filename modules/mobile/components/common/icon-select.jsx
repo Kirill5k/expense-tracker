@@ -41,6 +41,7 @@ const iconGroups = {
     'mdi-television',
     'mdi-controller',
     'mdi-watch',
+    'mdi-drama-masks'
   ],
   'Food, drink': [
     'mdi-beer',
@@ -87,6 +88,7 @@ const iconGroups = {
     'mdi-cog',
     'mdi-wrench',
     'mdi-hammer',
+    'mdi-gauge'
   ],
   'Shopping': [
     'mdi-basket',

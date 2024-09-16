@@ -17,6 +17,7 @@ enum TransactionKind:
 final case class Transaction(
     id: TransactionId,
     userId: UserId,
+    //TODO: Deprecate
     kind: TransactionKind,
     categoryId: CategoryId,
     amount: Money,
