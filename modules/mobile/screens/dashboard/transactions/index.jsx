@@ -1,9 +1,9 @@
 import React, {useState} from 'react'
-import {VStack} from "@/components/ui/vstack";
-import {Box} from "@/components/ui/box";
-import {Heading} from "@/components/ui/heading";
-import {Divider} from "@/components/ui/divider";
-import {ScrollView} from "@/components/ui/scroll-view";
+import {VStack} from '@/components/ui/vstack'
+import {Box} from '@/components/ui/box'
+import {Heading} from '@/components/ui/heading'
+import {Divider} from '@/components/ui/divider'
+import {ScrollView} from '@/components/ui/scroll-view'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
 import DatePeriodSelect from '@/components/common/date-period-select'
@@ -16,7 +16,7 @@ import Classes from '@/constants/classes'
 
 export const Transactions = () => {
   const [loading, setLoading] = useState(false)
-  const [headerSize, setHeaderSize] = useState("2xl")
+  const [headerSize, setHeaderSize] = useState('2xl')
   const [showModal, setShowModal] = useState(false)
   const [txToUpdate, setTxToUpdate] = useState(null)
 
