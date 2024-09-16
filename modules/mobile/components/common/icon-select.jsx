@@ -7,6 +7,7 @@ import {Text} from '@/components/ui/text'
 import {Divider} from '@/components/ui/divider'
 import {MaterialIcon} from '@/components/ui/icon'
 import {Avatar} from '@/components/ui/avatar'
+import Colors from '@/constants/colors'
 
 const iconGroups = {
   'Banking': [
@@ -132,7 +133,7 @@ const iconGroups = {
   ]
 }
 
-const IconSelect = ({value, onChange, valueColor}) => {
+const IconSelect = ({value, onChange, valueColor, mode}) => {
   return (
       <ScrollView className="max-h-60" persistentScrollbar={true}>
         <VStack>
@@ -146,11 +147,11 @@ const IconSelect = ({value, onChange, valueColor}) => {
                           key={i}
                           onPress={() => onChange(i)}
                       >
-                        <Avatar size="sm" style={{backgroundColor: value === i ? valueColor : 'black'}}>
+                        <Avatar size="sm" style={{backgroundColor: value === i ? valueColor : Colors[mode].text}}>
                           <MaterialIcon
                               code={i}
                               dsize={20}
-                              dcolor="white"
+                              dcolor={Colors[mode].background}
                           />
                         </Avatar>
                       </Pressable>

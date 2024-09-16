@@ -15,12 +15,11 @@ import {
 import {CircleIcon} from '@/components/ui/icon'
 import IconSelect from '@/components/common/icon-select'
 import {AlertTriangle} from 'lucide-react-native'
-import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider } from 'reanimated-color-picker';
+import ColorPicker, {Panel1, Swatches, Preview, OpacitySlider, HueSlider} from 'reanimated-color-picker';
 import {Keyboard} from 'react-native'
 import {z} from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {Controller, useForm} from 'react-hook-form'
-
 
 const categorySchema = z.object({
   kind: z.enum(['expense', 'income']),
@@ -131,7 +130,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
                       value={value}
                       onComplete={c => onChange(c.hex)}
                   >
-                    <HueSlider />
+                    <HueSlider/>
                   </ColorPicker>
               )}
           />
@@ -148,9 +147,10 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <IconSelect
-                    value={value}
-                    valueColor={color}
-                    onChange={onChange}
+                      mode={mode}
+                      value={value}
+                      valueColor={color}
+                      onChange={onChange}
                   />
               )}
           />
