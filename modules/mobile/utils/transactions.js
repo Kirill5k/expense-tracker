@@ -6,7 +6,7 @@ export const calcTotal = (transactions) => {
   const currencySymbol = transactions[0].amount.currency.symbol;
   const total = transactions.reduce((acc, transaction) => {
     const value = transaction.amount.value;
-    return transaction.kind === 'expense' ? acc - value : acc + value;
+    return transaction.category.kind === 'expense' ? acc - value : acc + value;
   }, 0);
 
   return printAmount(total, currencySymbol)
@@ -14,7 +14,7 @@ export const calcTotal = (transactions) => {
 
 export const formatAmount = (tx) => {
   const currencySymbol = tx.amount.currency.symbol;
-  const amount = tx.kind === 'expense' ? (0 - tx.amount.value) : tx.amount.value
+  const amount = tx.category.kind === 'expense' ? (0 - tx.amount.value) : tx.amount.value
   return printAmount(amount, currencySymbol)
 }
 

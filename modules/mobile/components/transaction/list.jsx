@@ -41,7 +41,7 @@ const TransactionGroup = ({disabled, items, onItemPress}) => {
                     ))}
                   </HStack>}
                 </VStack>
-                <Text className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${tx.kind === 'expense'
+                <Text className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${tx.category.kind === 'expense'
                     ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'}`}>
                   {formatAmount(tx)}
                 </Text>

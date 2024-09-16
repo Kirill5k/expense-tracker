@@ -54,7 +54,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
   } = useForm({
     defaultValues: {
       date: transaction?.date ? new Date(transaction.date) : new Date(),
-      kind: transaction?.kind || 'expense',
+      kind: transaction?.category?.kind || 'expense',
       category: transaction?.category || null,
       amount: transaction?.amount?.value?.toFixed(2),
       tags: transaction?.tags || [],
