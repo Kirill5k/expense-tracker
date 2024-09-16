@@ -27,7 +27,7 @@ const CategoryList = ({items, onItemPress, disabled}) => {
                 <Text className={Classes.listItemMainText + ' mx-2'}>
                   {c.name}
                 </Text>
-                <Text className={Classes.listItemMainText + ' ml-auto'}>
+                <Text className="uppercase ml-auto text-typography-500 text-xs font-medium">
                   {c.kind}
                 </Text>
               </HStack>

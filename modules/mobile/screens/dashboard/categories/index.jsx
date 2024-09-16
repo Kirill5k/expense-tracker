@@ -5,6 +5,8 @@ import {Box} from '@/components/ui/box';
 import {Heading} from '@/components/ui/heading';
 import {ScrollView} from "@/components/ui/scroll-view";
 import * as Progress from 'react-native-progress'
+import FloatingButton from '@/components/common/floating-button'
+import Modal from '@/components/common/modal'
 import CategoryList from '@/components/category/list'
 import Classes from '@/constants/classes'
 import Colors from '@/constants/colors'
@@ -13,6 +15,8 @@ import useStore from '@/store'
 export const Categories = () => {
   const [headerSize, setHeaderSize] = useState("2xl")
   const [loading, setLoading] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [catToUpdate, setCatToUpdate] = useState(null)
 
   const {
     mode,
@@ -53,8 +57,29 @@ export const Categories = () => {
           <CategoryList
               items={categories}
               disabled={loading}
+              onItemPress={tx => {
+                setCatToUpdate(tx)
+                setShowModal(true)
+              }}
           />
         </ScrollView>
+        <FloatingButton
+            onPress={() => {
+              setCatToUpdate(null)
+              setShowModal(true)
+            }}
+            mode={mode}
+            iconCode={"plus"}
+        />
+        <Modal
+            headerTitle={catToUpdate?.id ? 'Edit Category' : 'New Category'}
+            isOpen={showModal}
+            onClose={() => {
+              setCatToUpdate(null)
+              setShowModal(false)
+            }}
+        >
+        </Modal>
       </VStack>
   )
 }
