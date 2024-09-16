@@ -29,7 +29,7 @@ export const Categories = () => {
           Categories
         </Heading>
         <ScrollView
-            className="max-w-[600px] flex-1"
+            className="max-w-[600px] flex-1 w-full"
             showsVerticalScrollIndicator={false}
             stickyHeaderIndices={[0]}
             onScroll={({nativeEvent}) => {
@@ -62,6 +62,7 @@ export const Categories = () => {
                 setShowModal(true)
               }}
           />
+          <Box className="py-1"></Box>
         </ScrollView>
         <FloatingButton
             onPress={() => {
