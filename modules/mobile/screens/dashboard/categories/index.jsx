@@ -21,13 +21,17 @@ export const Categories = () => {
 
   const {
     mode,
-    categories
+    categories,
+    createCategory,
+    updateCategory
   } = useStore()
 
   const handleFormSubmit = (cat) => {
-    console.log('submitting form', cat)
-    setShowModal(false)
     setCatToUpdate(null)
+    setShowModal(false)
+    setLoading(true)
+    const res = cat.id ? updateCategory(cat) : createCategory(cat)
+    return res.then(() => setLoading(false))
   }
 
   return (

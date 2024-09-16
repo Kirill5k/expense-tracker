@@ -1,6 +1,7 @@
 import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
+import {insertSorted, sortedBy} from '@/utils/arrays'
 
 const handleError = (get, err, rethrow = false) => {
   console.log('error', err)
@@ -42,6 +43,16 @@ const useStore = create((set, get) => ({
     const incomeCategories = categories.filter(c => c.kind === 'income')
     const expenseCategories = categories.filter(c => c.kind === 'expense')
     set({incomeCategories, expenseCategories, categories})
+  },
+  addCreatedCategory: (newCat) => {
+    const categories = insertSorted(get().categories, newCat, c => c.name)
+    get().setCategories(categories)
+  },
+  addUpdatedCategory: (category) => {
+    const categories = [...get().categories.filter(c => c.id !== category.id), category]
+    get().setCategories(sortedBy(categories, c => c.name))
+    const transactions = get().transactions.map(t => t.categoryId === category.id ? ({...t, category}) : t)
+    get().setTransactions(transactions)
   },
   displayDate: null,
   setDisplayDate: (displayDate) => {
@@ -135,6 +146,16 @@ const useStore = create((set, get) => ({
       .get(get().isOnline)
       .createTransaction(get().accessToken, tx)
       .then(tx => get().addCreatedTransaction(tx))
+      .catch(err => handleError(get, err)),
+  createCategory: (cat) => Clients
+      .get(get().isOnline)
+      .createCategory(get().accessToken, cat)
+      .then(cat => get().addCreatedCategory(cat))
+      .catch(err => handleError(get, err)),
+  updateCategory: (cat) => Clients
+      .get(get().isOnline)
+      .updateCategory(get().accessToken, cat)
+      .then(() => get().addUpdatedCategory(cat))
       .catch(err => handleError(get, err)),
 }));
 
