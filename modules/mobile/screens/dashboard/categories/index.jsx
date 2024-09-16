@@ -8,6 +8,7 @@ import * as Progress from 'react-native-progress'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
 import CategoryList from '@/components/category/list'
+import CategoryForm from '@/components/category/form'
 import Classes from '@/constants/classes'
 import Colors from '@/constants/colors'
 import useStore from '@/store'
@@ -22,6 +23,12 @@ export const Categories = () => {
     mode,
     categories
   } = useStore()
+
+  const handleFormSubmit = (cat) => {
+    console.log('submitting form', cat)
+    setShowModal(false)
+    setCatToUpdate(null)
+  }
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -80,6 +87,15 @@ export const Categories = () => {
               setShowModal(false)
             }}
         >
+          <CategoryForm
+              mode={mode}
+              category={catToUpdate}
+              onCancel={() => {
+                setCatToUpdate(null)
+                setShowModal(false)
+              }}
+              onSubmit={handleFormSubmit}
+          />
         </Modal>
       </VStack>
   )

@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect} from 'react'
 import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/components/ui/radio'
-import {Text} from "@/components/ui/text";
-import {HStack} from "@/components/ui/hstack";
-import {VStack} from "@/components/ui/vstack";
-import {Button, ButtonText} from "@/components/ui/button";
-import {CircleIcon} from "@/components/ui/icon";
+import {Text} from '@/components/ui/text'
+import {HStack} from '@/components/ui/hstack'
+import {VStack} from '@/components/ui/vstack'
+import {Button, ButtonText} from '@/components/ui/button'
+import {CircleIcon} from '@/components/ui/icon'
 import {
   FormControl,
   FormControlError,
@@ -12,18 +12,18 @@ import {
   FormControlErrorText,
   FormControlHelper,
   FormControlHelperText
-} from "@/components/ui/form-control";
-import {Textarea, TextareaInput} from "@/components/ui/textarea";
-import {Input, InputField, InputSlot} from "@/components/ui/input";
-import {z} from "zod"
+} from '@/components/ui/form-control'
+import {Textarea, TextareaInput} from '@/components/ui/textarea'
+import {Input, InputField, InputSlot} from '@/components/ui/input'
+import {z} from 'zod'
 import {format} from 'date-fns'
-import {Controller, useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Keyboard} from "react-native";
-import {AlertTriangle} from "lucide-react-native";
-import CategorySelect from "@/components/category/select";
-import DateSelect from "@/components/common/date-select";
-import TagsInput from "@/components/common/tags-input";
+import {Controller, useForm} from 'react-hook-form'
+import {zodResolver} from '@hookform/resolvers/zod'
+import {Keyboard} from 'react-native'
+import {AlertTriangle} from 'lucide-react-native'
+import CategorySelect from '@/components/category/select'
+import DateSelect from '@/components/common/date-select'
+import TagsInput from '@/components/common/tags-input'
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -61,7 +61,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
       note: transaction?.note || ''
     },
     resolver: zodResolver(transactionSchema)
-  });
+  })
 
   const [categories, setCategories] = useState(transaction?.kind === 'income' ? incomeCategories : expenseCategories)
   const [loaded, setLoaded] = useState(false)
@@ -77,7 +77,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
       setValue('category', null)
     }
     setLoaded(true)
-  }, [txKind]);
+  }, [txKind])
 
   const handleFormSubmit = (data) => {
     reset()
