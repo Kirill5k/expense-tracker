@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {VStack} from '@/components/ui/vstack';
+import {Divider} from '@/components/ui/divider'
 import {Box} from '@/components/ui/box';
 import {Heading} from '@/components/ui/heading';
 import {ScrollView} from "@/components/ui/scroll-view";
@@ -36,6 +37,7 @@ export const Categories = () => {
             }}
         >
           <Box>
+            {headerSize === 'sm' && <Divider/>}
             {loading && <Progress.Bar
                 height={3}
                 animationType="decay"

@@ -56,7 +56,6 @@ export const Transactions = () => {
             value={displayDate}
             onSelect={setDisplayDate}
         />
-        <Divider/>
         <ScrollView
             className="max-w-[600px] flex-1"
             showsVerticalScrollIndicator={false}
@@ -70,6 +69,7 @@ export const Transactions = () => {
             }}
         >
           <Box>
+            {headerSize === 'sm' && <Divider/>}
             {loading && <Progress.Bar
                 height={3}
                 animationType="decay"
