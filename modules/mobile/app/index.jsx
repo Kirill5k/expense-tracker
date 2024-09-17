@@ -1,18 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Button, ButtonText} from "@/components/ui/button";
 import {router} from "expo-router";
 import {SafeAreaView} from "@/components/ui/safe-area-view";
 import {VStack} from "@/components/ui/vstack";
-import useStore from "@/store";
 
 const Index = () => {
-  const {getUser, accessToken} = useStore();
-
-  useEffect(() => {
-    if (accessToken) {
-      getUser()
-    }
-  }, [accessToken])
 
   return (
       <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">
