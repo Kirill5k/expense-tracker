@@ -11,6 +11,10 @@ const txSorts = {
   amount: (desc) => (a, b) => desc ? a.amount.value - b.amount.value : b.amount.value - a.amount.value
 }
 
+const catSorts = {
+  name: (desc) => (a, b) => desc ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name),
+}
+
 const withinDates = (txs, { start, end }) => txs.filter(tx => {
   const txdate = new Date(tx.date)
   return start <= txdate && txdate <= end
@@ -77,8 +81,8 @@ export default new Vuex.Store({
       .filter(t => t.amount.currency.code === state.user.settings.currency.code)
       .filter(t => state.user.settings.hideFutureTransactions ? new Date(t.date) <= new Date() : true),
     displayedTransactions: (state, getters) => withinDates(getters.filteredTransactions, state.displayDate),
-    expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'expense'),
-    incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.kind === 'income'),
+    expenseTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.category.kind === 'expense'),
+    incomeTransactions: (state, getters) => getters.displayedTransactions.filter(t => t.category.kind === 'income'),
     totalSpent: (state, getters) => totalAmount(getters.expenseTransactions),
     totalEarned: (state, getters) => totalAmount(getters.incomeTransactions)
   },
@@ -120,13 +124,13 @@ export default new Vuex.Store({
       state.filterBy = categories.map(c => c.id)
     },
     addCategory (state, category) {
-      state.categories = [...state.categories, category]
+      state.categories = [...state.categories, category].sort(catSorts.name(false))
       state.filterBy = [...state.filterBy, category.id]
     },
-    updateCategory (state, updatedCategory) {
-      const catId = updatedCategory.id
-      state.categories = state.categories.map(c => c.id === catId ? updatedCategory : c)
-      state.transactions = state.transactions.map(tx => tx.categoryId === catId ? { ...tx, category: updatedCategory } : tx)
+    updateCategory (state, category) {
+      const catId = category.id
+      state.categories = state.categories.map(c => c.id === catId ? category : c).sort(catSorts.name(false))
+      state.transactions = state.transactions.map(tx => tx.categoryId === catId ? { ...tx, category } : tx)
     },
     hideCategory (state, { id, hidden }) {
       state.categories = state.categories.map(cat => cat.id === id ? { ...cat, hidden } : cat)

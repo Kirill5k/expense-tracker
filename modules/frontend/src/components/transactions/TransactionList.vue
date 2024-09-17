@@ -107,7 +107,7 @@ export default {
         color: item.category.color,
         icon: item.category.icon,
         tx: { name: item.category.name, note: item.note, displayDate: this.formatTxDate(item), date: item.date, tags: item.tags },
-        amount: { value: item.amount.value, kind: item.kind, currency: item.amount.currency.code },
+        amount: { value: item.amount.value, kind: item.category.kind, currency: item.amount.currency.code },
         original: item,
         last: i === this.items.length - 1
       }))
