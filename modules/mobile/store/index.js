@@ -79,6 +79,7 @@ const useStore = create((set, get) => ({
   alert: null,
   isOnline: true,
   isLoading: false,
+  setIsLoading: (isLoading) => set({isLoading}),
   isAuthenticated: false,
   accessToken: null,
   user: {
@@ -94,27 +95,17 @@ const useStore = create((set, get) => ({
     isAuthenticated: false,
     accessToken: null,
     user: {},
-    isLoading: false
   }),
   login: async (creds) => {
-    try {
-      get().clearAlert()
-      set({isLoading: true})
-      const {access_token} = await Clients.get(get().isOnline).login(creds)
-      set({accessToken: access_token})
-      set({alert: Alerts.LOGIN_SUCCESS})
-    } catch (err) {
-      if (err.status === 401) {
-        return Promise.reject(new Error(err.message))
-      } else {
-        get().setErrorAlert(err.message)
-      }
-    } finally {
-      set({isLoading: false})
-    }
+    get().clearAlert()
+    return Clients.get(get().isOnline)
+        .login(creds)
+        .then(({access_token}) => {
+          set({accessToken: access_token})
+          set({alert: Alerts.LOGIN_SUCCESS})
+        })
   },
   getUser: async () => {
-    set({isLoading: true})
     return Clients.get(get().isOnline)
         .getUser(get().accessToken)
         .then(user => {
@@ -125,14 +116,11 @@ const useStore = create((set, get) => ({
             return Promise.reject(new Error(Alerts.SESSION_EXPIRED.message))
           }
         })
-        .finally(() => set({isLoading: false}))
   },
   getTransactions: () => {
-    set({isLoading: true})
     return Clients.get(get().isOnline)
         .getTransactions(get().accessToken)
         .then(txs => get().setTransactions(txs))
-        .finally(() => set({isLoading: false}))
   },
   updateTransaction: (tx) => Clients
       .get(get().isOnline)

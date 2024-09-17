@@ -57,7 +57,7 @@ const LoginForm = ({onSubmit}) => {
     onSubmit(data)
         .then(() => reset())
         .catch(e => setLoginError(e.message))
-        .then(() => setLoading(false))
+        .finally(() => setLoading(false))
   }
 
   const handleKeyPress = () => {
@@ -226,7 +226,7 @@ export const SignIn = () => {
 
   return (
       <AuthLayout>
-        <LoginForm onSubmit={login}/>
+        <LoginForm onSubmit={creds => login(creds).then(() => router.push('/'))}/>
       </AuthLayout>
   );
 };

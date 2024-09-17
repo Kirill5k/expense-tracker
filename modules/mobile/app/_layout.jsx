@@ -51,7 +51,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme()
   const isDark = colorScheme === ' dark'
   const {
     alert,
@@ -61,10 +61,12 @@ function RootLayoutNav() {
     clearUser,
     getUser,
     getTransactions,
-  } = useStore();
+    setIsLoading,
+  } = useStore()
 
   useEffect(() => {
     if (accessToken != null) {
+      setIsLoading(true)
       getUser()
           .then(getTransactions)
           .then(() => router.push("/analytics"))
@@ -72,10 +74,11 @@ function RootLayoutNav() {
             setErrorAlert(e.message)
             clearUser()
           })
+          .finally(() => setTimeout(() => setIsLoading(false), 1000))
     } else {
       router.push('/')
     }
-  }, [accessToken]);
+  }, [accessToken])
 
   return (
       <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
