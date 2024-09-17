@@ -79,7 +79,7 @@ const useStore = create((set, get) => ({
   alert: null,
   isOnline: true,
   isLoading: false,
-  setIsLoading: (isLoading) => set({isLoading}),
+  seLoading: (isLoading) => set({isLoading}),
   isAuthenticated: false,
   accessToken: null,
   user: {

@@ -61,12 +61,12 @@ function RootLayoutNav() {
     clearUser,
     getUser,
     getTransactions,
-    setIsLoading,
+    setLoading,
   } = useStore()
 
   useEffect(() => {
     if (accessToken != null) {
-      setIsLoading(true)
+      setLoading(true)
       getUser()
           .then(getTransactions)
           .then(() => router.push("/analytics"))
@@ -74,7 +74,7 @@ function RootLayoutNav() {
             setErrorAlert(e.message)
             clearUser()
           })
-          .finally(() => setTimeout(() => setIsLoading(false), 1000))
+          .finally(() => setTimeout(() => setLoading(false), 1000))
     } else {
       router.push('/')
     }
