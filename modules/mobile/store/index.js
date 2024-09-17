@@ -51,7 +51,7 @@ const useStore = create((set, get) => ({
   addUpdatedCategory: (category) => {
     const categories = [...get().categories.filter(c => c.id !== category.id), category]
     get().setCategories(sortedBy(categories, c => c.name))
-    const transactions = get().transactions.map(t => t.categoryId === category.id ? ({...t, category}) : t)
+    const transactions = get().transactions.map(t => t.category.id === category.id ? ({...t, category}) : t)
     get().setTransactions(transactions)
   },
   displayDate: null,

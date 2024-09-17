@@ -68,7 +68,7 @@ export default {
   computed: {
     breakdown () {
       const grouped = this.transactions.reduce((acc, tx) => {
-        const catId = tx.categoryId
+        const catId = tx.category.id
         if (!acc[catId]) {
           acc[catId] = { count: 0, total: 0, ...tx.category }
         }

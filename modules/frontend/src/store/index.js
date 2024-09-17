@@ -65,17 +65,17 @@ export default new Vuex.Store({
     transactionsByCatsCount: state => state.transactions
       .filter(t => t.hidden !== true)
       .reduce((acc, tx) => {
-        if (!acc[tx.categoryId]) {
-          acc[tx.categoryId] = 0
+        if (!acc[tx.category.id]) {
+          acc[tx.category.id] = 0
         }
-        acc[tx.categoryId] = acc[tx.categoryId] + 1
+        acc[tx.category.id] = acc[tx.category.id] + 1
         return acc
       }, {}),
     filteredCats: state => state.categories.filter(c => c.hidden !== true),
     incomeCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'income'),
     expenseCats: (state, getters) => getters.filteredCats.filter(c => c.kind === 'expense'),
     filteredTransactions: state => state.transactions
-      .filter(t => state.filterBy.includes(t.categoryId))
+      .filter(t => state.filterBy.includes(t.category.id))
       .filter(t => t.hidden !== true)
       .filter(t => t.category.hidden !== true)
       .filter(t => t.amount.currency.code === state.user.settings.currency.code)
@@ -130,12 +130,12 @@ export default new Vuex.Store({
     updateCategory (state, category) {
       const catId = category.id
       state.categories = state.categories.map(c => c.id === catId ? category : c).sort(catSorts.name(false))
-      state.transactions = state.transactions.map(tx => tx.categoryId === catId ? { ...tx, category } : tx)
+      state.transactions = state.transactions.map(tx => tx.category.id === catId ? { ...tx, category } : tx)
     },
     hideCategory (state, { id, hidden }) {
       state.categories = state.categories.map(cat => cat.id === id ? { ...cat, hidden } : cat)
       state.filterBy = hidden ? state.filterBy.filter(c => c !== id) : [...state.filterBy, id]
-      state.transactions = state.transactions.map(t => t.categoryId === id ? { ...t, category: { ...t.category, hidden } } : t)
+      state.transactions = state.transactions.map(t => t.category.id === id ? { ...t, category: { ...t.category, hidden } } : t)
     },
     setTransactions (state, txs) {
       state.transactions = txs
