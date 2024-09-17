@@ -12,7 +12,7 @@ const txSorts = {
 }
 
 const catSorts = {
-  name: (desc) => (a, b) => desc ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name),
+  name: (desc) => (a, b) => desc ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
 }
 
 const withinDates = (txs, { start, end }) => txs.filter(tx => {
