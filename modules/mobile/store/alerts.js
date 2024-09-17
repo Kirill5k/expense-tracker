@@ -1,4 +1,4 @@
-const ALERTS = {
+export default {
   LOGIN_SUCCESS: {
     type: 'success',
     message: 'Successfully signed in into the account! Loading transactions'
@@ -16,5 +16,3 @@ const ALERTS = {
     message: 'Your session has expired. Please sign in again'
   }
 }
-
-export default ALERTS

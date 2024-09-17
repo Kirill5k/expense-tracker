@@ -53,12 +53,25 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === ' dark'
-  const { alert, clearAlert, accessToken, getUser } = useStore();
+  const {
+    alert,
+    clearAlert,
+    setErrorAlert,
+    accessToken,
+    clearUser,
+    getUser,
+    getTransactions,
+  } = useStore();
 
   useEffect(() => {
     if (accessToken != null) {
       getUser()
-      router.push("/analytics")
+          .then(getTransactions)
+          .then(() => router.push("/analytics"))
+          .catch(e => {
+            setErrorAlert(e.message)
+            clearUser()
+          })
     } else {
       router.push('/')
     }

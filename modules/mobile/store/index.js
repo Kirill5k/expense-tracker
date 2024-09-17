@@ -96,25 +96,6 @@ const useStore = create((set, get) => ({
     user: {},
     isLoading: false
   }),
-  getUser: async () => {
-    try {
-      set({isLoading: true})
-      const user = await Clients.get(get().isOnline).getUser(get().accessToken)
-      if (!get().user?.id || get().user?.id === user.id) {
-        set({user})
-        get().setCategories(user.categories)
-        await get().getTransactions()
-      } else {
-        get().clearUser()
-        set({alert: Alerts.SESSION_EXPIRED})
-      }
-    } catch (e) {
-      get().setErrorAlert(e.message)
-      get().clearUser()
-    } finally {
-      set({isLoading: false})
-    }
-  },
   login: async (creds) => {
     try {
       get().clearAlert()
@@ -132,11 +113,27 @@ const useStore = create((set, get) => ({
       set({isLoading: false})
     }
   },
-  getTransactions: () => Clients
-      .get(get().isOnline)
-      .getTransactions(get().accessToken)
-      .then(txs => get().setTransactions(txs))
-      .catch(err => handleError(get, err)),
+  getUser: async () => {
+    set({isLoading: true})
+    return Clients.get(get().isOnline)
+        .getUser(get().accessToken)
+        .then(user => {
+          if (!get().user?.id || get().user?.id === user.id) {
+            set({user})
+            get().setCategories(user.categories)
+          } else {
+            return Promise.reject(new Error(Alerts.SESSION_EXPIRED.message))
+          }
+        })
+        .finally(() => set({isLoading: false}))
+  },
+  getTransactions: () => {
+    set({isLoading: true})
+    return Clients.get(get().isOnline)
+        .getTransactions(get().accessToken)
+        .then(txs => get().setTransactions(txs))
+        .finally(() => set({isLoading: false}))
+  },
   updateTransaction: (tx) => Clients
       .get(get().isOnline)
       .updateTransaction(get().accessToken, tx)
