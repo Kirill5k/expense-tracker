@@ -7,7 +7,7 @@ const FloatingButton = ({onPress, mode, iconCode}) => {
       <Fab
           onPress={onPress}
           placement="bottom right"
-          className="bg-background-50"
+          className="bg-background-50 border border-outline-300"
       >
         <FabIcon
             as={MaterialIcon}
