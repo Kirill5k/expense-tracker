@@ -86,6 +86,7 @@ function RootLayoutNav() {
         <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
           <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
             <StackWithToast
+                placement="top"
                 screenOptions={{headerShown: false}}
                 onToastClose={clearAlert}
                 toastType={alert?.type}

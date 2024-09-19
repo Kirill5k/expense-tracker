@@ -199,7 +199,7 @@ export const ToastDescription = React.forwardRef(({ className, size = 'md', ...p
 });
 
 export const withToast = (ChildComponent) => {
-  return ({toastType, toastMessage, onToastClose, ...props}) => {
+  return ({placement, toastType, toastMessage, onToastClose, ...props}) => {
     const [toastId, setToastId] = React.useState(0)
     const toast = useToast();
 
@@ -210,7 +210,7 @@ export const withToast = (ChildComponent) => {
         toast.show({
           duration: 3000,
           id: newId,
-          placement: "bottom",
+          placement,
           render: ({id}) => (
               <Toast id={"toast-" + id} variant="outline" action={toastType}>
                 <ToastTitle>{toastType.charAt(0).toUpperCase() + toastType.slice(1) + '!'}</ToastTitle>
