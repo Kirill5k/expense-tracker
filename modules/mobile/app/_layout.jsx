@@ -2,6 +2,7 @@ import '@/global.css'
 import 'react-native-reanimated'
 import React, {useEffect} from 'react'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
+import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
 import {router, Stack} from 'expo-router'
@@ -81,19 +82,21 @@ function RootLayoutNav() {
   }, [accessToken])
 
   return (
-      <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
-        <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-          <StackWithToast
-              screenOptions={{headerShown: false}}
-              onToastClose={clearAlert}
-              toastType={alert?.type}
-              toastMessage={alert?.message}
-          >
-            <Stack.Screen name="(dashboard)"/>
-            <Stack.Screen name="auth/signup"/>
-          </StackWithToast>
-        </ThemeProvider>
-      </GluestackUIProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
+          <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+            <StackWithToast
+                screenOptions={{headerShown: false}}
+                onToastClose={clearAlert}
+                toastType={alert?.type}
+                toastMessage={alert?.message}
+            >
+              <Stack.Screen name="(dashboard)"/>
+              <Stack.Screen name="auth/signup"/>
+            </StackWithToast>
+          </ThemeProvider>
+        </GluestackUIProvider>
+      </GestureHandlerRootView>
   );
 }
 
