@@ -12,26 +12,6 @@ const tabs = [
   {icon: 'account-cog', text: 'Settings', path: 'settings'}
 ]
 
-/* OLD LAYOUT
-        <VStack className="h-full w-full bg-background-0">
-          <Box className="md:hidden">
-            <MobileHeader title={title}/>
-          </Box>
-          <Box className="hidden md:flex">
-            <WebHeader onSidebarToggle={() => setIsSidebarVisible(!isSidebarVisible)} title={title}/>
-          </Box>
-          <VStack className="h-full w-full">
-            <HStack className="h-full w-full">
-              <Box className="hidden md:flex h-full">
-                {isSidebarVisible && <Sidebar tabs={bottomTabs}/>}
-              </Box>
-              <VStack className="w-full">{children}</VStack>
-            </HStack>
-          </VStack>
-        </VStack>
-        <MobileFooter tabs={bottomTabs}/>
- */
-
 const DashboardLayout = () => {
   const colorScheme = useColorScheme();
   // docs: https://reactnavigation.org/docs/bottom-tab-navigator/#options
