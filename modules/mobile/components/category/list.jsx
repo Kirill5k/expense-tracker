@@ -7,7 +7,7 @@ import {Avatar} from '@/components/ui/avatar'
 import ListItemPressable from '@/components/common/list-item-pressable'
 import Classes from '@/constants/classes'
 
-const CategoryList = ({items, onItemPress, disabled}) => {
+const CategoryList = ({items, onItemPress, disabled, onItemDelete}) => {
   return (
       <VStack className={Classes.listLayout} space="sm">
         {items.map(c => (
@@ -15,6 +15,7 @@ const CategoryList = ({items, onItemPress, disabled}) => {
                 disabled={disabled}
                 key={c.id}
                 onPress={() => onItemPress(c)}
+                onDelete={() => onItemDelete(c)}
             >
               <HStack className="items-center p-2">
                 <Avatar size="sm" style={{backgroundColor: c.color}}>

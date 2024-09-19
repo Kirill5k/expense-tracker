@@ -89,6 +89,12 @@ export const Transactions = () => {
                 setTxToUpdate(tx)
                 setShowModal(true)
               }}
+              onItemCopy={tx => {
+                console.log('copy', tx)
+              }}
+              onItemDelete={tx => {
+                console.log('delete', tx)
+              }}
           />
         </ScrollView>
         <FloatingButton

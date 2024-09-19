@@ -11,7 +11,7 @@ import {calcTotal, formatAmount} from '@/utils/transactions'
 import Classes from '@/constants/classes'
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
-const TransactionGroup = ({disabled, items, onItemPress}) => {
+const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
       <VStack className={Classes.listLayout} space="sm">
         {items.map(tx => (
@@ -19,6 +19,8 @@ const TransactionGroup = ({disabled, items, onItemPress}) => {
                 disabled={disabled}
                 key={tx.id}
                 onPress={() => onItemPress(tx)}
+                onCopy={() => onItemCopy(tx)}
+                onDelete={() => onItemDelete(tx)}
             >
               <HStack className="items-center p-2">
                 <Avatar size="sm" style={{backgroundColor: tx.category.color}}>
@@ -52,7 +54,7 @@ const TransactionGroup = ({disabled, items, onItemPress}) => {
   )
 }
 
-const TransactionList = ({disabled, items, onItemPress}) => {
+const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   const groupedItems = groupBy(items, i => i.date)
 
   const formatDate = (isoDate) => {
@@ -70,14 +72,16 @@ const TransactionList = ({disabled, items, onItemPress}) => {
       <VStack className="w-full py-2" space="xl">
         {Object.entries(groupedItems).map(([date, txGroup]) => (
             <VStack key={date}>
-              <HStack className="flex items-center justify-between">
+              <HStack className="items-center">
                 <Heading size="xs" className="mb-1">{formatDate(date)}</Heading>
-                <Text className="text-xs">{calcTotal(txGroup)}</Text>
+                <Text className="text-xs ml-auto">{calcTotal(txGroup)}</Text>
               </HStack>
               <TransactionGroup
                   disabled={disabled}
                   items={txGroup}
                   onItemPress={onItemPress}
+                  onItemCopy={onItemCopy}
+                  onItemDelete={onItemDelete}
               />
             </VStack>
         ))}

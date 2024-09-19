@@ -4,29 +4,33 @@ import {HStack} from '@/components/ui/hstack'
 import {Button, ButtonIcon} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
 import Swipeable from 'react-native-gesture-handler/Swipeable'
-import {Text, Animated} from 'react-native'
+import {Animated} from 'react-native'
 
-function LegacyRightAction(prog, drag) {
-  const trans = Animated.add(drag, new Animated.Value(50));
-
+const RightAction = ({onCopy, onDelete}) => (prog, drag) => {
+  const withCopyButton = onCopy != null
+  const trans = Animated.add(drag, new Animated.Value(withCopyButton ? 100 : 50));
   return (
       <Animated.View
-          className="rounded-r-xl bg-background-200 w-14 h-full"
+          className={`rounded-r-xl bg-background-200 h-full ${withCopyButton ? 'w-28' : 'w-14'}`}
           style={{
             transform: [{translateX: trans}],
           }}
       >
-        <HStack className="w-full h-full p-1">
-          <Button size="sm" className="rounded-xl w-12 h-full p-0 bg-red-500" action="negative">
-            {/* EditIcon is imported from 'lucide-react-native' */}
-            <ButtonIcon as={MaterialIcon} code="trash-can" dsize={24} dcolor="white" />
+        <HStack className="w-full h-full p-1" space="xs">
+          {withCopyButton && (
+              <Button size="sm" className="rounded-xl w-12 h-full p-0 bg-sky-500" action="positive" onPress={onCopy}>
+                <ButtonIcon as={MaterialIcon} code="content-copy" dsize={16} dcolor="white" />
+              </Button>
+          )}
+          <Button size="sm" className="rounded-xl w-12 h-full p-0 bg-red-500" action="negative" onPress={onDelete}>
+            <ButtonIcon as={MaterialIcon} code="trash-can" dsize={16} dcolor="white" />
           </Button>
         </HStack>
       </Animated.View>
   );
 }
 
-const ListItemPressable = ({onPress, children, disabled}) => {
+const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
   const [isPressed, setIsPressed] = useState(false)
   return (
       <Swipeable
@@ -34,7 +38,7 @@ const ListItemPressable = ({onPress, children, disabled}) => {
           friction={2}
           enableTrackpadTwoFingerGesture
           rightThreshold={40}
-          renderRightActions={LegacyRightAction}
+          renderRightActions={RightAction({onCopy, onDelete})}
       >
         <Pressable
             disabled={disabled}

@@ -68,9 +68,12 @@ export const Categories = () => {
           <CategoryList
               items={categories}
               disabled={loading}
-              onItemPress={tx => {
-                setCatToUpdate(tx)
+              onItemPress={c => {
+                setCatToUpdate(c)
                 setShowModal(true)
+              }}
+              onItemDelete={c => {
+                console.log('delete cat', c)
               }}
           />
           <Box className="py-1"></Box>
