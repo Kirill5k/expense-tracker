@@ -9,7 +9,7 @@ import ListItemPressable from '@/components/common/list-item-pressable'
 import {groupBy} from '@/utils/arrays'
 import {calcTotal, formatAmount} from '@/utils/transactions'
 import Classes from '@/constants/classes'
-import {ScrollView} from '@/components/ui/scroll-view'
+import {VirtualizedList} from '@/components/ui/virtualized-list'
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
 const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
@@ -55,8 +55,8 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
   )
 }
 
-const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll, children}) => {
-  const groupedItems = groupBy(items, i => i.date)
+const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
+  const groupedItems = Object.entries(groupBy(items, i => i.date))
 
   const formatDate = (isoDate) => {
     const date = parseISO(isoDate);
@@ -70,29 +70,31 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
   }
 
   return (
-      <ScrollView
-          className={Classes.scrollList}
-          showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[0]}
+      <VirtualizedList
           onScroll={onScroll}
-      >
-        {children}
-        {Object.entries(groupedItems).map(([date, txGroup]) => (
-            <VStack className="mb-5" key={date}>
-              <HStack className="items-center">
-                <Heading size="xs" className="mb-1">{formatDate(date)}</Heading>
-                <Text className="text-xs ml-auto">{calcTotal(txGroup)}</Text>
-              </HStack>
-              <TransactionGroup
-                  disabled={disabled}
-                  items={txGroup}
-                  onItemPress={onItemPress}
-                  onItemCopy={onItemCopy}
-                  onItemDelete={onItemDelete}
-              />
-            </VStack>
-        ))}
-      </ScrollView>
+          showsVerticalScrollIndicator={false}
+          className={Classes.scrollList}
+          data={groupedItems.map(([date, txGroup]) => ({date, txGroup}))}
+          initialNumToRender={3}
+          getItem={(data, index) => data[index]}
+          keyExtractor={(item) => item.date}
+          getItemCount={(d) => d.length}
+          renderItem={({ item }) => (
+              <VStack className="mb-5">
+                <HStack className="items-center">
+                  <Heading size="xs" className="mb-1">{formatDate(item.date)}</Heading>
+                  <Text className="text-xs ml-auto">{calcTotal(item.txGroup)}</Text>
+                </HStack>
+                <TransactionGroup
+                    disabled={disabled}
+                    items={item.txGroup}
+                    onItemPress={onItemPress}
+                    onItemCopy={onItemCopy}
+                    onItemDelete={onItemDelete}
+                />
+              </VStack>
+          )}
+      />
   )
 }
 

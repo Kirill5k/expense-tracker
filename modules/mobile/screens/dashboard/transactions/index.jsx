@@ -3,7 +3,6 @@ import {VStack} from '@/components/ui/vstack'
 import {Box} from '@/components/ui/box'
 import {Heading} from '@/components/ui/heading'
 import {Divider} from '@/components/ui/divider'
-import {ScrollView} from '@/components/ui/scroll-view'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
 import DatePeriodSelect from '@/components/common/date-period-select'
@@ -56,6 +55,20 @@ export const Transactions = () => {
             value={displayDate}
             onSelect={setDisplayDate}
         />
+        <Box>
+          {headerSize === 'sm' && <Divider/>}
+          {loading && <Progress.Bar
+              height={3}
+              animationType="decay"
+              borderRadius={0}
+              borderWidth={0}
+              indeterminateAnimationDuration={250}
+              width={null}
+              indeterminate={true}
+              color={Colors[mode].tint}
+              borderColor={Colors[mode].tint}
+          />}
+        </Box>
         <TransactionList
             disabled={loading}
             items={displayedTransactions}
@@ -76,22 +89,7 @@ export const Transactions = () => {
                 setHeaderSize('sm')
               }
             }}
-        >
-          <Box>
-            {headerSize === 'sm' && <Divider/>}
-            {loading && <Progress.Bar
-                height={3}
-                animationType="decay"
-                borderRadius={0}
-                borderWidth={0}
-                indeterminateAnimationDuration={250}
-                width={null}
-                indeterminate={true}
-                color={Colors[mode].tint}
-                borderColor={Colors[mode].tint}
-            />}
-          </Box>
-        </TransactionList>
+        />
         <FloatingButton
             onPress={() => {
               setTxToUpdate(null)
