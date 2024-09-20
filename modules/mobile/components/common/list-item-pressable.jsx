@@ -6,7 +6,7 @@ import {MaterialIcon} from '@/components/ui/icon'
 import Swipeable from 'react-native-gesture-handler/Swipeable'
 import {Animated} from 'react-native'
 
-const RightAction = ({onCopy, onDelete}) => (prog, drag) => {
+const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
   const withCopyButton = onCopy != null
   const trans = Animated.add(drag, new Animated.Value(withCopyButton ? 100 : 50));
   return (
@@ -18,11 +18,27 @@ const RightAction = ({onCopy, onDelete}) => (prog, drag) => {
       >
         <HStack className="w-full h-full p-1" space="xs">
           {withCopyButton && (
-              <Button size="sm" className="rounded-xl w-12 h-full p-0 bg-sky-500" action="positive" onPress={onCopy}>
+              <Button
+                  size="sm"
+                  className="rounded-xl w-12 h-full p-0 bg-sky-500"
+                  action="positive"
+                  onPress={() => {
+                    onCopy()
+                    swipeableRef?.current?.close()
+                  }}
+              >
                 <ButtonIcon as={MaterialIcon} code="content-copy" dsize={16} dcolor="white" />
               </Button>
           )}
-          <Button size="sm" className="rounded-xl w-12 h-full p-0 bg-red-500" action="negative" onPress={onDelete}>
+          <Button
+              size="sm"
+              className="rounded-xl w-12 h-full p-0 bg-red-500"
+              action="negative"
+              onPress={() => {
+                onDelete()
+                swipeableRef?.current?.close()
+              }}
+          >
             <ButtonIcon as={MaterialIcon} code="trash-can" dsize={16} dcolor="white" />
           </Button>
         </HStack>
@@ -31,14 +47,16 @@ const RightAction = ({onCopy, onDelete}) => (prog, drag) => {
 }
 
 const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
+  const ref = React.useRef(null)
   const [isPressed, setIsPressed] = useState(false)
   return (
       <Swipeable
+          ref={ref}
           overshootRight={false}
           friction={2}
           enableTrackpadTwoFingerGesture
           rightThreshold={40}
-          renderRightActions={RightAction({onCopy, onDelete})}
+          renderRightActions={RightAction({onCopy, onDelete, swipeableRef: ref})}
       >
         <Pressable
             disabled={disabled}
