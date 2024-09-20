@@ -9,6 +9,7 @@ import ListItemPressable from '@/components/common/list-item-pressable'
 import {groupBy} from '@/utils/arrays'
 import {calcTotal, formatAmount} from '@/utils/transactions'
 import Classes from '@/constants/classes'
+import {ScrollView} from '@/components/ui/scroll-view'
 import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
 const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
@@ -54,7 +55,7 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
   )
 }
 
-const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
+const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll, children}) => {
   const groupedItems = groupBy(items, i => i.date)
 
   const formatDate = (isoDate) => {
@@ -69,9 +70,15 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
   }
 
   return (
-      <VStack className="w-full py-2" space="xl">
+      <ScrollView
+          className={Classes.scrollList}
+          showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={[0]}
+          onScroll={onScroll}
+      >
+        {children}
         {Object.entries(groupedItems).map(([date, txGroup]) => (
-            <VStack key={date}>
+            <VStack className="mb-5" key={date}>
               <HStack className="items-center">
                 <Heading size="xs" className="mb-1">{formatDate(date)}</Heading>
                 <Text className="text-xs ml-auto">{calcTotal(txGroup)}</Text>
@@ -85,7 +92,7 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
               />
             </VStack>
         ))}
-      </VStack>
+      </ScrollView>
   )
 }
 

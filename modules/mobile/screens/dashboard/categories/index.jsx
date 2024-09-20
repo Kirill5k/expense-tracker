@@ -1,9 +1,8 @@
 import React, {useState} from 'react'
-import {VStack} from '@/components/ui/vstack';
+import {VStack} from '@/components/ui/vstack'
 import {Divider} from '@/components/ui/divider'
-import {Box} from '@/components/ui/box';
-import {Heading} from '@/components/ui/heading';
-import {ScrollView} from "@/components/ui/scroll-view";
+import {Box} from '@/components/ui/box'
+import {Heading} from '@/components/ui/heading'
 import * as Progress from 'react-native-progress'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
@@ -39,10 +38,16 @@ export const Categories = () => {
         <Heading size={headerSize} className="font-roboto pb-2">
           Categories
         </Heading>
-        <ScrollView
-            className="max-w-[600px] flex-1 w-full"
-            showsVerticalScrollIndicator={false}
-            stickyHeaderIndices={[0]}
+        <CategoryList
+            items={categories}
+            disabled={loading}
+            onItemPress={c => {
+              setCatToUpdate(c)
+              setShowModal(true)
+            }}
+            onItemDelete={c => {
+              console.log('delete cat', c)
+            }}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 40) {
                 setHeaderSize('2xl')
@@ -65,19 +70,7 @@ export const Categories = () => {
                 borderColor={Colors[mode].tint}
             />}
           </Box>
-          <CategoryList
-              items={categories}
-              disabled={loading}
-              onItemPress={c => {
-                setCatToUpdate(c)
-                setShowModal(true)
-              }}
-              onItemDelete={c => {
-                console.log('delete cat', c)
-              }}
-          />
-          <Box className="py-1"></Box>
-        </ScrollView>
+        </CategoryList>
         <FloatingButton
             onPress={() => {
               setCatToUpdate(null)

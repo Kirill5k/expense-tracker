@@ -56,12 +56,21 @@ export const Transactions = () => {
             value={displayDate}
             onSelect={setDisplayDate}
         />
-        <ScrollView
-            className="max-w-[600px] flex-1"
-            showsVerticalScrollIndicator={false}
-            stickyHeaderIndices={[0]}
+        <TransactionList
+            disabled={loading}
+            items={displayedTransactions}
+            onItemPress={tx => {
+              setTxToUpdate(tx)
+              setShowModal(true)
+            }}
+            onItemCopy={tx => {
+              console.log('copy', tx)
+            }}
+            onItemDelete={tx => {
+              console.log('delete', tx)
+            }}
             onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 40) {
+              if (nativeEvent.contentOffset.y <= 20) {
                 setHeaderSize('2xl')
               } else {
                 setHeaderSize('sm')
@@ -82,21 +91,7 @@ export const Transactions = () => {
                 borderColor={Colors[mode].tint}
             />}
           </Box>
-          <TransactionList
-              disabled={loading}
-              items={displayedTransactions}
-              onItemPress={tx => {
-                setTxToUpdate(tx)
-                setShowModal(true)
-              }}
-              onItemCopy={tx => {
-                console.log('copy', tx)
-              }}
-              onItemDelete={tx => {
-                console.log('delete', tx)
-              }}
-          />
-        </ScrollView>
+        </TransactionList>
         <FloatingButton
             onPress={() => {
               setTxToUpdate(null)
