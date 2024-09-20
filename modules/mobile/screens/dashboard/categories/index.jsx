@@ -38,6 +38,20 @@ export const Categories = () => {
         <Heading size={headerSize} className="font-roboto pb-2">
           Categories
         </Heading>
+        <Box>
+          {headerSize === 'sm' && <Divider/>}
+          {loading && <Progress.Bar
+              height={3}
+              animationType="decay"
+              borderRadius={0}
+              borderWidth={0}
+              indeterminateAnimationDuration={250}
+              width={null}
+              indeterminate={true}
+              color={Colors[mode].tint}
+              borderColor={Colors[mode].tint}
+          />}
+        </Box>
         <CategoryList
             items={categories}
             disabled={loading}
@@ -55,22 +69,7 @@ export const Categories = () => {
                 setHeaderSize('sm')
               }
             }}
-        >
-          <Box>
-            {headerSize === 'sm' && <Divider/>}
-            {loading && <Progress.Bar
-                height={3}
-                animationType="decay"
-                borderRadius={0}
-                borderWidth={0}
-                indeterminateAnimationDuration={250}
-                width={null}
-                indeterminate={true}
-                color={Colors[mode].tint}
-                borderColor={Colors[mode].tint}
-            />}
-          </Box>
-        </CategoryList>
+        />
         <FloatingButton
             onPress={() => {
               setCatToUpdate(null)
