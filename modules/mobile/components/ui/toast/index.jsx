@@ -198,29 +198,36 @@ export const ToastDescription = React.forwardRef(({ className, size = 'md', ...p
   );
 });
 
+const formatToastTitle = (notification) => {
+  if (!notification?.type) {
+    return 'Error!'
+  }
+  return notification?.type?.charAt(0).toUpperCase() + notification?.type.slice(1) + '!'
+}
+
 export const withToast = (ChildComponent) => {
-  return ({placement, toastType, toastMessage, onToastClose, ...props}) => {
+  return ({notification, onToastClose, ...props}) => {
     const [toastId, setToastId] = React.useState(0)
     const toast = useToast();
 
     React.useEffect(() => {
-      if (toastMessage) {
+      if (notification?.message) {
         const newId = Math.random()
         setToastId(newId)
         toast.show({
           duration: 3000,
           id: newId,
-          placement,
+          placement: notification?.type === 'info' ? 'bottom' : 'top',
           render: ({id}) => (
-              <Toast id={"toast-" + id} variant="outline" action={toastType}>
-                <ToastTitle>{toastType.charAt(0).toUpperCase() + toastType.slice(1) + '!'}</ToastTitle>
-                <ToastDescription>{toastMessage}</ToastDescription>
+              <Toast id={"toast-" + id} variant="outline" action={notification?.type || 'error'}>
+                <ToastTitle>{formatToastTitle(notification)}</ToastTitle>
+                <ToastDescription>{notification?.message}</ToastDescription>
               </Toast>
           ),
           onCloseComplete: onToastClose,
         });
       }
-    }, [toastMessage]);
+    }, [notification?.message]);
 
     return (
         <ChildComponent {...props}/>

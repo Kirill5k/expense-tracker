@@ -86,11 +86,9 @@ function RootLayoutNav() {
         <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
           <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
             <StackWithToast
-                placement="top"
                 screenOptions={{headerShown: false}}
                 onToastClose={clearAlert}
-                toastType={alert?.type}
-                toastMessage={alert?.message}
+                notification={alert}
             >
               <Stack.Screen name="(dashboard)"/>
               <Stack.Screen name="auth/signup"/>
