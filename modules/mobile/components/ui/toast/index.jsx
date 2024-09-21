@@ -1,15 +1,15 @@
 'use client';
 import React from 'react';
-import { createToast, createToastHook } from '@gluestack-ui/toast';
-import { Text, View, Platform } from 'react-native';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
-import { cssInterop } from 'nativewind';
-import { Motion, AnimatePresence } from '@legendapp/motion';
-import {
-  withStyleContext,
-  useStyleContext,
-} from '@gluestack-ui/nativewind-utils/withStyleContext';
-import { withStyleContextAndStates } from '@gluestack-ui/nativewind-utils/withStyleContextAndStates';
+import {Text, View, Platform} from 'react-native'
+import {createToast, createToastHook} from '@gluestack-ui/toast'
+import {tva} from '@gluestack-ui/nativewind-utils/tva'
+import {withStyleContext, useStyleContext} from '@gluestack-ui/nativewind-utils/withStyleContext'
+import {withStyleContextAndStates} from '@gluestack-ui/nativewind-utils/withStyleContextAndStates'
+import {Motion, AnimatePresence} from '@legendapp/motion'
+import {cssInterop} from 'nativewind'
+import {Button, ButtonText} from "../button"
+import {HStack} from "../hstack"
+import {VStack} from "../vstack"
 
 export const useToast = createToastHook(Motion.View, AnimatePresence);
 const SCOPE = 'TOAST';
@@ -19,10 +19,10 @@ export const UIToast = createToast({
   Description: Text,
 });
 
-cssInterop(Motion.View, { className: 'style' });
-cssInterop(UIToast, { className: 'style' });
-cssInterop(UIToast.Title, { className: 'style' });
-cssInterop(UIToast.Description, { className: 'style' });
+cssInterop(Motion.View, {className: 'style'});
+cssInterop(UIToast, {className: 'style'});
+cssInterop(UIToast.Title, {className: 'style'});
+cssInterop(UIToast.Description, {className: 'style'});
 
 const toastStyle = tva({
   base: 'p-4 m-1 rounded-md gap-1 web:pointer-events-auto shadow-hard-5 border-outline-100',
@@ -150,65 +150,57 @@ const toastDescriptionStyle = tva({
   },
 });
 
-
-export const Toast = React.forwardRef(({ className, variant = 'solid', action = 'muted', ...props }, ref) => {
+export const Toast = React.forwardRef(({className, variant = 'solid', action = 'muted', ...props}, ref) => {
   return (
-    <UIToast
-      ref={ref}
-      className={toastStyle({ variant, action, class: className })}
-      context={{ variant, action }}
-      {...props}
-    />
+      <UIToast
+          ref={ref}
+          className={toastStyle({variant, action, class: className})}
+          context={{variant, action}}
+          {...props}
+      />
   );
 });
 
-export const ToastTitle = React.forwardRef(({ className, size = 'md', ...props }, ref) => {
-  const { variant: parentVariant, action: parentAction } =
-    useStyleContext(SCOPE);
+export const ToastTitle = React.forwardRef(({className, size = 'md', ...props}, ref) => {
+  const {variant: parentVariant, action: parentAction} =
+      useStyleContext(SCOPE);
   return (
-    <UIToast.Title
-      ref={ref}
-      {...props}
-      className={toastTitleStyle({
-        size,
-        class: className,
-        parentVariants: {
-          variant: parentVariant,
-          action: parentAction,
-        },
-      })}
-    />
+      <UIToast.Title
+          ref={ref}
+          {...props}
+          className={toastTitleStyle({
+            size,
+            class: className,
+            parentVariants: {
+              variant: parentVariant,
+              action: parentAction,
+            },
+          })}
+      />
   );
 });
 
-export const ToastDescription = React.forwardRef(({ className, size = 'md', ...props }, ref) => {
-  const { variant: parentVariant } = useStyleContext(SCOPE);
+export const ToastDescription = React.forwardRef(({className, size = 'md', ...props}, ref) => {
+  const {variant: parentVariant} = useStyleContext(SCOPE);
   return (
-    <UIToast.Description
-      ref={ref}
-      {...props}
-      className={toastDescriptionStyle({
-        size,
-        class: className,
-        parentVariants: {
-          variant: parentVariant,
-        },
-      })}
-    />
+      <UIToast.Description
+          ref={ref}
+          {...props}
+          className={toastDescriptionStyle({
+            size,
+            class: className,
+            parentVariants: {
+              variant: parentVariant,
+            },
+          })}
+      />
   );
 });
-
-const formatToastTitle = (notification) => {
-  if (!notification?.type) {
-    return 'Error!'
-  }
-  return notification?.type?.charAt(0).toUpperCase() + notification?.type.slice(1) + '!'
-}
 
 export const withToast = (ChildComponent) => {
   return ({notification, onToastClose, ...props}) => {
     const [toastId, setToastId] = React.useState(0)
-    const toast = useToast();
+    const toast = useToast()
 
     React.useEffect(() => {
       if (notification?.message) {
@@ -219,9 +211,34 @@ export const withToast = (ChildComponent) => {
           id: newId,
           placement: notification?.type === 'info' ? 'bottom' : 'top',
           render: ({id}) => (
-              <Toast id={"toast-" + id} variant="outline" action={notification?.type || 'error'}>
-                <ToastTitle>{formatToastTitle(notification)}</ToastTitle>
-                <ToastDescription>{notification?.message}</ToastDescription>
+              <Toast
+                  nativeId={`toast-${id}`}
+                  variant="outline"
+                  action={notification?.type || 'error'}
+              >
+                <HStack className="justify-between align-center" space="md">
+                  <VStack className="justify-center">
+                    {notification?.title && <ToastTitle>{notification.title}</ToastTitle>}
+                    <ToastDescription>{notification?.message}</ToastDescription>
+                  </VStack>
+                  <VStack className="justify-center">
+                    {notification?.undoAction && (
+                        <Button
+                            variant="link"
+                            size="sm"
+                            className="self-center"
+                            onPress={() => {
+                              toast.close(id)
+                              notification.undoAction()
+                            }}
+                        >
+                          <ButtonText>
+                            UNDO
+                          </ButtonText>
+                        </Button>
+                    )}
+                  </VStack>
+                </HStack>
               </Toast>
           ),
           onCloseComplete: onToastClose,

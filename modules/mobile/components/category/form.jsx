@@ -39,7 +39,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
     defaultValues: {
       kind: category?.kind || 'expense',
       name: category?.name || '',
-      color: category?.color || 'red',
+      color: category?.color || '#FF0000',
       icon: category?.icon || ''
     },
     resolver: zodResolver(categorySchema)

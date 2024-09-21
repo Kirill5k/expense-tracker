@@ -37,12 +37,14 @@ const withinDates = (txs, dd) => !dd ? txs : txs.filter(tx => {
 const useStore = create((set, get) => ({
   mode: 'light',
   categories: [],
+  displayedCategories: [],
   incomeCategories: [],
   expenseCategories: [],
   setCategories: (categories) => {
-    const incomeCategories = categories.filter(c => c.kind === 'income')
-    const expenseCategories = categories.filter(c => c.kind === 'expense')
-    set({incomeCategories, expenseCategories, categories})
+    const displayedCategories = categories.filter(c => !c.hidden)
+    const incomeCategories = displayedCategories.filter(c => c.kind === 'income')
+    const expenseCategories = displayedCategories.filter(c => c.kind === 'expense')
+    set({incomeCategories, expenseCategories, categories, displayedCategories})
   },
   addCreatedCategory: (newCat) => {
     const categories = insertSorted(get().categories, newCat, c => c.name)
@@ -52,6 +54,12 @@ const useStore = create((set, get) => ({
     const categories = [...get().categories.filter(c => c.id !== category.id), category]
     get().setCategories(sortedBy(categories, c => c.name))
     const transactions = get().transactions.map(t => t.category.id === category.id ? ({...t, category}) : t)
+    get().setTransactions(transactions)
+  },
+  setHiddenForCategory: (id, hidden) => {
+    const cats = get().categories.map(c => c.id === id ? {...c, hidden} : c)
+    get().setCategories(cats)
+    const transactions = get().transactions.map(t => t.category.id === id ? ({...t, category: {...t.category, hidden}}) : t)
     get().setTransactions(transactions)
   },
   displayDate: null,
@@ -89,7 +97,8 @@ const useStore = create((set, get) => ({
       darkMode: null
     }
   },
-  setErrorAlert: (message) => set({alert: {type: 'error', message}}),
+  setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
+  setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
   clearAlert: () => set({alert: null}),
   clearUser: () => set({
     isAuthenticated: false,
@@ -142,6 +151,16 @@ const useStore = create((set, get) => ({
       .updateCategory(get().accessToken, cat)
       .then(() => get().addUpdatedCategory(cat))
       .catch(err => handleError(get, err)),
+  hideCategory: (id, hidden, undoAction) => Clients
+      .get(get().isOnline)
+      .hideCategory(get().accessToken, {id, hidden})
+      .then(() => {
+        get().setHiddenForCategory(id, hidden)
+        if (hidden) {
+          get().setUndoAlert('Category has been deleted', undoAction)
+        }
+      })
+      .catch(err => handleError(get, err))
 }));
 
 export default useStore;

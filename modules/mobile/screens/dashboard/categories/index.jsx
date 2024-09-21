@@ -20,9 +20,10 @@ export const Categories = () => {
 
   const {
     mode,
-    categories,
+    displayedCategories,
     createCategory,
-    updateCategory
+    updateCategory,
+    hideCategory
   } = useStore()
 
   const handleFormSubmit = (cat) => {
@@ -31,6 +32,15 @@ export const Categories = () => {
     setLoading(true)
     const res = cat.id ? updateCategory(cat) : createCategory(cat)
     return res.then(() => setLoading(false))
+  }
+
+  const handleDelete = (cat) => {
+    const setHidden = (hidden, undoAction) => {
+      setLoading(true)
+      hideCategory(cat.id, hidden, undoAction).then(() => setLoading(false))
+    }
+
+    setHidden(true, () => setHidden(false, null))
   }
 
   return (
@@ -53,15 +63,13 @@ export const Categories = () => {
           />}
         </Box>
         <CategoryList
-            items={categories}
+            items={displayedCategories}
             disabled={loading}
             onItemPress={c => {
               setCatToUpdate(c)
               setShowModal(true)
             }}
-            onItemDelete={c => {
-              console.log('delete cat', c)
-            }}
+            onItemDelete={handleDelete}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 40) {
                 setHeaderSize('2xl')
