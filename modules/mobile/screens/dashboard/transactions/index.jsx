@@ -29,6 +29,7 @@ export const Transactions = () => {
     setDisplayDate,
     createTransaction,
     updateTransaction,
+    hideTransaction
   } = useStore()
 
   const handleFormSubmit = (tx) => {
@@ -37,6 +38,15 @@ export const Transactions = () => {
     setLoading(true)
     const res = tx.id ? updateTransaction(tx) : createTransaction(tx)
     return res.then(() => setLoading(false))
+  }
+
+  const handleItemDelete = (tx) => {
+    const setHidden = (hidden, undoAction) => {
+      setLoading(true)
+      hideTransaction(tx.id, hidden, undoAction).then(() => setLoading(false))
+    }
+
+    setHidden(true, () => setHidden(false, null))
   }
 
   /*
@@ -79,9 +89,7 @@ export const Transactions = () => {
             onItemCopy={tx => {
               console.log('copy', tx)
             }}
-            onItemDelete={tx => {
-              console.log('delete', tx)
-            }}
+            onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 20) {
                 setHeaderSize('2xl')

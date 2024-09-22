@@ -34,7 +34,7 @@ export const Categories = () => {
     return res.then(() => setLoading(false))
   }
 
-  const handleDelete = (cat) => {
+  const handleItemDelete = (cat) => {
     const setHidden = (hidden, undoAction) => {
       setLoading(true)
       hideCategory(cat.id, hidden, undoAction).then(() => setLoading(false))
@@ -69,7 +69,7 @@ export const Categories = () => {
               setCatToUpdate(c)
               setShowModal(true)
             }}
-            onItemDelete={handleDelete}
+            onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 40) {
                 setHeaderSize('2xl')

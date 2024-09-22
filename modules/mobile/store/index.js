@@ -84,6 +84,10 @@ const useStore = create((set, get) => ({
     const transactions = [newTx, ...get().transactions]
     get().setTransactions(transactions)
   },
+  setHiddenForTransaction: (id, hidden) => {
+    const txs = get().transactions.map(t => t.id === id ? ({...t, hidden}) : t)
+    get().setTransactions(txs)
+  },
   alert: null,
   isOnline: true,
   isLoading: false,
@@ -140,6 +144,16 @@ const useStore = create((set, get) => ({
       .get(get().isOnline)
       .createTransaction(get().accessToken, tx)
       .then(tx => get().addCreatedTransaction(tx))
+      .catch(err => handleError(get, err)),
+  hideTransaction: (id, hidden, undoAction) => Clients
+      .get(get().isOnline)
+      .hideTransaction(get().accessToken, {id, hidden})
+      .then(() => {
+        get().setHiddenForTransaction(id, hidden)
+        if (hidden) {
+          get().setUndoAlert('Transaction has been deleted', undoAction)
+        }
+      })
       .catch(err => handleError(get, err)),
   createCategory: (cat) => Clients
       .get(get().isOnline)
