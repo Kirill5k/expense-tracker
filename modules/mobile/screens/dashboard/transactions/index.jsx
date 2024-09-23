@@ -49,6 +49,11 @@ export const Transactions = () => {
     setHidden(true, () => setHidden(false, null))
   }
 
+  const handleItemCopy = (tx) => {
+    setTxToUpdate({...tx, id: null})
+    setShowModal(true)
+  }
+
   /*
   TODO:
    - Filter and search transactions
@@ -86,9 +91,7 @@ export const Transactions = () => {
               setTxToUpdate(tx)
               setShowModal(true)
             }}
-            onItemCopy={tx => {
-              console.log('copy', tx)
-            }}
+            onItemCopy={handleItemCopy}
             onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 20) {
