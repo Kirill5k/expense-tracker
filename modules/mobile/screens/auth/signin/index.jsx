@@ -105,12 +105,16 @@ const LoginForm = ({onSubmit}) => {
                   render={({field: {onChange, onBlur, value}}) => (
                       <Input>
                         <InputField
+                            autoComplete="email"
+                            textContentType="emailAddress"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
                             placeholder="Enter email"
                             value={value}
                             onChangeText={onChange}
                             onBlur={onBlur}
                             onSubmitEditing={handleKeyPress}
-                            returnKeyType="done"
+                            returnKeyType="next"
                         />
                       </Input>
                   )}
