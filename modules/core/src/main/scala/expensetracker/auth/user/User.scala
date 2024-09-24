@@ -40,6 +40,7 @@ object UserSettings {
   )
 }
 
+// TODO: Add avatar
 final case class User(
     id: UserId,
     email: UserEmail,
