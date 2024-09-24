@@ -18,7 +18,6 @@ import mongo4cats.operations.{Aggregate, Filter, Update}
 
 trait UserRepository[F[_]] extends Repository[F]:
   def find(uid: UserId): F[User]
-  def findWithCategories(uid: UserId): F[User]
   def findBy(email: UserEmail): F[Option[User]]
   def create(details: UserDetails, password: PasswordHash): F[UserId]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
@@ -49,19 +48,12 @@ final private class LiveUserRepository[F[_]](
 
   override def find(uid: UserId): F[User] =
     collection
-      .find(idEq(uid.toObjectId))
-      .first
-      .unwrapOpt(AccountDoesNotExist(uid))
-      .map(_.toDomain)
-
-  override def findWithCategories(uid: UserId): F[User] =
-    collection
       .aggregate[UserEntity](
         Aggregate
           .matchBy(idEq(uid.toObjectId))
-          .lookup("categories", Field.Id, Field.UId, "categories")
+          .lookup(Field.Categories, Field.Id, Field.UId, Field.Categories)
           .addFields(
-            "categories" -> Document(
+            Field.Categories -> Document(
               "$filter" := Document(
                 "input" := "$categories",
                 "as"    := "category",
@@ -70,7 +62,7 @@ final private class LiveUserRepository[F[_]](
             )
           )
           .addFields(
-            "categories" -> Document(
+            Field.Categories -> Document(
               "$sortArray" := Document(
                 "input" := "$categories",
                 "sortBy" := Document("name" := 1)

@@ -112,24 +112,6 @@ class UserServiceSpec extends IOWordSpec {
       }
     }
 
-    "findWithCategories" should {
-      "return account on success" in {
-        val (repo, encr, disp) = mocks
-        when(repo.findWithCategories(any[UserId])).thenReturnIO(Users.user)
-
-        val result = for
-          service <- UserService.make[IO](repo, encr, disp)
-          res <- service.findWithCategories(Users.uid1)
-        yield res
-
-        result.asserting { res =>
-          verifyNoInteractions(encr, disp)
-          verify(repo).findWithCategories(Users.uid1)
-          res mustBe Users.user
-        }
-      }
-    }
-
     "login" should {
 
       "return account on success" in {

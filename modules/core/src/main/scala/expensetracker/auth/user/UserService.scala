@@ -10,7 +10,6 @@ trait UserService[F[_]]:
   def create(details: UserDetails, password: Password): F[UserId]
   def login(login: Login): F[User]
   def find(uid: UserId): F[User]
-  def findWithCategories(uid: UserId): F[User]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
 
@@ -46,9 +45,6 @@ final private class LiveUserService[F[_]](
 
   override def find(uid: UserId): F[User] =
     repository.find(uid)
-
-  override def findWithCategories(uid: UserId): F[User] =
-    repository.findWithCategories(uid)
   
   override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     repository.updateSettings(uid, settings)

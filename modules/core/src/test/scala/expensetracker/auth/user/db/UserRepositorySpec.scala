@@ -26,32 +26,6 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
   "An UserRepository" when {
 
     "find" should {
-      "find account by id" in {
-        withEmbeddedMongoDb { db =>
-          val result = for
-            repo <- UserRepository.make(db)
-            acc  <- repo.find(Users.uid1)
-          yield acc
-
-          result.map { acc =>
-            acc mustBe User(Users.uid1, Users.details.email, Users.details.name, Users.hash, UserSettings.Default, Users.regDate)
-          }
-        }
-      }
-
-      "return error account does not exist" in {
-        withEmbeddedMongoDb { db =>
-          val result = for
-            repo <- UserRepository.make(db)
-            acc  <- repo.find(Users.uid2)
-          yield acc
-
-          result.attempt.map(_ mustBe Left(AccountDoesNotExist(Users.uid2)))
-        }
-      }
-    }
-
-    "findWithCategories" should {
       "return error account does not exist" in {
         withEmbeddedMongoDb { db =>
           val result = for
@@ -67,7 +41,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
-            acc  <- repo.findWithCategories(Users.uid1)
+            acc  <- repo.find(Users.uid1)
           yield acc
 
           result.map { acc =>

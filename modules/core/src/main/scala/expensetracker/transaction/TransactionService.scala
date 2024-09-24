@@ -7,7 +7,7 @@ import expensetracker.category.CategoryId
 
 import java.time.Instant
 
-trait TransactionService[F[_]] {
+trait TransactionService[F[_]]:
   def getAll(aid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(aid: UserId, txid: TransactionId): F[Transaction]
   def delete(aid: UserId, txid: TransactionId): F[Unit]
@@ -15,7 +15,6 @@ trait TransactionService[F[_]] {
   def update(tx: Transaction): F[Unit]
   def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
-}
 
 final private class LiveTransactionService[F[_]](
     private val repository: TransactionRepository[F]
