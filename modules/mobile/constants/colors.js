@@ -1,18 +1,20 @@
+import colors from "tailwindcss/colors";
+
 export default {
   light: {
-    text: '#1F2937', // Equivalent to text-gray-900
-    background: '#FFFFFF', // Equivalent to bg-white
-    tint: '#2563EB', // Equivalent to text-blue-600
-    tabIconDefault: '#6B7280', // Equivalent to text-gray-500
-    tabIconSelected: '#2563EB', // Equivalent to text-blue-600
+    text: colors.gray[900], // Equivalent to text-gray-900
+    background: colors.white, // Equivalent to bg-white
+    tint: colors.blue[600], // Equivalent to text-blue-600
+    tabIconDefault: colors.gray[500], // Equivalent to text-gray-500
+    tabIconSelected: colors.blue[600], // Equivalent to text-blue-600
     defaultTint: '#2f95dc'
   },
   dark: {
-    text: '#FFFFFF', // Equivalent to text-white
-    background: '#111827', // Equivalent to bg-gray-900
-    tint: '#93C5FD', // Equivalent to text-blue-300
-    tabIconDefault: '#9CA3AF', // Equivalent to text-gray-400
-    tabIconSelected: '#93C5FD', // Equivalent to text-blue-300
+    text: colors.white, // Equivalent to text-white
+    background: colors.gray[900], // Equivalent to bg-gray-900
+    tint: colors.blue[300], // Equivalent to text-blue-300
+    tabIconDefault: colors.gray[400], // Equivalent to text-gray-400
+    tabIconSelected: colors.blue[300], // Equivalent to text-blue-300
     defaultTint: '#fff'
   },
 };
