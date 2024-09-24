@@ -75,24 +75,6 @@ class TransactionServiceSpec extends IOWordSpec {
       }
     }
 
-    "retrieve all txs from db with categories" in {
-      val repo = mock[TransactionRepository[IO]]
-      when(repo.getAllWithCategories(any[UserId], anyOpt[Instant], anyOpt[Instant])).thenReturnIO(List(Transactions.tx()))
-
-      val from = Instant.now().minusSeconds(5L)
-      val to   = Instant.now().plusSeconds(5L)
-
-      val result = for
-        svc <- TransactionService.make[IO](repo)
-        res <- svc.getAllWithCategories(Users.uid1, Some(from), Some(to))
-      yield res
-
-      result.asserting { res =>
-        verify(repo).getAllWithCategories(Users.uid1, Some(from), Some(to))
-        res mustBe List(Transactions.tx())
-      }
-    }
-
     "create new tx in db" in {
       val tx   = Transactions.tx()
       val repo = mock[TransactionRepository[IO]]

@@ -90,19 +90,6 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
         verify(svc).getAll(Users.uid1, None, None)
       }
 
-      "return user's txs with categories" in {
-        val svc = mock[TransactionService[IO]]
-        when(svc.getAllWithCategories(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturnIO(List(Transactions.tx()))
-
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
-
-        val req = Request[IO](Method.GET, uri"/transactions?expanded=true").withAuthHeader()
-        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
-
-        res mustHaveStatus(Status.Ok, Some(s"""[${Transactions.txjson}]"""))
-        verify(svc).getAllWithCategories(Users.uid1, None, None)
-      }
-
       "return user's txs with provided date and time ranges" in {
         val svc = mock[TransactionService[IO]]
         when(svc.getAll(any[UserId], any[Option[Instant]], any[Option[Instant]])).thenReturnIO(List(Transactions.tx()))

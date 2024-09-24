@@ -33,7 +33,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           for
             repo <- TransactionRepository.make(db, sess, false)
             tx   <- repo.create(Transactions.create())
-            txs  <- repo.getAllWithCategories(Users.uid1, None, None)
+            txs  <- repo.getAll(Users.uid1, None, None)
           yield {
             txs must have size 1
             tx mustBe txs.head
@@ -74,7 +74,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
           repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create())
           _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
-          txs  <- repo.getAllWithCategories(Users.uid1, None, None)
+          txs  <- repo.getAll(Users.uid1, None, None)
         yield txs
 
         result.map { txs =>
@@ -171,7 +171,9 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             tx   <- repo.create(Transactions.create())
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
             txs  <- repo.getAll(Users.uid1, None, None)
-          yield txs mustBe List(tx.copy(category = None, amount = GBP(25.0)))
+          yield {
+            txs mustBe List(tx.copy(amount = GBP(25.0)))
+          }
         }
       }
 

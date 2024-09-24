@@ -23,7 +23,6 @@ import java.time.Instant
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[Transaction]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
-  def getAllWithCategories(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
   def get(uid: UserId, txid: TransactionId): F[Transaction]
   def delete(uid: UserId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
@@ -60,13 +59,6 @@ final private class LiveTransactionRepository[F[_]](
     }
 
   override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
-    collection
-      .find(userIdEq(uid) && notHidden && dateRangeSelector(from, to))
-      .sortByDesc("date")
-      .all
-      .mapList(_.toDomain)
-
-  override def getAllWithCategories(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
       .aggregate[TransactionEntity](findWithCategory(userIdEq(uid) && notHidden && dateRangeSelector(from, to)))
       .all

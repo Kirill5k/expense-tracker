@@ -30,11 +30,10 @@ final private class TransactionController[F[_]](
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
     TransactionController.getAllEndpoint.withAuthenticatedSession
-      .serverLogic { session => (from, to, expanded) =>
-        val txs = expanded match
-          case Some(true) => service.getAllWithCategories(session.userId, from, to)
-          case _          => service.getAll(session.userId, from, to)
-        txs.mapResponse(_.map(TransactionController.TransactionView.from))
+      .serverLogic { session => (from, to) =>
+        service
+          .getAll(session.userId, from, to)
+          .mapResponse(_.map(TransactionController.TransactionView.from))
       }
 
   private def getTransactionById(using authenticator: Authenticator[F]) =
@@ -171,7 +170,6 @@ object TransactionController extends TapirSchema with TapirJson {
   private val getAllQueryParams =
     query[Option[Instant]]("from")
       .and(query[Option[Instant]]("to"))
-      .and(query[Option[Boolean]]("expanded").description("When true, each returned transaction will include its respective category obj"))
 
   val createEndpoint = Controller.securedEndpoint.post
     .in(basePath)
