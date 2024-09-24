@@ -95,6 +95,11 @@ const useStore = create((set, get) => ({
   isAuthenticated: false,
   accessToken: null,
   user: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    registrationDate: '',
+    transactionsCount: 100,
     settings: {
       hideFutureTransactions: false,
       currency: {code: 'GBP', symbol: '£'},
