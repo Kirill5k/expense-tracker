@@ -19,7 +19,7 @@ export const SettingsAccordion = ({className, children}) => {
           variant="unfilled"
           type="single"
           isCollapsible={true}
-          className={`mb-4 border border-outline-200 rounded-xl bg-background-50 ${className}`}
+          className={`mb-4 rounded-xl bg-background-50 ${className}`}
       >
         {children}
       </Accordion>
