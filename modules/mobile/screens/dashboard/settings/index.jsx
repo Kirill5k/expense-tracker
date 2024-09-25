@@ -1,6 +1,8 @@
+import {useState} from 'react'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
+import {Divider} from '@/components/ui/divider'
 import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
 import Profile from '@/components/user/profile'
@@ -8,15 +10,43 @@ import {SettingsAccordion, SettingsAccordionItem} from '@/components/user/settin
 import {AccordionContent, AccordionContentText} from '@/components/ui/accordion'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
+import Progress from "react-native-progress";
+import Colors from '@/constants/colors'
+
 
 export const Settings = () => {
+  const [isScrolling, setIsScrolling] = useState(false)
+  const [loading, setLoading] = useState(false)
   const {mode, user} = useStore()
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size="2xl" className="pb-2">
+        <Heading size={isScrolling ? 'sm' : '2xl'} className="pb-2">
           Settings
         </Heading>
-        <ScrollView>
+        <Box>
+          {isScrolling && <Divider/>}
+          {loading && <Progress.Bar
+              height={3}
+              animationType="decay"
+              borderRadius={0}
+              borderWidth={0}
+              indeterminateAnimationDuration={250}
+              width={null}
+              indeterminate={true}
+              color={Colors[mode].tint}
+              borderColor={Colors[mode].tint}
+          />}
+        </Box>
+        <ScrollView
+            showsVerticalScrollIndicator={false}
+            onScroll={({nativeEvent}) => {
+              if (nativeEvent.contentOffset.y <= 40 && isScrolling) {
+                setIsScrolling(false)
+              } else if (nativeEvent.contentOffset.y > 40 && !isScrolling) {
+                setIsScrolling(true)
+              }
+            }}
+        >
           <Profile user={user}/>
           <Heading className="py-2" size="xl">
             General
