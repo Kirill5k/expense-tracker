@@ -1,4 +1,3 @@
-import {useState} from 'react'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
@@ -11,11 +10,10 @@ import Classes from '@/constants/classes'
 import useStore from '@/store'
 
 export const Settings = () => {
-  const [headerSize, setHeaderSize] = useState("2xl")
   const {mode, user} = useStore()
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={headerSize} className="pb-2">
+        <Heading size="2xl" className="pb-2">
           Settings
         </Heading>
         <ScrollView>
