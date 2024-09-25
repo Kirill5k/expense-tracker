@@ -71,9 +71,9 @@ export const Categories = () => {
             }}
             onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 40 && isScrolling) {
+              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
                 setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 40 && !isScrolling) {
+              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
                 setIsScrolling(true)
               }
             }}

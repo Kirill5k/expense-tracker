@@ -40,9 +40,9 @@ export const Settings = () => {
         <ScrollView
             showsVerticalScrollIndicator={false}
             onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 40 && isScrolling) {
+              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
                 setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 40 && !isScrolling) {
+              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
                 setIsScrolling(true)
               }
             }}
