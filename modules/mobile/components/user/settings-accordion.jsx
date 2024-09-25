@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/accordion'
 import {ChevronDownIcon, ChevronUpIcon} from '@/components/ui/icon'
 
-export const SettingsAccordion = ({className, children}) => {
+export const SettingsAccordion = ({isDisabled, className, children}) => {
   return (
       <Accordion
+          isDisabled={isDisabled}
           size="sm"
           variant="unfilled"
           type="single"

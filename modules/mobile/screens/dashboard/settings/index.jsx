@@ -6,7 +6,8 @@ import {Divider} from '@/components/ui/divider'
 import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
 import Profile from '@/components/user/profile'
-import {SettingsAccordion, SettingsAccordionItem} from '@/components/user/settings-accordion'
+import CurrencySelect from '@/components/user/currency-select'
+import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/user/settings-accordion'
 import {AccordionContent, AccordionContentText} from '@/components/ui/accordion'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
@@ -18,6 +19,9 @@ export const Settings = () => {
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const {mode, user} = useStore()
+
+  const [currency, setCurrency] = useState(user.settings.currency)
+
   return (
       <VStack className={Classes.dashboardLayout}>
         <Heading size={isScrolling ? 'sm' : '2xl'} className="pb-2">
@@ -51,19 +55,24 @@ export const Settings = () => {
           <Heading className="py-2" size="xl">
             General
           </Heading>
-          <SettingsAccordion>
+          <SettingsAccordion
+              isDisabled={loading}
+          >
             <SettingsAccordionItem
                 value="1"
                 headerTitle="Currency"
                 headerValue={user.settings.currency.symbol}
             >
-              <AccordionContent>
-                <AccordionContentText>
-                  To place an order, simply select the products you want, proceed to
-                  checkout, provide shipping and payment information, and finalize your
-                  purchase.
-                </AccordionContentText>
-              </AccordionContent>
+              <SettingsAccordionContent>
+                <CurrencySelect
+                    mode={mode}
+                    value={currency}
+                    onSelect={(c) => {
+                      console.log('selecting currency', c)
+                      setCurrency(c)
+                    }}
+                />
+              </SettingsAccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem
                 value="2"
@@ -97,7 +106,9 @@ export const Settings = () => {
           <Heading className="py-2" size="xl">
             Security
           </Heading>
-          <SettingsAccordion>
+          <SettingsAccordion
+              isDisabled={loading}
+          >
             <SettingsAccordionItem
                 value="4"
                 headerTitle="Change Password"

@@ -50,7 +50,7 @@ const CategorySelect = ({items, value, onSelect, mode}) => {
           )}
       >
         {items.map(c => (
-            <MenuItem key={c.id} textValue={c.id}>
+            <MenuItem key={c.id} textValue={c.id} className={`${c.id === value?.id ? 'bg-background-100' : ''}`}>
               <MaterialIcon
                   code={c.icon}
                   dsize={24}
