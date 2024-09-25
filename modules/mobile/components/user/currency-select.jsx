@@ -36,10 +36,10 @@ const CurrencySelect = ({value, onSelect, mode}) => {
           onClose={() => setIsOpen(false)}
           trigger={(triggerProps) => (
               <Button
-                  size="sm"
-                  variant="link"
+                  size="xs"
+                  variant="outline"
                   action="secondary"
-                  className="justify-between align-center border-b"
+                  className="justify-between align-center"
                   {...triggerProps}
               >
                 <ButtonText className="px-2 text-lg">

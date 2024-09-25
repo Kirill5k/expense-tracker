@@ -7,11 +7,12 @@ import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
 import Profile from '@/components/user/profile'
 import CurrencySelect from '@/components/user/currency-select'
+import ThemeSelect from '@/components/user/theme-select'
 import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/user/settings-accordion'
 import {AccordionContent, AccordionContentText} from '@/components/ui/accordion'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
-import Progress from "react-native-progress";
+import * as Progress from "react-native-progress";
 import Colors from '@/constants/colors'
 
 
@@ -64,14 +65,19 @@ export const Settings = () => {
                 headerValue={user.settings.currency.symbol}
             >
               <SettingsAccordionContent>
-                <CurrencySelect
-                    mode={mode}
-                    value={currency}
-                    onSelect={(c) => {
-                      console.log('selecting currency', c)
-                      setCurrency(c)
-                    }}
-                />
+                <VStack space="sm">
+                  <AccordionContentText>
+                    Select your default currency for logging and viewing transactions. Existing transactions will retain their original currency.
+                  </AccordionContentText>
+                  <CurrencySelect
+                      mode={mode}
+                      value={currency}
+                      onSelect={(c) => {
+                        console.log('selecting currency', c)
+                        setCurrency(c)
+                      }}
+                  />
+                </VStack>
               </SettingsAccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem
@@ -90,16 +96,14 @@ export const Settings = () => {
             <SettingsAccordionItem
                 isLast
                 value="3"
-                headerTitle="Dark Mode"
-                headerValue={user.settings.darkMode === true ? 'On' : user.settings.darkMode === false ? 'Off' : 'Auto'}
+                headerTitle="Theme"
+                headerValue={user.settings.darkMode === true ? 'Dark' : user.settings.darkMode === false ? 'Light' : 'System'}
             >
-              <AccordionContent>
-                <AccordionContentText>
-                  To place an order, simply select the products you want, proceed to
-                  checkout, provide shipping and payment information, and finalize your
-                  purchase.
-                </AccordionContentText>
-              </AccordionContent>
+              <SettingsAccordionContent>
+                <ThemeSelect
+                  value={user.settings.darkMode}
+                />
+              </SettingsAccordionContent>
             </SettingsAccordionItem>
           </SettingsAccordion>
 
