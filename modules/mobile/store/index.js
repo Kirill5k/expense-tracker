@@ -99,7 +99,6 @@ const useStore = create((set, get) => ({
     lastName: '',
     email: '',
     registrationDate: '',
-    transactionsCount: 100,
     settings: {
       hideFutureTransactions: false,
       currency: {code: 'GBP', symbol: '£'},
