@@ -32,7 +32,8 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
             |"lastName":"${Users.details.name.last}",
             |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
             |"registrationDate": "${Users.regDate}",
-            |"categories": null
+            |"categories": null,
+            |"totalTransactionCount": null
             |}""".stripMargin
 
         res mustHaveStatus (Status.Ok, Some(resBody))

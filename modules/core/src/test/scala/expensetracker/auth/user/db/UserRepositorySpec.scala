@@ -7,14 +7,15 @@ import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserSettings}
 import expensetracker.category.CategoryName
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
-import expensetracker.fixtures.{Categories, Users}
+import expensetracker.fixtures.{Categories, Transactions, Users}
+import expensetracker.transaction.TransactionId
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
-import squants.market.USD
+import squants.market.{GBP, USD}
 
 import scala.concurrent.Future
 
@@ -49,6 +50,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc.categories mustBe defined
             acc.categories.get must have size 1
             acc.categories.get.head.name mustBe CategoryName("category-1")
+            acc.totalTransactionCount mustBe Some(2)
           }
         }
       }
@@ -181,6 +183,13 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
               List(
                 categoryDoc(Categories.cid, "category-1", Some(Users.uid1)),
                 categoryDoc(Categories.cid2, "category-2", Some(Users.uid1), Some(true))
+              )
+            )
+            transactions <- db.getCollection("transactions")
+            _ <- transactions.insertMany(
+              List(
+                transactionDoc(Transactions.txid, Categories.cid, Users.uid1, GBP(15.0), Transactions.txdate),
+                transactionDoc(TransactionId(ObjectId().toHexString), Categories.cid2, Users.uid1, GBP(15.0), Transactions.txdate)
               )
             )
             users <- db.getCollection("users")

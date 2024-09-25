@@ -14,7 +14,7 @@ import mongo4cats.bson.{BsonValue, Document}
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
-import mongo4cats.operations.{Aggregate, Filter, Update}
+import mongo4cats.operations.{Aggregate, Filter, Projection, Update}
 
 trait UserRepository[F[_]] extends Repository[F]:
   def find(uid: UserId): F[User]
@@ -69,6 +69,20 @@ final private class LiveUserRepository[F[_]](
               )
             )
           )
+          .lookup(Field.Transactions, Field.Id, Field.UId, Field.Transactions)
+          .addFields(
+            Field.Transactions -> Document(
+              "$filter" := Document(
+                "input" := "$transactions",
+                "as"    := "transaction",
+                "cond"  := Document("$ne" := List(BsonValue.string("$$transaction.hidden"), BsonValue.True))
+              )
+            )
+          )
+          .addFields(
+            "totalTransactionCount" -> Document("$size" := "$transactions")
+          )
+          .project(Projection.exclude(Field.Transactions))
       )
       .first
       .unwrapOpt(AccountDoesNotExist(uid))

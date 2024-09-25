@@ -15,7 +15,8 @@ final case class UserEntity(
     password: String,
     settings: Option[UserSettings],
     registrationDate: Instant,
-    categories: Option[List[CategoryEntity]] = None
+    categories: Option[List[CategoryEntity]] = None,
+    totalTransactionCount: Option[Int] = None
 ) derives Codec.AsObject {
   def toDomain: User =
     User(
@@ -25,7 +26,8 @@ final case class UserEntity(
       password = PasswordHash(password),
       settings = settings.getOrElse(UserSettings.Default),
       registrationDate = registrationDate,
-      categories = categories.map(_.map(_.toDomain))
+      categories = categories.map(_.map(_.toDomain)),
+      totalTransactionCount = totalTransactionCount
     )
 }
 

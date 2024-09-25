@@ -24,6 +24,7 @@ trait Repository[F[_]] {
     val Date           = "date"
     val Category       = "category"
     val Categories     = "categories"
+    val Transactions   = "transactions"
   }
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)

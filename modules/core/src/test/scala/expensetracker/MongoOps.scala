@@ -2,12 +2,28 @@ package expensetracker
 
 import expensetracker.auth.user.{PasswordHash, UserEmail, UserId}
 import expensetracker.category.CategoryId
+import expensetracker.transaction.TransactionId
 import mongo4cats.bson.Document
 import mongo4cats.bson.syntax.*
+import kirill5k.common.syntax.time.*
+import squants.market.Money
 
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 
 trait MongoOps {
+
+  def transactionDoc(id: TransactionId, cid: CategoryId, uid: UserId, amount: Money, date: LocalDate = LocalDate.now): Document =
+    Document(
+      "_id"        := id.toObjectId,
+      "kind"       := "expense",
+      "categoryId" := cid.toObjectId,
+      "userId"     := uid.toObjectId,
+      "amount" := Document(
+        "value"    := amount.amount,
+        "currency" := Document("code" := amount.currency.code, "symbol" := amount.currency.symbol)
+      ),
+      "date" := date.toInstantAtStartOfDay
+    )
 
   def categoryDoc(id: CategoryId, name: String, uid: Option[UserId] = None, hidden: Option[Boolean] = None): Document =
     Document(

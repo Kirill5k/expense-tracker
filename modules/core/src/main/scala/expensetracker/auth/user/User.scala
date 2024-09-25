@@ -48,7 +48,8 @@ final case class User(
     password: PasswordHash,
     settings: UserSettings,
     registrationDate: Instant,
-    categories: Option[List[Category]] = None
+    categories: Option[List[Category]] = None,
+    totalTransactionCount: Option[Int] = None
 )
 
 final case class UserDetails(

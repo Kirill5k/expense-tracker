@@ -131,7 +131,8 @@ object AuthController extends TapirSchema with TapirJson {
       email: String,
       settings: UserSettings,
       registrationDate: Instant,
-      categories: Option[List[CategoryView]]
+      categories: Option[List[CategoryView]],
+      totalTransactionCount: Option[Int]
   ) derives Codec.AsObject
 
   object UserView:
@@ -143,7 +144,8 @@ object AuthController extends TapirSchema with TapirJson {
         acc.email.value,
         acc.settings,
         acc.registrationDate,
-        acc.categories.map(_.map(CategoryView.from))
+        acc.categories.map(_.map(CategoryView.from)),
+        acc.totalTransactionCount
       )
 
   final case class UpdateUserSettingsRequest(
