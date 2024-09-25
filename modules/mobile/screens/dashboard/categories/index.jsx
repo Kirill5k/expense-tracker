@@ -13,7 +13,7 @@ import Colors from '@/constants/colors'
 import useStore from '@/store'
 
 export const Categories = () => {
-  const [headerSize, setHeaderSize] = useState("2xl")
+  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [catToUpdate, setCatToUpdate] = useState(null)
@@ -45,11 +45,11 @@ export const Categories = () => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={headerSize} className="font-roboto pb-2">
+        <Heading size={isScrolling ? 'sm' : '2xl'} className="font-roboto pb-2">
           Categories
         </Heading>
         <Box>
-          {headerSize === 'sm' && <Divider/>}
+          {isScrolling && <Divider/>}
           {loading && <Progress.Bar
               height={3}
               animationType="decay"
@@ -71,10 +71,10 @@ export const Categories = () => {
             }}
             onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 40) {
-                setHeaderSize('2xl')
-              } else {
-                setHeaderSize('sm')
+              if (nativeEvent.contentOffset.y <= 40 && isScrolling) {
+                setIsScrolling(false)
+              } else if (nativeEvent.contentOffset.y > 40 && !isScrolling) {
+                setIsScrolling(true)
               }
             }}
         />

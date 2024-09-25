@@ -14,8 +14,8 @@ import Colors from '@/constants/colors'
 import Classes from '@/constants/classes'
 
 export const Transactions = () => {
+  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [headerSize, setHeaderSize] = useState('2xl')
   const [showModal, setShowModal] = useState(false)
   const [txToUpdate, setTxToUpdate] = useState(null)
 
@@ -61,7 +61,7 @@ export const Transactions = () => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={headerSize} className="font-roboto">
+        <Heading size={isScrolling ? 'sm' : '2xl'} className="font-roboto">
           Transactions
         </Heading>
         <DatePeriodSelect
@@ -71,7 +71,7 @@ export const Transactions = () => {
             onSelect={setDisplayDate}
         />
         <Box>
-          {headerSize === 'sm' && <Divider/>}
+          {isScrolling && <Divider/>}
           {loading && <Progress.Bar
               height={3}
               animationType="decay"
@@ -94,10 +94,10 @@ export const Transactions = () => {
             onItemCopy={handleItemCopy}
             onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 20) {
-                setHeaderSize('2xl')
-              } else {
-                setHeaderSize('sm')
+              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
+                setIsScrolling(false)
+              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
+                setIsScrolling(true)
               }
             }}
         />
