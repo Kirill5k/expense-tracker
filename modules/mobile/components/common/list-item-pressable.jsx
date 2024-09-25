@@ -16,7 +16,7 @@ const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
             transform: [{translateX: trans}],
           }}
       >
-        <HStack className="w-full h-full p-1" space="xs">
+        <HStack className="w-full h-full px-1 py-2" space="xs">
           {withCopyButton && (
               <Button
                   size="sm"

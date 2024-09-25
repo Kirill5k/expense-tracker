@@ -14,7 +14,7 @@ import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
 const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
-      <VStack className={Classes.listLayout} space="sm">
+      <VStack className="rounded-xl bg-background-50 p-1" space="sm">
         {items.map(tx => (
             <ListItemPressable
                 disabled={disabled}
@@ -23,7 +23,7 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
                 onCopy={() => onItemCopy(tx)}
                 onDelete={() => onItemDelete(tx)}
             >
-              <HStack className="items-center p-2">
+              <HStack className="items-center p-3">
                 <Avatar size="sm" style={{backgroundColor: tx.category.color}}>
                   <MaterialIcon
                       code={tx.category.icon}
@@ -31,7 +31,7 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
                       dcolor="white"
                   />
                 </Avatar>
-                <VStack className="mx-2">
+                <VStack className="ml-4">
                   <Text className={Classes.listItemMainText}>
                     {tx.category.name}
                   </Text>
