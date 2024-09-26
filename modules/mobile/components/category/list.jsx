@@ -12,7 +12,7 @@ const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) =>
       <VirtualizedList
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
-          initialNumToRender={10}
+          initialNumToRender={11}
           onScroll={onScroll}
           data={items}
           getItem={(data, index) => ({...data[index], isLast: index === data.length - 1, isFirst: index === 0})}

@@ -37,7 +37,7 @@ const DaysSelect = ({isDisabled, value = 7, onSelect, mode}) => {
                   action="secondary"
                   {...triggerProps}
               >
-                <ButtonText className="text-sm text-primary-400 font-medium">
+                <ButtonText className="underline text-sm text-primary-400 font-medium">
                   {`${value} days`}
                 </ButtonText>
                 <ButtonIcon

@@ -33,12 +33,24 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 export const Settings = () => {
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const {mode, user, updateUserSettings} = useStore()
+  const {
+    mode,
+    user,
+    updateUserSettings,
+    logout
+  } = useStore()
+
+  const handleLogout = () => {
+    setLoading(true)
+    logout()
+  }
 
   const handleUpdateSettings = (settings) => {
     setLoading(true)
     updateUserSettings(settings).then(() => setLoading(false))
   }
+
+  if (!user) return null
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -79,7 +91,7 @@ export const Settings = () => {
             <SettingsAccordionItem
                 value="1"
                 headerTitle="Currency"
-                headerValue={user.settings.currency.symbol}
+                headerValue={user?.settings?.currency?.symbol}
             >
               <SettingsAccordionContent>
                 <VStack space="sm">
@@ -90,7 +102,7 @@ export const Settings = () => {
                   <CurrencySelect
                       isDisabled={loading}
                       mode={mode}
-                      value={user.settings.currency}
+                      value={user?.settings?.currency}
                       onSelect={(currency) => {
                         handleUpdateSettings({...user.settings, currency})
                       }}
@@ -101,13 +113,13 @@ export const Settings = () => {
             <SettingsAccordionItem
                 value="2"
                 headerTitle="Hide Future Transactions"
-                headerValue={hideFutureTransactionsDisplayLabel(user.settings.futureTransactionVisibilityDays)}
+                headerValue={hideFutureTransactionsDisplayLabel(user?.settings?.futureTransactionVisibilityDays)}
             >
               <AccordionContent>
                 <FutureTransactionsToggle
                     isDisabled={loading}
                     mode={mode}
-                    value={user.settings.futureTransactionVisibilityDays}
+                    value={user?.settings?.futureTransactionVisibilityDays}
                     onSelect={(futureTransactionVisibilityDays) => {
                       handleUpdateSettings({...user.settings, futureTransactionVisibilityDays})
                     }}
@@ -118,12 +130,12 @@ export const Settings = () => {
                 isLast
                 value="3"
                 headerTitle="Theme"
-                headerValue={themeDisplayLabel(user.settings.darkMode)}
+                headerValue={themeDisplayLabel(user?.settings?.darkMode)}
             >
               <SettingsAccordionContent>
                 <ThemeSelect
                     isDisabled={loading}
-                    value={user.settings.darkMode}
+                    value={user?.settings?.darkMode}
                     onSelect={(darkMode) => {
                       handleUpdateSettings({...user.settings, darkMode})
                     }}
@@ -179,7 +191,7 @@ export const Settings = () => {
 
           <Box className="px-5">
             <Button className="my-4 w-full" size="xs" variant="outline" action="secondary">
-              <ButtonText>
+              <ButtonText onPress={handleLogout}>
                 Sign Out
               </ButtonText>
             </Button>

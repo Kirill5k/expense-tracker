@@ -68,14 +68,14 @@ function RootLayoutNav() {
   } = useStore()
 
   useEffect(() => {
-    if (user.settings.darkMode === null) {
-      setMode(colorScheme === ' dark' ? 'dark' : 'light')
-    } else if (user.settings.darkMode === true) {
+    if (user?.settings?.darkMode === true) {
       setMode('dark')
-    } else if (user.settings.darkMode === false) {
+    } else if (user?.settings?.darkMode === false) {
       setMode('light')
+    } else {
+      setMode(colorScheme === ' dark' ? 'dark' : 'light')
     }
-  }, [user.settings.darkMode])
+  }, [user?.settings?.darkMode])
 
   useEffect(() => {
     if (accessToken != null) {

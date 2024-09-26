@@ -96,26 +96,16 @@ const useStore = create((set, get) => ({
   setLoading: (isLoading) => set({isLoading}),
   isAuthenticated: false,
   accessToken: null,
-  user: {
-    firstName: '',
-    lastName: '',
-    email: '',
-    registrationDate: '',
-    settings: {
-      hideFutureTransactions: false,
-      currency: {code: 'GBP', symbol: '£'},
-      darkMode: null
-    }
-  },
+  user: null,
   setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
   setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
   clearAlert: () => set({alert: null}),
   clearUser: () => set({
     isAuthenticated: false,
     accessToken: null,
-    user: {},
+    user: null,
   }),
-  login: async (creds) => {
+  login: (creds) => {
     get().clearAlert()
     return Clients.get(get().isOnline)
         .login(creds)
@@ -124,7 +114,13 @@ const useStore = create((set, get) => ({
           set({alert: Alerts.LOGIN_SUCCESS})
         })
   },
-  getUser: async () => {
+  logout: () => {
+    return Clients.get(get().isOnline)
+        .logout(get().accessToken)
+        .then(() => get().clearUser())
+        .catch(err => handleError(get, err))
+  },
+  getUser: () => {
     return Clients.get(get().isOnline)
         .getUser(get().accessToken)
         .then(user => {

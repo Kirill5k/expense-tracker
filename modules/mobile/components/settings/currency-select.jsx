@@ -44,10 +44,10 @@ const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
                   {...triggerProps}
               >
                 <ButtonText className="px-2 text-lg">
-                  {value.symbol}
+                  {value?.symbol}
                 </ButtonText>
                 <ButtonText className="pl-2 grow text-sm text-left">
-                  {currenciesByCode[value.code].country}
+                  {currenciesByCode[value?.code]?.country}
                 </ButtonText>
                 <ButtonIcon
                     className="flex-grow-0"
@@ -62,7 +62,7 @@ const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
             <MenuItem
                 key={c.code}
                 textValue={c.code}
-                className={`${value.code === c.code ? 'bg-background-100' : ''}`}
+                className={`${value?.code === c.code ? 'bg-background-100' : ''}`}
             >
               <MenuItemLabel size="md" className="px-2">{c.symbol}</MenuItemLabel>
               <MenuItemLabel size="sm" className="px-2">{c.country}</MenuItemLabel>

@@ -27,6 +27,7 @@ const Index = () => {
         )}
         {isLoading && (
             <Progress.CircleSnail
+                direction="clockwise"
                 color={Colors[mode].defaultTint}
                 strokeCap="butt"
                 thickness={10}
