@@ -87,12 +87,12 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
-            _    <- repo.updateSettings(Users.uid1, UserSettings(USD, false, None))
+            _    <- repo.updateSettings(Users.uid1, UserSettings(USD, false, None, Some(7)))
             acc  <- repo.find(Users.uid1)
           yield acc
 
           result.map { acc =>
-            acc.settings mustBe UserSettings(USD, false, None)
+            acc.settings mustBe UserSettings(USD, false, None, Some(7))
           }
         }
       }

@@ -151,13 +151,15 @@ object AuthController extends TapirSchema with TapirJson {
   final case class UpdateUserSettingsRequest(
       currency: Currency,
       hideFutureTransactions: Boolean,
-      darkMode: Option[Boolean]
+      darkMode: Option[Boolean],
+      futureTransactionVisibilityDays: Option[Int]
   ) derives Codec.AsObject:
     def toDomain: UserSettings =
       UserSettings(
         currency,
         hideFutureTransactions = hideFutureTransactions,
-        darkMode = darkMode
+        darkMode = darkMode,
+        futureTransactionVisibilityDays = futureTransactionVisibilityDays
       )
 
   final case class ChangePasswordRequest(

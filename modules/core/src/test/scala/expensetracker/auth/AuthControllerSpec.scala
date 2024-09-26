@@ -30,7 +30,12 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
             |"email":"${Users.email}",
             |"firstName":"${Users.details.name.first}",
             |"lastName":"${Users.details.name.last}",
-            |"settings":{"currency":{"code":"GBP","symbol":"£"},"hideFutureTransactions":false,"darkMode":null},
+            |"settings":{
+            |   "currency":{"code":"GBP","symbol":"£"},
+            |   "hideFutureTransactions":false,
+            |   "darkMode":null,
+            |   "futureTransactionVisibilityDays": null
+            |},
             |"registrationDate": "${Users.regDate}",
             |"categories": null,
             |"totalTransactionCount": null
@@ -72,12 +77,13 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
           .withBody("""{
               |"currency":{"code":"USD","symbol":"$"},
               |"hideFutureTransactions":false,
+              |"futureTransactionVisibilityDays": 7,
               |"darkMode":false
               |}""".stripMargin)
         val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.NoContent, None)
-        verify(usrSvc).updateSettings(Users.uid1, UserSettings(USD, false, Some(false)))
+        verify(usrSvc).updateSettings(Users.uid1, UserSettings(USD, false, Some(false), Some(7)))
         verifyNoInteractions(sessSvc)
       }
     }

@@ -29,14 +29,16 @@ final case class UserName(
 final case class UserSettings(
     currency: Currency,
     hideFutureTransactions: Boolean,
-    darkMode: Option[Boolean]
+    darkMode: Option[Boolean],
+    futureTransactionVisibilityDays: Option[Int]
 ) derives Codec.AsObject
 
 object UserSettings {
   val Default = UserSettings(
     GBP,
     hideFutureTransactions = false,
-    darkMode = None
+    darkMode = None,
+    futureTransactionVisibilityDays = None
   )
 }
 
