@@ -8,6 +8,7 @@ import {ScrollView} from '@/components/ui/scroll-view'
 import Profile from '@/components/settings/profile'
 import CurrencySelect from '@/components/settings/currency-select'
 import ThemeSelect from '@/components/settings/theme-select'
+import FutureTransactionsToggle from '@/components/settings/future-transactions-toggle'
 import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/settings/accordion'
 import {AccordionContent, AccordionContentText} from '@/components/ui/accordion'
 import Classes from '@/constants/classes'
@@ -15,13 +16,13 @@ import useStore from '@/store'
 import * as Progress from "react-native-progress";
 import Colors from '@/constants/colors'
 
-
 export const Settings = () => {
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const {mode, user} = useStore()
 
   const [currency, setCurrency] = useState(user.settings.currency)
+  const [futureTransactionViewDays, setFutureTransactionViewDays] = useState(null)
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -67,7 +68,8 @@ export const Settings = () => {
               <SettingsAccordionContent>
                 <VStack space="sm">
                   <AccordionContentText>
-                    Select your default currency for logging and viewing transactions. Existing transactions will retain their original currency.
+                    Select your default currency for logging and viewing transactions. Existing transactions will retain
+                    their original currency.
                   </AccordionContentText>
                   <CurrencySelect
                       mode={mode}
@@ -83,25 +85,31 @@ export const Settings = () => {
             <SettingsAccordionItem
                 value="2"
                 headerTitle="Hide Future Transactions"
-                headerValue={user.settings.hideFutureTransactions ? 'Yes' : 'No'}
+                headerValue={user.settings.futureTransactionViewDays === 0 ? 'Yes' : 'No'}
             >
               <AccordionContent>
-                <AccordionContentText>
-                  To place an order, simply select the products you want, proceed to
-                  checkout, provide shipping and payment information, and finalize your
-                  purchase.
-                </AccordionContentText>
+                <FutureTransactionsToggle
+                    isDisabled={loading}
+                    mode={mode}
+                    value={futureTransactionViewDays}
+                    onSelect={(v) => {
+                      console.log('futureTransactionViewDays', v)
+                      setFutureTransactionViewDays(v)
+                    }}
+                />
               </AccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem
                 isLast
                 value="3"
                 headerTitle="Theme"
-                headerValue={user.settings.darkMode === true ? 'Dark' : user.settings.darkMode === false ? 'Light' : 'System'}
+                headerValue={user.settings.darkMode === true ? 'Dark' : user.settings.darkMode === false ? 'Light'
+                    : 'System'}
             >
               <SettingsAccordionContent>
                 <ThemeSelect
-                  value={user.settings.darkMode}
+                    isDisabled={loading}
+                    value={user.settings.darkMode}
                 />
               </SettingsAccordionContent>
             </SettingsAccordionItem>

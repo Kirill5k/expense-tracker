@@ -4,12 +4,12 @@ import {VStack} from '@/components/ui/vstack'
 import {CircleIcon} from '@/components/ui/icon'
 import {Radio, RadioGroup, RadioIndicator, RadioLabel, RadioIcon} from '@/components/ui/radio'
 
-const ThemeSelect = ({value, onSelect}) => {
+const ThemeSelect = ({isDisabled, value, onSelect}) => {
   return (
       <RadioGroup className="ml-1" value={value} onChange={onSelect}>
         <VStack space="sm">
           <Box>
-            <Radio value={false} size="sm">
+            <Radio isDisabled={isDisabled} value={false} size="sm">
               <RadioIndicator>
                 <RadioIcon as={CircleIcon}/>
               </RadioIndicator>
@@ -20,7 +20,7 @@ const ThemeSelect = ({value, onSelect}) => {
             </Text>
           </Box>
           <Box>
-            <Radio value={true} size="sm">
+            <Radio isDisabled={isDisabled} value={true} size="sm">
               <RadioIndicator>
                 <RadioIcon as={CircleIcon}/>
               </RadioIndicator>
@@ -31,7 +31,7 @@ const ThemeSelect = ({value, onSelect}) => {
             </Text>
           </Box>
           <Box>
-            <Radio value={null} size="sm">
+            <Radio isDisabled={isDisabled} value={null} size="sm">
               <RadioIndicator>
                 <RadioIcon as={CircleIcon}/>
               </RadioIndicator>
