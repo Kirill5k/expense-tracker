@@ -178,6 +178,11 @@ const useStore = create((set, get) => ({
           get().setUndoAlert('Category has been deleted', undoAction)
         }
       })
+      .catch(err => handleError(get, err)),
+  updateUserSettings: (settings) => Clients
+      .get(get().isOnline)
+      .updateUserSettings(get().accessToken, get().user.id, settings)
+      .then(() => set({user: {...(get().user), settings}}))
       .catch(err => handleError(get, err))
 }));
 

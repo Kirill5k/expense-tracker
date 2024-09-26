@@ -16,13 +16,31 @@ import useStore from '@/store'
 import * as Progress from "react-native-progress";
 import Colors from '@/constants/colors'
 
+
+const themeDisplayLabel = (darkMode) => {
+  if (darkMode === null) return 'System'
+  if (darkMode === true) return 'Dark'
+  return 'Light'
+}
+
+const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => {
+  if (futureTransactionVisibilityDays === 0) return 'All'
+  if (!futureTransactionVisibilityDays) return 'No'
+  return `${futureTransactionVisibilityDays} Days`
+}
+
+
 export const Settings = () => {
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const {mode, user} = useStore()
+  const {mode, user, updateUserSettings} = useStore()
 
-  const [currency, setCurrency] = useState(user.settings.currency)
-  const [futureTransactionViewDays, setFutureTransactionViewDays] = useState(null)
+  console.log('user', user)
+
+  const handleUpdateSettings = (settings) => {
+    setLoading(true)
+    updateUserSettings(settings).then(() => setLoading(false))
+  }
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -72,11 +90,11 @@ export const Settings = () => {
                     their original currency.
                   </AccordionContentText>
                   <CurrencySelect
+                      isDisabled={loading}
                       mode={mode}
-                      value={currency}
-                      onSelect={(c) => {
-                        console.log('selecting currency', c)
-                        setCurrency(c)
+                      value={user.settings.currency}
+                      onSelect={(currency) => {
+                        handleUpdateSettings({...user.settings, currency})
                       }}
                   />
                 </VStack>
@@ -85,16 +103,15 @@ export const Settings = () => {
             <SettingsAccordionItem
                 value="2"
                 headerTitle="Hide Future Transactions"
-                headerValue={user.settings.futureTransactionViewDays === 0 ? 'Yes' : 'No'}
+                headerValue={hideFutureTransactionsDisplayLabel(user.settings.futureTransactionVisibilityDays)}
             >
               <AccordionContent>
                 <FutureTransactionsToggle
                     isDisabled={loading}
                     mode={mode}
-                    value={futureTransactionViewDays}
-                    onSelect={(v) => {
-                      console.log('futureTransactionViewDays', v)
-                      setFutureTransactionViewDays(v)
+                    value={user.settings.futureTransactionVisibilityDays}
+                    onSelect={(futureTransactionVisibilityDays) => {
+                      handleUpdateSettings({...user.settings, futureTransactionVisibilityDays})
                     }}
                 />
               </AccordionContent>
@@ -103,13 +120,15 @@ export const Settings = () => {
                 isLast
                 value="3"
                 headerTitle="Theme"
-                headerValue={user.settings.darkMode === true ? 'Dark' : user.settings.darkMode === false ? 'Light'
-                    : 'System'}
+                headerValue={themeDisplayLabel(user.settings.darkMode)}
             >
               <SettingsAccordionContent>
                 <ThemeSelect
                     isDisabled={loading}
                     value={user.settings.darkMode}
+                    onSelect={(darkMode) => {
+                      handleUpdateSettings({...user.settings, darkMode})
+                    }}
                 />
               </SettingsAccordionContent>
             </SettingsAccordionItem>

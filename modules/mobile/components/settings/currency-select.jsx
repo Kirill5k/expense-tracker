@@ -16,7 +16,7 @@ const currencies = [
   { country: 'Turkish Lira', code: 'TRY', symbol: '₺' }
 ]
 
-const CurrencySelect = ({value, onSelect, mode}) => {
+const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const currenciesByCode = createLookup(currencies, c => c.code)
   const [selected, setSelected] = React.useState(value?.code ? new Set([value.code]) : new Set([]))
@@ -36,6 +36,7 @@ const CurrencySelect = ({value, onSelect, mode}) => {
           onClose={() => setIsOpen(false)}
           trigger={(triggerProps) => (
               <Button
+                  isDisabled={isDisabled}
                   size="xs"
                   variant="outline"
                   action="secondary"
