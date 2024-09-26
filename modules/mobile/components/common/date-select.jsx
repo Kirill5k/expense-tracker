@@ -58,6 +58,19 @@ const DateSelect = ({value, onSelect, mode}) => {
                     fontWeight: 'bold',
                     color: colors[mode].background,
                   }}
+                  calendarTextStyle={{
+                    color: colors[mode].text,
+                  }}
+                  headerTextStyle={{
+                    fontWeight: 'bold',
+                    color: colors[mode].text,
+                  }}
+                  weekDaysTextStyle={{
+                    color: colors[mode].text,
+                  }}
+                  todayTextStyle={{
+                    fontWeight: 'bold'
+                  }}
               />
               <Box className="ml-auto">
                 <Button

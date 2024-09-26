@@ -16,10 +16,10 @@ const Profile = ({user}) => {
         </AvatarBadge>
       </Avatar>
       <VStack className="w-full items-left" space="xs">
-        <Text size="2xl" className="font-roboto text-dark">
+        <Text size="2xl" className="font-bold">
           {fullName}
         </Text>
-        <Text className="font-roboto text-sm text-typograpphy-700">
+        <Text className="text-sm font-semibold">
           {user.email}
         </Text>
         <Text className="text-2xs">

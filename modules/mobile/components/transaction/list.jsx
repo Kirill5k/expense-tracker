@@ -75,7 +75,7 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
           showsVerticalScrollIndicator={false}
           className={Classes.scrollList}
           data={groupedItems.map(([date, txGroup]) => ({date, txGroup}))}
-          initialNumToRender={3}
+          initialNumToRender={5}
           getItem={(data, index) => data[index]}
           keyExtractor={(item) => item.date}
           getItemCount={(d) => d.length}

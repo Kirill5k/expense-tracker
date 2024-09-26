@@ -2,6 +2,7 @@ import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
 import {insertSorted, sortedBy} from '@/utils/arrays'
+import {addDays} from 'date-fns'
 
 const handleError = (get, err, rethrow = false) => {
   console.log('error', err)
@@ -21,12 +22,12 @@ const txSorts = {
 }
 
 const filtered = (txs, user) => {
-  const now = new Date()
+  const maxTxDate = addDays(new Date(), user.settings?.futureTransactionVisibilityDays || 0)
   return txs
       .filter(t => t?.hidden !== true)
       .filter(t => t?.category?.hidden !== true)
       .filter(t => t?.amount?.currency?.code === user.settings?.currency?.code)
-      .filter(t => user.settings?.hideFutureTransactions ? new Date(t.date) <= now : true)
+      .filter(t => user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
 }
 
 const withinDates = (txs, dd) => !dd ? txs : txs.filter(tx => {
@@ -36,6 +37,7 @@ const withinDates = (txs, dd) => !dd ? txs : txs.filter(tx => {
 
 const useStore = create((set, get) => ({
   mode: 'light',
+  setMode: (mode) => set({mode}),
   categories: [],
   displayedCategories: [],
   incomeCategories: [],
@@ -182,7 +184,10 @@ const useStore = create((set, get) => ({
   updateUserSettings: (settings) => Clients
       .get(get().isOnline)
       .updateUserSettings(get().accessToken, get().user.id, settings)
-      .then(() => set({user: {...(get().user), settings}}))
+      .then(() => {
+        set({user: {...(get().user), settings}})
+        get().setTransactions(get().transactions)
+      })
       .catch(err => handleError(get, err))
 }));
 

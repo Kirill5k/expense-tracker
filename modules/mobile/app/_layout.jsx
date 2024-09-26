@@ -53,8 +53,10 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme()
-  const isDark = colorScheme === ' dark'
   const {
+    mode,
+    setMode,
+    user,
     alert,
     clearAlert,
     setErrorAlert,
@@ -64,6 +66,16 @@ function RootLayoutNav() {
     getTransactions,
     setLoading,
   } = useStore()
+
+  useEffect(() => {
+    if (user.settings.darkMode === null) {
+      setMode(colorScheme === ' dark' ? 'dark' : 'light')
+    } else if (user.settings.darkMode === true) {
+      setMode('dark')
+    } else if (user.settings.darkMode === false) {
+      setMode('light')
+    }
+  }, [user.settings.darkMode])
 
   useEffect(() => {
     if (accessToken != null) {
@@ -83,8 +95,8 @@ function RootLayoutNav() {
 
   return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GluestackUIProvider mode={isDark ? 'dark' : 'light'}>
-          <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+        <GluestackUIProvider mode={mode}>
+          <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
             <StackWithToast
                 screenOptions={{headerShown: false}}
                 onToastClose={clearAlert}

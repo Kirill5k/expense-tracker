@@ -35,8 +35,6 @@ export const Settings = () => {
   const [loading, setLoading] = useState(false)
   const {mode, user, updateUserSettings} = useStore()
 
-  console.log('user', user)
-
   const handleUpdateSettings = (settings) => {
     setLoading(true)
     updateUserSettings(settings).then(() => setLoading(false))
