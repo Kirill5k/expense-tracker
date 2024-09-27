@@ -3,7 +3,7 @@ import {VStack} from '@/components/ui/vstack'
 import {Divider} from '@/components/ui/divider'
 import {Box} from '@/components/ui/box'
 import {Heading} from '@/components/ui/heading'
-import * as Progress from 'react-native-progress'
+import {ProgressBar} from '@/components/common/progress'
 import FloatingButton from '@/components/common/floating-button'
 import Modal from '@/components/common/modal'
 import CategoryList from '@/components/category/list'
@@ -45,22 +45,12 @@ export const Categories = () => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'sm' : '2xl'} className="font-roboto pb-2">
+        <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Categories
         </Heading>
         <Box>
           {isScrolling && <Divider/>}
-          {loading && <Progress.Bar
-              height={3}
-              animationType="decay"
-              borderRadius={0}
-              borderWidth={0}
-              indeterminateAnimationDuration={250}
-              width={null}
-              indeterminate={true}
-              color={Colors[mode].tint}
-              borderColor={Colors[mode].tint}
-          />}
+          {loading && <ProgressBar mode={mode}/>}
         </Box>
         <CategoryList
             items={displayedCategories}

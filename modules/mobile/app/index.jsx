@@ -3,9 +3,9 @@ import {router} from 'expo-router'
 import {Button, ButtonText} from '@/components/ui/button'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import {VStack} from '@/components/ui/vstack'
-import * as Progress from 'react-native-progress'
+import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
-import Colors from '@/constants/colors'
+
 
 const Index = () => {
   const {isLoading, mode} = useStore()
@@ -25,16 +25,7 @@ const Index = () => {
               </Button>
             </VStack>
         )}
-        {isLoading && (
-            <Progress.CircleSnail
-                direction="clockwise"
-                color={Colors[mode].defaultTint}
-                strokeCap="butt"
-                thickness={10}
-                size={125}
-                indeterminate={true}
-            />
-        )}
+        {isLoading && <ProgressCircle mode={mode}/>}
       </SafeAreaView>
   );
 };

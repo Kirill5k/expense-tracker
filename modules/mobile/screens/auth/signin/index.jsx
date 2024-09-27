@@ -195,7 +195,7 @@ const LoginForm = ({onSubmit}) => {
           </VStack>
           <VStack className="w-full my-7 " space="lg">
             <Button className="w-full" onPress={handleSubmit(handleFormSubmit)} isDisabled={loading}>
-              {loading && <ButtonSpinner color={colors.gray[400]} />}
+              {loading && <ButtonSpinner color={colors.gray[400]} className="pr-2" />}
               <ButtonText className="font-medium">{loading ? 'Logging you in...' : 'Log in'}</ButtonText>
             </Button>
             <Button

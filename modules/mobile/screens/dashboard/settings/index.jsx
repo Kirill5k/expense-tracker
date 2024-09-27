@@ -11,10 +11,9 @@ import ThemeSelect from '@/components/settings/theme-select'
 import FutureTransactionsToggle from '@/components/settings/future-transactions-toggle'
 import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/settings/accordion'
 import {AccordionContent, AccordionContentText} from '@/components/ui/accordion'
+import {ProgressBar} from '@/components/common/progress'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
-import * as Progress from "react-native-progress";
-import Colors from '@/constants/colors'
 
 
 const themeDisplayLabel = (darkMode) => {
@@ -54,22 +53,12 @@ export const Settings = () => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'sm' : '2xl'} className="pb-2">
+        <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
         <Box>
           {isScrolling && <Divider/>}
-          {loading && <Progress.Bar
-              height={3}
-              animationType="decay"
-              borderRadius={0}
-              borderWidth={0}
-              indeterminateAnimationDuration={250}
-              width={null}
-              indeterminate={true}
-              color={Colors[mode].tint}
-              borderColor={Colors[mode].tint}
-          />}
+          {loading && <ProgressBar mode={mode}/>}
         </Box>
         <ScrollView
             showsVerticalScrollIndicator={false}

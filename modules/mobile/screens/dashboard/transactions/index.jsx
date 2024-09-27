@@ -8,9 +8,8 @@ import Modal from '@/components/common/modal'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionForm from '@/components/transaction/form'
 import TransactionList from '@/components/transaction/list'
+import {ProgressBar} from '@/components/common/progress'
 import useStore from '@/store'
-import * as Progress from 'react-native-progress'
-import Colors from '@/constants/colors'
 import Classes from '@/constants/classes'
 
 export const Transactions = () => {
@@ -61,7 +60,7 @@ export const Transactions = () => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'sm' : '2xl'} className="font-roboto">
+        <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Transactions
         </Heading>
         <DatePeriodSelect
@@ -72,17 +71,7 @@ export const Transactions = () => {
         />
         <Box>
           {isScrolling && <Divider/>}
-          {loading && <Progress.Bar
-              height={3}
-              animationType="decay"
-              borderRadius={0}
-              borderWidth={0}
-              indeterminateAnimationDuration={250}
-              width={null}
-              indeterminate={true}
-              color={Colors[mode].tint}
-              borderColor={Colors[mode].tint}
-          />}
+          {loading && <ProgressBar mode={mode}/>}
         </Box>
         <TransactionList
             disabled={loading}
