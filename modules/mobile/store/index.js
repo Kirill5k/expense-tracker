@@ -4,6 +4,20 @@ import Alerts from './alerts'
 import {insertSorted, sortedBy} from '@/utils/arrays'
 import {addDays} from 'date-fns'
 
+const DefaultState = {
+  accessToken: null,
+  user: null,
+  categories: [],
+  displayedCategories: [],
+  incomeCategories: [],
+  expenseCategories: [],
+  transactions: [],
+  filteredTransactions: [],
+  displayedTransactions: [],
+  displayDate: null,
+  isLoading: false
+}
+
 const handleError = (get, err, rethrow = false) => {
   console.log('error', err)
   if (err.status === 403) {
@@ -38,12 +52,12 @@ const withinDates = (txs, dd) => !dd ? txs : txs.filter(tx => {
 })
 
 const useStore = create((set, get) => ({
+  ...DefaultState,
+  isOnline: true,
+  alert: null,
   mode: 'light',
   setMode: (mode) => set({mode}),
-  categories: [],
-  displayedCategories: [],
-  incomeCategories: [],
-  expenseCategories: [],
+  setLoading: (isLoading) => set({isLoading}),
   setCategories: (categories) => {
     const displayedCategories = categories.filter(c => !c.hidden)
     const incomeCategories = displayedCategories.filter(c => c.kind === 'income')
@@ -66,21 +80,19 @@ const useStore = create((set, get) => ({
     const transactions = get().transactions.map(t => t.category.id === id ? ({...t, category: {...t.category, hidden}}) : t)
     get().setTransactions(transactions)
   },
-  displayDate: null,
   setDisplayDate: (displayDate) => {
     const displayedTransactions = withinDates(get().filteredTransactions, displayDate).sort(txSorts.date(true))
     set({displayDate, displayedTransactions})
   },
-  transactions: [],
-  filteredTransactions: [],
-  displayedTransactions: [],
   setTransactions: (transactions) => {
     const filteredTransactions = filtered(transactions, get().user)
     const displayedTransactions = withinDates(filteredTransactions, get().displayDate).sort(txSorts.date(true))
     set({transactions, filteredTransactions, displayedTransactions})
   },
   reloadTransactions: () => {
-    get().setTransactions(get().transactions)
+    if (get().transactions.length > 0) {
+      get().setTransactions(get().transactions)
+    }
   },
   addUpdatedTransaction: (updatedTx) => {
     const transactions = get().transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
@@ -94,21 +106,10 @@ const useStore = create((set, get) => ({
     const txs = get().transactions.map(t => t.id === id ? ({...t, hidden}) : t)
     get().setTransactions(txs)
   },
-  alert: null,
-  isOnline: true,
-  isLoading: false,
-  setLoading: (isLoading) => set({isLoading}),
-  isAuthenticated: false,
-  accessToken: null,
-  user: null,
   setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
   setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
   clearAlert: () => set({alert: null}),
-  clearUser: () => set({
-    isAuthenticated: false,
-    accessToken: null,
-    user: null,
-  }),
+  clearUser: () => set({...DefaultState}),
   login: (creds) => {
     get().clearAlert()
     return Clients.get(get().isOnline)
