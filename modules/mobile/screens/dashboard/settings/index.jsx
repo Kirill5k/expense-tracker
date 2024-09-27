@@ -5,14 +5,17 @@ import {Heading} from '@/components/ui/heading'
 import {Divider} from '@/components/ui/divider'
 import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
+import {MaterialIcon} from '@/components/ui/icon'
+import {Alert, AlertIcon, AlertText} from '@/components/ui/alert'
 import Profile from '@/components/settings/profile'
 import CurrencySelect from '@/components/settings/currency-select'
 import ThemeSelect from '@/components/settings/theme-select'
 import FutureTransactionsToggle from '@/components/settings/future-transactions-toggle'
 import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/settings/accordion'
-import {AccordionContent, AccordionContentText} from '@/components/ui/accordion'
+import {AccordionContentText} from '@/components/ui/accordion'
 import {ProgressBar} from '@/components/common/progress'
 import Classes from '@/constants/classes'
+import Colors from '@/constants/colors'
 import useStore from '@/store'
 
 
@@ -104,7 +107,7 @@ export const Settings = () => {
                 headerTitle="Hide Future Transactions"
                 headerValue={hideFutureTransactionsDisplayLabel(user?.settings?.futureTransactionVisibilityDays)}
             >
-              <AccordionContent>
+              <SettingsAccordionContent>
                 <FutureTransactionsToggle
                     isDisabled={loading}
                     mode={mode}
@@ -113,7 +116,7 @@ export const Settings = () => {
                       handleUpdateSettings({...user.settings, futureTransactionVisibilityDays})
                     }}
                 />
-              </AccordionContent>
+              </SettingsAccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem
                 isLast
@@ -143,38 +146,40 @@ export const Settings = () => {
                 value="4"
                 headerTitle="Change Password"
             >
-              <AccordionContent>
+              <SettingsAccordionContent>
                 <AccordionContentText>
                   To place an order, simply select the products you want, proceed to
                   checkout, provide shipping and payment information, and finalize your
                   purchase.
                 </AccordionContentText>
-              </AccordionContent>
+              </SettingsAccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem
                 value="5"
-                headerTitle="Erase All Transactions"
+                headerTitle="Clear All Data"
             >
-              <AccordionContent>
-                <AccordionContentText>
-                  To place an order, simply select the products you want, proceed to
-                  checkout, provide shipping and payment information, and finalize your
-                  purchase.
-                </AccordionContentText>
-              </AccordionContent>
+              <SettingsAccordionContent>
+                <Alert action="error" variant="solid">
+                  <AlertIcon as={MaterialIcon} code="alert-circle-outline" dcolor={Colors[mode].error} dsize={16} />
+                  <AlertText size="sm">
+                    This will permanently delete all your saved transactions, categories, and personal settings from the app. This action is irreversible and cannot be undone. However, your account will remain active.
+                  </AlertText>
+                </Alert>
+              </SettingsAccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem
                 isLast
                 value="6"
                 headerTitle="Close Account"
             >
-              <AccordionContent>
-                <AccordionContentText>
-                  To place an order, simply select the products you want, proceed to
-                  checkout, provide shipping and payment information, and finalize your
-                  purchase.
-                </AccordionContentText>
-              </AccordionContent>
+              <SettingsAccordionContent>
+                <Alert action="error" variant="solid">
+                  <AlertIcon as={MaterialIcon} code="alert-circle-outline" dcolor={Colors[mode].error} dsize={16} />
+                  <AlertText size="sm">
+                    Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account.
+                  </AlertText>
+                </Alert>
+              </SettingsAccordionContent>
             </SettingsAccordionItem>
           </SettingsAccordion>
 
