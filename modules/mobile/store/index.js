@@ -24,10 +24,12 @@ const txSorts = {
 const filtered = (txs, user) => {
   const maxTxDate = addDays(new Date(), user.settings?.futureTransactionVisibilityDays || 0)
   return txs
-      .filter(t => t?.hidden !== true)
-      .filter(t => t?.category?.hidden !== true)
-      .filter(t => t?.amount?.currency?.code === user.settings?.currency?.code)
-      .filter(t => user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
+      .filter(t => {
+        return (t?.hidden !== true) &&
+            (t?.category?.hidden !== true) &&
+            (t?.amount?.currency?.code === user.settings?.currency?.code) &&
+            (user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
+      })
 }
 
 const withinDates = (txs, dd) => !dd ? txs : txs.filter(tx => {
@@ -77,9 +79,11 @@ const useStore = create((set, get) => ({
     const displayedTransactions = withinDates(filteredTransactions, get().displayDate).sort(txSorts.date(true))
     set({transactions, filteredTransactions, displayedTransactions})
   },
+  reloadTransactions: () => {
+    get().setTransactions(get().transactions)
+  },
   addUpdatedTransaction: (updatedTx) => {
-    const transactions = get()
-        .transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
+    const transactions = get().transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
     get().setTransactions(transactions)
   },
   addCreatedTransaction: (newTx) => {
@@ -182,7 +186,6 @@ const useStore = create((set, get) => ({
       .updateUserSettings(get().accessToken, get().user.id, settings)
       .then(() => {
         set({user: {...(get().user), settings}})
-        get().setTransactions(get().transactions)
       })
       .catch(err => handleError(get, err))
 }));

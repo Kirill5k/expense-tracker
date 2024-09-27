@@ -64,8 +64,15 @@ function RootLayoutNav() {
     clearUser,
     getUser,
     getTransactions,
+    reloadTransactions,
     setLoading,
   } = useStore()
+
+  useEffect(() => {
+    if (user?.settings) {
+      reloadTransactions()
+    }
+  }, [user?.settings?.currency, user?.settings?.futureTransactionVisibilityDays])
 
   useEffect(() => {
     if (user?.settings?.darkMode === true) {
@@ -94,7 +101,7 @@ function RootLayoutNav() {
   }, [accessToken])
 
   return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{flex: 1}}>
         <GluestackUIProvider mode={mode}>
           <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
             <StackWithToast
