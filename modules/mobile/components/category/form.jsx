@@ -4,18 +4,11 @@ import {HStack} from '@/components/ui/hstack'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Input, InputField} from '@/components/ui/input'
 import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/components/ui/radio'
-import {
-  FormControl,
-  FormControlError,
-  FormControlErrorIcon,
-  FormControlErrorText,
-  FormControlHelper,
-  FormControlHelperText
-} from "@/components/ui/form-control"
+import {FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText} from "@/components/ui/form-control"
 import {CircleIcon} from '@/components/ui/icon'
 import IconSelect from '@/components/common/icon-select'
 import {AlertTriangle} from 'lucide-react-native'
-import ColorPicker, {Panel1, Swatches, Preview, OpacitySlider, HueSlider} from 'reanimated-color-picker';
+import ColorPicker, {HueSlider} from 'reanimated-color-picker';
 import {Keyboard} from 'react-native'
 import {z} from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'

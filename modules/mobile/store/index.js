@@ -5,6 +5,7 @@ import {insertSorted, sortedBy} from '@/utils/arrays'
 import {addDays} from 'date-fns'
 
 const DefaultState = {
+  isAuthenticated: false,
   accessToken: null,
   user: null,
   categories: [],
@@ -18,11 +19,11 @@ const DefaultState = {
   isLoading: false
 }
 
-const handleError = (get, err, rethrow = false) => {
+const handleError = (get, err, rethrow = false, displayAlert = true) => {
   console.log('error', err)
   if (err.status === 403) {
     get().clearUser()
-  } else {
+  } else if (displayAlert) {
     get().setErrorAlert(err.message)
   }
   if (rethrow) {
@@ -77,7 +78,8 @@ const useStore = create((set, get) => ({
   setHiddenForCategory: (id, hidden) => {
     const cats = get().categories.map(c => c.id === id ? {...c, hidden} : c)
     get().setCategories(cats)
-    const transactions = get().transactions.map(t => t.category.id === id ? ({...t, category: {...t.category, hidden}}) : t)
+    const transactions = get().transactions.map(
+        t => t.category.id === id ? ({...t, category: {...t.category, hidden}}) : t)
     get().setTransactions(transactions)
   },
   setDisplayDate: (displayDate) => {
@@ -110,13 +112,15 @@ const useStore = create((set, get) => ({
   setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
   clearAlert: () => set({alert: null}),
   clearUser: () => set({...DefaultState}),
-  login: (creds) => {
+  login: (creds, showAlert = true) => {
     get().clearAlert()
     return Clients.get(get().isOnline)
         .login(creds)
         .then(({access_token}) => {
-          set({accessToken: access_token})
-          set({alert: Alerts.LOGIN_SUCCESS})
+          set({accessToken: access_token, isAuthenticated: true})
+          if (showAlert) {
+            set({alert: Alerts.LOGIN_SUCCESS})
+          }
         })
   },
   logout: () => {
@@ -185,10 +189,14 @@ const useStore = create((set, get) => ({
   updateUserSettings: (settings) => Clients
       .get(get().isOnline)
       .updateUserSettings(get().accessToken, get().user.id, settings)
-      .then(() => {
-        set({user: {...(get().user), settings}})
-      })
-      .catch(err => handleError(get, err))
+      .then(() => set({user: {...(get().user), settings}}))
+      .catch(err => handleError(get, err)),
+  changeUserPassword: ({currentPassword, newPassword}) => Clients
+      .get(get().isOnline)
+      .changeUserPassword(get().accessToken, get().user.id, {currentPassword, newPassword})
+      .then(() => get().login({email: get().user.email, password: newPassword}, false))
+      .then(() => set({alert: Alerts.PASSWORD_CHANGE_SUCCESS}))
+      .catch(e => handleError(get, e, e.status === 401, e.status !== 401))
 }));
 
 export default useStore;

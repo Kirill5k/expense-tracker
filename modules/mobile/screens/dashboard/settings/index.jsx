@@ -9,6 +9,7 @@ import Profile from '@/components/settings/profile'
 import CurrencySelect from '@/components/settings/currency-select'
 import ThemeSelect from '@/components/settings/theme-select'
 import DeleteButton from '@/components/settings/delete-button'
+import PasswordChange from '@/components/settings/password-change'
 import FutureTransactionsToggle from '@/components/settings/future-transactions-toggle'
 import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/settings/accordion'
 import {AccordionContentText} from '@/components/ui/accordion'
@@ -43,7 +44,8 @@ export const Settings = () => {
     mode,
     user,
     updateUserSettings,
-    logout
+    logout,
+    changeUserPassword
   } = useStore()
 
   const handleLogout = () => {
@@ -54,6 +56,12 @@ export const Settings = () => {
   const handleUpdateSettings = (settings) => {
     setLoading(true)
     updateUserSettings(settings).then(() => setLoading(false))
+  }
+
+  const handlePasswordChange = ({password, currentPassword}) => {
+    setLoading(true)
+    return changeUserPassword({currentPassword, newPassword: password})
+        .finally(() => setLoading(false))
   }
 
   if (!user) {
@@ -153,11 +161,9 @@ export const Settings = () => {
                 headerTitle="Change Password"
             >
               <SettingsAccordionContent>
-                <AccordionContentText>
-                  To place an order, simply select the products you want, proceed to
-                  checkout, provide shipping and payment information, and finalize your
-                  purchase.
-                </AccordionContentText>
+                <PasswordChange
+                    onSubmit={handlePasswordChange}
+                />
               </SettingsAccordionContent>
             </SettingsAccordionItem>
             <SettingsAccordionItem

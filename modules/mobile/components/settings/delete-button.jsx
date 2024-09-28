@@ -30,7 +30,7 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
           <InputField
               value={input}
               onChangeText={setInput}
-              placeholder={`Type "${confirmationText}" to confirm`}
+              placeholder={`Type ${confirmationText} to confirm`}
               autoCapitalize="none"
               autoCorrect="none"
               importantForAutofill="no"

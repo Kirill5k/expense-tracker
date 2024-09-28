@@ -60,7 +60,7 @@ function RootLayoutNav() {
     alert,
     clearAlert,
     setErrorAlert,
-    accessToken,
+    isAuthenticated,
     clearUser,
     getUser,
     getTransactions,
@@ -85,7 +85,7 @@ function RootLayoutNav() {
   }, [user?.settings?.darkMode])
 
   useEffect(() => {
-    if (accessToken != null) {
+    if (isAuthenticated) {
       setLoading(true)
       getUser()
           .then(getTransactions)
@@ -98,7 +98,7 @@ function RootLayoutNav() {
     } else {
       router.push('/')
     }
-  }, [accessToken])
+  }, [isAuthenticated])
 
   return (
       <GestureHandlerRootView style={{flex: 1}}>
