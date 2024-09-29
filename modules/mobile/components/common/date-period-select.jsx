@@ -150,7 +150,7 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
           )}
       >
         {dateRangeOptions.map(o => (
-            <MenuItem key={o.value} textValue={o.text}>
+            <MenuItem key={o.value} textValue={o.text} className={o.value === value?.range ? 'bg-background-100' : ''}>
               <MenuItemLabel size="sm" className="px-2">{o.text}</MenuItemLabel>
             </MenuItem>
         ))}
