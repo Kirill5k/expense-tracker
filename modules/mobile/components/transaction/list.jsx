@@ -7,10 +7,9 @@ import {Avatar} from '@/components/ui/avatar'
 import {MaterialIcon} from '@/components/ui/icon'
 import ListItemPressable from '@/components/common/list-item-pressable'
 import {groupBy} from '@/utils/arrays'
-import {calcTotal, formatAmount} from '@/utils/transactions'
+import {calcTotal, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
 import {VirtualizedList} from '@/components/ui/virtualized-list'
-import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
 const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
@@ -44,8 +43,8 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
                     ))}
                   </HStack>}
                 </VStack>
-                <Text className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${tx.category.kind === 'expense'
-                    ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'}`}>
+                <Text
+                    className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${isExpense(tx) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'}`}>
                   {formatAmount(tx)}
                 </Text>
               </HStack>
@@ -55,19 +54,26 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
   )
 }
 
+const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy, onItemDelete}) => {
+  return (
+      <VStack className="mb-5">
+        <HStack className="items-center">
+          <Heading size="xs" className="mb-1">{formatDate(item)}</Heading>
+          <Text className="text-xs ml-auto">{calcTotal(item.txGroup)}</Text>
+        </HStack>
+        <TransactionGroup
+            disabled={disabled}
+            items={item.txGroup}
+            onItemPress={onItemPress}
+            onItemCopy={onItemCopy}
+            onItemDelete={onItemDelete}
+        />
+      </VStack>
+  )
+})
+
 const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
   const groupedItems = Object.entries(groupBy(items, i => i.date))
-
-  const formatDate = (isoDate) => {
-    const date = parseISO(isoDate);
-    if (isToday(date)) {
-      return 'Today'
-    }
-    if (isYesterday(date)) {
-      return 'Yesterday'
-    }
-    return format(date, 'd MMMM')
-  }
 
   return (
       <VirtualizedList
@@ -79,20 +85,14 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
           getItem={(data, index) => data[index]}
           keyExtractor={(item) => item.date}
           getItemCount={(d) => d.length}
-          renderItem={({ item }) => (
-              <VStack className="mb-5">
-                <HStack className="items-center">
-                  <Heading size="xs" className="mb-1">{formatDate(item.date)}</Heading>
-                  <Text className="text-xs ml-auto">{calcTotal(item.txGroup)}</Text>
-                </HStack>
-                <TransactionGroup
-                    disabled={disabled}
-                    items={item.txGroup}
-                    onItemPress={onItemPress}
-                    onItemCopy={onItemCopy}
-                    onItemDelete={onItemDelete}
-                />
-              </VStack>
+          renderItem={({item}) => (
+              <TransactionListItem
+                  item={item}
+                  disabled={disabled}
+                  onItemPress={onItemPress}
+                  onItemCopy={onItemCopy}
+                  onItemDelete={onItemDelete}
+              />
           )}
       />
   )

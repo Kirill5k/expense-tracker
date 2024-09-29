@@ -1,3 +1,4 @@
+import React from 'react'
 import {VirtualizedList} from '@/components/ui/virtualized-list'
 import {Box} from '@/components/ui/box'
 import {HStack} from '@/components/ui/hstack'
@@ -6,6 +7,35 @@ import {MaterialIcon} from '@/components/ui/icon'
 import {Avatar} from '@/components/ui/avatar'
 import ListItemPressable from '@/components/common/list-item-pressable'
 import Classes from '@/constants/classes'
+
+const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}) => {
+  return (
+      <Box className={`bg-background-50 px-1 ${item.isFirst ? 'rounded-t-xl pt-1' : ''} ${item.isLast
+          ? 'rounded-b-xl pb-1' : ''}`}>
+        <ListItemPressable
+            disabled={disabled}
+            onPress={() => onItemPress(item)}
+            onDelete={() => onItemDelete(item)}
+        >
+          <HStack className="items-center p-3">
+            <Avatar size="sm" style={{backgroundColor: item.color}}>
+              <MaterialIcon
+                  code={item.icon}
+                  dsize={20}
+                  dcolor="white"
+              />
+            </Avatar>
+            <Text className={Classes.listItemMainText + ' ml-4'}>
+              {item.name}
+            </Text>
+            <Text className="uppercase ml-auto text-typography-500 text-xs font-medium">
+              {item.kind}
+            </Text>
+          </HStack>
+        </ListItemPressable>
+      </Box>
+  )
+})
 
 const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) => {
   return (
@@ -19,29 +49,12 @@ const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) =>
           keyExtractor={(item) => item.id}
           getItemCount={data => data.length}
           renderItem={({item}) => (
-              <Box className={`bg-background-50 px-1 ${item.isFirst ? 'rounded-t-xl pt-1' : ''} ${item.isLast ? 'rounded-b-xl pb-1' : ''}`}>
-                <ListItemPressable
-                    disabled={disabled}
-                    onPress={() => onItemPress(item)}
-                    onDelete={() => onItemDelete(item)}
-                >
-                  <HStack className="items-center p-3">
-                    <Avatar size="sm" style={{backgroundColor: item.color}}>
-                      <MaterialIcon
-                          code={item.icon}
-                          dsize={20}
-                          dcolor="white"
-                      />
-                    </Avatar>
-                    <Text className={Classes.listItemMainText + ' ml-4'}>
-                      {item.name}
-                    </Text>
-                    <Text className="uppercase ml-auto text-typography-500 text-xs font-medium">
-                      {item.kind}
-                    </Text>
-                  </HStack>
-                </ListItemPressable>
-              </Box>
+              <CategoryListItem
+                  onItemPress={onItemPress}
+                  disabled={disabled}
+                  onItemDelete={onItemDelete}
+                  item={item}
+              />
           )}
       />
   )
