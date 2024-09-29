@@ -5,6 +5,7 @@ import {Heading} from '@/components/ui/heading'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {ProgressBar} from '@/components/common/progress'
 import DatePeriodSelect from '@/components/common/date-period-select'
+import TransactionChart from '@/components/transaction/chart'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
 
@@ -26,6 +27,11 @@ const Analytics = () => {
           Analytics
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
+        <TransactionChart
+            mode={mode}
+            items={displayedTransactions}
+            displayDate={displayDate}
+        />
         <DatePeriodSelect
             disabled={loading}
             mode={mode}
