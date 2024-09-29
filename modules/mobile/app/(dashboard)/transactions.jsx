@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
-import {Box} from '@/components/ui/box'
 import {Heading} from '@/components/ui/heading'
 import {Divider} from '@/components/ui/divider'
 import FloatingButton from '@/components/common/floating-button'
@@ -63,16 +62,14 @@ const Transactions = () => {
         <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Transactions
         </Heading>
+        {loading && <ProgressBar mode={mode}/>}
         <DatePeriodSelect
             disabled={loading}
             mode={mode}
             value={displayDate}
             onSelect={setDisplayDate}
         />
-        <Box>
-          {isScrolling && <Divider/>}
-          {loading && <ProgressBar mode={mode}/>}
-        </Box>
+        {isScrolling && <Divider/>}
         <TransactionList
             disabled={loading}
             items={displayedTransactions}

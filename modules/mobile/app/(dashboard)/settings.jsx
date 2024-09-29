@@ -73,10 +73,8 @@ const Settings = () => {
         <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
-        <Box>
-          {isScrolling && <Divider/>}
-          {loading && <ProgressBar mode={mode}/>}
-        </Box>
+        {isScrolling && <Divider/>}
+        {loading && <ProgressBar mode={mode}/>}
         <ScrollView
             showsVerticalScrollIndicator={false}
             onScroll={({nativeEvent}) => {

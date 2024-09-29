@@ -1,7 +1,6 @@
 import React, {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Divider} from '@/components/ui/divider'
-import {Box} from '@/components/ui/box'
 import {Heading} from '@/components/ui/heading'
 import {ProgressBar} from '@/components/common/progress'
 import FloatingButton from '@/components/common/floating-button'
@@ -26,8 +25,8 @@ const Categories = () => {
   } = useStore()
 
   const handleFormSubmit = (cat) => {
-    setCatToUpdate(null)
     setShowModal(false)
+    setCatToUpdate(null)
     setLoading(true)
     const res = cat.id ? updateCategory(cat) : createCategory(cat)
     return res.then(() => setLoading(false))
@@ -47,10 +46,8 @@ const Categories = () => {
         <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Categories
         </Heading>
-        <Box>
-          {isScrolling && <Divider/>}
-          {loading && <ProgressBar mode={mode}/>}
-        </Box>
+        {isScrolling && <Divider/>}
+        {loading && <ProgressBar mode={mode}/>}
         <CategoryList
             items={displayedCategories}
             disabled={loading}
