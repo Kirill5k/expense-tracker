@@ -11,7 +11,7 @@ import {calcTotal, formatAmount, formatDate, isExpense} from '@/utils/transactio
 import Classes from '@/constants/classes'
 import {VirtualizedList} from '@/components/ui/virtualized-list'
 
-const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
+const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
       <VStack className="rounded-xl bg-background-50 p-1" space="sm">
         {items.map(tx => (
@@ -52,7 +52,7 @@ const TransactionGroup = ({disabled, items, onItemPress, onItemCopy, onItemDelet
         ))}
       </VStack>
   )
-}
+})
 
 const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy, onItemDelete}) => {
   return (

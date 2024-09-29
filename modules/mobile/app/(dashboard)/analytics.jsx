@@ -1,5 +1,4 @@
-import React, {useState} from 'react'
-import {Box} from '@/components/ui/box'
+import {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Divider} from '@/components/ui/divider'
 import {Heading} from '@/components/ui/heading'
@@ -17,6 +16,8 @@ const Analytics = () => {
     mode,
     displayDate,
     setDisplayDate,
+    user,
+    displayedTransactions
   } = useStore()
 
   return (
