@@ -9,7 +9,9 @@ export default {
     tabIconDefault: colors.gray[500], // Equivalent to text-gray-500
     tabIconSelected: colors.blue[600], // Equivalent to text-blue-600
     progressMain: colors.blue[500],
-    progressBackground: colors.blue[200]
+    progressBackground: colors.blue[200],
+    barChartMain: colors.blue[400],
+    barChartSecondary: colors.blue[950],
   },
   dark: {
     error: colors.red[200],
@@ -19,6 +21,8 @@ export default {
     tabIconDefault: colors.gray[400], // Equivalent to text-gray-400
     tabIconSelected: colors.blue[300], // Equivalent to text-blue-300
     progressMain: colors.blue[300],
-    progressBackground: colors.blue[100]
+    progressBackground: colors.blue[100],
+    barChartMain: colors.blue[400],
+    barChartSecondary: colors.blue[950],
   },
 };
