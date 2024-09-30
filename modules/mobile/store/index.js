@@ -2,7 +2,12 @@ import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
 import {insertSorted, sortedBy} from '@/utils/arrays'
-import {addDays} from 'date-fns'
+import {addDays, format, startOfMonth, endOfMonth} from 'date-fns'
+
+const defaultDisplayDate = () => {
+  const now = new Date()
+  return {range: 'monthly', start: startOfMonth(now), end: endOfMonth(now), text: format(now, 'LLLL yyyy')}
+}
 
 const DefaultState = {
   isAuthenticated: false,
@@ -15,7 +20,7 @@ const DefaultState = {
   transactions: [],
   filteredTransactions: [],
   displayedTransactions: [],
-  displayDate: null,
+  displayDate: defaultDisplayDate(),
   isLoading: false
 }
 
@@ -83,12 +88,12 @@ const useStore = create((set, get) => ({
     get().setTransactions(transactions)
   },
   setDisplayDate: (displayDate) => {
-    const displayedTransactions = withinDates(get().filteredTransactions, displayDate).sort(txSorts.date(true))
+    const displayedTransactions = withinDates(get().filteredTransactions, displayDate)
     set({displayDate, displayedTransactions})
   },
   setTransactions: (transactions) => {
-    const filteredTransactions = filtered(transactions, get().user)
-    const displayedTransactions = withinDates(filteredTransactions, get().displayDate).sort(txSorts.date(true))
+    const filteredTransactions = filtered(transactions, get().user).sort(txSorts.date(true))
+    const displayedTransactions = withinDates(filteredTransactions, get().displayDate)
     set({transactions, filteredTransactions, displayedTransactions})
   },
   reloadTransactions: () => {
@@ -111,7 +116,7 @@ const useStore = create((set, get) => ({
   setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
   setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
   clearAlert: () => set({alert: null}),
-  clearUser: () => set({...DefaultState}),
+  clearUser: () => set({...DefaultState, displayDate: defaultDisplayDate()}),
   login: (creds, showAlert = true) => {
     get().clearAlert()
     return Clients.get(get().isOnline)
