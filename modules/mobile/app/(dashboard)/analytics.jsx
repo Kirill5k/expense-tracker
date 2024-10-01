@@ -5,6 +5,7 @@ import {Heading} from '@/components/ui/heading'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {ProgressBar} from '@/components/common/progress'
 import DatePeriodSelect from '@/components/common/date-period-select'
+import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
@@ -15,6 +16,7 @@ const Analytics = () => {
   const chartWidth = screenWidth - 92
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [subject, setSubject] = useState('Spending')
 
   const {
     mode,
@@ -30,6 +32,13 @@ const Analytics = () => {
           Analytics
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
+        <ToggleButton
+            className="mb-2"
+            size="md"
+            value={subject}
+            items={['Spending', 'Income']}
+            onChange={setSubject}
+        />
         <TransactionChart
             mode={mode}
             items={displayedTransactions}

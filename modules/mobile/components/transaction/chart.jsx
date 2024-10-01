@@ -5,7 +5,7 @@ import {MaterialIcon} from '@/components/ui/icon'
 import Colors from '@/constants/colors'
 import TransactionBarChart from './bar-chart'
 import TransactionPieChart from './pie-chart'
-import {Dimensions} from "react-native";
+import {Dimensions} from 'react-native'
 
 
 const TransactionChart = ({items, mode, displayDate, currency}) => {
