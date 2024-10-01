@@ -61,7 +61,6 @@ const TransactionPieChart = ({items, chartWidth, mode, currency}) => {
   return (
       <Box className="w-full flex items-center justify-center my-1">
         <PieChart
-            focusOnPress
             sectionAutoFocus
             onPress={handleItemPress}
             data={data}
@@ -69,11 +68,13 @@ const TransactionPieChart = ({items, chartWidth, mode, currency}) => {
             radius={90}
             innerRadius={60}
             innerCircleColor={Colors[mode].background}
+            strokeColor={Colors[mode].background}
+            strokeWidth={1}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
                   <Text size="xs">Spent</Text>
                   <Heading size="xl">
-                    {currency?.symbol}{total.toFixed(2)}
+                    {currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}
                   </Heading>
                 </VStack>
             )}

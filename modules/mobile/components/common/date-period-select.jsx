@@ -57,7 +57,7 @@ const incrementBy = ({start, end, range}, amount) => {
   }
 }
 
-const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
+const DatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState(value?.range ? new Set([value.range]) : new Set([]))
 
@@ -99,7 +99,7 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode}) => {
           trigger={(triggerProps) => (
               <HStack
                   space="lg"
-                  className="align-center justify-center"
+                  className={`align-center justify-center ${className}`}
               >
                 <Button
                     size="sm"

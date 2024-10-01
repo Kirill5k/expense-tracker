@@ -93,7 +93,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) =
   return (
       <VStack>
         <Text size="xs">Spent</Text>
-        <Heading size="xl" className="mb-4">{currency?.symbol}{total.toFixed(2)}</Heading>
+        <Heading size="xl" className="mb-4">{currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}</Heading>
         <BarChart
             frontColor={frontColor}
             height={120}

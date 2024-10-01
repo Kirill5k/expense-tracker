@@ -15,12 +15,12 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
   const [showPieChart, setShowPieChart] = useState(true)
 
   return (
-      <VStack>
+      <VStack className="h-56">
         <Fab
             isHovered={false}
             placement="top right"
             size="md"
-            className="shadow-none rounded-full p-1.5 top-1 bg-primary border border-primary-50"
+            className="shadow-none rounded-full p-1.5 top-1 bg-primary border border-primary-900"
             variant="outline" onPress={() => setShowPieChart(!showPieChart)}
         >
           <FabIcon as={MaterialIcon} code={showPieChart ? 'chart-bar' : 'chart-pie'} dsize={22} dcolor={Colors[mode].text} />

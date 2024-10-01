@@ -38,6 +38,7 @@ const Analytics = () => {
             chartWidth={chartWidth}
         />
         <DatePeriodSelect
+            className="mt-2"
             disabled={loading}
             mode={mode}
             value={displayDate}
