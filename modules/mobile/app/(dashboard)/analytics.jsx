@@ -31,6 +31,7 @@ const Analytics = () => {
             mode={mode}
             items={displayedTransactions}
             displayDate={displayDate}
+            currency={user?.settings?.currency}
         />
         <DatePeriodSelect
             disabled={loading}
