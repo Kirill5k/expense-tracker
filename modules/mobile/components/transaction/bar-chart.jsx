@@ -5,6 +5,7 @@ import {Heading} from '@/components/ui/heading'
 import {getDaysInMonth} from 'date-fns'
 import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
+import {Dimensions} from 'react-native'
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weeks = ['1-7', '8-14', '15-21', '22-28']
@@ -34,7 +35,10 @@ const getBucketNumberForDateRange = (tx, range) => {
 }
 
 
-const prepareChartData = (items, displayDate, chartWidth) => {
+const prepareChartData = (items, displayDate) => {
+  const screenWidth = Dimensions.get('window').width
+  const chartWidth = screenWidth - 92
+
   let total = 0
 
   const transactionsByDateRange = items.reduce((acc, tx) => {
@@ -61,8 +65,8 @@ const prepareChartData = (items, displayDate, chartWidth) => {
   return {total, data, average: Math.floor(total / data.length), chartWidth}
 }
 
-const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) => {
-  const chartData = prepareChartData(items, displayDate, chartWidth)
+const TransactionBarChart = ({items, mode, displayDate, currency}) => {
+  const chartData = prepareChartData(items, displayDate)
   const [pressedItem, setPressedItem] = useState(null)
   const [data, setData] = useState(chartData.data)
   const [total, setTotal] = useState(chartData.total)
@@ -95,7 +99,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) =
         <BarChart
             frontColor={frontColor}
             height={120}
-            width={chartWidth}
+            width={chartData.chartWidth}
             initialSpacing={10}
             roundToDigits={0}
             yAxisSide={yAxisSides.RIGHT}

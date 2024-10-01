@@ -8,8 +8,11 @@ import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionChart from '@/components/transaction/chart'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
+import {Dimensions} from 'react-native'
 
 const Analytics = () => {
+  const screenWidth = Dimensions.get('window').width
+  const chartWidth = screenWidth - 92
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -20,6 +23,8 @@ const Analytics = () => {
     user,
     displayedTransactions
   } = useStore()
+
+  console.log('chart-width', chartWidth)
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -32,6 +37,7 @@ const Analytics = () => {
             items={displayedTransactions}
             displayDate={displayDate}
             currency={user?.settings?.currency}
+            chartWidth={chartWidth}
         />
         <DatePeriodSelect
             disabled={loading}
