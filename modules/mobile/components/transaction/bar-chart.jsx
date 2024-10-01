@@ -68,6 +68,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) =
   const [pressedItem, setPressedItem] = useState(null)
   const [data, setData] = useState([])
   const [total, setTotal] = useState(0)
+  const [chartData, setChartData] = useState({})
 
   const handleItemPress = (item) => {
     if (pressedItem?.index === item.index) {
@@ -85,6 +86,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) =
     const chartData = prepareChartData(items, displayDate, chartWidth)
     setData(chartData.data)
     setTotal(chartData.total)
+    setChartData(chartData)
     setPressedItem(null)
   }, [items]);
 

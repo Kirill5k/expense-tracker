@@ -24,8 +24,6 @@ const Analytics = () => {
     displayedTransactions
   } = useStore()
 
-  console.log('chart-width', chartWidth)
-
   return (
       <VStack className={Classes.dashboardLayout}>
         <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>

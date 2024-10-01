@@ -4,6 +4,7 @@ import {Fab, FabIcon} from '@/components/ui/fab'
 import {MaterialIcon} from '@/components/ui/icon'
 import Colors from '@/constants/colors'
 import TransactionBarChart from './bar-chart'
+import TransactionPieChart from './pie-chart'
 import {Dimensions} from "react-native";
 
 
@@ -19,10 +20,10 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
             isHovered={false}
             placement="top right"
             size="md"
-            className="rounded-full p-1 top-1 bg-background-0 border border-outline-500"
-            variant="outline" onPress={() => setShowPieChart(true)}
+            className="shadow-none rounded-full p-1.5 top-1 bg-primary border border-primary-50"
+            variant="outline" onPress={() => setShowPieChart(!showPieChart)}
         >
-          <FabIcon as={MaterialIcon} code="chart-donut" dsize={26} dcolor={Colors[mode].text} />
+          <FabIcon as={MaterialIcon} code={showPieChart ? 'chart-bar' : 'chart-pie'} dsize={22} dcolor={Colors[mode].text} />
         </Fab>
         <TransactionBarChart
           items={items}
