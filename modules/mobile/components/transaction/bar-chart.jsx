@@ -1,15 +1,10 @@
 import {useEffect, useState} from 'react'
-import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
-import {Fab, FabIcon} from '@/components/ui/fab'
-import {MaterialIcon} from '@/components/ui/icon'
-import {Dimensions} from 'react-native'
 import {getDaysInMonth} from 'date-fns'
 import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
-import TransactionBarChart from './bar-chart'
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weeks = ['1-7', '8-14', '15-21', '22-28']
@@ -39,10 +34,7 @@ const getBucketNumberForDateRange = (tx, range) => {
 }
 
 
-const prepareChartData = (items, displayDate) => {
-  const screenWidth = Dimensions.get('window').width
-  const chartWidth = screenWidth - 92
-
+const prepareChartData = (items, displayDate, chartWidth) => {
   let total = 0
 
   const transactionsByDateRange = items.reduce((acc, tx) => {
@@ -69,9 +61,8 @@ const prepareChartData = (items, displayDate) => {
   return {total, data, average: Math.floor(total / data.length), chartWidth}
 }
 
-const TransactionChart = ({items, mode, displayDate, currency}) => {
-  const [showPieChart, setShowPieChart] = useState(false)
-  const chartData = prepareChartData(items, displayDate)
+const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) => {
+  const chartData = prepareChartData(items, displayDate, chartWidth)
   const [pressedItem, setPressedItem] = useState(null)
   const [data, setData] = useState(chartData.data)
   const [total, setTotal] = useState(chartData.total)
@@ -99,47 +90,36 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
 
   return (
       <VStack>
-        <Fab
-            isHovered={false}
-            placement="top right"
-            size="md"
-            className="rounded-full p-1 top-1 bg-background-0 border border-outline-500"
-            variant="outline" onPress={() => setShowPieChart(true)}
-        >
-          <FabIcon as={MaterialIcon} code="chart-donut" dsize={26} dcolor={Colors[mode].text} />
-        </Fab>
-        <VStack>
-          <Text size="xs">Spent</Text>
-          <Heading size="xl" className="mb-4">{currency?.symbol}{total.toFixed(2)}</Heading>
-          <BarChart
-              frontColor={frontColor}
-              height={120}
-              width={chartData.chartWidth}
-              initialSpacing={10}
-              roundToDigits={0}
-              yAxisSide={yAxisSides.RIGHT}
-              roundedBottom={false}
-              barBorderTopLeftRadius={4}
-              barBorderTopRightRadius={4}
-              data={data}
-              yAxisThickness={0}
-              xAxisThickness={1}
-              xAxisColor={Colors[mode].tabIconDefault}
-              yAxisTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16, textAlign: 'right'}}
-              xAxisLabelTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16}}
-              noOfSections={3}
-              onPress={handleItemPress}
-              // showReferenceLine1
-              // referenceLine1Position={chartData.average}
-              // referenceLine1Config={{
-              //   color: '#177AD5',
-              //   dashWidth: 1000,
-              //   dashGap: 0,
-              // }}
-          />
-        </VStack>
+        <Text size="xs">Spent</Text>
+        <Heading size="xl" className="mb-4">{currency?.symbol}{total.toFixed(2)}</Heading>
+        <BarChart
+            frontColor={frontColor}
+            height={120}
+            width={chartWidth}
+            initialSpacing={10}
+            roundToDigits={0}
+            yAxisSide={yAxisSides.RIGHT}
+            roundedBottom={false}
+            barBorderTopLeftRadius={4}
+            barBorderTopRightRadius={4}
+            data={data}
+            yAxisThickness={0}
+            xAxisThickness={1}
+            xAxisColor={Colors[mode].tabIconDefault}
+            yAxisTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16, textAlign: 'right'}}
+            xAxisLabelTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16}}
+            noOfSections={3}
+            onPress={handleItemPress}
+            // showReferenceLine1
+            // referenceLine1Position={chartData.average}
+            // referenceLine1Config={{
+            //   color: '#177AD5',
+            //   dashWidth: 1000,
+            //   dashGap: 0,
+            // }}
+        />
       </VStack>
   )
 }
 
-export default TransactionChart
+export default TransactionBarChart
