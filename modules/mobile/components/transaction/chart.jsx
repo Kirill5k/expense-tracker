@@ -4,9 +4,13 @@ import {Fab, FabIcon} from '@/components/ui/fab'
 import {MaterialIcon} from '@/components/ui/icon'
 import Colors from '@/constants/colors'
 import TransactionBarChart from './bar-chart'
+import {Dimensions} from "react-native";
 
 
-const TransactionChart = ({items, mode, displayDate, currency, chartWidth}) => {
+const TransactionChart = ({items, mode, displayDate, currency}) => {
+  const screenWidth = Dimensions.get('window').width
+  const chartWidth = screenWidth - 92
+
   const [showPieChart, setShowPieChart] = useState(false)
 
   return (
@@ -25,6 +29,7 @@ const TransactionChart = ({items, mode, displayDate, currency, chartWidth}) => {
           displayDate={displayDate}
           currency={currency}
           mode={mode}
+          chartWidth={chartWidth}
         />
       </VStack>
   )

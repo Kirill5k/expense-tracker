@@ -5,7 +5,6 @@ import {Heading} from '@/components/ui/heading'
 import {getDaysInMonth} from 'date-fns'
 import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
-import {Dimensions} from 'react-native'
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weeks = ['1-7', '8-14', '15-21', '22-28']
@@ -35,10 +34,7 @@ const getBucketNumberForDateRange = (tx, range) => {
 }
 
 
-const prepareChartData = (items, displayDate) => {
-  const screenWidth = Dimensions.get('window').width
-  const chartWidth = screenWidth - 92
-
+const prepareChartData = (items, displayDate, chartWidth) => {
   let total = 0
 
   const transactionsByDateRange = items.reduce((acc, tx) => {
@@ -62,16 +58,16 @@ const prepareChartData = (items, displayDate) => {
         return {spacing: chartWidth / 42, barWidth: chartWidth / 17, label: months[i], ...baseData}
     }
   })
-  return {total, data, average: Math.floor(total / data.length), chartWidth}
+  return {total, data, average: Math.floor(total / data.length)}
 }
 
-const TransactionBarChart = ({items, mode, displayDate, currency}) => {
-  const chartData = prepareChartData(items, displayDate)
-  const [pressedItem, setPressedItem] = useState(null)
-  const [data, setData] = useState(chartData.data)
-  const [total, setTotal] = useState(chartData.total)
+const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) => {
   const frontColor = Colors[mode].barChartMain
   const frontColorSecondary = Colors[mode].barChartSecondary
+
+  const [pressedItem, setPressedItem] = useState(null)
+  const [data, setData] = useState([])
+  const [total, setTotal] = useState(0)
 
   const handleItemPress = (item) => {
     if (pressedItem?.index === item.index) {
@@ -86,7 +82,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency}) => {
   }
 
   useEffect(() => {
-    const chartData = prepareChartData(items, displayDate)
+    const chartData = prepareChartData(items, displayDate, chartWidth)
     setData(chartData.data)
     setTotal(chartData.total)
     setPressedItem(null)
@@ -99,7 +95,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency}) => {
         <BarChart
             frontColor={frontColor}
             height={120}
-            width={chartData.chartWidth}
+            width={chartWidth}
             initialSpacing={10}
             roundToDigits={0}
             yAxisSide={yAxisSides.RIGHT}
