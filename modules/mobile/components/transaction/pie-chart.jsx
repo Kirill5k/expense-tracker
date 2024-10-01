@@ -32,7 +32,7 @@ const prepareChartData = (items) => {
   return {data, total}
 }
 
-const TransactionPieChart = ({items, chartWidth, mode, currency}) => {
+const TransactionPieChart = ({items, mode, currency, kindLabel}) => {
   const [pressedItem, setPressedItem] = useState(null)
   const [data, setData] = useState([])
   const [total, setTotal] = useState(0)
@@ -72,7 +72,7 @@ const TransactionPieChart = ({items, chartWidth, mode, currency}) => {
             strokeWidth={1}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Text size="xs">Spent</Text>
+                  <Text size="xs">{kindLabel}</Text>
                   <Heading size="xl">
                     {currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}
                   </Heading>

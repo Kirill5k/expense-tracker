@@ -11,12 +11,14 @@ import Classes from '@/constants/classes'
 import useStore from '@/store'
 import {Dimensions} from 'react-native'
 
+const kinds = [{label: 'Spending', value: 'expense'}, {label: 'Income', value: 'income'}]
+
 const Analytics = () => {
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [subject, setSubject] = useState('Spending')
+  const [kind, setKind] = useState(kinds[0])
 
   const {
     mode,
@@ -25,6 +27,8 @@ const Analytics = () => {
     user,
     displayedTransactions
   } = useStore()
+
+  const analysedTransactions = displayedTransactions.filter(tx => tx.category.kind === kind.value)
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -35,13 +39,14 @@ const Analytics = () => {
         <ToggleButton
             className="mb-2"
             size="md"
-            value={subject}
-            items={['Spending', 'Income']}
-            onChange={setSubject}
+            value={kind}
+            items={kinds}
+            onChange={setKind}
         />
         <TransactionChart
+            kind={kind.value}
             mode={mode}
-            items={displayedTransactions}
+            items={analysedTransactions}
             displayDate={displayDate}
             currency={user?.settings?.currency}
             chartWidth={chartWidth}

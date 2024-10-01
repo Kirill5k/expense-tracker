@@ -8,11 +8,13 @@ import TransactionPieChart from './pie-chart'
 import {Dimensions} from 'react-native'
 
 
-const TransactionChart = ({items, mode, displayDate, currency}) => {
+const TransactionChart = ({items, mode, displayDate, currency, kind}) => {
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
 
   const [showPieChart, setShowPieChart] = useState(true)
+
+  const kindLabel = kind === 'expense' ? 'Spent' : 'Received'
 
   return (
       <VStack className="h-56">
@@ -27,6 +29,7 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
         </Fab>
         {!showPieChart && (
             <TransactionBarChart
+                kindLabel={kindLabel}
                 items={items}
                 displayDate={displayDate}
                 currency={currency}
@@ -36,6 +39,7 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
         )}
         {showPieChart && (
             <TransactionPieChart
+                kindLabel={kindLabel}
                 items={items}
                 currency={currency}
                 mode={mode}

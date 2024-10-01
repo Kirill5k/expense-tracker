@@ -61,7 +61,7 @@ const prepareChartData = (items, displayDate, chartWidth) => {
   return {total, data, average: Math.floor(total / data.length)}
 }
 
-const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) => {
+const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel}) => {
   const frontColor = Colors[mode].barChartMain
   const frontColorSecondary = Colors[mode].barChartSecondary
 
@@ -92,7 +92,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth}) =
 
   return (
       <VStack>
-        <Text size="xs">Spent</Text>
+        <Text size="xs">{kindLabel}</Text>
         <Heading size="xl" className="mb-4">{currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}</Heading>
         <BarChart
             frontColor={frontColor}
