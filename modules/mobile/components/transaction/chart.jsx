@@ -12,7 +12,7 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
 
-  const [showPieChart, setShowPieChart] = useState(false)
+  const [showPieChart, setShowPieChart] = useState(true)
 
   return (
       <VStack>
@@ -25,13 +25,23 @@ const TransactionChart = ({items, mode, displayDate, currency}) => {
         >
           <FabIcon as={MaterialIcon} code={showPieChart ? 'chart-bar' : 'chart-pie'} dsize={22} dcolor={Colors[mode].text} />
         </Fab>
-        <TransactionBarChart
-          items={items}
-          displayDate={displayDate}
-          currency={currency}
-          mode={mode}
-          chartWidth={chartWidth}
-        />
+        {!showPieChart && (
+            <TransactionBarChart
+                items={items}
+                displayDate={displayDate}
+                currency={currency}
+                mode={mode}
+                chartWidth={chartWidth}
+            />
+        )}
+        {showPieChart && (
+            <TransactionPieChart
+                items={items}
+                currency={currency}
+                mode={mode}
+                chartWidth={chartWidth}
+            />
+        )}
       </VStack>
   )
 }

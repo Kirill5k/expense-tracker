@@ -16,7 +16,7 @@ export default {
   dark: {
     error: colors.red[200],
     text: colors.white, // Equivalent to text-white
-    background: colors.gray[900], // Equivalent to bg-gray-900
+    background: colors.black, // Equivalent to bg-gray-900
     tint: colors.blue[300], // Equivalent to text-blue-300
     tabIconDefault: colors.gray[400], // Equivalent to text-gray-400
     tabIconSelected: colors.blue[300], // Equivalent to text-blue-300
