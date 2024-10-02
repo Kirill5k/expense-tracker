@@ -1,10 +1,12 @@
 import React, {useState} from 'react'
+import {Avatar} from '@/components/ui/avatar'
+import {MaterialIcon} from '@/components/ui/icon'
 import {Pressable} from '@/components/ui/pressable'
 import {HStack} from '@/components/ui/hstack'
 import {Button, ButtonIcon} from '@/components/ui/button'
-import {MaterialIcon} from '@/components/ui/icon'
 import Swipeable from 'react-native-gesture-handler/Swipeable'
 import {Animated} from 'react-native'
+
 
 const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
   const withCopyButton = onCopy != null
@@ -46,7 +48,7 @@ const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
   );
 }
 
-const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
+export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
   const ref = React.useRef(null)
   const [isPressed, setIsPressed] = useState(false)
   return (
@@ -71,4 +73,14 @@ const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
   )
 }
 
-export default ListItemPressable
+export const ListItemIcon = ({icon, color}) => {
+  return (
+      <Avatar size="sm" className="mr-4" style={{backgroundColor: color}}>
+        <MaterialIcon
+            code={icon}
+            dsize={20}
+            dcolor="white"
+        />
+      </Avatar>
+  )
+}

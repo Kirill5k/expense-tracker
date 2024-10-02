@@ -3,9 +3,7 @@ import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
-import {Avatar} from '@/components/ui/avatar'
-import {MaterialIcon} from '@/components/ui/icon'
-import ListItemPressable from '@/components/common/list-item-pressable'
+import {ListItemPressable, ListItemIcon} from '@/components/common/list'
 import {groupBy} from '@/utils/arrays'
 import {calcTotal, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
@@ -22,15 +20,12 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                 onCopy={() => onItemCopy(tx)}
                 onDelete={() => onItemDelete(tx)}
             >
-              <HStack className="items-center p-3">
-                <Avatar size="sm" style={{backgroundColor: tx.category.color}}>
-                  <MaterialIcon
-                      code={tx.category.icon}
-                      dsize={20}
-                      dcolor="white"
-                  />
-                </Avatar>
-                <VStack className="ml-4">
+              <HStack className={Classes.listItemLayout}>
+                <ListItemIcon
+                  icon={tx.category.icon}
+                  color={tx.category.color}
+                />
+                <VStack>
                   <Text className={Classes.listItemMainText}>
                     {tx.category.name}
                   </Text>
