@@ -41,3 +41,5 @@ export const sortedBy = (arr, f) => {
     return 0
   });
 }
+
+export const nonEmpty = (arr) => arr && arr.length > 0

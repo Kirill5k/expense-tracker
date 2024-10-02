@@ -5,6 +5,7 @@ import {Heading} from '@/components/ui/heading'
 import {getDaysInMonth} from 'date-fns'
 import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
+import {nonEmpty} from '@/utils/arrays'
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weeks = ['1-7', '8-14', '15-21', '22-28']
@@ -61,19 +62,25 @@ const prepareChartData = (items, displayDate, chartWidth) => {
   return {total, data, average: Math.floor(total / data.length)}
 }
 
-const focusItem = (items, index, mode) => items.map((d, i) => {
+const focusItem = (items, index, mode, kind) => items.map((d, i) => {
   return i === index
-      ? {...d, frontColor: Colors[mode].barChartMain}
-      : {...d, frontColor: Colors[mode].barChartSecondary}
+      ? {...d, frontColor: Colors[mode][kind].barChartMain}
+      : {...d, frontColor: Colors[mode][kind].barChartSecondary}
 })
 
-const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel, onChartPress}) => {
+const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kind, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
 
   const chartData = prepareChartData(items, displayDate, chartWidth)
   const [data, total] = pressedItem
-      ? [focusItem(chartData.data, pressedItem.index, mode), pressedItem.value]
+      ? [focusItem(chartData.data, pressedItem.index, mode, kind), pressedItem.value]
       : [chartData.data, chartData.total]
+
+  const [prevItems, setPrevItems] = useState(items)
+  if (items.length !== prevItems.length || (nonEmpty(items) && nonEmpty(prevItems) && items[0].id !== prevItems[0].id)) {
+    setPressedItem(null)
+    setPrevItems(items)
+  }
 
   const handleItemPress = (item) => {
     if (pressedItem?.index === item.index) {
@@ -87,10 +94,10 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
 
   return (
       <VStack>
-        <Text size="xs">{kindLabel}</Text>
+        <Text size="xs">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
         <Heading size="xl" className="mb-4">{currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}</Heading>
         <BarChart
-            frontColor={Colors[mode].barChartMain}
+            frontColor={Colors[mode][kind].barChartMain}
             height={120}
             width={chartWidth}
             initialSpacing={10}

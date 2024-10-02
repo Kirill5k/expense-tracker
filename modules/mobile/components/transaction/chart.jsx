@@ -12,7 +12,6 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
   const [showPieChart, setShowPieChart] = useState(false)
-  const kindLabel = kind === 'expense' ? 'Spent' : 'Received'
 
   return (
       <VStack className="h-56">
@@ -27,7 +26,7 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
         </Fab>
         {!showPieChart && (
             <TransactionBarChart
-                kindLabel={kindLabel}
+                kind={kind}
                 items={items}
                 displayDate={displayDate}
                 currency={currency}
@@ -38,7 +37,7 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
         )}
         {showPieChart && (
             <TransactionPieChart
-                kindLabel={kindLabel}
+                kind={kind}
                 items={items}
                 currency={currency}
                 mode={mode}

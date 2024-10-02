@@ -5,6 +5,7 @@ import {Box} from '@/components/ui/box'
 import {useState} from 'react'
 import {PieChart} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
+import {nonEmpty} from '@/utils/arrays'
 
 const prepareChartData = (items, mode) => {
   let total = 0
@@ -35,9 +36,15 @@ const prepareChartData = (items, mode) => {
 
 const focusItem = (items, index) => items.map((d, i) => i === index ? { ...d, focused: true } : { ...d, focused: false })
 
-const TransactionPieChart = ({items, mode, currency, kindLabel, onChartPress}) => {
+const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
   const chartData = prepareChartData(items, mode)
+
+  const [prevItems, setPrevItems] = useState(items)
+  if (items.length !== prevItems.length || (nonEmpty(items) && nonEmpty(prevItems) && items[0].id !== prevItems[0].id)) {
+    setPressedItem(null)
+    setPrevItems(items)
+  }
 
   const [data, total] = pressedItem
       ? [focusItem(chartData.data, pressedItem.index), pressedItem.value]
@@ -67,7 +74,7 @@ const TransactionPieChart = ({items, mode, currency, kindLabel, onChartPress}) =
             strokeWidth={1}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Text size="xs">{kindLabel}</Text>
+                  <Text size="xs">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
                   <Heading size="xl">
                     {currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}
                   </Heading>
