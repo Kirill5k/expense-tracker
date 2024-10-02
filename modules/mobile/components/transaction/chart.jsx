@@ -11,7 +11,7 @@ import TransactionPieChart from './pie-chart'
 const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPress}) => {
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
-  const [showPieChart, setShowPieChart] = useState(true)
+  const [showPieChart, setShowPieChart] = useState(false)
   const kindLabel = kind === 'expense' ? 'Spent' : 'Received'
 
   return (

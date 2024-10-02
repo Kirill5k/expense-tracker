@@ -1,7 +1,8 @@
 import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
-import {insertSorted, sortedBy} from '@/utils/arrays'
+import {insertSorted} from '@/utils/arrays'
+import {withUpdatedCategory, withinDates, sorts} from '@/utils/transactions'
 import {addDays, format, startOfMonth, endOfMonth} from 'date-fns'
 
 const defaultDisplayDate = () => {
@@ -36,11 +37,6 @@ const handleError = (get, err, rethrow = false, displayAlert = true) => {
   }
 }
 
-const txSorts = {
-  date: (desc) => (a, b) => desc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date),
-  amount: (desc) => (a, b) => desc ? a.amount.value - b.amount.value : b.amount.value - a.amount.value
-}
-
 const filtered = (txs, user) => {
   const maxTxDate = addDays(new Date(), user.settings?.futureTransactionVisibilityDays || 0)
   return txs
@@ -51,11 +47,6 @@ const filtered = (txs, user) => {
             (user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
       })
 }
-
-const withinDates = (txs, dd) => !dd ? txs : txs.filter(tx => {
-  const txDate = new Date(tx.date)
-  return dd.start <= txDate && txDate <= dd.end
-})
 
 const useStore = create((set, get) => ({
   ...DefaultState,
@@ -75,24 +66,26 @@ const useStore = create((set, get) => ({
     get().setCategories(categories)
   },
   addUpdatedCategory: (category) => {
-    const categories = [...get().categories.filter(c => c.id !== category.id), category]
-    get().setCategories(sortedBy(categories, c => c.name))
+    const categories = get().categories.filter(c => c.id !== category.id)
+    get().setCategories(insertSorted(categories, category, c => c.name))
     const transactions = get().transactions.map(t => t.category.id === category.id ? ({...t, category}) : t)
-    get().setTransactions(transactions)
+    get().setTransactions(transactions, false)
   },
   setHiddenForCategory: (id, hidden) => {
     const cats = get().categories.map(c => c.id === id ? {...c, hidden} : c)
     get().setCategories(cats)
-    const transactions = get().transactions.map(
-        t => t.category.id === id ? ({...t, category: {...t.category, hidden}}) : t)
-    get().setTransactions(transactions)
+    const transactions = get().transactions.map(t => t.category.id === id ? withUpdatedCategory(t, {hidden}) : t)
+    get().setTransactions(transactions, false)
   },
   setDisplayDate: (displayDate) => {
     const displayedTransactions = withinDates(get().filteredTransactions, displayDate)
     set({displayDate, displayedTransactions})
   },
-  setTransactions: (transactions) => {
-    const filteredTransactions = filtered(transactions, get().user).sort(txSorts.date(true))
+  setTransactions: (transactions, withSorting = true) => {
+    let filteredTransactions = filtered(transactions, get().user)
+    if (withSorting) {
+      filteredTransactions = filteredTransactions.sort(sorts.byDate(true))
+    }
     const displayedTransactions = withinDates(filteredTransactions, get().displayDate)
     set({transactions, filteredTransactions, displayedTransactions})
   },
@@ -102,16 +95,17 @@ const useStore = create((set, get) => ({
     }
   },
   addUpdatedTransaction: (updatedTx) => {
-    const transactions = get().transactions.map(tx => tx.id === updatedTx.id ? updatedTx : tx)
-    get().setTransactions(transactions)
+    const transactions = get().transactions.filter(tx => tx.id !== updatedTx.id)
+    const sortedTxs = insertSorted(transactions, updatedTx, tx => tx.date, false)
+    get().setTransactions(sortedTxs, false)
   },
   addCreatedTransaction: (newTx) => {
-    const transactions = [newTx, ...get().transactions]
-    get().setTransactions(transactions)
+    const transactions = insertSorted(get().transactions, newTx, tx => tx.date, false)
+    get().setTransactions(transactions, false)
   },
   setHiddenForTransaction: (id, hidden) => {
     const txs = get().transactions.map(t => t.id === id ? ({...t, hidden}) : t)
-    get().setTransactions(txs)
+    get().setTransactions(txs, false)
   },
   setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
   setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),

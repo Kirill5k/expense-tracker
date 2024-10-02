@@ -35,3 +35,15 @@ export const formatDate = (tx) => {
 }
 
 export const isExpense = tx => tx.category.kind === 'expense'
+
+export const withUpdatedCategory = (tx, catUpdates) => ({...tx, category: {...tx.category, ...catUpdates}})
+
+export const withinDates = (txs, {start, end}) => txs.filter(tx => {
+  const txDate = new Date(tx.date)
+  return start <= txDate && txDate <= end
+})
+
+export const sorts = {
+  byDate: (desc) => (a, b) => desc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date),
+  byAmount: (desc) => (a, b) => desc ? a.amount.value - b.amount.value : b.amount.value - a.amount.value
+}

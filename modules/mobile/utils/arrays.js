@@ -13,20 +13,22 @@ export const createLookup = (arr, f) => arr.reduce((acc, item) => {
   return acc
 }, {})
 
-export const insertSorted = (arr, newItem, f) => {
+export const insertSorted = (arr, newItem, f, ascending = true) => {
   let left = 0
   let right = arr.length
 
   while (left < right) {
     const mid = Math.floor((left + right) / 2)
-    if (f(arr[mid]) < f(newItem)) {
+    const comparison = f(arr[mid]) < f(newItem)
+
+    if (ascending ? comparison : !comparison) {
       left = mid + 1
     } else {
       right = mid
     }
   }
 
-  return [...arr.slice(0, left), newItem, ...arr.slice(left)]
+  return [...arr.slice(0, left), newItem, ...arr.slice(left)];
 }
 
 export const sortedBy = (arr, f) => {
