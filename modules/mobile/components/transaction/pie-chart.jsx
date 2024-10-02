@@ -8,8 +8,12 @@ import Colors from '@/constants/colors'
 
 const defaultEntry = {transactions: [], totalAmount: 0}
 
-const prepareChartData = (items) => {
+const prepareChartData = (items, mode) => {
   let total = 0
+
+  if (items.length === 0) {
+    return {total, data: [{value: 100, color: Colors[mode].tabIconDefault}]}
+  }
   const transactionsByCategory = items.reduce((acc, tx) => {
     const catId = tx.category.id
     if (!acc[catId]) {
@@ -51,7 +55,7 @@ const TransactionPieChart = ({items, mode, currency, kindLabel}) => {
   }
 
   useEffect(() => {
-    const chartData = prepareChartData(items)
+    const chartData = prepareChartData(items, mode)
     setData(chartData.data)
     setTotal(chartData.total)
     setChartData(chartData)
