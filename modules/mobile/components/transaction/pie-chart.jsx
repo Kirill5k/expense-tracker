@@ -2,7 +2,7 @@ import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
 import {Box} from '@/components/ui/box'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {PieChart} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 
@@ -23,8 +23,7 @@ const prepareChartData = (items, mode) => {
     return acc
   }, {})
 
-  const data = Object.values(transactionsByCategory).map((group, i) => ({
-    index: i,
+  const data = Object.values(transactionsByCategory).map((group) => ({
     transactions: group.transactions,
     color: group.category.color,
     value: group.totalAmount,
@@ -34,33 +33,28 @@ const prepareChartData = (items, mode) => {
   return {data, total}
 }
 
-const TransactionPieChart = ({items, mode, currency, kindLabel, onChartPress}) => {
-  const [pressedItem, setPressedItem] = useState(null)
-  const [data, setData] = useState([])
-  const [total, setTotal] = useState(0)
-  const [chartData, setChartData] = useState({})
+const focusItem = (items, index) => items.map((d, i) => i === index ? { ...d, focused: true } : { ...d, focused: false })
 
-  const handlePress = (item) => {
-    if (pressedItem?.index === item.index || !item.category) {
-      setData(chartData.data)
-      setTotal(chartData.total)
-      setPressedItem(null)
-      onChartPress([])
+const TransactionPieChart = ({items, mode, currency, kindLabel, onChartPress}) => {
+  const [pressedItemIndex, setPressedItemIndex] = useState(null)
+  const [pressedItemValue, setPressedItemValue] = useState(null)
+  const chartData = prepareChartData(items, mode)
+
+  const [data, total] = pressedItemIndex !== null
+      ? [focusItem(chartData.data, pressedItemIndex), pressedItemValue]
+      : [chartData.data, chartData.total]
+
+  const handlePress = (item, i) => {
+    if (pressedItemIndex === i || !item.category) {
+      setPressedItemIndex(null)
+      setPressedItemValue(null);
+      onChartPress([]);
     } else {
-      setPressedItem(item)
-      setData(data.map((d, i) => i === item.index ? {...d, focused: true} : {...d, focused: false}))
-      setTotal(item.value)
-      onChartPress(item.transactions)
+      setPressedItemIndex(i)
+      setPressedItemValue(item.value);
+      onChartPress(item.transactions);
     }
   }
-
-  useEffect(() => {
-    const chartData = prepareChartData(items, mode)
-    setData(chartData.data)
-    setTotal(chartData.total)
-    setChartData(chartData)
-    setPressedItem(null)
-  }, [items]);
 
   return (
       <Box className="w-full flex items-center justify-center my-1">
