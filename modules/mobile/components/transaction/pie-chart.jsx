@@ -3,10 +3,8 @@ import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
 import {Box} from '@/components/ui/box'
 import {useEffect, useState} from 'react'
-import {PieChart, yAxisSides} from 'react-native-gifted-charts'
+import {PieChart} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
-
-const defaultEntry = {transactions: [], totalAmount: 0}
 
 const prepareChartData = (items, mode) => {
   let total = 0
@@ -17,7 +15,7 @@ const prepareChartData = (items, mode) => {
   const transactionsByCategory = items.reduce((acc, tx) => {
     const catId = tx.category.id
     if (!acc[catId]) {
-      acc[catId] = {...defaultEntry, category: tx.category}
+      acc[catId] = {transactions: [], totalAmount: 0, category: tx.category}
     }
     total += tx.amount.value
     acc[catId].totalAmount += tx.amount.value
@@ -31,26 +29,28 @@ const prepareChartData = (items, mode) => {
     color: group.category.color,
     value: group.totalAmount,
     category: group.category,
-  }))
+  })).sort((a, b) => a.category.name.localeCompare(b.category.name))
 
   return {data, total}
 }
 
-const TransactionPieChart = ({items, mode, currency, kindLabel}) => {
+const TransactionPieChart = ({items, mode, currency, kindLabel, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
   const [data, setData] = useState([])
   const [total, setTotal] = useState(0)
   const [chartData, setChartData] = useState({})
 
-  const handleItemPress = (item, i) => {
+  const handlePress = (item) => {
     if (pressedItem?.index === item.index || !item.category) {
       setData(chartData.data)
       setTotal(chartData.total)
       setPressedItem(null)
+      onChartPress([])
     } else {
       setPressedItem(item)
       setData(data.map((d, i) => i === item.index ? {...d, focused: true} : {...d, focused: false}))
       setTotal(item.value)
+      onChartPress(item.transactions)
     }
   }
 
@@ -66,7 +66,7 @@ const TransactionPieChart = ({items, mode, currency, kindLabel}) => {
       <Box className="w-full flex items-center justify-center my-1">
         <PieChart
             sectionAutoFocus
-            onPress={handleItemPress}
+            onPress={handlePress}
             data={data}
             donut
             radius={90}

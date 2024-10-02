@@ -61,7 +61,7 @@ const prepareChartData = (items, displayDate, chartWidth) => {
   return {total, data, average: Math.floor(total / data.length)}
 }
 
-const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel}) => {
+const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel, onChartPress}) => {
   const frontColor = Colors[mode].barChartMain
   const frontColorSecondary = Colors[mode].barChartSecondary
 
@@ -75,10 +75,12 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
       setData(chartData.data)
       setTotal(chartData.total)
       setPressedItem(null)
+      onChartPress([])
     } else {
       setPressedItem(item)
       setData(data.map((d, i) => i === item.index ? {...d, frontColor} : {...d, frontColor: frontColorSecondary}))
       setTotal(item.value)
+      onChartPress(item.transactions)
     }
   }
 

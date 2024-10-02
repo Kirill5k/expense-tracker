@@ -1,19 +1,17 @@
 import {useState} from 'react'
+import {Dimensions} from 'react-native'
 import {VStack} from '@/components/ui/vstack'
 import {Fab, FabIcon} from '@/components/ui/fab'
 import {MaterialIcon} from '@/components/ui/icon'
 import Colors from '@/constants/colors'
 import TransactionBarChart from './bar-chart'
 import TransactionPieChart from './pie-chart'
-import {Dimensions} from 'react-native'
 
 
-const TransactionChart = ({items, mode, displayDate, currency, kind}) => {
+const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPress}) => {
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
-
   const [showPieChart, setShowPieChart] = useState(true)
-
   const kindLabel = kind === 'expense' ? 'Spent' : 'Received'
 
   return (
@@ -35,6 +33,7 @@ const TransactionChart = ({items, mode, displayDate, currency, kind}) => {
                 currency={currency}
                 mode={mode}
                 chartWidth={chartWidth}
+                onChartPress={onChartPress}
             />
         )}
         {showPieChart && (
@@ -44,6 +43,7 @@ const TransactionChart = ({items, mode, displayDate, currency, kind}) => {
                 currency={currency}
                 mode={mode}
                 chartWidth={chartWidth}
+                onChartPress={onChartPress}
             />
         )}
       </VStack>
