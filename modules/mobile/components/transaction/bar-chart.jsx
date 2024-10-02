@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
@@ -61,43 +61,39 @@ const prepareChartData = (items, displayDate, chartWidth) => {
   return {total, data, average: Math.floor(total / data.length)}
 }
 
-const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel, onChartPress}) => {
-  const frontColor = Colors[mode].barChartMain
-  const frontColorSecondary = Colors[mode].barChartSecondary
+const focusItem = (items, index, mode) => items.map((d, i) => {
+  return i === index
+      ? {...d, frontColor: Colors[mode].barChartMain}
+      : {...d, frontColor: Colors[mode].barChartSecondary}
+})
 
-  const [pressedItem, setPressedItem] = useState(null)
-  const [data, setData] = useState([])
-  const [total, setTotal] = useState(0)
-  const [chartData, setChartData] = useState({})
+const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel, onChartPress}) => {
+  const [pressedItemIndex, setPressedItemIndex] = useState(null)
+  const [pressedItemValue, setPressedItemValue] = useState(null)
+
+  const chartData = prepareChartData(items, displayDate, chartWidth)
+  const [data, total] = pressedItemIndex !== null
+      ? [focusItem(chartData.data, pressedItemIndex, mode), pressedItemValue]
+      : [chartData.data, chartData.total]
 
   const handleItemPress = (item) => {
-    if (pressedItem?.index === item.index) {
-      setData(chartData.data)
-      setTotal(chartData.total)
-      setPressedItem(null)
-      onChartPress([])
+    if (pressedItemIndex === item.index) {
+      setPressedItemIndex(null);
+      setPressedItemValue(null);
+      onChartPress([]);
     } else {
-      setPressedItem(item)
-      setData(data.map((d, i) => i === item.index ? {...d, frontColor} : {...d, frontColor: frontColorSecondary}))
-      setTotal(item.value)
-      onChartPress(item.transactions)
+      setPressedItemIndex(item.index);
+      setPressedItemValue(item.value);
+      onChartPress(item.transactions);
     }
   }
-
-  useEffect(() => {
-    const chartData = prepareChartData(items, displayDate, chartWidth)
-    setData(chartData.data)
-    setTotal(chartData.total)
-    setChartData(chartData)
-    setPressedItem(null)
-  }, [items]);
 
   return (
       <VStack>
         <Text size="xs">{kindLabel}</Text>
         <Heading size="xl" className="mb-4">{currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}</Heading>
         <BarChart
-            frontColor={frontColor}
+            frontColor={Colors[mode].barChartMain}
             height={120}
             width={chartWidth}
             initialSpacing={10}
