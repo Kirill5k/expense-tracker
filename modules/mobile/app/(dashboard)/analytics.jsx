@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Divider} from '@/components/ui/divider'
 import {Heading} from '@/components/ui/heading'
@@ -9,17 +9,10 @@ import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
-import {Dimensions} from 'react-native'
 
 const kinds = [{label: 'Spending', value: 'expense'}, {label: 'Income', value: 'income'}]
 
 const Analytics = () => {
-  const screenWidth = Dimensions.get('window').width
-  const chartWidth = screenWidth - 92
-  const [isScrolling, setIsScrolling] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [kind, setKind] = useState(kinds[0])
-
   const {
     mode,
     displayDate,
@@ -28,7 +21,16 @@ const Analytics = () => {
     displayedTransactions
   } = useStore()
 
+  const [isScrolling, setIsScrolling] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [kind, setKind] = useState(kinds[0])
+  const [selectedTransactions, setSelectedTransactions] = useState([])
+
   const analysedTransactions = displayedTransactions.filter(tx => tx.category.kind === kind.value)
+
+  useEffect(() => {
+    setSelectedTransactions(analysedTransactions)
+  }, [displayDate.text])
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -60,7 +62,7 @@ const Analytics = () => {
               items={analysedTransactions}
               displayDate={displayDate}
               currency={user?.settings?.currency}
-              chartWidth={chartWidth}
+              onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
               className="mt-2"
