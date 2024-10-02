@@ -7,6 +7,7 @@ import {ProgressBar} from '@/components/common/progress'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
+import CategoryGroupedTransactionList from '@/components/analytics/list'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
 
@@ -29,7 +30,7 @@ const Analytics = () => {
   const analysedTransactions = displayedTransactions.filter(tx => tx.category.kind === kind.value)
 
   useEffect(() => {
-    setSelectedTransactions(analysedTransactions)
+    setSelectedTransactions([])
   }, [displayDate.text])
 
   return (
@@ -70,6 +71,9 @@ const Analytics = () => {
               mode={mode}
               value={displayDate}
               onSelect={setDisplayDate}
+          />
+          <CategoryGroupedTransactionList
+            items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
           />
         </ScrollView>
       </VStack>

@@ -36,23 +36,20 @@ const prepareChartData = (items, mode) => {
 const focusItem = (items, index) => items.map((d, i) => i === index ? { ...d, focused: true } : { ...d, focused: false })
 
 const TransactionPieChart = ({items, mode, currency, kindLabel, onChartPress}) => {
-  const [pressedItemIndex, setPressedItemIndex] = useState(null)
-  const [pressedItemValue, setPressedItemValue] = useState(null)
+  const [pressedItem, setPressedItem] = useState(null)
   const chartData = prepareChartData(items, mode)
 
-  const [data, total] = pressedItemIndex !== null
-      ? [focusItem(chartData.data, pressedItemIndex), pressedItemValue]
+  const [data, total] = pressedItem
+      ? [focusItem(chartData.data, pressedItem.index), pressedItem.value]
       : [chartData.data, chartData.total]
 
   const handlePress = (item, i) => {
-    if (pressedItemIndex === i || !item.category) {
-      setPressedItemIndex(null)
-      setPressedItemValue(null);
+    if (pressedItem === i || !item.category) {
+      setPressedItem(null)
       onChartPress([]);
     } else {
-      setPressedItemIndex(i)
-      setPressedItemValue(item.value);
-      onChartPress(item.transactions);
+      setPressedItem({index: i, value: item.value})
+      onChartPress(item.transactions)
     }
   }
 

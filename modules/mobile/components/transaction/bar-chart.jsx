@@ -68,23 +68,20 @@ const focusItem = (items, index, mode) => items.map((d, i) => {
 })
 
 const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kindLabel, onChartPress}) => {
-  const [pressedItemIndex, setPressedItemIndex] = useState(null)
-  const [pressedItemValue, setPressedItemValue] = useState(null)
+  const [pressedItem, setPressedItem] = useState(null)
 
   const chartData = prepareChartData(items, displayDate, chartWidth)
-  const [data, total] = pressedItemIndex !== null
-      ? [focusItem(chartData.data, pressedItemIndex, mode), pressedItemValue]
+  const [data, total] = pressedItem
+      ? [focusItem(chartData.data, pressedItem.index, mode), pressedItem.value]
       : [chartData.data, chartData.total]
 
   const handleItemPress = (item) => {
-    if (pressedItemIndex === item.index) {
-      setPressedItemIndex(null);
-      setPressedItemValue(null);
-      onChartPress([]);
+    if (pressedItem?.index === item.index) {
+      setPressedItem(null)
+      onChartPress([])
     } else {
-      setPressedItemIndex(item.index);
-      setPressedItemValue(item.value);
-      onChartPress(item.transactions);
+      setPressedItem({index: item.index, value: item.value})
+      onChartPress(item.transactions)
     }
   }
 
