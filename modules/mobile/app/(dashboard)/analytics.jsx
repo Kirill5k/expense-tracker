@@ -43,21 +43,6 @@ const Analytics = () => {
             items={kinds}
             onChange={setKind}
         />
-        <TransactionChart
-            kind={kind.value}
-            mode={mode}
-            items={analysedTransactions}
-            displayDate={displayDate}
-            currency={user?.settings?.currency}
-            chartWidth={chartWidth}
-        />
-        <DatePeriodSelect
-            className="mt-2"
-            disabled={loading}
-            mode={mode}
-            value={displayDate}
-            onSelect={setDisplayDate}
-        />
         {isScrolling && <Divider/>}
         <ScrollView
             showsVerticalScrollIndicator={false}
@@ -69,6 +54,21 @@ const Analytics = () => {
               }
             }}
         >
+          <TransactionChart
+              kind={kind.value}
+              mode={mode}
+              items={analysedTransactions}
+              displayDate={displayDate}
+              currency={user?.settings?.currency}
+              chartWidth={chartWidth}
+          />
+          <DatePeriodSelect
+              className="mt-2"
+              disabled={loading}
+              mode={mode}
+              value={displayDate}
+              onSelect={setDisplayDate}
+          />
         </ScrollView>
       </VStack>
   )

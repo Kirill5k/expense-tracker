@@ -4,12 +4,13 @@ import {Text} from '@/components/ui/text'
 import {Box} from '@/components/ui/box'
 
 const ToggleButton = ({value, items, onChange, className, size}) => {
+  const isSelected = (i, v) => i.value === v.value
   return (
       <HStack className={`items-center ${className}`} space={size}>
         {items.map((i) => (
             <Pressable key={i.value} onPress={() => onChange(i)}>
-              <Box className={`py-1 px-2 ${i === value ? 'rounded-xl bg-background-100' : 'rounded-none'}`}>
-                <Text size={size} className={`font-medium ${i === value ? 'text-primary-900' : 'text-secondary-300'}`}>
+              <Box className={`py-1 px-2 ${isSelected(i, value) ? 'rounded-xl bg-background-100' : 'rounded-none'}`}>
+                <Text size={size} className={`font-medium ${isSelected(i, value) ? 'text-primary-900' : 'text-secondary-300'}`}>
                   {i.label}
                 </Text>
               </Box>

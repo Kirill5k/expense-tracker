@@ -23,7 +23,7 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
             className="shadow-none rounded-full p-1.5 top-1 bg-background-100"
             variant="outline" onPress={() => setShowPieChart(!showPieChart)}
         >
-          <FabIcon as={MaterialIcon} code={showPieChart ? 'chart-bar' : 'chart-pie'} dsize={22} dcolor={Colors[mode].text} />
+          <FabIcon as={MaterialIcon} code={showPieChart ? 'chart-bar' : 'chart-arc'} dsize={22} dcolor={Colors[mode].text} />
         </Fab>
         {!showPieChart && (
             <TransactionBarChart
