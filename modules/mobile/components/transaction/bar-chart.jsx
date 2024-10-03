@@ -114,13 +114,14 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
             xAxisLabelTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16}}
             noOfSections={3}
             onPress={handleItemPress}
-            // showReferenceLine1
-            // referenceLine1Position={chartData.average}
-            // referenceLine1Config={{
-            //   color: '#177AD5',
-            //   dashWidth: 1000,
-            //   dashGap: 0,
-            // }}
+            showReferenceLine1
+            referenceLine1Position={chartData.average}
+            referenceLine1Config={{
+              color: pressedItem ? Colors[mode][kind].barChartSecondary : Colors[mode][kind].barChartMain,
+              dashWidth: 2,
+              dashGap: 3,
+              zIndex: -1
+            }}
         />
       </VStack>
   )
