@@ -31,13 +31,13 @@ export const insertSorted = (arr, newItem, f, ascending = true) => {
   return [...arr.slice(0, left), newItem, ...arr.slice(left)];
 }
 
-export const sortedBy = (arr, f) => {
+export const sortedBy = (arr, f, ascending = true) => {
   return arr.slice().sort((a, b) => {
     const aValue = f(a)
     const bValue = f(b)
 
-    if (aValue < bValue) return -1
-    if (aValue > bValue) return 1
+    if (aValue < bValue) return ascending ? -1 : 1
+    if (aValue > bValue) return ascending ? 1 : -1
     return 0
   });
 }

@@ -13,6 +13,11 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
   const chartWidth = screenWidth - 92
   const [showPieChart, setShowPieChart] = useState(false)
 
+  const handleFabPress = () => {
+    setShowPieChart(!showPieChart)
+    onChartPress([])
+  }
+
   return (
       <VStack className="h-56">
         <Fab
@@ -20,7 +25,8 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
             placement="top right"
             size="md"
             className="shadow-none rounded-full p-1.5 top-1 bg-background-100"
-            variant="outline" onPress={() => setShowPieChart(!showPieChart)}
+            variant="outline"
+            onPress={handleFabPress}
         >
           <FabIcon as={MaterialIcon} code={showPieChart ? 'chart-bar' : 'chart-arc'} dsize={22} dcolor={Colors[mode].text} />
         </Fab>
