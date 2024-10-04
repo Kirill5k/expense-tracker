@@ -75,7 +75,7 @@ const CategoryGroupedTransactionList = ({items}) => {
                   )}
                 </AccordionTrigger>
               </AccordionHeader>
-              <AccordionContent>
+              <AccordionContent className="pt-0 mt-0">
                 <VStack space="md">
                   {item.transactions.map(tx => (
                       <HStack key={tx.id} className="w-full justify-between">

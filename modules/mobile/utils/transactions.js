@@ -36,10 +36,35 @@ export const isExpense = tx => tx.category.kind === 'expense'
 
 export const withUpdatedCategory = (tx, catUpdates) => ({...tx, category: {...tx.category, ...catUpdates}})
 
-export const withinDates = (txs, {start, end}) => txs.filter(tx => {
-  const txDate = new Date(tx.date)
-  return start <= txDate && txDate <= end
-})
+// Performs binary search while assuming that txs array is sorted by date field
+export const withinDates = (txs, {start, end}) => {
+  const asc = txs.length < 2 || txs[0].date <= txs[txs.length - 1].date
+  const startDate = format(start, 'yyyy-MM-dd')
+  const endDate = format(end, 'yyyy-MM-dd')
+  const startIdx = binarySearchDateIndex(txs, startDate, (mid, target) => asc ? mid < target : mid >= target);
+  const endIdx = binarySearchDateIndex(txs, endDate, (mid, target) => asc ? mid <= target : mid > target);
+
+  return asc ? txs.slice(startIdx, endIdx) : txs.slice(endIdx, startIdx)
+}
+
+const binarySearchDateIndex = (array, targetDate, comparator) => {
+  let low = 0
+  let high = array.length - 1
+  let result = array.length
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2)
+    const midDate = array[mid].date
+
+    if (comparator(midDate, targetDate)) {
+      low = mid + 1
+    } else {
+      result = mid
+      high = mid - 1
+    }
+  }
+  return result
+}
 
 export const sorts = {
   byDate: (desc) => (a, b) => desc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date),
