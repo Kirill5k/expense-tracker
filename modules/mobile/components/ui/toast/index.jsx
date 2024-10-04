@@ -1,5 +1,5 @@
-'use client';
-import React from 'react';
+'use client'
+import React from 'react'
 import {Text, View, Platform} from 'react-native'
 import {createToast, createToastHook} from '@gluestack-ui/toast'
 import {tva} from '@gluestack-ui/nativewind-utils/tva'
@@ -207,7 +207,6 @@ export const withToast = (ChildComponent) => {
         const newId = Math.random()
         setToastId(newId)
         toast.show({
-          duration: 3000,
           id: newId,
           placement: notification?.type === 'info' ? 'bottom' : 'top',
           render: ({id}) => (
@@ -218,8 +217,8 @@ export const withToast = (ChildComponent) => {
               >
                 <HStack className="justify-between align-center" space="md">
                   <VStack className="justify-center">
-                    {notification?.title && <ToastTitle>{notification.title}</ToastTitle>}
-                    <ToastDescription>{notification?.message}</ToastDescription>
+                    {notification?.title && <ToastTitle size="sm">{notification.title}</ToastTitle>}
+                    <ToastDescription size="sm">{notification?.message}</ToastDescription>
                   </VStack>
                   <VStack className="justify-center">
                     {notification?.undoAction && (
