@@ -76,9 +76,9 @@ const CategoryGroupedTransactionList = ({items}) => {
                 </AccordionTrigger>
               </AccordionHeader>
               <AccordionContent className="pt-0 mt-0">
-                <VStack space="md">
+                <VStack space="sm">
                   {item.transactions.map(tx => (
-                      <HStack key={tx.id} className="w-full justify-between">
+                      <HStack key={tx.id} className="w-full justify-between bg-background-100 rounded-xl py-2 px-4">
                         <VStack className="items-start">
                           <Text className="line-clamp-1 text-xs text-right font-semibold">{formatDate(tx)}</Text>
                           {tx.note && <Text className="line-clamp-1 text-sm">{tx.note}</Text>}
