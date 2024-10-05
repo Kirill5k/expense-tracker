@@ -84,7 +84,7 @@ export const LoginForm = ({onSubmit}) => {
                           textContentType="emailAddress"
                           keyboardType="email-address"
                           autoCapitalize="none"
-                          placeholder="Enter email"
+                          placeholder="Email"
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
@@ -95,8 +95,8 @@ export const LoginForm = ({onSubmit}) => {
                 )}
             />
             <FormControlError>
-              <FormControlErrorIcon as={AlertTriangle}/>
-              <FormControlErrorText>
+              <FormControlErrorIcon as={AlertTriangle} size="sm"/>
+              <FormControlErrorText className="text-sm">
                 {formState.errors?.email?.message}
               </FormControlErrorText>
             </FormControlError>
@@ -116,7 +116,7 @@ export const LoginForm = ({onSubmit}) => {
                     <Input size="sm">
                       <InputField
                           type={showPassword ? "text" : "password"}
-                          placeholder="Enter password"
+                          placeholder="Password"
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
@@ -130,8 +130,8 @@ export const LoginForm = ({onSubmit}) => {
                 )}
             />
             <FormControlError>
-              <FormControlErrorIcon as={AlertTriangle}/>
-              <FormControlErrorText>
+              <FormControlErrorIcon as={AlertTriangle} size="sm"/>
+              <FormControlErrorText className="text-sm">
                 {formState.errors?.password?.message || loginError}
               </FormControlErrorText>
             </FormControlError>

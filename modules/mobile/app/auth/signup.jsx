@@ -21,9 +21,9 @@ const SignUp = () => {
           </Pressable>
           <VStack>
             <Heading className="md:text-center" size="3xl">
-              Sign up
+              Sign Up
             </Heading>
-            <Text>Sign up and start using Expense-Tracker</Text>
+            <Text>Create an account and start using Expense-Tracker</Text>
           </VStack>
           <RegistrationForm/>
         </VStack>

@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import {Link} from 'expo-router'
 import {Keyboard} from 'react-native'
-import {Toast, ToastTitle, useToast} from '@/components/ui/toast'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
@@ -24,9 +23,14 @@ import {z} from 'zod'
 import {AlertTriangle} from 'lucide-react-native'
 import {GoogleIcon} from '@/assets/icons/google'
 
-
 const signUpSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
+  firstName: z
+      .string()
+      .min(1, "Enter your fist name"),
+  lastName: z
+      .string()
+      .min(1, "Enter your last name"),
   password: z
       .string()
       .min(6, "Must be at least 8 characters in length")
@@ -34,57 +38,37 @@ const signUpSchema = z.object({
       .regex(new RegExp(".*[a-z].*"), "One lowercase character")
       .regex(new RegExp(".*\\d.*"), "One number")
       .regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character"),
-  confirmpassword: z
+  confirmPassword: z
       .string()
       .min(6, "Must be at least 8 characters in length")
       .regex(new RegExp(".*[A-Z].*"), "One uppercase character")
       .regex(new RegExp(".*[a-z].*"), "One lowercase character")
       .regex(new RegExp(".*\\d.*"), "One number")
       .regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character"),
-  rememberme: z.boolean().optional(),
+  acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const RegistrationForm = () => {
+export const RegistrationForm = ({onSubmit}) => {
   const {
     control,
     handleSubmit,
     reset,
     formState: {errors},
+    setError
   } = useForm({resolver: zodResolver(signUpSchema)})
-  const toast = useToast()
 
-  const onSubmit = (data) => {
-    if (data.password === data.confirmpassword) {
-      toast.show({
-        placement: "bottom right",
-        render: ({id}) => {
-          return (
-              <Toast nativeID={id} variant="accent" action="success">
-                <ToastTitle>Success</ToastTitle>
-              </Toast>
-          );
-        },
-      })
-      reset();
-    } else {
-      toast.show({
-        placement: "bottom right",
-        render: ({id}) => {
-          return (
-              <Toast nativeID={id} variant="accent" action="error">
-                <ToastTitle>Passwords do not match</ToastTitle>
-              </Toast>
-          );
-        },
-      })
+  const handleFormSubmit = (data) => {
+    if (data.password !== data.confirmPassword) {
+      setError('confirmPassword', {message: 'Passwords do not match', type: 'manual'})
     }
-  };
+  }
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleKeyPress = () => {
     Keyboard.dismiss()
-    handleSubmit(onSubmit)()
+    handleSubmit(handleFormSubmit)()
   }
 
   return (
@@ -98,13 +82,8 @@ export const RegistrationForm = () => {
                 name="email"
                 defaultValue=""
                 control={control}
-                rules={{
-                  validate: email => signUpSchema.parseAsync({email})
-                      .then(() => true)
-                      .catch(e => e.message),
-                }}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input size="sm">
                       <InputField
                           className="text-sm"
                           placeholder="Email"
@@ -119,12 +98,79 @@ export const RegistrationForm = () => {
                 )}
             />
             <FormControlError>
-              <FormControlErrorIcon size="md" as={AlertTriangle}/>
-              <FormControlErrorText>
+              <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+              <FormControlErrorText className="text-sm">
                 {errors?.email?.message}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
+
+          <HStack className="w-full justify-between" space="md">
+            <FormControl isInvalid={!!errors.firstName} className="grow">
+              <FormControlLabel>
+                <FormControlLabelText>First Name</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                  name="firstName"
+                  defaultValue=""
+                  control={control}
+                  render={({field: {onChange, onBlur, value}}) => (
+                      <Input size="sm">
+                        <InputField
+                            className="text-sm"
+                            placeholder="First Name"
+                            type="text"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            onSubmitEditing={handleKeyPress}
+                            returnKeyType="done"
+                        />
+                      </Input>
+                  )}
+              />
+              <FormControlError>
+                <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+                <FormControlErrorText className="text-sm">
+                  {errors?.firstName?.message}
+                </FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+
+            <FormControl isInvalid={!!errors.lastName} className="grow">
+              <FormControlLabel>
+                <FormControlLabelText>Last Name</FormControlLabelText>
+              </FormControlLabel>
+              <Controller
+                  name="lastName"
+                  defaultValue=""
+                  control={control}
+                  render={({field: {onChange, onBlur, value}}) => (
+                      <Input size="sm">
+                        <InputField
+                            className="text-sm"
+                            placeholder="Last Name"
+                            type="text"
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            onSubmitEditing={handleKeyPress}
+                            returnKeyType="done"
+                        />
+                      </Input>
+                  )}
+              />
+              <FormControlError>
+                <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+                <FormControlErrorText className="text-sm">
+                  {errors?.lastName?.message}
+                </FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+
+          </HStack>
+
+
           <FormControl isInvalid={!!errors.password}>
             <FormControlLabel>
               <FormControlLabelText>Password</FormControlLabelText>
@@ -133,13 +179,8 @@ export const RegistrationForm = () => {
                 defaultValue=""
                 name="password"
                 control={control}
-                rules={{
-                  validate: password => signUpSchema.parseAsync({password})
-                      .then(() => true)
-                      .catch(e => e.message),
-                }}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input size="sm">
                       <InputField
                           className="text-sm"
                           placeholder="Password"
@@ -158,26 +199,22 @@ export const RegistrationForm = () => {
             />
             <FormControlError>
               <FormControlErrorIcon size="sm" as={AlertTriangle}/>
-              <FormControlErrorText>
+              <FormControlErrorText className="text-sm">
                 {errors?.password?.message}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
-          <FormControl isInvalid={!!errors.confirmpassword}>
+
+          <FormControl isInvalid={!!errors.confirmPassword}>
             <FormControlLabel>
               <FormControlLabelText>Confirm Password</FormControlLabelText>
             </FormControlLabel>
             <Controller
                 defaultValue=""
-                name="confirmpassword"
+                name="confirmPassword"
                 control={control}
-                rules={{
-                  validate: password => signUpSchema.parseAsync({password})
-                      .then(() => true)
-                      .catch(e => e.message),
-                }}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input size="sm">
                       <InputField
                           placeholder="Confirm Password"
                           className="text-sm"
@@ -197,40 +234,49 @@ export const RegistrationForm = () => {
             />
             <FormControlError>
               <FormControlErrorIcon size="sm" as={AlertTriangle}/>
-              <FormControlErrorText>
-                {errors?.confirmpassword?.message}
+              <FormControlErrorText className="text-sm">
+                {errors?.confirmPassword?.message}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
 
-          <Controller
-              name="rememberme"
-              defaultValue={false}
-              control={control}
-              render={({field: {onChange, value}}) => (
-                  <Checkbox
-                      size="sm"
-                      value="Remember me"
-                      isChecked={value}
-                      onChange={onChange}
-                      aria-label="Remember me"
-                  >
-                    <CheckboxIndicator>
-                      <CheckboxIcon as={CheckIcon}/>
-                    </CheckboxIndicator>
-                    <CheckboxLabel>
-                      I accept the Terms of Use & Privacy Policy
-                    </CheckboxLabel>
-                  </Checkbox>
-              )}
-          />
+          <FormControl isInvalid={!!errors.acceptTerms}>
+            <Controller
+                name="acceptTerms"
+                defaultValue={false}
+                control={control}
+                render={({field: {onChange, value}}) => (
+                    <Checkbox
+                        size="sm"
+                        value="accepterTerms"
+                        isChecked={value}
+                        onChange={onChange}
+                        aria-label="Accept Terms and Conditions"
+                    >
+                      <CheckboxIndicator>
+                        <CheckboxIcon as={CheckIcon}/>
+                      </CheckboxIndicator>
+                      <CheckboxLabel>
+                        I accept the Terms of Use & Privacy Policy
+                      </CheckboxLabel>
+                    </Checkbox>
+                )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+              <FormControlErrorText className="text-sm">
+                {errors?.acceptTerms?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
         </VStack>
 
         <VStack className="w-full my-7" space="lg">
-          <Button className="w-full" onPress={handleSubmit(onSubmit)}>
-            <ButtonText className="font-medium">Sign up</ButtonText>
+          <Button className="w-full" onPress={handleSubmit(handleFormSubmit)}>
+            <ButtonText size="sm" className="font-medium">Sign up</ButtonText>
           </Button>
           <Button
+              size="sm"
               variant="outline"
               action="secondary"
               className="w-full gap-1"
@@ -249,7 +295,7 @@ export const RegistrationForm = () => {
                 className="font-medium text-primary-700 group-hover/link:text-primary-600 group-hover/pressed:text-primary-700"
                 size="md"
             >
-              Login
+              Sign in
             </LinkText>
           </Link>
         </HStack>
