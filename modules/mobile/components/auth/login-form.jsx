@@ -34,7 +34,7 @@ const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
   password: z.string().min(1, "Password is required"),
   rememberme: z.boolean().optional(),
-});
+})
 
 export const LoginForm = ({onSubmit}) => {
   const {
@@ -58,10 +58,10 @@ export const LoginForm = ({onSubmit}) => {
 
   const handleKeyPress = () => {
     if (!loading) {
-      Keyboard.dismiss();
-      handleSubmit(handleFormSubmit)();
+      Keyboard.dismiss()
+      handleSubmit(handleFormSubmit)()
     }
-  };
+  }
 
   return (
       <VStack className="w-full">
