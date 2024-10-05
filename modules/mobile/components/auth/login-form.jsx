@@ -78,7 +78,7 @@ export const LoginForm = ({onSubmit}) => {
                 name="email"
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input size="sm">
                       <InputField
                           autoComplete="email"
                           textContentType="emailAddress"
@@ -113,7 +113,7 @@ export const LoginForm = ({onSubmit}) => {
                 name="password"
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input size="sm">
                       <InputField
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
@@ -164,11 +164,17 @@ export const LoginForm = ({onSubmit}) => {
           </HStack>
         </VStack>
         <VStack className="w-full my-7 " space="lg">
-          <Button className="w-full" onPress={handleSubmit(handleFormSubmit)} isDisabled={loading}>
+          <Button
+              size="sm"
+              className="w-full"
+              onPress={handleSubmit(handleFormSubmit)}
+              isDisabled={loading}
+          >
             {loading && <ButtonSpinner color={colors.gray[400]} className="pr-2" />}
-            <ButtonText className="font-medium">{loading ? 'Logging you in...' : 'Log in'}</ButtonText>
+            <ButtonText className="font-medium">{loading ? 'Signing you in...' : 'Sign in'}</ButtonText>
           </Button>
           <Button
+              size="sm"
               variant="outline"
               action="secondary"
               className="w-full gap-1"

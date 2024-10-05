@@ -207,7 +207,7 @@ const Settings = () => {
                 action="secondary"
             >
               <ButtonText onPress={handleLogout}>
-                Sign Out
+                Sign out
               </ButtonText>
             </Button>
           </Box>

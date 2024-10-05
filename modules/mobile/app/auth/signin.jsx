@@ -23,8 +23,8 @@ const SignIn = () => {
             />
           </Pressable>
           <VStack>
-            <Heading className="md:text-center" size="3xl">
-              Log in
+            <Heading className="md:text-center" size="2xl">
+              Sign In
             </Heading>
             <Text>Login to start using Expense-Tracker</Text>
           </VStack>
