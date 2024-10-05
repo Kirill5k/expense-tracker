@@ -15,7 +15,7 @@ const DashboardLayout = () => {
   const {mode} = useStore()
 
   return (
-      <SafeAreaView className="w-full h-full">
+      <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
             screenOptions={{
               tabBarActiveTintColor: colors[mode].text,

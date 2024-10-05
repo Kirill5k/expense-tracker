@@ -11,7 +11,6 @@ import * as SplashScreen from 'expo-splash-screen'
 import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
-import {StatusBarWithBackground} from '@/components/common/status-bar'
 import useStore from '@/store'
 
 export {
@@ -106,7 +105,6 @@ function RootLayoutNav() {
       <SafeAreaProvider>
         <GestureHandlerRootView style={{flex: 1}}>
           <GluestackUIProvider mode={mode}>
-            <StatusBarWithBackground mode={mode}/>
             <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
               <StackWithToast
                   screenOptions={{headerShown: false}}
