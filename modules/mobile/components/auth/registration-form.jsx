@@ -27,10 +27,10 @@ const signUpSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
   firstName: z
       .string()
-      .min(1, "Enter your fist name"),
+      .min(1, "Enter your name"),
   lastName: z
       .string()
-      .min(1, "Enter your last name"),
+      .min(1, "Enter your surname"),
   password: z
       .string()
       .min(6, "Must be at least 8 characters in length")
@@ -105,8 +105,8 @@ export const RegistrationForm = ({onSubmit}) => {
             </FormControlError>
           </FormControl>
 
-          <HStack className="w-full justify-between" space="md">
-            <FormControl isInvalid={!!errors.firstName} className="grow">
+          <HStack className="w-full flex-row" space="md">
+            <FormControl isInvalid={!!errors.firstName} className="flex-1">
               <FormControlLabel>
                 <FormControlLabelText>First Name</FormControlLabelText>
               </FormControlLabel>
@@ -137,7 +137,7 @@ export const RegistrationForm = ({onSubmit}) => {
               </FormControlError>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.lastName} className="grow">
+            <FormControl isInvalid={!!errors.lastName} className="flex-1">
               <FormControlLabel>
                 <FormControlLabelText>Last Name</FormControlLabelText>
               </FormControlLabel>
