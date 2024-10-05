@@ -3,6 +3,7 @@ import 'react-native-reanimated'
 import React, {useEffect} from 'react'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
+import {SafeAreaProvider} from 'react-native-safe-area-context'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
 import {router, Stack} from 'expo-router'
@@ -10,6 +11,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
+import {StatusBarWithBackground} from '@/components/common/status-bar'
 import useStore from '@/store'
 
 export {
@@ -101,20 +103,23 @@ function RootLayoutNav() {
   }, [isAuthenticated])
 
   return (
-      <GestureHandlerRootView style={{flex: 1}}>
-        <GluestackUIProvider mode={mode}>
-          <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
-            <StackWithToast
-                screenOptions={{headerShown: false}}
-                onToastClose={clearAlert}
-                notification={alert}
-            >
-              <Stack.Screen name="(dashboard)"/>
-              <Stack.Screen name="auth/signup"/>
-            </StackWithToast>
-          </ThemeProvider>
-        </GluestackUIProvider>
-      </GestureHandlerRootView>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <GluestackUIProvider mode={mode}>
+            <StatusBarWithBackground mode={mode}/>
+            <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
+              <StackWithToast
+                  screenOptions={{headerShown: false}}
+                  onToastClose={clearAlert}
+                  notification={alert}
+              >
+                <Stack.Screen name="(dashboard)"/>
+                <Stack.Screen name="auth/signup"/>
+              </StackWithToast>
+            </ThemeProvider>
+          </GluestackUIProvider>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
   );
 }
 
