@@ -17,11 +17,18 @@ import {Input, InputField, InputIcon, InputSlot} from '@/components/ui/input'
 import {Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel} from '@/components/ui/checkbox'
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
 import {Button, ButtonText, ButtonIcon} from '@/components/ui/button'
+import {CurrencySelect, currencies} from '@/components/settings/currency-select'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
 import {AlertTriangle} from 'lucide-react-native'
 import {GoogleIcon} from '@/assets/icons/google'
+
+const currencySchema = z.object({
+  country: z.string().min(1, 'Currency country is required'),
+  code: z.string().min(1, 'Currency code is required'),
+  symbol: z.string().min(1, 'Currency symbol is required'),
+})
 
 const signUpSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
@@ -38,6 +45,8 @@ const signUpSchema = z.object({
       .regex(new RegExp(".*[a-z].*"), "One lowercase character")
       .regex(new RegExp(".*\\d.*"), "One number")
       .regex(new RegExp(".*[`~<>?,./!@#$%^&*()\\-_+=\"'|{}\\[\\];:\\\\].*"), "One special character"),
+  currency: z.preprocess(c => c || {code: '', symbol: '', country: ''},
+      currencySchema.refine((c) => c?.code && c?.symbol, {message: 'Please select default currency'})),
   confirmPassword: z
       .string()
       .min(6, "Must be at least 8 characters in length")
@@ -48,7 +57,7 @@ const signUpSchema = z.object({
   acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const RegistrationForm = ({onSubmit}) => {
+export const RegistrationForm = ({onSubmit, mode}) => {
   const {
     control,
     handleSubmit,
@@ -170,6 +179,29 @@ export const RegistrationForm = ({onSubmit}) => {
 
           </HStack>
 
+          <FormControl isInvalid={!!errors.currency}>
+            <FormControlLabel>
+              <FormControlLabelText>Default Currency</FormControlLabelText>
+            </FormControlLabel>
+            <Controller
+                name="currency"
+                defaultValue={currencies[0]}
+                control={control}
+                render={({field: {onChange, onBlur, value}}) => (
+                    <CurrencySelect
+                        mode={mode}
+                        value={value}
+                        onSelect={onChange}
+                    />
+                )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+              <FormControlErrorText className="text-sm">
+                {errors?.currency?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
 
           <FormControl isInvalid={!!errors.password}>
             <FormControlLabel>

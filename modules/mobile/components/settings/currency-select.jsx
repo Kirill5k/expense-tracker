@@ -5,7 +5,7 @@ import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
 import colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
 
-const currencies = [
+export const currencies = [
   { country: 'United States Dollar', code: 'USD', symbol: '$' },
   { country: 'Euro', code: 'EUR', symbol: '€' },
   { country: 'Pound Sterling', code: 'GBP', symbol: '£' },
@@ -16,7 +16,7 @@ const currencies = [
   { country: 'Turkish Lira', code: 'TRY', symbol: '₺' }
 ]
 
-const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
+export const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const currenciesByCode = createLookup(currencies, c => c.code)
   const [selected, setSelected] = React.useState(value?.code ? new Set([value.code]) : new Set([]))
@@ -40,10 +40,10 @@ const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
                   size="xs"
                   variant="outline"
                   action="secondary"
-                  className="justify-between align-center"
+                  className="justify-between align-center px-3"
                   {...triggerProps}
               >
-                <ButtonText className="px-2 text-lg">
+                <ButtonText className="px-0 text-lg">
                   {value?.symbol}
                 </ButtonText>
                 <ButtonText className="pl-2 grow text-sm text-left">
@@ -71,5 +71,3 @@ const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
       </Menu>
   )
 }
-
-export default CurrencySelect

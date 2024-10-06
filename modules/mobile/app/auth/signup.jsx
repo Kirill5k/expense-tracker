@@ -6,9 +6,12 @@ import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {Pressable} from '@/components/ui/pressable'
 import {AuthLayout} from '@/components/auth/layout'
 import {RegistrationForm} from '@/components/auth/registration-form'
+import useStore from '@/store'
 
 
 const SignUp = () => {
+  const { mode } = useStore()
+
   return (
       <AuthLayout>
         <VStack className="md:items-center" space="md">
@@ -25,7 +28,9 @@ const SignUp = () => {
             </Heading>
             <Text>Create an account and start using Expense-Tracker</Text>
           </VStack>
-          <RegistrationForm/>
+          <RegistrationForm
+              mode={mode}
+          />
         </VStack>
       </AuthLayout>
   )
