@@ -1,10 +1,7 @@
 import {useState} from 'react'
-import {Link} from 'expo-router'
 import {Keyboard} from 'react-native'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
-import {Text} from '@/components/ui/text'
-import {LinkText} from '@/components/ui/link'
 import {
   FormControl,
   FormControlError,
@@ -69,6 +66,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
   const handleFormSubmit = (data) => {
     if (data.password !== data.confirmPassword) {
       setError('confirmPassword', {message: 'Passwords do not match', type: 'manual'})
+    } else {
+      console.log(data)
     }
   }
 
@@ -94,14 +93,18 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input size="sm">
                       <InputField
-                          className="text-sm"
+                          autoComplete="email"
+                          textContentType="emailAddress"
+                          keyboardType="email-address"
+                          autoCapitalize="none"
                           placeholder="Email"
+                          className="text-sm"
                           type="text"
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
                           onSubmitEditing={handleKeyPress}
-                          returnKeyType="done"
+                          returnKeyType="next"
                       />
                     </Input>
                 )}
@@ -126,6 +129,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   render={({field: {onChange, onBlur, value}}) => (
                       <Input size="sm">
                         <InputField
+                            textContentType="givenName"
+                            autoComplete="given-name"
                             className="text-sm"
                             placeholder="First Name"
                             type="text"
@@ -133,7 +138,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                             onChangeText={onChange}
                             onBlur={onBlur}
                             onSubmitEditing={handleKeyPress}
-                            returnKeyType="done"
+                            returnKeyType="next"
                         />
                       </Input>
                   )}
@@ -157,6 +162,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   render={({field: {onChange, onBlur, value}}) => (
                       <Input size="sm">
                         <InputField
+                            textContentType="familyName"
+                            autoComplete="family-name"
                             className="text-sm"
                             placeholder="Last Name"
                             type="text"
@@ -164,7 +171,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                             onChangeText={onChange}
                             onBlur={onBlur}
                             onSubmitEditing={handleKeyPress}
-                            returnKeyType="done"
+                            returnKeyType="next"
                         />
                       </Input>
                   )}
@@ -214,13 +221,15 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input size="sm">
                       <InputField
+                          autoComplete="off"
+                          textContentType="newPassword"
                           className="text-sm"
                           placeholder="Password"
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
                           onSubmitEditing={handleKeyPress}
-                          returnKeyType="done"
+                          returnKeyType="next"
                           type={showPassword ? "text" : "password"}
                       />
                       <InputSlot onPress={() => setShowPassword((s) => !s)} className="pr-3">
@@ -248,6 +257,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input size="sm">
                       <InputField
+                          autoComplete="off"
+                          textContentType="password"
                           placeholder="Confirm Password"
                           className="text-sm"
                           value={value}
@@ -302,7 +313,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
             </FormControlError>
           </FormControl>
         </VStack>
-
         <VStack className="w-full my-7" space="lg">
           <Button className="w-full" onPress={handleSubmit(handleFormSubmit)}>
             <ButtonText size="sm" className="font-medium">Sign up</ButtonText>
@@ -320,17 +330,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
             <ButtonIcon as={GoogleIcon}/>
           </Button>
         </VStack>
-        <HStack className="self-center" space="sm">
-          <Text size="md">Already have an account?</Text>
-          <Link href="/auth/signin">
-            <LinkText
-                className="font-medium text-primary-700 group-hover/link:text-primary-600 group-hover/pressed:text-primary-700"
-                size="md"
-            >
-              Sign in
-            </LinkText>
-          </Link>
-        </HStack>
       </VStack>
   )
 }

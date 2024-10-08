@@ -1,6 +1,8 @@
-import {router} from 'expo-router'
+import {Link, router} from 'expo-router'
+import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
+import {LinkText} from '@/components/ui/link'
 import {Text} from '@/components/ui/text'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {Pressable} from '@/components/ui/pressable'
@@ -29,6 +31,17 @@ const SignIn = () => {
             <Text>Login to start using Expense-Tracker</Text>
           </VStack>
           <LoginForm onSubmit={creds => login(creds).then(() => router.push('/'))}/>
+          <HStack className="self-center" space="sm">
+            <Text size="md">Don't have an account?</Text>
+            <Link href="/auth/signup">
+              <LinkText
+                  className="font-medium text-primary-700 group-hover/link:text-primary-600  group-hover/pressed:text-primary-700"
+                  size="md"
+              >
+                Sign up
+              </LinkText>
+            </Link>
+          </HStack>
         </VStack>
       </AuthLayout>
   )

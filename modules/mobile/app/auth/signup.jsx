@@ -1,7 +1,9 @@
 import {VStack} from '@/components/ui/vstack'
+import {HStack} from '@/components/ui/hstack'
 import {Heading} from '@/components/ui/heading'
+import {Link, router} from 'expo-router'
 import {Text} from '@/components/ui/text'
-import {router} from 'expo-router'
+import {LinkText} from '@/components/ui/link'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {Pressable} from '@/components/ui/pressable'
 import {AuthLayout} from '@/components/auth/layout'
@@ -31,6 +33,17 @@ const SignUp = () => {
           <RegistrationForm
               mode={mode}
           />
+          <HStack className="self-center" space="sm">
+            <Text size="md">Already have an account?</Text>
+            <Link href="/auth/signin">
+              <LinkText
+                  className="font-medium text-primary-700 group-hover/link:text-primary-600 group-hover/pressed:text-primary-700"
+                  size="md"
+              >
+                Sign in
+              </LinkText>
+            </Link>
+          </HStack>
         </VStack>
       </AuthLayout>
   )

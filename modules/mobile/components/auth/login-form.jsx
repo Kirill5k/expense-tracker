@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import colors from 'tailwindcss/colors'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
-import {Text} from '@/components/ui/text'
 import {LinkText} from '@/components/ui/link'
 import {Link} from 'expo-router'
 import {
@@ -41,18 +40,17 @@ export const LoginForm = ({onSubmit}) => {
     control,
     handleSubmit,
     reset,
-    formState
+    formState,
+    setError
   } = useForm({resolver: zodResolver(loginSchema)});
-  const [loginError, setLoginError] = useState('')
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false)
 
   const handleFormSubmit = (data) => {
     setLoading(true)
-    setLoginError('')
     onSubmit(data)
         .then(() => reset())
-        .catch(e => setLoginError(e.message))
+        .catch(e => setError('password', {message: e.message, type: 'manual'}))
         .finally(() => setLoading(false))
   }
 
@@ -102,7 +100,7 @@ export const LoginForm = ({onSubmit}) => {
             </FormControlError>
           </FormControl>
           <FormControl
-              isInvalid={!!formState.errors.password || !!loginError}
+              isInvalid={!!formState.errors.password}
               className="w-full"
           >
             <FormControlLabel>
@@ -132,7 +130,7 @@ export const LoginForm = ({onSubmit}) => {
             <FormControlError>
               <FormControlErrorIcon as={AlertTriangle} size="sm"/>
               <FormControlErrorText className="text-sm">
-                {formState.errors?.password?.message || loginError}
+                {formState.errors?.password?.message}
               </FormControlErrorText>
             </FormControlError>
           </FormControl>
@@ -185,17 +183,6 @@ export const LoginForm = ({onSubmit}) => {
             <ButtonIcon as={GoogleIcon}/>
           </Button>
         </VStack>
-        <HStack className="self-center" space="sm">
-          <Text size="md">Don't have an account?</Text>
-          <Link href="/auth/signup">
-            <LinkText
-                className="font-medium text-primary-700 group-hover/link:text-primary-600  group-hover/pressed:text-primary-700"
-                size="md"
-            >
-              Sign up
-            </LinkText>
-          </Link>
-        </HStack>
       </VStack>
   )
 }
