@@ -35,7 +35,7 @@ const loginSchema = z.object({
   rememberme: z.boolean().optional(),
 })
 
-export const LoginForm = ({onSubmit}) => {
+export const Login = ({onSubmit}) => {
   const {
     control,
     handleSubmit,

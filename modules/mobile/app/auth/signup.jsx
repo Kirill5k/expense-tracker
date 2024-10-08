@@ -7,12 +7,12 @@ import {LinkText} from '@/components/ui/link'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {Pressable} from '@/components/ui/pressable'
 import {AuthLayout} from '@/components/auth/layout'
-import {RegistrationForm} from '@/components/auth/registration-form'
+import {RegistrationForm} from '@/components/auth/registration'
 import useStore from '@/store'
 
 
 const SignUp = () => {
-  const { mode } = useStore()
+  const { mode, createAccount } = useStore()
 
   return (
       <AuthLayout>
@@ -32,6 +32,7 @@ const SignUp = () => {
           </VStack>
           <RegistrationForm
               mode={mode}
+              onSubmit={createAccount}
           />
           <HStack className="self-center" space="sm">
             <Text size="md">Already have an account?</Text>

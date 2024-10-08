@@ -56,7 +56,7 @@ const signUpSchema = z.object({
   acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const RegistrationForm = ({onSubmit, mode}) => {
+export const Registration = ({onSubmit, mode}) => {
   const {
     control,
     handleSubmit,
@@ -70,7 +70,10 @@ export const RegistrationForm = ({onSubmit, mode}) => {
       setError('confirmPassword', {message: 'Passwords do not match', type: 'manual'})
     } else {
       setLoading(true)
-      console.log(data)
+      onSubmit(data)
+          .then(() => reset())
+          .catch(e => setError('email', {message: e.message, type: 'manual'}))
+          .finally(() => setLoading(false))
     }
   }
 

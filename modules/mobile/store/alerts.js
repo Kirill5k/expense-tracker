@@ -7,7 +7,7 @@ export default {
   REGISTRATION_SUCCESS: {
     type: 'success',
     title: 'Success!',
-    message: 'Account has been successfully created! Redirecting to the sign in page'
+    message: 'Account has been successfully created! Signing you in'
   },
   PASSWORD_CHANGE_SUCCESS: {
     type: 'success',

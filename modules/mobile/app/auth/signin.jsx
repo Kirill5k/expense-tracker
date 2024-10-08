@@ -7,7 +7,7 @@ import {Text} from '@/components/ui/text'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {Pressable} from '@/components/ui/pressable'
 import {AuthLayout} from '@/components/auth/layout'
-import {LoginForm} from '@/components/auth/login-form'
+import {LoginForm} from '@/components/auth/login'
 import useStore from '@/store'
 
 
@@ -30,7 +30,7 @@ const SignIn = () => {
             </Heading>
             <Text>Login to start using Expense-Tracker</Text>
           </VStack>
-          <LoginForm onSubmit={creds => login(creds).then(() => router.push('/'))}/>
+          <LoginForm onSubmit={login}/>
           <HStack className="self-center" space="sm">
             <Text size="md">Don't have an account?</Text>
             <Link href="/auth/signup">

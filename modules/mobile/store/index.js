@@ -122,6 +122,15 @@ const useStore = create((set, get) => ({
           }
         })
   },
+  createAccount: (acc) => {
+    return Clients.get(get().isOnline)
+        .createUser(acc)
+        .then(() => {
+          set({alert: Alerts.REGISTRATION_SUCCESS})
+          return get().login({email: acc.email, password: acc.password}, false)
+        })
+        .catch(e => handleError(get, e, e.status === 409, e.status !== 409))
+  },
   logout: () => {
     return Clients.get(get().isOnline)
         .logout(get().accessToken)
