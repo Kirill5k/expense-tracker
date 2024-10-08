@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import React, {useState} from 'react'
 import {Keyboard} from 'react-native'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
@@ -13,13 +13,15 @@ import {
 import {Input, InputField, InputIcon, InputSlot} from '@/components/ui/input'
 import {Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel} from '@/components/ui/checkbox'
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
-import {Button, ButtonText, ButtonIcon} from '@/components/ui/button'
+import {Button, ButtonText, ButtonIcon, ButtonSpinner} from '@/components/ui/button'
 import {CurrencySelect, currencies} from '@/components/settings/currency-select'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
 import {AlertTriangle} from 'lucide-react-native'
 import {GoogleIcon} from '@/assets/icons/google'
+import colors from 'tailwindcss/colors'
+
 
 const currencySchema = z.object({
   country: z.string().min(1, 'Currency country is required'),
@@ -71,12 +73,15 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     }
   }
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleKeyPress = () => {
-    Keyboard.dismiss()
-    handleSubmit(handleFormSubmit)()
+    if (!loading) {
+      Keyboard.dismiss()
+      handleSubmit(handleFormSubmit)()
+    }
   }
 
   return (
@@ -314,8 +319,14 @@ export const RegistrationForm = ({onSubmit, mode}) => {
           </FormControl>
         </VStack>
         <VStack className="w-full my-7" space="lg">
-          <Button className="w-full" onPress={handleSubmit(handleFormSubmit)}>
-            <ButtonText size="sm" className="font-medium">Sign up</ButtonText>
+          <Button
+              size="sm"
+              className="w-full"
+              onPress={handleSubmit(handleFormSubmit)}
+              isDisabled={loading}
+          >
+            {loading && <ButtonSpinner color={colors.gray[400]} className="pr-2" />}
+            <ButtonText className="font-medium">{loading ? 'Creating an account...' : 'Sign up'}</ButtonText>
           </Button>
           <Button
               size="sm"
