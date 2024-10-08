@@ -38,12 +38,12 @@ const handleError = (get, err, rethrow = false, displayAlert = true) => {
 }
 
 const filtered = (txs, user) => {
-  const maxTxDate = addDays(new Date(), user.settings?.futureTransactionVisibilityDays || 0)
+  const maxTxDate = addDays(new Date(), user?.settings?.futureTransactionVisibilityDays || 0)
   return txs
       .filter(t => {
         return (t?.hidden !== true) &&
             (t?.category?.hidden !== true) &&
-            (t?.amount?.currency?.code === user.settings?.currency?.code) &&
+            (t?.amount?.currency?.code === user?.settings?.currency?.code) &&
             (user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
       })
 }

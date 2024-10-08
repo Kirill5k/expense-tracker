@@ -32,7 +32,7 @@ const SignUp = () => {
           </VStack>
           <RegistrationForm
               mode={mode}
-              onSubmit={createAccount}
+              onSubmit={(acc) => createAccount(acc).then(() => router.push('/'))}
           />
           <HStack className="self-center" space="sm">
             <Text size="md">Already have an account?</Text>

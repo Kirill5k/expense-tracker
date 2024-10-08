@@ -30,7 +30,7 @@ const SignIn = () => {
             </Heading>
             <Text>Login to start using Expense-Tracker</Text>
           </VStack>
-          <LoginForm onSubmit={login}/>
+          <LoginForm onSubmit={creds => login(creds).then(() => router.push('/'))}/>
           <HStack className="self-center" space="sm">
             <Text size="md">Don't have an account?</Text>
             <Link href="/auth/signup">

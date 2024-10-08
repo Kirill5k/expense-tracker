@@ -20,9 +20,6 @@ const Index = () => {
               <Button onPress={() => router.push("auth/signup")}>
                 <ButtonText>Sign Up</ButtonText>
               </Button>
-              <Button onPress={() => router.push("/analytics")}>
-                <ButtonText>Dashboard</ButtonText>
-              </Button>
             </VStack>
         )}
         {isLoading && <ProgressCircle mode={mode}/>}

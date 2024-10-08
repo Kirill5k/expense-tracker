@@ -56,7 +56,7 @@ const signUpSchema = z.object({
   acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const Registration = ({onSubmit, mode}) => {
+export const RegistrationForm = ({onSubmit, mode}) => {
   const {
     control,
     handleSubmit,
