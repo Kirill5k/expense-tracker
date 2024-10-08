@@ -99,10 +99,11 @@ object AuthController extends TapirSchema with TapirJson {
       email: EmailString,
       firstName: NonEmptyString,
       lastName: NonEmptyString,
-      password: NonEmptyString
+      password: NonEmptyString,
+      currency: Option[Currency]
   ) derives Codec.AsObject {
     def userDetails: UserDetails =
-      UserDetails(UserEmail.from(email), UserName(firstName.value, lastName.value))
+      UserDetails(UserEmail.from(email), UserName(firstName.value, lastName.value), currency)
     def userPassword: Password = Password(password.value)
   }
 

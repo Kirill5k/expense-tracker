@@ -69,6 +69,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     if (data.password !== data.confirmPassword) {
       setError('confirmPassword', {message: 'Passwords do not match', type: 'manual'})
     } else {
+      setLoading(true)
       console.log(data)
     }
   }

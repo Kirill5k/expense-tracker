@@ -38,7 +38,12 @@ object UserEntity {
       details.email.value,
       details.name,
       password.value,
-      Some(UserSettings.Default),
+      Some(UserSettings(
+        currency = details.currency.getOrElse(UserSettings.Default.currency),
+        hideFutureTransactions = false,
+        darkMode = None,
+        futureTransactionVisibilityDays = None
+      )),
       Instant.now()
     )
 }

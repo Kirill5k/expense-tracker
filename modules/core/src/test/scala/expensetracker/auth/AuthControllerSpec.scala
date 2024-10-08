@@ -9,7 +9,7 @@ import expensetracker.fixtures.{Sessions, Users}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.implicits.*
 import org.http4s.{Method, Request, Status, Uri}
-import squants.market.USD
+import squants.market.{GBP, USD}
 
 class AuthControllerSpec extends HttpRoutesWordSpec {
 
@@ -130,12 +130,19 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
         when(usrSvc.create(any[UserDetails], any[Password])).thenRaiseError(AccountAlreadyExists(UserEmail("foo@bar.com")))
 
         val req = Request[IO](Method.POST, uri"/auth/user")
-          .withBody("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
+          .withBody(
+            """{
+              |"email":"foo@bar.com",
+              |"password":"pwd",
+              |"firstName":"John",
+              |"lastName":"Bloggs",
+              |"currency":{"code":"GBP","symbol":"£"}
+              |}""".stripMargin)
         val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Conflict, Some("""{"message":"An account with email foo@bar.com already exists"}"""))
         verify(usrSvc).create(
-          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs")),
+          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), Some(GBP)),
           Password("pwd")
         )
         verifyNoInteractions(sessSvc)
@@ -158,12 +165,19 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
         when(usrSvc.create(any[UserDetails], any[Password])).thenReturnIO(Users.uid1)
 
         val req = Request[IO](Method.POST, uri"/auth/user")
-          .withBody("""{"email":"foo@bar.com","password":"pwd","firstName":"John","lastName":"Bloggs"}""")
+          .withBody(
+            """{
+              |"email":"foo@bar.com",
+              |"password":"pwd",
+              |"firstName":"John",
+              |"lastName":"Bloggs",
+              |"currency":{"code":"GBP","symbol":"£"}
+              |}""".stripMargin)
         val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Created, Some(s"""{"id":"${Users.uid1}"}"""))
         verify(usrSvc).create(
-          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs")),
+          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), Some(GBP)),
           Password("pwd")
         )
         verifyNoInteractions(sessSvc)
