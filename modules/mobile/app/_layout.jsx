@@ -8,10 +8,12 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
 import {router, Stack} from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
+import { DatabaseProvider } from '@nozbe/watermelondb/react'
 import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
 import useStore from '@/store'
+import database from '@/db'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -102,22 +104,24 @@ function RootLayoutNav() {
   }, [isAuthenticated])
 
   return (
-      <SafeAreaProvider>
-        <GestureHandlerRootView style={{flex: 1}}>
-          <GluestackUIProvider mode={mode}>
-            <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
-              <StackWithToast
-                  screenOptions={{headerShown: false}}
-                  onToastClose={clearAlert}
-                  notification={alert}
-              >
-                <Stack.Screen name="(dashboard)"/>
-                <Stack.Screen name="auth/signup"/>
-              </StackWithToast>
-            </ThemeProvider>
-          </GluestackUIProvider>
-        </GestureHandlerRootView>
-      </SafeAreaProvider>
+      <DatabaseProvider database={database}>
+        <SafeAreaProvider>
+          <GestureHandlerRootView style={{flex: 1}}>
+            <GluestackUIProvider mode={mode}>
+              <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
+                <StackWithToast
+                    screenOptions={{headerShown: false}}
+                    onToastClose={clearAlert}
+                    notification={alert}
+                >
+                  <Stack.Screen name="(dashboard)"/>
+                  <Stack.Screen name="auth/signup"/>
+                </StackWithToast>
+              </ThemeProvider>
+            </GluestackUIProvider>
+          </GestureHandlerRootView>
+        </SafeAreaProvider>
+      </DatabaseProvider>
   );
 }
 

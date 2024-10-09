@@ -47,13 +47,18 @@
     "@gluestack-ui/tooltip": "^0.1.32",
     "@hookform/resolvers": "^3.9.0",
     "@legendapp/motion": "^2.4.0",
+    "@morrowdigital/watermelondb-expo-plugin": "^2.3.3",
+    "@nozbe/watermelondb": "^0.27.1",
     "@react-navigation/native": "^6.0.2",
+    "bson": "^6.8.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "expo": "^51.0.34",
+    "expo-build-properties": "~0.12.5",
     "expo-constants": "~16.0.2",
     "expo-dev-client": "~4.0.27",
     "expo-font": "~12.0.9",
+    "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
     "expo-router": "~3.5.23",
     "expo-splash-screen": "~0.27.6",
@@ -78,8 +83,7 @@
     "reanimated-color-picker": "^3.0.4",
     "tailwindcss": "^3.4.10",
     "zod": "^3.23.8",
-    "zustand": "^4.5.5",
-    "expo-linear-gradient": "~13.0.2"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
