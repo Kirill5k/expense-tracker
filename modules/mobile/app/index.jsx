@@ -1,22 +1,15 @@
-import React, {useEffect} from 'react'
 import {router} from 'expo-router'
 import {Button, ButtonText} from '@/components/ui/button'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import {VStack} from '@/components/ui/vstack'
 import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
-import {useDatabase} from '@nozbe/watermelondb/react'
-import {saveUser} from '@/db/operations'
+import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
 
-const Index = () => {
-  const database = useDatabase()
-  const {isLoading, mode, user} = useStore()
+const Index = ({state}) => {
+  const {isLoading, mode} = useStore()
 
-  useEffect(() => {
-    if (user != null) {
-      saveUser(database, user)
-    }
-  }, [user])
+  console.log('retrieved state', state)
 
   return (
       <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">
@@ -35,4 +28,12 @@ const Index = () => {
   );
 };
 
-export default Index;
+const enhance = compose(
+    withDatabase,
+    withObservables([], ({database}) => ({
+          users: database.get('state').findAndObserve('expense-tracker'),
+        }),
+    )
+)
+
+export default enhance(Index)

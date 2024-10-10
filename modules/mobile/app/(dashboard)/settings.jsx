@@ -18,6 +18,7 @@ import Classes from '@/constants/classes'
 import useStore from '@/store'
 import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
 
+
 const themeDisplayLabel = (darkMode) => {
   if (darkMode === null) {
     return 'System'

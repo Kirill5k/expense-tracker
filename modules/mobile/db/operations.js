@@ -1,3 +1,24 @@
+import {defaultDisplayDate} from '@/utils/dates'
+
+export const initState = async (database) => {
+  await database.write(async () => {
+    try {
+      await database.get('state').find('expense-tracker')
+    } catch (e) {
+      const dd = defaultDisplayDate()
+      await database.get('state').create(state => {
+        state.isAuthenticated = false
+        state.accessToken = null
+        state.userId = null
+        state.displayDateRange = dd.range
+        state.displayDateText = dd.text
+        state.displayDateStart = dd.start.toISOString().slice(0, 10)
+        state.displayDateEnd = dd.end.toISOString().slice(0, 10)
+      })
+    }
+  })
+}
+
 export const saveUser = async (database, user) => {
   await database.write(async () => {
     try {

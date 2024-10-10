@@ -2,13 +2,9 @@ import {create} from 'zustand'
 import Clients from './clients'
 import Alerts from './alerts'
 import {insertSorted} from '@/utils/arrays'
+import {defaultDisplayDate} from '@/utils/dates'
 import {withUpdatedCategory, withinDates, sorts} from '@/utils/transactions'
-import {addDays, format, startOfMonth, endOfMonth} from 'date-fns'
-
-const defaultDisplayDate = () => {
-  const now = new Date()
-  return {range: 'monthly', start: startOfMonth(now), end: endOfMonth(now), text: format(now, 'LLLL yyyy')}
-}
+import {addDays} from 'date-fns'
 
 const DefaultState = {
   isAuthenticated: false,
