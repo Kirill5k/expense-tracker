@@ -7,6 +7,7 @@ export const initState = async (database) => {
     } catch (e) {
       const dd = defaultDisplayDate()
       await database.get('state').create(state => {
+        state._raw.id = 'expense-tracker'
         state.isAuthenticated = false
         state.accessToken = null
         state.userId = null

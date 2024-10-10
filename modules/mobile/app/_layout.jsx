@@ -15,7 +15,6 @@ import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
 import useStore from '@/store'
 import database from '@/db'
-import {initState} from '@/db/operations'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -72,10 +71,6 @@ function RootLayoutNav() {
     reloadTransactions,
     setLoading,
   } = useStore()
-
-  useEffect(() => {
-    initState(database)
-  }, []);
 
   useEffect(() => {
     if (user?.settings) {

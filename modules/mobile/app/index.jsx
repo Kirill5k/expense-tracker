@@ -31,7 +31,7 @@ const Index = ({state}) => {
 const enhance = compose(
     withDatabase,
     withObservables([], ({database}) => ({
-          users: database.get('state').findAndObserve('expense-tracker'),
+          state: database.get('state').findAndObserve('expense-tracker'),
         }),
     )
 )
