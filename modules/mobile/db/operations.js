@@ -1,14 +1,27 @@
 export const saveUser = async (database, user) => {
   await database.write(async () => {
-    await database.get('users').create(newUser => {
-      newUser.firstName = user.firstName
-      newUser.lastName = user.lastName
-      newUser.email = user.email
-      newUser.settingsCurrencyCode = user.settings.currency.code
-      newUser.settingsCurrencySymbol = user.settings.currency.symbol
-      newUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
-      newUser.settingsDarkMode = user.settings.darkMode
-    })
+    try {
+      const foundUser = await database.get('users').find(user.id)
+      foundUser.update(foundUser => {
+        foundUser.firstName = user.firstName
+        foundUser.lastName = user.lastName
+        foundUser.email = user.email
+        foundUser.settingsCurrencyCode = user.settings.currency.code
+        foundUser.settingsCurrencySymbol = user.settings.currency.symbol
+        foundUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
+        foundUser.settingsDarkMode = user.settings.darkMode
+      })
+    } catch (err) {
+      await database.get('users').create(newUser => {
+        newUser.firstName = user.firstName
+        newUser.lastName = user.lastName
+        newUser.email = user.email
+        newUser.settingsCurrencyCode = user.settings.currency.code
+        newUser.settingsCurrencySymbol = user.settings.currency.symbol
+        newUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
+        newUser.settingsDarkMode = user.settings.darkMode
+      })
+    }
   })
 }
 

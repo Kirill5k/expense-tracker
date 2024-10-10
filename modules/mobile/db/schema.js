@@ -41,11 +41,25 @@ const User = tableSchema({
   ],
 })
 
+const State = tableSchema({
+  name: 'state',
+  columns: [
+    {name: 'is_authenticated', type: 'boolean', isOptional: true},
+    {name: 'access_token', type: 'string', isOptional: true},
+    {name: 'user_id', type: 'string', isOptional: true},
+    {name: 'display_date_range', type: 'string', isOptional: true},
+    {name: 'display_date_text', type: 'string', isOptional: true},
+    {name: 'display_date_start', type: 'string', isOptional: true},
+    {name: 'display_date_end', type: 'string', isOptional: true},
+  ],
+})
+
 export default appSchema({
   version: 1,
   tables: [
     Category,
     Transaction,
-    User
+    User,
+    State
   ]
 })

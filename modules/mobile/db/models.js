@@ -109,3 +109,17 @@ export class User extends Model {
     }
   }
 }
+
+export class State extends Model {
+  static table = 'state'
+
+  @field('is_authenticated') isAuthenticated
+  @field('access_token') accessToken
+  @field('user_id') userId
+  @field('display_date_range') displayDateRange
+  @field('display_date_text') displayDateText
+  @field('display_date_start') displayDateStart
+  @field('display_date_end') displayDateEnd
+
+  @relation('users', 'user_id') category
+}
