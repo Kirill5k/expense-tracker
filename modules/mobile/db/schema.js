@@ -36,6 +36,8 @@ const User = tableSchema({
     {name: 'settings_currency_symbol', type: 'string'},
     {name: 'settings_future_transaction_visibility_days', type: 'number', isOptional: true},
     {name: 'settings_dark_mode', type: 'boolean', isOptional: true},
+    {name: 'total_transaction_count', type: 'number'},
+    {name: 'registration_date', type: 'string'},
   ],
 })
 

@@ -27,6 +27,7 @@ const DefaultState = {
 
 const handleError = (get, err, rethrow = false, displayAlert = true) => {
   console.log('error', err)
+
   if (err.status === 403) {
     get().clearUser()
   } else if (displayAlert) {

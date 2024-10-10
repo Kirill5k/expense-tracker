@@ -1,5 +1,6 @@
 import '@/global.css'
 import 'react-native-reanimated'
+import 'react-native-get-random-values'
 import React, {useEffect} from 'react'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
@@ -8,7 +9,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
 import {router, Stack} from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
-import { DatabaseProvider } from '@nozbe/watermelondb/react'
+import {DatabaseProvider} from '@nozbe/watermelondb/react'
 import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
@@ -104,11 +105,12 @@ function RootLayoutNav() {
   }, [isAuthenticated])
 
   return (
-      <DatabaseProvider database={database}>
-        <SafeAreaProvider>
-          <GestureHandlerRootView style={{flex: 1}}>
-            <GluestackUIProvider mode={mode}>
-              <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
+
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <GluestackUIProvider mode={mode}>
+            <ThemeProvider value={mode === 'dark' ? DarkTheme : DefaultTheme}>
+              <DatabaseProvider database={database}>
                 <StackWithToast
                     screenOptions={{headerShown: false}}
                     onToastClose={clearAlert}
@@ -117,11 +119,11 @@ function RootLayoutNav() {
                   <Stack.Screen name="(dashboard)"/>
                   <Stack.Screen name="auth/signup"/>
                 </StackWithToast>
-              </ThemeProvider>
-            </GluestackUIProvider>
-          </GestureHandlerRootView>
-        </SafeAreaProvider>
-      </DatabaseProvider>
+              </DatabaseProvider>
+            </ThemeProvider>
+          </GluestackUIProvider>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
   );
 }
 

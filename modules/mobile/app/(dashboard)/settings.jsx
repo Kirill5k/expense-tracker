@@ -16,6 +16,7 @@ import {AccordionContentText} from '@/components/ui/accordion'
 import {ProgressBar} from '@/components/common/progress'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
+import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
 
 const themeDisplayLabel = (darkMode) => {
   if (darkMode === null) {
@@ -37,12 +38,11 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
   return `${futureTransactionVisibilityDays} Days`
 }
 
-const Settings = () => {
+const Settings = ({users}) => {
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const {
     mode,
-    user,
     updateUserSettings,
     logout,
     changeUserPassword
@@ -64,9 +64,11 @@ const Settings = () => {
         .finally(() => setLoading(false))
   }
 
-  if (!user) {
+  if (!users) {
     return null
   }
+
+  const user = users[0].toDomain
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -216,4 +218,12 @@ const Settings = () => {
   )
 }
 
-export default Settings
+const enhance = compose(
+    withDatabase,
+    withObservables([], ({database}) => ({
+          users: database.get('users').query().observe(),
+        }),
+    )
+)
+
+export default enhance(Settings)
