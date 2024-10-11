@@ -29,9 +29,9 @@ const Analytics = () => {
 
   const analysedTransactions = displayedTransactions.filter(tx => tx.category.kind === kind.value)
 
-  useEffect(() => {
-    setSelectedTransactions([])
-  }, [displayDate.text])
+  // useEffect(() => {
+  //   setSelectedTransactions([])
+  // }, [displayDate.text])
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -63,7 +63,8 @@ const Analytics = () => {
               items={analysedTransactions}
               displayDate={displayDate}
               currency={user?.settings?.currency}
-              onChartPress={setSelectedTransactions}
+              // onChartPress={setSelectedTransactions}
+              onChartPress={() => {}}
           />
           <DatePeriodSelect
               className="my-2"

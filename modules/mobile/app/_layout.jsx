@@ -69,6 +69,7 @@ function RootLayoutNav() {
                     notification={alert}
                 >
                   <Stack.Screen name="(dashboard)"/>
+                  <Stack.Screen name="auth/signin"/>
                   <Stack.Screen name="auth/signup"/>
                 </StackWithToast>
               </DatabaseProvider>

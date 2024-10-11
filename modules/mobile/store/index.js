@@ -50,6 +50,12 @@ const useStore = create((set, get) => ({
   alert: null,
   mode: 'light',
   setMode: (mode) => set({mode}),
+  setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
+  setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
+  clearAlert: () => set({alert: null}),
+  setLoginSuccessAlert: () => set({alert: Alerts.LOGIN_SUCCESS}),
+
+
   setLoading: (isLoading) => set({isLoading}),
   setCategories: (categories) => {
     const displayedCategories = categories.filter(c => !c.hidden)
@@ -103,9 +109,6 @@ const useStore = create((set, get) => ({
     const txs = get().transactions.map(t => t.id === id ? ({...t, hidden}) : t)
     get().setTransactions(txs, false)
   },
-  setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),
-  setUndoAlert: (message, undoAction) => set({alert: {type: 'info', message, undoAction}}),
-  clearAlert: () => set({alert: null}),
   clearUser: () => set({...DefaultState, displayDate: defaultDisplayDate()}),
   login: (creds, showAlert = true) => {
     get().clearAlert()

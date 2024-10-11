@@ -20,7 +20,10 @@ const Index = ({state}) => {
     setMode(colorScheme === ' dark' ? 'dark' : 'light')
   }
 
+  console.log('state', state)
+
   if (state.isAuthenticated && state.user) {
+    console.log('going to analytics')
     router.push('/analytics')
   }
 

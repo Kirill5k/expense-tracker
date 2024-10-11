@@ -13,7 +13,7 @@ export const saveTransactions = async (database, transactions) => {
       rec.tags = (tx.tags || []).join(',');
       rec.hidden = tx.hidden || false
     }))
-    await database.batch(...actions)
+    await database.batch(actions)
   })
 }
 
@@ -27,7 +27,7 @@ export const saveCategories = async (database, categories) => {
       rec.color = c.color
       rec.hidden = c.hidden || false
     }))
-    await database.batch(...actions)
+    await database.batch(actions)
   })
 }
 
