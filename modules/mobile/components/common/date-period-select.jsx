@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {HStack} from '../ui/hstack'
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu'
 import {ButtonIcon, ButtonText, Button} from '../ui/button'
@@ -59,7 +59,6 @@ const incrementBy = ({start, end, range}, amount) => {
 
 const DatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [selected, setSelected] = useState(value?.range ? new Set([value.range]) : new Set([]))
 
   const resetDate = (range) => {
     const newDateRange = newDisplayDateForToday(range)
@@ -78,20 +77,12 @@ const DatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
     onSelect({...newDateRange, previous})
   }
 
-  useEffect(() => {
-    if (!value?.text) {
-      resetDate('monthly')
-    }
-  }, []);
-
   return (
       <Menu
           placement="bottom"
           offset={0}
           selectionMode="single"
-          selectedKeys={selected}
           onSelectionChange={(keys) => {
-            setSelected(keys)
             resetDate(keys.currentKey)
           }}
           onOpen={() => setIsOpen(true)}
