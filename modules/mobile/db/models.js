@@ -83,8 +83,8 @@ export class Transaction extends Model {
 export class User extends Model {
   static table = 'users'
   static associations = {
-    categories: { type: 'has_many', foreignKey: 'categories' },
-    transactions: { type: 'has_many', foreignKey: 'transactions' },
+    categories: { type: 'has_many', foreignKey: 'user_id' },
+    transactions: { type: 'has_many', foreignKey: 'user_id' },
   }
 
   @field('first_name') firstName
@@ -135,6 +135,8 @@ export class State extends Model {
   @lazy displayedTransactions = this.collections.get('transactions').query(
       Q.where('date', Q.gte(this.displayDateStart)),
       Q.where('date', Q.lte(this.displayDateEnd)),
+      Q.where('hidden', Q.notEq(true)),
+      Q.sortBy('date', Q.desc),
   )
 
   get displayDate() {

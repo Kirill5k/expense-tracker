@@ -18,7 +18,7 @@ const kinds = [
   {label: 'Income', value: 'income'}
 ]
 
-const Analytics = ({state, user, displayedTransactions}) => {
+const Analytics = ({state, user, displayedTransactions, categories}) => {
   const database = useDatabase()
   const {mode} = useStore()
 
@@ -27,7 +27,10 @@ const Analytics = ({state, user, displayedTransactions}) => {
   const [kind, setKind] = useState(kinds[0])
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
-  const analysedTransactions = displayedTransactions.filter(tx => tx.category.kind === kind.value)
+  const analysedTransactions = displayedTransactions.map(t => t.toDomain).filter(tx => tx.category.kind === kind.value)
+
+  console.log('user', user.toDomain)
+  console.log(displayedTransactions[0].category)
 
   useEffect(() => {
     setSelectedTransactions([])
@@ -88,6 +91,9 @@ const enhance = compose(
     withObservables(['state'], ({state}) => ({
       user: state.user.observe(),
       displayedTransactions: state.displayedTransactions.observe()
+    })),
+    withObservables(['user'], ({user}) => ({
+      categories: user.categories.observe(),
     }))
 )
 

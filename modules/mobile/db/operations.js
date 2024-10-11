@@ -3,8 +3,8 @@ import {defaultDisplayDate} from '@/utils/dates'
 export const saveTransactions = async (database, userId, transactions) => {
   await database.write(async () => {
     const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => {
-      res.userId = userId
       rec._raw.id = tx.id
+      rec.userId = userId
       rec.categoryId = tx.category.id
       rec.date = tx.date;
       rec.amountValue = tx.amount.value;
@@ -21,8 +21,8 @@ export const saveTransactions = async (database, userId, transactions) => {
 export const saveCategories = async (database, userId, categories) => {
   await database.write(async () => {
     const actions = categories.map(c => database.get('categories').prepareCreate(rec => {
-      res.userId = userId
       rec._raw.id = c.id
+      rec.userId = userId
       rec.name = c.name
       rec.icon = c.icon
       rec.kind = c.kind
