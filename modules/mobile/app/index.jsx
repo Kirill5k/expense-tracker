@@ -3,13 +3,26 @@ import {Button, ButtonText} from '@/components/ui/button'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import {VStack} from '@/components/ui/vstack'
 import {ProgressCircle} from '@/components/common/progress'
+import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
 
 const Index = ({state}) => {
-  const {isLoading, mode} = useStore()
+  const colorScheme = useColorScheme()
+  const {isLoading, mode, setMode} = useStore()
 
-  console.log('retrieved state', state)
+  //TODO: update mode when user updates settings
+  if (state?.user?.settings?.darkMode === true) {
+    setMode('dark')
+  } else if (state?.user?.settings?.darkMode === false) {
+    setMode('light')
+  } else {
+    setMode(colorScheme === ' dark' ? 'dark' : 'light')
+  }
+
+  if (state.isAuthenticated && state.user) {
+    router.push('/analytics')
+  }
 
   return (
       <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">

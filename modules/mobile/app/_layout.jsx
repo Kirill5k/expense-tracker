@@ -7,11 +7,10 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
-import {router, Stack} from 'expo-router'
+import {Stack} from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import {DatabaseProvider} from '@nozbe/watermelondb/react'
 import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
-import {useColorScheme} from '@/components/useColorScheme'
 import {withToast} from '@/components/ui/toast'
 import useStore from '@/store'
 import database from '@/db'
@@ -56,53 +55,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme()
-  const {
-    mode,
-    setMode,
-    user,
-    alert,
-    clearAlert,
-    setErrorAlert,
-    isAuthenticated,
-    clearUser,
-    getUser,
-    getTransactions,
-    reloadTransactions,
-    setLoading,
-  } = useStore()
-
-  useEffect(() => {
-    if (user?.settings) {
-      reloadTransactions()
-    }
-  }, [user?.settings?.currency, user?.settings?.futureTransactionVisibilityDays])
-
-  useEffect(() => {
-    if (user?.settings?.darkMode === true) {
-      setMode('dark')
-    } else if (user?.settings?.darkMode === false) {
-      setMode('light')
-    } else {
-      setMode(colorScheme === ' dark' ? 'dark' : 'light')
-    }
-  }, [user?.settings?.darkMode])
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      setLoading(true)
-      getUser()
-          .then(getTransactions)
-          .then(() => router.push("/analytics"))
-          .catch(e => {
-            setErrorAlert(e.message)
-            clearUser()
-          })
-          .finally(() => setTimeout(() => setLoading(false), 1000))
-    } else {
-      router.push('/')
-    }
-  }, [isAuthenticated])
+  const {mode, alert, clearAlert} = useStore()
 
   return (
       <SafeAreaProvider>

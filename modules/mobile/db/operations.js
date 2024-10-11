@@ -1,5 +1,28 @@
 import {defaultDisplayDate} from '@/utils/dates'
 
+export const saveCategories = async (database, categories) => {
+  await database.write(async () => {
+    const actions = categories.map(c => database.get('categories').prepareCreate(rec => {
+      rec.name = c.name;
+      rec.icon = c.icon;
+      rec.kind = c.kind;
+      rec.color = c.color;
+      rec.hidden = c.hidden || false;
+    }))
+    await database.batch(...actions)
+  })
+}
+
+export const updateStateAuthStatus = async (database, accessToken) => {
+  await database.write(async () => {
+    const state = await database.get('state').find('expense-tracker')
+    await state.update(record => {
+      record.accessToken = accessToken
+      record.isAuthenticated = true
+    })
+  })
+}
+
 export const initState = async (database) => {
   await database.write(async () => {
     try {
@@ -35,6 +58,7 @@ export const saveUser = async (database, user) => {
       })
     } catch (err) {
       await database.get('users').create(newUser => {
+        newUser._raw.id = user.id
         newUser.firstName = user.firstName
         newUser.lastName = user.lastName
         newUser.email = user.email
@@ -44,6 +68,10 @@ export const saveUser = async (database, user) => {
         newUser.settingsDarkMode = user.settings.darkMode
       })
     }
+    const state = await database.get('state').find('expense-tracker')
+    await state.update(record => {
+      record.userId = user.id
+    })
   })
 }
 
