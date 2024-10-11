@@ -98,6 +98,13 @@ export class User extends Model {
   @children('categories') categories
   @children('transactions') transactions
 
+  get currency() {
+    return {
+      code: this.settingsCurrencyCode,
+      symbol: this.settingsCurrencySymbol,
+    }
+  }
+
   get toDomain() {
     return {
       firstName: this.firstName,

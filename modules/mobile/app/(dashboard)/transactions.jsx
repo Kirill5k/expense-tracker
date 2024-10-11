@@ -10,25 +10,29 @@ import TransactionList from '@/components/transaction/list'
 import {ProgressBar} from '@/components/common/progress'
 import useStore from '@/store'
 import Classes from '@/constants/classes'
+import {mapTransactions} from '@/db/mappers'
+import {updateStateDisplayDate} from '@/db/operations'
+import {enhanceWithCompleteState} from '@/db/observers'
+import {useDatabase} from '@nozbe/watermelondb/react'
 
-const Transactions = () => {
+const Transactions = ({state, user, displayedTransactions, categories}) => {
+  const database = useDatabase()
+  const {mode} = useStore()
+
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [txToUpdate, setTxToUpdate] = useState(null)
 
-  const {
-    mode,
-    user,
-    displayedTransactions,
-    incomeCategories,
-    expenseCategories,
-    displayDate,
-    setDisplayDate,
-    createTransaction,
-    updateTransaction,
-    hideTransaction
-  } = useStore()
+  const incomeCategories = categories.filter(c => c.kind === 'income').map(c => c.toDomain)
+  const expenseCategories = categories.filter(c => c.kind === 'expense').map(c => c.toDomain)
+  const transactions =  mapTransactions(displayedTransactions, categories, user)
+
+  // const {
+  //   createTransaction,
+  //   updateTransaction,
+  //   hideTransaction
+  // } = useStore()
 
   const handleFormSubmit = (tx) => {
     setTxToUpdate(null)
@@ -66,13 +70,13 @@ const Transactions = () => {
         <DatePeriodSelect
             disabled={loading}
             mode={mode}
-            value={displayDate}
-            onSelect={setDisplayDate}
+            value={state.displayDate}
+            onSelect={dd => updateStateDisplayDate(database, dd)}
         />
         {isScrolling && <Divider/>}
         <TransactionList
             disabled={loading}
-            items={displayedTransactions}
+            items={transactions}
             onItemPress={tx => {
               setTxToUpdate(tx)
               setShowModal(true)
@@ -106,7 +110,7 @@ const Transactions = () => {
           <TransactionForm
               mode={mode}
               transaction={txToUpdate}
-              currency={user?.settings?.currency}
+              currency={user?.currency}
               expenseCategories={expenseCategories}
               incomeCategories={incomeCategories}
               onCancel={() => {
@@ -120,4 +124,4 @@ const Transactions = () => {
   )
 }
 
-export default Transactions
+export default enhanceWithCompleteState(Transactions)

@@ -12,8 +12,8 @@ import Classes from '@/constants/classes'
 import useStore from '@/store'
 import {updateStateDisplayDate} from '@/db/operations'
 import {mapTransactions} from '@/db/mappers'
-import {observeDisplayedTransactions} from '@/db/observers'
-import {withDatabase, compose, withObservables, useDatabase} from '@nozbe/watermelondb/react'
+import {enhanceWithCompleteState} from '@/db/observers'
+import {useDatabase} from '@nozbe/watermelondb/react'
 
 const kinds = [
   {label: 'Spending', value: 'expense'},
@@ -64,7 +64,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
               mode={mode}
               items={analysedTransactions}
               displayDate={state.displayDate}
-              currency={user?.toDomain.settings?.currency}
+              currency={user?.currency}
               onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
@@ -82,18 +82,4 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
   )
 }
 
-const enhance = compose(
-    withDatabase,
-    withObservables([], ({database}) => ({
-      state: database.get('state').findAndObserve('expense-tracker')
-    })),
-    withObservables(['state'], ({state}) => ({
-      user: state.user.observe(),
-      displayedTransactions: observeDisplayedTransactions(state)
-    })),
-    withObservables(['user'], ({user}) => ({
-      categories: user.categories.observe(),
-    }))
-)
-
-export default enhance(Analytics)
+export default enhanceWithCompleteState(Analytics)
