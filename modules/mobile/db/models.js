@@ -64,7 +64,6 @@ export class Transaction extends Model {
       id: this.id,
       kind: this.kind,
       categoryId: this.categoryId,
-      category: this.category,
       amount: {
         value: this.amountValue,
         currency: {

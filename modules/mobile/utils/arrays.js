@@ -7,9 +7,10 @@ export const groupBy = (arr, f) => arr.reduce((acc, item) => {
   return acc
 }, {})
 
-export const createLookup = (arr, f) => arr.reduce((acc, item) => {
-  const key = f(item);
-  acc[key] = item
+export const createLookup = (arr, getKey, mapItem = i => i) => arr.reduce((acc, item) => {
+  const mappedItem = mapItem(item)
+  const key = getKey(mappedItem);
+  acc[key] = mappedItem
   return acc
 }, {})
 

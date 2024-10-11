@@ -11,6 +11,7 @@ import CategoryGroupedTransactionList from '@/components/analytics/list'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
 import {updateStateDisplayDate} from '@/db/operations'
+import {mapTransactions} from '@/db/mappers'
 import {withDatabase, compose, withObservables, useDatabase} from '@nozbe/watermelondb/react'
 
 const kinds = [
@@ -27,10 +28,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
   const [kind, setKind] = useState(kinds[0])
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
-  const analysedTransactions = displayedTransactions.map(t => t.toDomain).filter(tx => tx.category.kind === kind.value)
-
-  console.log('user', user.toDomain)
-  console.log(displayedTransactions[0].category)
+  const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind.value)
 
   useEffect(() => {
     setSelectedTransactions([])
