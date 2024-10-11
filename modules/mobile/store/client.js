@@ -25,10 +25,6 @@ const simpleRequest = (token) => {
 const requestWithBody = (reqBody, method, token) => ({ ...simpleRequest(token), method, body: JSON.stringify(reqBody) })
 
 /* eslint-disable */
-const notConnectedToTheInternet = () => Promise.reject({
-  message: 'Unable to complete the action - no internet connection',
-  status: 500
-})
 
 export const reject = async res => {
   const text = await res.text()
@@ -40,22 +36,6 @@ export const reject = async res => {
   }
 }
 /* eslint-enable */
-
-class StubClient {
-  getUser = () => notConnectedToTheInternet()
-  login = () => notConnectedToTheInternet()
-  createUser = () => notConnectedToTheInternet()
-  updateUserSettings = () => notConnectedToTheInternet()
-  changeUserPassword = () => notConnectedToTheInternet()
-  logout = () => notConnectedToTheInternet()
-  createCategory = () => notConnectedToTheInternet()
-  hideCategory = () => notConnectedToTheInternet()
-  updateCategory = () => notConnectedToTheInternet()
-  getTransactions = () => notConnectedToTheInternet()
-  createTransaction = () => notConnectedToTheInternet()
-  hideTransaction = () => notConnectedToTheInternet()
-  updateTransaction = () => notConnectedToTheInternet()
-}
 
 class BackendClient {
   getUser = (token) =>
@@ -111,10 +91,4 @@ class BackendClient {
           .then(res => res.status === 204 ? requestBody : reject(res))
 }
 
-const onlineClient = new BackendClient()
-const stubClient = new StubClient()
-const clients = {
-  get: isOnline => isOnline ? onlineClient : stubClient
-}
-
-export default clients
+export default new BackendClient()

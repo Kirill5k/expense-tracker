@@ -1,5 +1,5 @@
 import {create} from 'zustand'
-import Clients from './clients'
+import Client from './client'
 import Alerts from './alerts'
 import {insertSorted} from '@/utils/arrays'
 import {defaultDisplayDate} from '@/utils/dates'
@@ -47,7 +47,6 @@ const filtered = (txs, user) => {
 
 const useStore = create((set, get) => ({
   ...DefaultState,
-  isOnline: true,
   alert: null,
   mode: 'light',
   setMode: (mode) => set({mode}),
@@ -110,7 +109,7 @@ const useStore = create((set, get) => ({
   clearUser: () => set({...DefaultState, displayDate: defaultDisplayDate()}),
   login: (creds, showAlert = true) => {
     get().clearAlert()
-    return Clients.get(get().isOnline)
+    return Client
         .login(creds)
         .then(({access_token}) => {
           set({accessToken: access_token, isAuthenticated: true})
@@ -120,7 +119,7 @@ const useStore = create((set, get) => ({
         })
   },
   createAccount: (acc) => {
-    return Clients.get(get().isOnline)
+    return Client
         .createUser(acc)
         .then(() => {
           set({alert: Alerts.REGISTRATION_SUCCESS})
@@ -129,13 +128,13 @@ const useStore = create((set, get) => ({
         .catch(e => handleError(get, e, e.status === 409, e.status !== 409))
   },
   logout: () => {
-    return Clients.get(get().isOnline)
+    return Client
         .logout(get().accessToken)
         .then(() => get().clearUser())
         .catch(err => handleError(get, err))
   },
   getUser: () => {
-    return Clients.get(get().isOnline)
+    return Client
         .getUser(get().accessToken)
         .then(user => {
           if (!get().user?.id || get().user?.id === user.id) {
@@ -146,23 +145,18 @@ const useStore = create((set, get) => ({
           }
         })
   },
-  getTransactions: () => {
-    return Clients.get(get().isOnline)
+  getTransactions: () => Client
         .getTransactions(get().accessToken)
-        .then(txs => get().setTransactions(txs))
-  },
-  updateTransaction: (tx) => Clients
-      .get(get().isOnline)
+        .then(txs => get().setTransactions(txs)),
+  updateTransaction: (tx) => Client
       .updateTransaction(get().accessToken, tx)
       .then(() => get().addUpdatedTransaction(tx))
       .catch(err => handleError(get, err)),
-  createTransaction: (tx) => Clients
-      .get(get().isOnline)
+  createTransaction: (tx) => Client
       .createTransaction(get().accessToken, tx)
       .then(tx => get().addCreatedTransaction(tx))
       .catch(err => handleError(get, err)),
-  hideTransaction: (id, hidden, undoAction) => Clients
-      .get(get().isOnline)
+  hideTransaction: (id, hidden, undoAction) => Client
       .hideTransaction(get().accessToken, {id, hidden})
       .then(() => {
         get().setHiddenForTransaction(id, hidden)
@@ -171,18 +165,15 @@ const useStore = create((set, get) => ({
         }
       })
       .catch(err => handleError(get, err)),
-  createCategory: (cat) => Clients
-      .get(get().isOnline)
+  createCategory: (cat) => Client
       .createCategory(get().accessToken, cat)
       .then(cat => get().addCreatedCategory(cat))
       .catch(err => handleError(get, err)),
-  updateCategory: (cat) => Clients
-      .get(get().isOnline)
+  updateCategory: (cat) => Client
       .updateCategory(get().accessToken, cat)
       .then(() => get().addUpdatedCategory(cat))
       .catch(err => handleError(get, err)),
-  hideCategory: (id, hidden, undoAction) => Clients
-      .get(get().isOnline)
+  hideCategory: (id, hidden, undoAction) => Client
       .hideCategory(get().accessToken, {id, hidden})
       .then(() => {
         get().setHiddenForCategory(id, hidden)
@@ -191,13 +182,11 @@ const useStore = create((set, get) => ({
         }
       })
       .catch(err => handleError(get, err)),
-  updateUserSettings: (settings) => Clients
-      .get(get().isOnline)
+  updateUserSettings: (settings) => Client
       .updateUserSettings(get().accessToken, get().user.id, settings)
       .then(() => set({user: {...(get().user), settings}}))
       .catch(err => handleError(get, err)),
-  changeUserPassword: ({currentPassword, newPassword}) => Clients
-      .get(get().isOnline)
+  changeUserPassword: ({currentPassword, newPassword}) => Client
       .changeUserPassword(get().accessToken, get().user.id, {currentPassword, newPassword})
       .then(() => get().login({email: get().user.email, password: newPassword}, false))
       .then(() => set({alert: Alerts.PASSWORD_CHANGE_SUCCESS}))
