@@ -8,6 +8,7 @@ const Category = tableSchema({
     {name: 'kind', type: 'string'},
     {name: 'color', type: 'string'},
     {name: 'hidden', type: 'boolean', isOptional: true},
+    {name: 'user_id', type: 'string'},
   ],
 })
 
@@ -23,6 +24,7 @@ const Transaction = tableSchema({
     {name: 'note', type: 'string', isOptional: true},
     {name: 'tags', type: 'string', isOptional: true},
     {name: 'hidden', type: 'boolean', isOptional: true},
+    {name: 'user_id', type: 'string'},
   ],
 })
 

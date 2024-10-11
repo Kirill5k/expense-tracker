@@ -32,9 +32,9 @@ const SignIn = () => {
     const fetchData = async () => {
       const user = await Client.getUser(accessToken)
       await saveUser(database, user)
-      await saveCategories(database, user.categories)
+      await saveCategories(database, user.id, user.categories)
       const transactions = await Client.getTransactions(accessToken)
-      await saveTransactions(database, transactions)
+      await saveTransactions(database, user.id, transactions)
       router.push('/analytics')
     }
 

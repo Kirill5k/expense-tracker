@@ -1,8 +1,9 @@
 import {defaultDisplayDate} from '@/utils/dates'
 
-export const saveTransactions = async (database, transactions) => {
+export const saveTransactions = async (database, userId, transactions) => {
   await database.write(async () => {
     const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => {
+      res.userId = userId
       rec._raw.id = tx.id
       rec.categoryId = tx.category.id
       rec.date = tx.date;
@@ -17,9 +18,10 @@ export const saveTransactions = async (database, transactions) => {
   })
 }
 
-export const saveCategories = async (database, categories) => {
+export const saveCategories = async (database, userId, categories) => {
   await database.write(async () => {
     const actions = categories.map(c => database.get('categories').prepareCreate(rec => {
+      res.userId = userId
       rec._raw.id = c.id
       rec.name = c.name
       rec.icon = c.icon
@@ -28,6 +30,18 @@ export const saveCategories = async (database, categories) => {
       rec.hidden = c.hidden || false
     }))
     await database.batch(actions)
+  })
+}
+
+export const updateStateDisplayDate = async (database, displayDate) => {
+  await database.write(async () => {
+    const state = await database.get('state').find('expense-tracker')
+    await state.update(record => {
+      record.displayDateRage = displayDate.range
+      record.displayDateText = displayDate.text
+      record.displayDateStart = displayDate.start.toISOString().slice(0, 10)
+      record.displayDateEnd = displayDate.end.toISOString().slice(0, 10)
+    })
   })
 }
 

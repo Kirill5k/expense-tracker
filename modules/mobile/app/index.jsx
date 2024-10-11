@@ -1,3 +1,4 @@
+import {useEffect, useState} from 'react'
 import {router} from 'expo-router'
 import {Button, ButtonText} from '@/components/ui/button'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
@@ -6,7 +7,6 @@ import {ProgressCircle} from '@/components/common/progress'
 import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
-import {useEffect, useState} from "react";
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)

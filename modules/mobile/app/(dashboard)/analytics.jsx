@@ -10,17 +10,17 @@ import TransactionChart from '@/components/transaction/chart'
 import CategoryGroupedTransactionList from '@/components/analytics/list'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
+import {updateStateDisplayDate} from '@/db/operations'
+import {withDatabase, compose, withObservables, useDatabase} from '@nozbe/watermelondb/react'
 
-const kinds = [{label: 'Spending', value: 'expense'}, {label: 'Income', value: 'income'}]
+const kinds = [
+  {label: 'Spending', value: 'expense'},
+  {label: 'Income', value: 'income'}
+]
 
-const Analytics = () => {
-  const {
-    mode,
-    displayDate,
-    setDisplayDate,
-    user,
-    displayedTransactions
-  } = useStore()
+const Analytics = ({state, user}) => {
+  const database = useDatabase()
+  const {mode, displayedTransactions} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -29,9 +29,9 @@ const Analytics = () => {
 
   const analysedTransactions = displayedTransactions.filter(tx => tx.category.kind === kind.value)
 
-  // useEffect(() => {
-  //   setSelectedTransactions([])
-  // }, [displayDate.text])
+  useEffect(() => {
+    setSelectedTransactions([])
+  }, [state.displayDate.text])
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -61,24 +61,33 @@ const Analytics = () => {
               kind={kind.value}
               mode={mode}
               items={analysedTransactions}
-              displayDate={displayDate}
+              displayDate={state.displayDate}
               currency={user?.settings?.currency}
-              // onChartPress={setSelectedTransactions}
-              onChartPress={() => {}}
+              onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
               className="my-2"
               disabled={loading}
               mode={mode}
-              value={displayDate}
-              onSelect={setDisplayDate}
+              value={state.displayDate}
+              onSelect={(dd) => updateStateDisplayDate(database, dd)}
           />
           <CategoryGroupedTransactionList
-            items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
+              items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
           />
         </ScrollView>
       </VStack>
   )
 }
 
-export default Analytics
+const enhance = compose(
+    withDatabase,
+    withObservables([], ({database}) => ({
+      state: database.get('state').findAndObserve('expense-tracker')
+    })),
+    withObservables(['state'], ({state}) => ({
+      user: state.user.observe()
+    }))
+)
+
+export default enhance(Analytics)

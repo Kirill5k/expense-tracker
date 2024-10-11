@@ -1,5 +1,5 @@
 import {Model} from '@nozbe/watermelondb'
-import {field, relation, writer} from '@nozbe/watermelondb/decorators'
+import {field, relation, writer, children} from '@nozbe/watermelondb/decorators'
 
 export class Category extends Model {
   static table = 'categories'
@@ -9,6 +9,7 @@ export class Category extends Model {
   @field('kind') kind
   @field('color') color
   @field('hidden') hidden
+  @field('user_id') userId
 
   get isNotHidden() {
     return this.hidden !== true
@@ -43,6 +44,7 @@ export class Transaction extends Model {
   @field('note') note
   @field('tags') tags
   @field('hidden') hidden
+  @field('user_id') userId
 
   @relation('categories', 'category_id') category
 
@@ -79,6 +81,10 @@ export class Transaction extends Model {
 
 export class User extends Model {
   static table = 'users'
+  static associations = {
+    categories: { type: 'has_many', foreignKey: 'categories' },
+    transactions: { type: 'has_many', foreignKey: 'transactions' },
+  }
 
   @field('first_name') firstName
   @field('last_name') lastName
@@ -89,6 +95,9 @@ export class User extends Model {
   @field('settings_dark_mode') settingsDarkMode
   @field('total_transaction_count') totalTransactionCount
   @field('registration_date') registrationDate
+
+  @children('categories') categories
+  @children('transactions') transactions
 
   get toDomain() {
     return {
@@ -121,4 +130,13 @@ export class State extends Model {
   @field('display_date_end') displayDateEnd
 
   @relation('users', 'user_id') user
+
+  get displayDate() {
+    return {
+      range: this.displayDateRange,
+      text: this.displayDateText,
+      start: new Date(this.displayDateStart),
+      end: new Date(this.displayDateEnd)
+    }
+  }
 }
