@@ -72,7 +72,7 @@ export class Transaction extends Model {
       },
       date: this.date,
       note: this.note,
-      tags: this.tags === null ? null : this.tags.split(','),
+      tags: this.tags === null || this.tags === '' ? [] : this.tags.split(','),
       hidden: this.hidden
     }
   }
