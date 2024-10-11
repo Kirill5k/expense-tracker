@@ -18,9 +18,9 @@ const kinds = [
   {label: 'Income', value: 'income'}
 ]
 
-const Analytics = ({state, user}) => {
+const Analytics = ({state, user, displayedTransactions}) => {
   const database = useDatabase()
-  const {mode, displayedTransactions} = useStore()
+  const {mode} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -86,7 +86,8 @@ const enhance = compose(
       state: database.get('state').findAndObserve('expense-tracker')
     })),
     withObservables(['state'], ({state}) => ({
-      user: state.user.observe()
+      user: state.user.observe(),
+      displayedTransactions: state.displayedTransactions.observe()
     }))
 )
 
