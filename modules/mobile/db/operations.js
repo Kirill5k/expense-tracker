@@ -1,13 +1,31 @@
 import {defaultDisplayDate} from '@/utils/dates'
 
+export const saveTransactions = async (database, transactions) => {
+  await database.write(async () => {
+    const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => {
+      rec._raw.id = tx.id
+      rec.categoryId = tx.category.id
+      rec.date = tx.date;
+      rec.amountValue = tx.amount.value;
+      rec.amountCurrencyCode = tx.amount.currency.code;
+      rec.amountCurrencySymbol = tx.amount.currency.symbol;
+      rec.note = tx.note;
+      rec.tags = (tx.tags || []).join(',');
+      rec.hidden = tx.hidden || false
+    }))
+    await database.batch(...actions)
+  })
+}
+
 export const saveCategories = async (database, categories) => {
   await database.write(async () => {
     const actions = categories.map(c => database.get('categories').prepareCreate(rec => {
-      rec.name = c.name;
-      rec.icon = c.icon;
-      rec.kind = c.kind;
-      rec.color = c.color;
-      rec.hidden = c.hidden || false;
+      rec._raw.id = c.id
+      rec.name = c.name
+      rec.icon = c.icon
+      rec.kind = c.kind
+      rec.color = c.color
+      rec.hidden = c.hidden || false
     }))
     await database.batch(...actions)
   })
