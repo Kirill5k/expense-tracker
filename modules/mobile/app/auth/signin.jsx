@@ -74,7 +74,11 @@ const SignIn = () => {
               </HStack>
             </VStack>
         )}
-        {accessToken && <ProgressCircle mode={mode}/>}
+        {accessToken && (
+            <VStack className="w-full h-full justify-center items-center">
+              <ProgressCircle mode={mode}/>
+            </VStack>
+        )}
       </AuthLayout>
   )
 }
