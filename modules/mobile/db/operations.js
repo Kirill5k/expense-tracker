@@ -73,6 +73,8 @@ export const saveUser = async (database, user) => {
         foundUser.settingsCurrencySymbol = user.settings.currency.symbol
         foundUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
         foundUser.settingsDarkMode = user.settings.darkMode
+        foundUser.totalTransactionCount = user.totalTransactionCount
+        foundUser.registrationDate = user.registrationDate
       })
     } catch (err) {
       await database.get('users').create(newUser => {
@@ -84,6 +86,8 @@ export const saveUser = async (database, user) => {
         newUser.settingsCurrencySymbol = user.settings.currency.symbol
         newUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
         newUser.settingsDarkMode = user.settings.darkMode
+        newUser.totalTransactionCount = user.totalTransactionCount
+        newUser.registrationDate = user.registrationDate
       })
     }
     const state = await database.get('state').find('expense-tracker')

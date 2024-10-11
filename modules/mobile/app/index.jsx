@@ -6,26 +6,29 @@ import {ProgressCircle} from '@/components/common/progress'
 import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
+import {useEffect, useState} from "react";
 
-const Index = ({state}) => {
+const Index = ({state, user}) => {
+  const [isLoading, setIsLoading] = useState(true)
   const colorScheme = useColorScheme()
-  const {isLoading, mode, setMode} = useStore()
+  const {mode, setMode} = useStore()
 
   //TODO: update mode when user updates settings
-  if (state?.user?.settings?.darkMode === true) {
-    setMode('dark')
-  } else if (state?.user?.settings?.darkMode === false) {
-    setMode('light')
-  } else {
-    setMode(colorScheme === ' dark' ? 'dark' : 'light')
-  }
+  useEffect(() => {
+    if (user?.settings?.darkMode === true) {
+      setMode('dark')
+    } else if (user?.settings?.darkMode === false) {
+      setMode('light')
+    } else {
+      setMode(colorScheme === ' dark' ? 'dark' : 'light')
+    }
 
-  console.log('state', state)
-
-  if (state.isAuthenticated && state.user) {
-    console.log('going to analytics')
-    router.push('/analytics')
-  }
+    if (state.isAuthenticated && user) {
+      setTimeout(() => router.push('/analytics'), 1000)
+    } else {
+      setIsLoading(false)
+    }
+  }, [state]);
 
   return (
       <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">
@@ -47,9 +50,11 @@ const Index = ({state}) => {
 const enhance = compose(
     withDatabase,
     withObservables([], ({database}) => ({
-          state: database.get('state').findAndObserve('expense-tracker'),
-        }),
-    )
+      state: database.get('state').findAndObserve('expense-tracker'),
+    })),
+    withObservables(['state'], ({state}) => ({
+      user: state.user.observe()
+    }))
 )
 
 export default enhance(Index)

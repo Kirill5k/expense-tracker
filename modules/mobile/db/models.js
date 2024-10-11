@@ -120,5 +120,5 @@ export class State extends Model {
   @field('display_date_start') displayDateStart
   @field('display_date_end') displayDateEnd
 
-  @relation('users', 'user_id') category
+  @relation('users', 'user_id') user
 }
