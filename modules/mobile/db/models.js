@@ -1,6 +1,5 @@
 import {Model} from '@nozbe/watermelondb'
-import {field, relation, writer, children, lazy} from '@nozbe/watermelondb/decorators'
-import {Q} from '@nozbe/watermelondb'
+import {field, relation, writer, children} from '@nozbe/watermelondb/decorators'
 
 export class Category extends Model {
   static table = 'categories'
@@ -130,13 +129,6 @@ export class State extends Model {
   @field('display_date_end') displayDateEnd
 
   @relation('users', 'user_id') user
-
-  @lazy displayedTransactions = this.collections.get('transactions').query(
-      Q.where('date', Q.gte(this.displayDateStart)),
-      Q.where('date', Q.lte(this.displayDateEnd)),
-      Q.where('hidden', Q.notEq(true)),
-      Q.sortBy('date', Q.desc),
-  )
 
   get displayDate() {
     return {

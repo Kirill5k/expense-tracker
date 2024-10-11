@@ -1,4 +1,6 @@
 import {defaultDisplayDate} from '@/utils/dates'
+import {nonEmpty} from '@/utils/arrays'
+import {toIsoDateString} from '@/utils/dates'
 
 export const saveTransactions = async (database, userId, transactions) => {
   await database.write(async () => {
@@ -6,12 +8,12 @@ export const saveTransactions = async (database, userId, transactions) => {
       rec._raw.id = tx.id
       rec.userId = userId
       rec.categoryId = tx.category.id
-      rec.date = tx.date;
-      rec.amountValue = tx.amount.value;
-      rec.amountCurrencyCode = tx.amount.currency.code;
-      rec.amountCurrencySymbol = tx.amount.currency.symbol;
-      rec.note = tx.note;
-      rec.tags = (tx.tags || []).join(',');
+      rec.date = tx.date
+      rec.amountValue = tx.amount.value
+      rec.amountCurrencyCode = tx.amount.currency.code
+      rec.amountCurrencySymbol = tx.amount.currency.symbol
+      rec.note = tx.note
+      rec.tags = nonEmpty(tx.tags) ? tx.tags.join(',') : null
       rec.hidden = tx.hidden || false
     }))
     await database.batch(actions)
@@ -37,10 +39,10 @@ export const updateStateDisplayDate = async (database, displayDate) => {
   await database.write(async () => {
     const state = await database.get('state').find('expense-tracker')
     await state.update(record => {
-      record.displayDateRage = displayDate.range
+      record.displayDateRange = displayDate.range
       record.displayDateText = displayDate.text
-      record.displayDateStart = displayDate.start.toISOString().slice(0, 10)
-      record.displayDateEnd = displayDate.end.toISOString().slice(0, 10)
+      record.displayDateStart = toIsoDateString(displayDate.start)
+      record.displayDateEnd = toIsoDateString(displayDate.end)
     })
   })
 }
@@ -68,8 +70,8 @@ export const initState = async (database) => {
         state.userId = null
         state.displayDateRange = dd.range
         state.displayDateText = dd.text
-        state.displayDateStart = dd.start.toISOString().slice(0, 10)
-        state.displayDateEnd = dd.end.toISOString().slice(0, 10)
+        state.displayDateStart = toIsoDateString(dd.start)
+        state.displayDateEnd = toIsoDateString(dd.end)
       })
     }
   })

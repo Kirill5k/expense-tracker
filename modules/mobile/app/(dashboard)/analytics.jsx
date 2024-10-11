@@ -12,6 +12,7 @@ import Classes from '@/constants/classes'
 import useStore from '@/store'
 import {updateStateDisplayDate} from '@/db/operations'
 import {mapTransactions} from '@/db/mappers'
+import {observeDisplayedTransactions} from '@/db/observers'
 import {withDatabase, compose, withObservables, useDatabase} from '@nozbe/watermelondb/react'
 
 const kinds = [
@@ -32,7 +33,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
 
   useEffect(() => {
     setSelectedTransactions([])
-  }, [state.displayDate.text])
+  }, [state.displayDateText])
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -63,7 +64,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
               mode={mode}
               items={analysedTransactions}
               displayDate={state.displayDate}
-              currency={user?.settings?.currency}
+              currency={user?.toDomain.settings?.currency}
               onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
@@ -88,7 +89,7 @@ const enhance = compose(
     })),
     withObservables(['state'], ({state}) => ({
       user: state.user.observe(),
-      displayedTransactions: state.displayedTransactions.observe()
+      displayedTransactions: observeDisplayedTransactions(state)
     })),
     withObservables(['user'], ({user}) => ({
       categories: user.categories.observe(),
