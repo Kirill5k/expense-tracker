@@ -14,3 +14,7 @@ export const mapTransactions = (dbTxs, dbCats, dbUser) => {
             (user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
       })
 }
+
+export const mapCategories = (dbCats) => {
+  return dbCats.map(c => c.toDomain)
+}

@@ -2,6 +2,15 @@ import {defaultDisplayDate} from '@/utils/dates'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
 
+const updateCatRec = (rec, c) => {
+  rec.userId = c.userId
+  rec.name = c.name
+  rec.icon = c.icon
+  rec.kind = c.kind
+  rec.color = c.color
+  rec.hidden = c.hidden || false
+}
+
 const updateTxRec = (rec, tx) => {
   rec.categoryId = tx.category.id
   rec.date = tx.date
@@ -24,6 +33,28 @@ const updateUserRec = (rec, user) => {
   rec.settingsDarkMode = user.settings.darkMode
   rec.totalTransactionCount = user.totalTransactionCount
   rec.registrationDate = user.registrationDate
+}
+
+export const hideCategory = async (database, catid, hidden) => {
+  await database.write(async () => {
+    const cat = await database.get('categories').find(catid)
+    await cat.update(rec => {
+      rec.hidden = hidden
+    })
+  })
+}
+
+export const createCategory = async (database, cat) => {
+  await database.write(async () => {
+    await database.get('categories').create(rec => updateCatRec(rec, cat))
+  })
+}
+
+export const updateCategory = async (database, cat) => {
+  await database.write(async () => {
+    const found = await database.get('categories').find(cat.id)
+    await found.update(rec => updateCatRec(rec ,cat))
+  })
 }
 
 export const hideTransaction = async (database, txid, hidden) => {
@@ -50,7 +81,11 @@ export const updateTransaction = async (database, tx) => {
 
 export const saveTransactions = async (database, userId, transactions) => {
   await database.write(async () => {
-    const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => updateTxRec(rec, tx)))
+    const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => {
+      updateTxRec(rec, tx)
+      rec._raw.id = tx.id
+      rec.userId = userId
+    }))
     await database.batch(actions)
   })
 }
@@ -58,13 +93,9 @@ export const saveTransactions = async (database, userId, transactions) => {
 export const saveCategories = async (database, userId, categories) => {
   await database.write(async () => {
     const actions = categories.map(c => database.get('categories').prepareCreate(rec => {
+      updateCatRec(rec, c)
       rec._raw.id = c.id
       rec.userId = userId
-      rec.name = c.name
-      rec.icon = c.icon
-      rec.kind = c.kind
-      rec.color = c.color
-      rec.hidden = c.hidden || false
     }))
     await database.batch(actions)
   })

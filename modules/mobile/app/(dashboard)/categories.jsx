@@ -9,37 +9,36 @@ import CategoryList from '@/components/category/list'
 import CategoryForm from '@/components/category/form'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
-import {enhanceWithCompleteState} from '@/db/observers'
+import {mapCategories} from '@/db/mappers'
+import {enhanceWithCategories} from '@/db/observers'
+import {createCategory, updateCategory, hideCategory} from '@/db/operations'
+import {useDatabase} from '@nozbe/watermelondb/react'
 
-const Categories = () => {
+const Categories = ({user, categories, state}) => {
+  const database = useDatabase()
+  const {mode, setUndoAlert} = useStore()
+
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [catToUpdate, setCatToUpdate] = useState(null)
 
-  const {
-    mode,
-    displayedCategories,
-    createCategory,
-    updateCategory,
-    hideCategory
-  } = useStore()
+  const displayedCategories = mapCategories(categories)
+  const withUserId = obj => ({...obj, userId: user.id})
 
   const handleFormSubmit = (cat) => {
+    setLoading(true)
     setShowModal(false)
     setCatToUpdate(null)
-    setLoading(true)
-    const res = cat.id ? updateCategory(cat) : createCategory(cat)
+    const res = cat.id ? updateCategory(database, withUserId(cat)) : createCategory(database, withUserId(cat))
     return res.then(() => setLoading(false))
   }
 
   const handleItemDelete = (cat) => {
-    const setHidden = (hidden, undoAction) => {
-      setLoading(true)
-      hideCategory(cat.id, hidden, undoAction).then(() => setLoading(false))
-    }
-
-    setHidden(true, () => setHidden(false, null))
+    setLoading(true)
+    hideCategory(database, cat.id, true)
+        .then(() => setUndoAlert('Category has been deleted', () => hideCategory(database, cat.id, false)))
+        .then(() => setLoading(false))
   }
 
   return (
@@ -95,4 +94,4 @@ const Categories = () => {
   )
 }
 
-export default Categories
+export default enhanceWithCategories(Categories)

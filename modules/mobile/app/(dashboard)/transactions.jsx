@@ -15,7 +15,6 @@ import {updateStateDisplayDate, updateTransaction, createTransaction, hideTransa
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
 
-
 const Transactions = ({state, user, displayedTransactions, categories}) => {
   const database = useDatabase()
   const {mode, setUndoAlert} = useStore()
@@ -27,7 +26,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
 
   const incomeCategories = categories.filter(c => c.kind === 'income').map(c => c.toDomain)
   const expenseCategories = categories.filter(c => c.kind === 'expense').map(c => c.toDomain)
-  const transactions =  mapTransactions(displayedTransactions, categories, user)
+  const transactions = mapTransactions(displayedTransactions, categories, user)
   const withUserId = obj => ({...obj, userId: user.id})
 
   const handleFormSubmit = (tx) => {
