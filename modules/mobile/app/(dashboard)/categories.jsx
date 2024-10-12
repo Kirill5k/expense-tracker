@@ -9,6 +9,7 @@ import CategoryList from '@/components/category/list'
 import CategoryForm from '@/components/category/form'
 import Classes from '@/constants/classes'
 import useStore from '@/store'
+import {enhanceWithCompleteState} from '@/db/observers'
 
 const Categories = () => {
   const [isScrolling, setIsScrolling] = useState(false)

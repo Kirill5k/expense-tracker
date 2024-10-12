@@ -11,13 +11,14 @@ import {ProgressBar} from '@/components/common/progress'
 import useStore from '@/store'
 import Classes from '@/constants/classes'
 import {mapTransactions} from '@/db/mappers'
-import {updateStateDisplayDate} from '@/db/operations'
+import {updateStateDisplayDate, updateTransaction, createTransaction, hideTransaction} from '@/db/operations'
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
 
+
 const Transactions = ({state, user, displayedTransactions, categories}) => {
   const database = useDatabase()
-  const {mode} = useStore()
+  const {mode, setUndoAlert} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -27,28 +28,21 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const incomeCategories = categories.filter(c => c.kind === 'income').map(c => c.toDomain)
   const expenseCategories = categories.filter(c => c.kind === 'expense').map(c => c.toDomain)
   const transactions =  mapTransactions(displayedTransactions, categories, user)
-
-  // const {
-  //   createTransaction,
-  //   updateTransaction,
-  //   hideTransaction
-  // } = useStore()
+  const withUserId = obj => ({...obj, userId: user.id})
 
   const handleFormSubmit = (tx) => {
     setTxToUpdate(null)
     setShowModal(false)
     setLoading(true)
-    const res = tx.id ? updateTransaction(tx) : createTransaction(tx)
+    const res = tx.id ? updateTransaction(database, withUserId(tx)) : createTransaction(database, withUserId(tx))
     return res.then(() => setLoading(false))
   }
 
   const handleItemDelete = (tx) => {
-    const setHidden = (hidden, undoAction) => {
-      setLoading(true)
-      hideTransaction(tx.id, hidden, undoAction).then(() => setLoading(false))
-    }
-
-    setHidden(true, () => setHidden(false, null))
+    setLoading(true)
+    hideTransaction(database, tx.id, true)
+        .then(() => setUndoAlert('Transaction has been deleted', () => hideTransaction(database, tx.id, false)))
+        .then(() => setLoading(false))
   }
 
   const handleItemCopy = (tx) => {

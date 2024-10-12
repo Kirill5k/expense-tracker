@@ -6,7 +6,8 @@ import {VStack} from '@/components/ui/vstack'
 import {ProgressCircle} from '@/components/common/progress'
 import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
-import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
+import {enhanceWithUser} from '@/db/observers'
+
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -15,9 +16,9 @@ const Index = ({state, user}) => {
 
   //TODO: update mode when user updates settings
   useEffect(() => {
-    if (user?.settings?.darkMode === true) {
+    if (user?.settingsDarkMode === true) {
       setMode('dark')
-    } else if (user?.settings?.darkMode === false) {
+    } else if (user?.settingsDarkMode === false) {
       setMode('light')
     } else {
       setMode(colorScheme === ' dark' ? 'dark' : 'light')
@@ -44,17 +45,7 @@ const Index = ({state, user}) => {
         )}
         {isLoading && <ProgressCircle mode={mode}/>}
       </SafeAreaView>
-  );
-};
+  )
+}
 
-const enhance = compose(
-    withDatabase,
-    withObservables([], ({database}) => ({
-      state: database.get('state').findAndObserve('expense-tracker'),
-    })),
-    withObservables(['state'], ({state}) => ({
-      user: state.user.observe()
-    }))
-)
-
-export default enhance(Index)
+export default enhanceWithUser(Index)
