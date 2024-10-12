@@ -9,6 +9,7 @@ export const observeDisplayedTransactions = (state) => {
           state.collections.get('transactions').query(
               Q.where('date', Q.gte(currentState.displayDateStart)),
               Q.where('date', Q.lte(currentState.displayDateEnd)),
+              Q.where('user_id', Q.lte(currentState.userId)),
               Q.where('hidden', Q.notEq(true)),
               Q.sortBy('date', Q.desc),
           ).observe()

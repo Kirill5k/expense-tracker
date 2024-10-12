@@ -2,20 +2,55 @@ import {defaultDisplayDate} from '@/utils/dates'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
 
+const updateTxRec = (rec, tx) => {
+  rec.categoryId = tx.category.id
+  rec.date = tx.date
+  rec.userId = tx.userId
+  rec.amountValue = tx.amount.value
+  rec.amountCurrencyCode = tx.amount.currency.code
+  rec.amountCurrencySymbol = tx.amount.currency.symbol
+  rec.note = tx.note
+  rec.tags = nonEmpty(tx.tags) ? tx.tags.join(',') : null
+  rec.hidden = tx.hidden || false
+}
+
+const updateUserRec = (rec, user) => {
+  rec.firstName = user.firstName
+  rec.lastName = user.lastName
+  rec.email = user.email
+  rec.settingsCurrencyCode = user.settings.currency.code
+  rec.settingsCurrencySymbol = user.settings.currency.symbol
+  rec.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
+  rec.settingsDarkMode = user.settings.darkMode
+  rec.totalTransactionCount = user.totalTransactionCount
+  rec.registrationDate = user.registrationDate
+}
+
+export const hideTransaction = async (database, txid, hidden) => {
+  await database.write(async () => {
+    const tx = await database.get('transactions').find(txid)
+    await tx.update(rec => {
+      rec.hidden = hidden
+    })
+  })
+}
+
+export const createTransaction = async (database, tx) => {
+  await database.write(async () => {
+    await database.get('transactions').create(rec => updateTxRec(rec, tx))
+  })
+}
+
+export const updateTransaction = async (database, tx) => {
+  await database.write(async () => {
+    const tx = await database.get('transactions').find(tx.id)
+    await tx.update(rec => updateTxRec(rec ,tx))
+  })
+}
+
 export const saveTransactions = async (database, userId, transactions) => {
   await database.write(async () => {
-    const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => {
-      rec._raw.id = tx.id
-      rec.userId = userId
-      rec.categoryId = tx.category.id
-      rec.date = tx.date
-      rec.amountValue = tx.amount.value
-      rec.amountCurrencyCode = tx.amount.currency.code
-      rec.amountCurrencySymbol = tx.amount.currency.symbol
-      rec.note = tx.note
-      rec.tags = nonEmpty(tx.tags) ? tx.tags.join(',') : null
-      rec.hidden = tx.hidden || false
-    }))
+    const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => updateTxRec(rec, tx)))
     await database.batch(actions)
   })
 }
@@ -81,29 +116,11 @@ export const saveUser = async (database, user) => {
   await database.write(async () => {
     try {
       const foundUser = await database.get('users').find(user.id)
-      foundUser.update(foundUser => {
-        foundUser.firstName = user.firstName
-        foundUser.lastName = user.lastName
-        foundUser.email = user.email
-        foundUser.settingsCurrencyCode = user.settings.currency.code
-        foundUser.settingsCurrencySymbol = user.settings.currency.symbol
-        foundUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
-        foundUser.settingsDarkMode = user.settings.darkMode
-        foundUser.totalTransactionCount = user.totalTransactionCount
-        foundUser.registrationDate = user.registrationDate
-      })
+      foundUser.update(rec => updateUserRec(rec, user))
     } catch (err) {
-      await database.get('users').create(newUser => {
-        newUser._raw.id = user.id
-        newUser.firstName = user.firstName
-        newUser.lastName = user.lastName
-        newUser.email = user.email
-        newUser.settingsCurrencyCode = user.settings.currency.code
-        newUser.settingsCurrencySymbol = user.settings.currency.symbol
-        newUser.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
-        newUser.settingsDarkMode = user.settings.darkMode
-        newUser.totalTransactionCount = user.totalTransactionCount
-        newUser.registrationDate = user.registrationDate
+      await database.get('users').create(rec => {
+        rec._raw.id = user.id
+        updateUserRec(rec, user)
       })
     }
     const state = await database.get('state').find('expense-tracker')
