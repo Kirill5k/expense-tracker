@@ -1,5 +1,6 @@
 import {Model} from '@nozbe/watermelondb'
-import {field, relation, writer, children} from '@nozbe/watermelondb/decorators'
+import {field, relation, writer, children, lazy} from '@nozbe/watermelondb/decorators'
+import {Q} from '@nozbe/watermelondb'
 
 export class Category extends Model {
   static table = 'categories'
@@ -97,6 +98,9 @@ export class User extends Model {
 
   @children('categories') categories
   @children('transactions') transactions
+
+  @lazy activeCategories = this.categories.extend(Q.where('hidden', false))
+  @lazy activeTransactions = this.categories.extend(Q.where('hidden', false))
 
   get currency() {
     return {

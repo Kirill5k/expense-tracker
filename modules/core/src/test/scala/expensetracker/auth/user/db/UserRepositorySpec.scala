@@ -22,7 +22,7 @@ import scala.concurrent.Future
 class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
   override protected val mongoPort: Int        = 12346
-  override protected val mongoVersion: Version = Version.V6_0_2
+  override protected val mongoVersion: Version = Version.V7_0_2
 
   "An UserRepository" when {
 
