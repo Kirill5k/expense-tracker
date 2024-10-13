@@ -93,7 +93,6 @@ export class User extends Model {
   @field('settings_currency_symbol') settingsCurrencySymbol
   @field('settings_future_transaction_visibility_days') settingsFutureTransactionVisibilityDays
   @field('settings_dark_mode') settingsDarkMode
-  @field('total_transaction_count') totalTransactionCount
   @field('registration_date') registrationDate
 
   @children('categories') categories
@@ -122,7 +121,6 @@ export class User extends Model {
         futureTransactionVisibilityDays: this.settingsFutureTransactionVisibilityDays,
         darkMode: this.settingsDarkMode,
       },
-      totalTransactionCount: this.totalTransactionCount,
       registrationDate: this.registrationDate
     }
   }

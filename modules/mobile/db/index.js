@@ -4,18 +4,13 @@ import {setGenerator} from '@nozbe/watermelondb/utils/common/randomId'
 import {ObjectId} from 'bson'
 import {User, Transaction, Category, State} from './models'
 import {initState} from './operations'
-
 import schema from './schema'
-import migrations from './migrations'
-// import Post from './model/Post' // ⬅️ You'll import your Models here
 
 setGenerator(() => new ObjectId().toHexString())
 
-// First, create the adapter to the underlying database:
 const adapter = new SQLiteAdapter({
   schema,
-  // (You might want to comment it out for development purposes -- see Migrations documentation)
-  migrations,
+  // migrations,
   // (optional database name or file system path)
   dbName: 'et-7',
   // (recommended option, should work flawlessly out of the box on iOS. On Android,
@@ -28,7 +23,6 @@ const adapter = new SQLiteAdapter({
   }
 })
 
-// Then, make a Watermelon database from it!
 const database = new Database({
   adapter,
   modelClasses: [

@@ -42,7 +42,6 @@ const updateUserRec = (rec, user) => {
   rec.settingsCurrencySymbol = user.settings.currency.symbol
   rec.settingsFutureTransactionVisibilityDays = user.settings.futureTransactionVisibilityDays
   rec.settingsDarkMode = user.settings.darkMode
-  rec.totalTransactionCount = user.totalTransactionCount
   rec.registrationDate = user.registrationDate
 }
 
