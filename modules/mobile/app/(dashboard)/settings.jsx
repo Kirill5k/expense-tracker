@@ -20,7 +20,7 @@ import Client from '@/store/client'
 import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {useDatabase} from '@nozbe/watermelondb/react'
-import {enhanceWithUser} from '@/db/observers'
+import {enhanceWithUserAndTxCount} from '@/db/observers'
 import {
   updateUserFutureTransactionVisibilityDays,
   updateUserDarkMode,
@@ -51,7 +51,7 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 
 const showSecuritySettings = false
 
-const Settings = ({user, state}) => {
+const Settings = ({user, state, totalTransactionCount}) => {
   const colorScheme = useColorScheme()
   const database = useDatabase()
   const {mode, setMode, logout, changeUserPassword} = useStore()
@@ -111,7 +111,7 @@ const Settings = ({user, state}) => {
               }
             }}
         >
-          <Profile user={user.toDomain}/>
+          <Profile user={{...user.toDomain, totalTransactionCount}}/>
           <Heading className="py-2" size="xl">
             General
           </Heading>
@@ -245,4 +245,4 @@ const Settings = ({user, state}) => {
   )
 }
 
-export default enhanceWithUser(Settings)
+export default enhanceWithUserAndTxCount(Settings)

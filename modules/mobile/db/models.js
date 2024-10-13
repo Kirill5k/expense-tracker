@@ -100,7 +100,7 @@ export class User extends Model {
   @children('transactions') transactions
 
   @lazy activeCategories = this.categories.extend(Q.where('hidden', false))
-  @lazy activeTransactions = this.categories.extend(Q.where('hidden', false))
+  @lazy activeTransactions = this.transactions.extend(Q.where('hidden', false))
 
   get currency() {
     return {

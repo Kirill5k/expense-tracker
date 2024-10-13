@@ -37,6 +37,11 @@ const transactionsObservable =
       )
     }))
 
+const transactionCountObservable =
+    withObservables(['user'], ({user}) => ({
+      totalTransactionCount: user.activeTransactions.observeCount(),
+    }))
+
 export const enhanceWithCompleteState = compose(
     withDatabase,
     stateObservable,
@@ -56,4 +61,11 @@ export const enhanceWithUser = compose(
     withDatabase,
     stateObservable,
     userObservable
+)
+
+export const enhanceWithUserAndTxCount = compose(
+    withDatabase,
+    stateObservable,
+    userObservable,
+    transactionCountObservable
 )
