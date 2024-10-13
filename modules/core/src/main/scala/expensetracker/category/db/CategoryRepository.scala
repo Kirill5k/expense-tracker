@@ -3,7 +3,7 @@ package expensetracker.category.db
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import expensetracker.category.{Category, CategoryId, CreateCategory}
+import expensetracker.category.{Category, CategoryId, CategoryKind, CreateCategory}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
@@ -11,7 +11,7 @@ import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.MongoJsonCodecs
-import mongo4cats.operations.Filter
+import mongo4cats.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 
@@ -64,7 +64,15 @@ final private class LiveCategoryRepository[F[_]](
 
   override def update(cat: Category): F[Unit] =
     collection
-      .replaceOne(userIdEq(cat.userId) && idEq(cat.id.toObjectId), CategoryEntity.from(cat))
+      .updateOne(
+        userIdEq(cat.userId) && idEq(cat.id.toObjectId),
+        Update
+          .set(Field.Kind, cat.kind)
+          .set(Field.Name, cat.name)
+          .set(Field.Icon, cat.icon)
+          .set(Field.Color, cat.color)
+          .currentDate(Field.LastUpdatedAt)
+      )
       .flatMap(errorIfNoMatches(AppError.CategoryDoesNotExist(cat.id)))
 
   override def assignDefault(uid: UserId): F[Unit] =
@@ -88,4 +96,6 @@ final private class LiveCategoryRepository[F[_]](
 
 object CategoryRepository extends MongoJsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F]): F[CategoryRepository[F]] =
-    db.getCollectionWithCodec[CategoryEntity]("categories").map(LiveCategoryRepository[F](_))
+    db.getCollectionWithCodec[CategoryEntity]("categories")
+      .map(_.withAddedCodec[CategoryKind])
+      .map(LiveCategoryRepository[F](_))

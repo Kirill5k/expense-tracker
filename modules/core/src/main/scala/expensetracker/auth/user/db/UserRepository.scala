@@ -90,7 +90,7 @@ final private class LiveUserRepository[F[_]](
 
   override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     collection
-      .updateOne(idEq(uid.toObjectId), Update.set(Field.Settings, settings))
+      .updateOne(idEq(uid.toObjectId), Update.set(Field.Settings, settings).currentDate(Field.LastUpdatedAt))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
 
   override def updatePassword(uid: UserId)(password: PasswordHash): F[Unit] =

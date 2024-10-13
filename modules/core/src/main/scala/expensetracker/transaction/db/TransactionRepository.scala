@@ -7,6 +7,7 @@ import cats.syntax.applicativeError.*
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
+import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
@@ -14,9 +15,10 @@ import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.client.ClientSession
-import mongo4cats.operations.{Aggregate, Filter, Sort}
+import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
+import squants.Money
 
 import java.time.Instant
 
@@ -79,12 +81,17 @@ final private class LiveTransactionRepository[F[_]](
 
   override def update(tx: Transaction): F[Unit] =
     collection
-      .findOneAndReplace(
+      .updateOne(
         userIdEq(tx.userId) && idEq(tx.id.toObjectId),
-        TransactionEntity.from(tx)
+        Update
+          .set(Field.CId, tx.categoryId.toObjectId)
+          .set(Field.Amount, tx.amount)
+          .set(Field.Note, tx.note)
+          .set(Field.Date, tx.date)
+          .set(Field.Tags, tx.tags)
+          .currentDate(Field.LastUpdatedAt)
       )
-      .unwrapOpt(TransactionDoesNotExist(tx.id))
-      .void
+      .flatMap(errorIfNoMatches(TransactionDoesNotExist(tx.id)))
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
@@ -109,7 +116,8 @@ final private class LiveTransactionRepository[F[_]](
       .map(_ > 0)
 }
 
-object TransactionRepository extends MongoJsonCodecs:
+object TransactionRepository extends MongoJsonCodecs with JsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F], cs: ClientSession[F], acid: Boolean = true): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
+      .map(_.withAddedCodec[Money])
       .map(coll => LiveTransactionRepository[F](coll, cs, acid))
