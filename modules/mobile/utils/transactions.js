@@ -18,8 +18,16 @@ export const formatAmount = (tx) => {
   return printAmount(amount, tx.amount.currency)
 }
 
-export const printAmount = (total, currency) =>
-    `${total < 0 ? '-' : '+'}${currency.symbol}${Math.abs(total).toFixed(2)}`
+export const printAmount = (total, currency, withSign = true) => {
+  const formattedNumber = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: total > 10000 ? 0 : 2,
+    maximumFractionDigits: total > 10000 ? 0 : 2,
+  }).format(Math.abs(total))
+
+  const sign = withSign ? (total < 0 ? '-' : '+') : '';
+
+  return `${sign}${currency.symbol}${formattedNumber}`
+}
 
 export const formatDate = (tx) => {
   const date = parseISO(tx.date);

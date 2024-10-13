@@ -2,6 +2,17 @@ import {defaultDisplayDate} from '@/utils/dates'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
 
+const resetStateRec = (rec) => {
+  const dd = defaultDisplayDate()
+  rec.isAuthenticated = false
+  rec.accessToken = null
+  rec.userId = null
+  rec.displayDateRange = dd.range
+  rec.displayDateText = dd.text
+  rec.displayDateStart = toIsoDateString(dd.start)
+  rec.displayDateEnd = toIsoDateString(dd.end)
+}
+
 const updateCatRec = (rec, c) => {
   rec.userId = c.userId
   rec.name = c.name
@@ -53,7 +64,7 @@ export const createCategory = async (database, cat) => {
 export const updateCategory = async (database, cat) => {
   await database.write(async () => {
     const found = await database.get('categories').find(cat.id)
-    await found.update(rec => updateCatRec(rec ,cat))
+    await found.update(rec => updateCatRec(rec, cat))
   })
 }
 
@@ -75,7 +86,7 @@ export const createTransaction = async (database, tx) => {
 export const updateTransaction = async (database, tx) => {
   await database.write(async () => {
     const found = await database.get('transactions').find(tx.id)
-    await found.update(rec => updateTxRec(rec ,tx))
+    await found.update(rec => updateTxRec(rec, tx))
   })
 }
 
@@ -123,21 +134,25 @@ export const updateStateAuthStatus = async (database, accessToken) => {
   })
 }
 
+export const resetState = async (database) => {
+  const txsToDelete = await database.get('transactions').query().fetch()
+  const catsToDelete = await database.get('categories').query().fetch()
+  await database.write(async () => {
+    const state = await database.get('state').find('expense-tracker')
+    await state.update(rec => resetStateRec(rec))
+    await database.batch(txsToDelete.map(t => t.prepareDestroyPermanently()))
+    await database.batch(catsToDelete.map(c => c.prepareDestroyPermanently()))
+  })
+}
+
 export const initState = async (database) => {
   await database.write(async () => {
     try {
       await database.get('state').find('expense-tracker')
     } catch (e) {
-      const dd = defaultDisplayDate()
       await database.get('state').create(state => {
         state._raw.id = 'expense-tracker'
-        state.isAuthenticated = false
-        state.accessToken = null
-        state.userId = null
-        state.displayDateRange = dd.range
-        state.displayDateText = dd.text
-        state.displayDateStart = toIsoDateString(dd.start)
-        state.displayDateEnd = toIsoDateString(dd.end)
+        resetStateRec(state)
       })
     }
   })

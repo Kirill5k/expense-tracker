@@ -18,40 +18,40 @@ import database from '@/db'
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
-} from 'expo-router';
+} from 'expo-router'
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(dashboard)',
-};
+}
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
-  });
+  })
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) {
-      throw error;
+      throw error
     }
-  }, [error]);
+  }, [error])
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync()
     }
-  }, [loaded]);
+  }, [loaded])
 
   if (!loaded) {
-    return null;
+    return null
   }
 
-  return <RootLayoutNav/>;
+  return <RootLayoutNav/>
 }
 
 function RootLayoutNav() {
@@ -77,7 +77,7 @@ function RootLayoutNav() {
           </GluestackUIProvider>
         </GestureHandlerRootView>
       </SafeAreaProvider>
-  );
+  )
 }
 
 const StackWithToast = withToast(Stack)

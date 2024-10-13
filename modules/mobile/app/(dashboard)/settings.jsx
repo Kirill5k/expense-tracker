@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
@@ -15,9 +16,18 @@ import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from
 import {AccordionContentText} from '@/components/ui/accordion'
 import {ProgressBar} from '@/components/common/progress'
 import Classes from '@/constants/classes'
+import Client from '@/store/client'
+import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
-import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
-
+import {useDatabase} from '@nozbe/watermelondb/react'
+import {enhanceWithUser} from '@/db/observers'
+import {
+  updateUserFutureTransactionVisibilityDays,
+  updateUserDarkMode,
+  updateUserCurrency,
+  resetState,
+  updateStateAuthStatus
+} from '@/db/operations'
 
 const themeDisplayLabel = (darkMode) => {
   if (darkMode === null) {
@@ -39,37 +49,50 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
   return `${futureTransactionVisibilityDays} Days`
 }
 
-const Settings = ({users}) => {
+const showSecuritySettings = false
+
+const Settings = ({user, state}) => {
+  const colorScheme = useColorScheme()
+  const database = useDatabase()
+  const {mode, setMode, logout, changeUserPassword} = useStore()
+
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const {
-    mode,
-    updateUserSettings,
-    logout,
-    changeUserPassword
-  } = useStore()
 
   const handleLogout = () => {
     setLoading(true)
-    logout()
+    resetState(database)
+        .then(() => router.push('/'))
+        .finally(() => setLoading(false))
   }
 
-  const handleUpdateSettings = (settings) => {
+  const handleModeChange = (darkMode) => {
     setLoading(true)
-    updateUserSettings(settings).then(() => setLoading(false))
+    updateUserDarkMode(database, user.id, darkMode)
+        .then(() => {
+          if (darkMode === false) {
+            setMode('light')
+          } else if (darkMode === true) {
+            setMode('dark')
+          } else {
+            setMode(colorScheme === ' dark' ? 'dark' : 'light')
+          }
+        })
+        .finally(() => setLoading(false))
   }
 
   const handlePasswordChange = ({password, currentPassword}) => {
     setLoading(true)
-    return changeUserPassword({currentPassword, newPassword: password})
+    return Client
+        .changeUserPassword(state.accessToken, state.userId, {currentPassword, newPassword: password})
+        .then(() => Client.login({email: user.email, password}))
+        .then(({access_token}) => updateStateAuthStatus(database, access_token))
         .finally(() => setLoading(false))
   }
 
-  if (!users) {
+  if (!user) {
     return null
   }
-
-  const user = users[0].toDomain
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -88,7 +111,7 @@ const Settings = ({users}) => {
               }
             }}
         >
-          <Profile user={user}/>
+          <Profile user={user.toDomain}/>
           <Heading className="py-2" size="xl">
             General
           </Heading>
@@ -98,7 +121,7 @@ const Settings = ({users}) => {
             <SettingsAccordionItem
                 value="1"
                 headerTitle="Currency"
-                headerValue={user?.settings?.currency?.symbol}
+                headerValue={user?.currency?.symbol}
             >
               <SettingsAccordionContent>
                 <VStack space="sm">
@@ -109,9 +132,9 @@ const Settings = ({users}) => {
                   <CurrencySelect
                       isDisabled={loading}
                       mode={mode}
-                      value={user?.settings?.currency}
+                      value={user?.currency}
                       onSelect={(currency) => {
-                        handleUpdateSettings({...user.settings, currency})
+                        updateUserCurrency(database, user.id, currency)
                       }}
                   />
                 </VStack>
@@ -120,15 +143,15 @@ const Settings = ({users}) => {
             <SettingsAccordionItem
                 value="2"
                 headerTitle="Hide Future Transactions"
-                headerValue={hideFutureTransactionsDisplayLabel(user?.settings?.futureTransactionVisibilityDays)}
+                headerValue={hideFutureTransactionsDisplayLabel(user?.settingsFutureTransactionVisibilityDays)}
             >
               <SettingsAccordionContent>
                 <FutureTransactionsToggle
                     isDisabled={loading}
                     mode={mode}
-                    value={user?.settings?.futureTransactionVisibilityDays}
+                    value={user?.settingsFutureTransactionVisibilityDays}
                     onSelect={(futureTransactionVisibilityDays) => {
-                      handleUpdateSettings({...user.settings, futureTransactionVisibilityDays})
+                      updateUserFutureTransactionVisibilityDays(database, user.id, futureTransactionVisibilityDays)
                     }}
                 />
               </SettingsAccordionContent>
@@ -137,69 +160,71 @@ const Settings = ({users}) => {
                 isLast
                 value="3"
                 headerTitle="Theme"
-                headerValue={themeDisplayLabel(user?.settings?.darkMode)}
+                headerValue={themeDisplayLabel(user?.settingsDarkMode)}
             >
               <SettingsAccordionContent>
                 <ThemeSelect
                     isDisabled={loading}
-                    value={user?.settings?.darkMode}
-                    onSelect={(darkMode) => {
-                      handleUpdateSettings({...user.settings, darkMode})
-                    }}
+                    value={user?.settingsDarkMode}
+                    onSelect={handleModeChange}
                 />
               </SettingsAccordionContent>
             </SettingsAccordionItem>
           </SettingsAccordion>
 
-          <Heading className="py-2" size="xl">
-            Security
-          </Heading>
-          <SettingsAccordion
-              isDisabled={loading}
-          >
-            <SettingsAccordionItem
-                value="4"
-                headerTitle="Change Password"
-            >
-              <SettingsAccordionContent>
-                <PasswordChange
-                    onSubmit={handlePasswordChange}
-                />
-              </SettingsAccordionContent>
-            </SettingsAccordionItem>
-            <SettingsAccordionItem
-                value="5"
-                headerTitle="Clear All Data"
-            >
-              <SettingsAccordionContent>
-                <DeleteButton
-                    outline
+          {showSecuritySettings && (
+              <>
+                <Heading className="py-2" size="xl">
+                  Security
+                </Heading>
+                <SettingsAccordion
                     isDisabled={loading}
-                    mode={mode}
-                    alertText="This will permanently delete all your saved transactions, categories, and personal settings from the app. This action is irreversible and cannot be undone. However, your account will remain active."
-                    buttonText="Clear All Data"
-                    confirmationText="DELETE"
-                    onPress={() => console.log('clear all data')}
-                />
-              </SettingsAccordionContent>
-            </SettingsAccordionItem>
-            <SettingsAccordionItem
-                isLast
-                value="6"
-                headerTitle="Close Account"
-            >
-              <SettingsAccordionContent>
-                <DeleteButton
-                    isDisabled={loading}
-                    mode={mode}
-                    alertText="Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account."
-                    buttonText="Close Account"
-                    confirmationText="DELETE"
-                    onPress={() => console.log('close account')}
-                />
-              </SettingsAccordionContent>
-            </SettingsAccordionItem>
-          </SettingsAccordion>
+                >
+                  <SettingsAccordionItem
+                      value="4"
+                      headerTitle="Change Password"
+                  >
+                    <SettingsAccordionContent>
+                      <PasswordChange
+                          onSubmit={handlePasswordChange}
+                      />
+                    </SettingsAccordionContent>
+                  </SettingsAccordionItem>
+                  <SettingsAccordionItem
+                      value="5"
+                      headerTitle="Clear All Data"
+                  >
+                    <SettingsAccordionContent>
+                      <DeleteButton
+                          outline
+                          isDisabled={loading}
+                          mode={mode}
+                          alertText="This will permanently delete all your saved transactions, categories, and personal settings from the app. This action is irreversible and cannot be undone. However, your account will remain active."
+                          buttonText="Clear All Data"
+                          confirmationText="DELETE"
+                          onPress={() => console.log('clear all data')}
+                      />
+                    </SettingsAccordionContent>
+                  </SettingsAccordionItem>
+                  <SettingsAccordionItem
+                      isLast
+                      value="6"
+                      headerTitle="Close Account"
+                  >
+                    <SettingsAccordionContent>
+                      <DeleteButton
+                          isDisabled={loading}
+                          mode={mode}
+                          alertText="Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account."
+                          buttonText="Close Account"
+                          confirmationText="DELETE"
+                          onPress={() => console.log('close account')}
+                      />
+                    </SettingsAccordionContent>
+                  </SettingsAccordionItem>
+                </SettingsAccordion>
+              </>
+          )}
 
           <Box className="px-5">
             <Button
@@ -208,8 +233,9 @@ const Settings = ({users}) => {
                 size="xs"
                 variant="outline"
                 action="secondary"
+                onPress={handleLogout}
             >
-              <ButtonText onPress={handleLogout}>
+              <ButtonText>
                 Sign out
               </ButtonText>
             </Button>
@@ -219,12 +245,4 @@ const Settings = ({users}) => {
   )
 }
 
-const enhance = compose(
-    withDatabase,
-    withObservables([], ({database}) => ({
-          users: database.get('users').query().observe(),
-        }),
-    )
-)
-
-export default enhance(Settings)
+export default enhanceWithUser(Settings)

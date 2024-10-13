@@ -4,7 +4,7 @@ import {Text} from '@/components/ui/text'
 import {ListItemIcon} from '@/components/common/list'
 import Classes from '@/constants/classes'
 import {sortedBy} from '@/utils/arrays'
-import {printAmount, formatDate, formatAmount} from '@/utils/transactions'
+import {printAmount, formatDate, formatAmount, isExpense} from '@/utils/transactions'
 import {Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionContent} from '@/components/ui/accordion'
 import React from "react";
 
@@ -36,7 +36,7 @@ const CategoryGroupedTransactionList = ({items}) => {
   }
 
   const printAmountAdjusted = (item) => {
-    const totalAmount = item.category.kind === 'expense' ? -item.totalAmount : item.totalAmount
+    const totalAmount = isExpense(item) ? -item.totalAmount : item.totalAmount
     return printAmount(totalAmount, item.currency)
   }
 

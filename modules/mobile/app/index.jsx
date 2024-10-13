@@ -8,13 +8,11 @@ import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
 
-
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
   const colorScheme = useColorScheme()
   const {mode, setMode} = useStore()
 
-  //TODO: update mode when user updates settings
   useEffect(() => {
     if (user?.settingsDarkMode === true) {
       setMode('dark')
@@ -29,7 +27,7 @@ const Index = ({state, user}) => {
     } else {
       setIsLoading(false)
     }
-  }, [state]);
+  }, []);
 
   return (
       <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">

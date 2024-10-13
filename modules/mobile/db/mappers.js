@@ -2,6 +2,9 @@ import {createLookup} from '@/utils/arrays'
 import {addDays} from 'date-fns'
 
 export const mapTransactions = (dbTxs, dbCats, dbUser) => {
+  if (!dbUser) return []
+  if (dbCats === null || dbCats.length === 0) return []
+
   const catsById = createLookup(dbCats, c => c.id, c => c.toDomain)
   const user = dbUser.toDomain
   const maxTxDate = addDays(new Date(), user?.settings?.futureTransactionVisibilityDays || 0)

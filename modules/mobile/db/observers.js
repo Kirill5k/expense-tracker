@@ -16,20 +16,20 @@ const userObservable =
 const categoriesObservable =
     withObservables([], ({state}) => ({
       categories: state.collections.get('categories').query(
-          Q.where('user_id', Q.lte(state.userId)),
+          Q.where('user_id', Q.eq(state.userId)),
           Q.where('hidden', Q.notEq(true)),
           Q.sortBy('name', Q.asc),
       ).observe()
     }))
 
 const transactionsObservable =
-    withObservables(['state'], ({state}) => ({
+    withObservables(['state', 'user'], ({state}) => ({
       displayedTransactions: combineLatest([state.observe()]).pipe(
           switchMap(([currentState]) =>
               state.collections.get('transactions').query(
                   Q.where('date', Q.gte(currentState.displayDateStart)),
                   Q.where('date', Q.lte(currentState.displayDateEnd)),
-                  Q.where('user_id', Q.lte(currentState.userId)),
+                  Q.where('user_id', Q.eq(currentState.userId)),
                   Q.where('hidden', Q.notEq(true)),
                   Q.sortBy('date', Q.desc),
               ).observe()
@@ -55,6 +55,5 @@ export const enhanceWithCategories = compose(
 export const enhanceWithUser = compose(
     withDatabase,
     stateObservable,
-    userObservable,
-    categoriesObservable
+    userObservable
 )

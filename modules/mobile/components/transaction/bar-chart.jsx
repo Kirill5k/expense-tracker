@@ -6,6 +6,8 @@ import {getDaysInMonth} from 'date-fns'
 import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 import {nonEmpty} from '@/utils/arrays'
+import {printAmount} from '@/utils/transactions'
+
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weeks = ['1-7', '8-14', '15-21', '22-28']
@@ -95,7 +97,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
   return (
       <VStack>
         <Text size="xs">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
-        <Heading size="xl" className="mb-4">{currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}</Heading>
+        <Heading size="xl" className="mb-4">{printAmount(total, currency, false)}</Heading>
         <BarChart
             frontColor={Colors[mode][kind].barChartMain}
             height={120}

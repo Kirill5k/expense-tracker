@@ -6,6 +6,7 @@ import {useState} from 'react'
 import {PieChart} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 import {nonEmpty} from '@/utils/arrays'
+import {printAmount} from '@/utils/transactions'
 
 const prepareChartData = (items, mode) => {
   let total = 0
@@ -76,7 +77,7 @@ const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
                 <VStack className="items-center justify-center">
                   <Text size="xs">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
                   <Heading size="xl">
-                    {currency?.symbol}{total >= 10000 ? total.toFixed(0) : total.toFixed(2)}
+                    {printAmount(total, currency, false)}
                   </Heading>
                 </VStack>
             )}
