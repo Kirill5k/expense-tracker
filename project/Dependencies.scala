@@ -9,10 +9,11 @@ object Dependencies {
     val squants     = "1.8.3"
     val bcrypt      = "4.3.0"
     val refined     = "0.11.2"
-    val logback     = "1.5.8"
+    val logback     = "1.5.10"
     val log4cats    = "2.7.0"
-    val tapir       = "1.11.2"
+    val tapir       = "1.11.7"
     val jwt         = "10.0.1"
+    val apispec     = "0.11.3"
   }
 
   object Libraries {
@@ -61,7 +62,12 @@ object Dependencies {
       val circe   = "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % Versions.tapir
       val http4s  = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % Versions.tapir
       val swagger = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % Versions.tapir
+      val openapi = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs"      % Versions.tapir
       val all     = Seq(core, circe, http4s)
+    }
+
+    object apispec {
+      val circeYaml = "com.softwaremill.sttp.apispec" %% "openapi-circe-yaml" % Versions.apispec
     }
 
   }
@@ -88,6 +94,9 @@ object Dependencies {
   )
 
   lazy val openapi = Seq(
-    Libraries.tapir.swagger
+    Libraries.commonScala.http4s,
+    Libraries.tapir.swagger,
+    Libraries.tapir.openapi,
+    Libraries.apispec.circeYaml,
   )
 }

@@ -5,11 +5,11 @@ import expensetracker.auth.AuthController
 import expensetracker.category.CategoryController
 import expensetracker.transaction.TransactionController
 import org.http4s.HttpRoutes
-import sttp.tapir.openapi.Info
+import sttp.apispec.openapi.Info
+import sttp.apispec.openapi.circe.yaml.*
 import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.SwaggerUI
-import sttp.tapir.openapi.circe.yaml.*
 
 object Swagger {
   private val categories = List(
