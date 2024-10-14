@@ -23,6 +23,7 @@ trait Repository[F[_]] {
     val Email          = "email"
     val Note           = "note"
     val Hidden         = "hidden"
+    val CreatedAt      = "createdAt"
     val LastUpdatedAt  = "lastUpdatedAt"
     val Status         = "status"
     val LastAccessedAt = "lastAccessedAt"
