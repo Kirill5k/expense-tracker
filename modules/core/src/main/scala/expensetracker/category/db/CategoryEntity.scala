@@ -14,6 +14,7 @@ final case class CategoryEntity(
     name: String,
     icon: String,
     color: String,
+    createdAt: Option[Instant],
     userId: Option[ObjectId],
     lastUpdatedAt: Option[Instant]
 ) derives Codec.AsObject {
@@ -29,17 +30,6 @@ final case class CategoryEntity(
 }
 
 object CategoryEntity {
-  def from(cat: Category): CategoryEntity =
-    CategoryEntity(
-      _id = cat.id.toObjectId,
-      kind = cat.kind,
-      name = cat.name.value,
-      icon = cat.icon.value,
-      color = cat.color.value,
-      userId = cat.userId.map(_.toObjectId),
-      lastUpdatedAt = Some(Instant.now())
-    )
-
   def from(cat: CreateCategory): CategoryEntity =
     CategoryEntity(
       _id = ObjectId(),
@@ -48,6 +38,7 @@ object CategoryEntity {
       icon = cat.icon.value,
       color = cat.color.value,
       userId = Some(cat.userId.toObjectId),
+      createdAt = Some(Instant.now),
       lastUpdatedAt = None
     )
 }

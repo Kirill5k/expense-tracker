@@ -20,6 +20,7 @@ final case class TransactionEntity(
     amount: Money,
     date: LocalDate,
     note: Option[String],
+    createdAt: Option[Instant],
     lastUpdatedAt: Option[Instant],
     tags: Option[Set[String]],
     category: Option[CategoryEntity] = None
@@ -38,21 +39,7 @@ final case class TransactionEntity(
     )
 }
 
-object TransactionEntity {
-
-  def from(tx: Transaction): TransactionEntity =
-    TransactionEntity(
-      tx.id.toObjectId,
-      tx.userId.toObjectId,
-      tx.categoryId.toObjectId,
-      tx.kind,
-      tx.amount,
-      tx.date,
-      tx.note,
-      tags = Some(tx.tags),
-      lastUpdatedAt = Some(Instant.now())
-    )
-
+object TransactionEntity:
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       ObjectId(),
@@ -63,6 +50,6 @@ object TransactionEntity {
       tx.date,
       tx.note,
       tags = Some(tx.tags),
+      createdAt = Some(Instant.now),
       lastUpdatedAt = None
     )
-}
