@@ -1,6 +1,7 @@
 package expensetracker.sync
 
 import cats.Monad
+import expensetracker.sync.db.SyncRepository
 import expensetracker.auth.user.UserId
 
 import java.time.Instant

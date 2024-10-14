@@ -149,7 +149,8 @@ object TransactionController extends TapirSchema with TapirJson {
       amount: Money,
       date: LocalDate,
       note: Option[String],
-      tags: Option[List[String]]
+      tags: Option[List[String]],
+      hidden: Option[Boolean],
   ) derives Codec.AsObject {
     def toDomain(aid: UserId): Transaction =
       Transaction(
@@ -160,7 +161,8 @@ object TransactionController extends TapirSchema with TapirJson {
         amount = amount,
         date = date,
         note = note,
-        tags = tags.map(_.toSet.map(_.trim.toLowerCase)).getOrElse(Set.empty)
+        tags = tags.map(_.toSet.map(_.trim.toLowerCase)).getOrElse(Set.empty),
+        hidden = hidden.getOrElse(false),
       )
   }
 

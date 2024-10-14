@@ -1,4 +1,4 @@
-package expensetracker.sync
+package expensetracker.sync.db
 
 import cats.effect.Async
 import cats.syntax.functor.*
@@ -6,7 +6,7 @@ import cats.syntax.flatMap.*
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
-import expensetracker.sync.db.{EntityChanges, SyncEntity}
+import expensetracker.sync.DataChanges
 import mongo4cats.bson.syntax.*
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase

@@ -24,6 +24,7 @@ final case class Transaction(
     date: LocalDate,
     note: Option[String],
     tags: Set[String],
+    hidden: Boolean,
     category: Option[Category] = None
 )
 

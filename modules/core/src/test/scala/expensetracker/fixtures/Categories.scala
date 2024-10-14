@@ -16,7 +16,7 @@ object Categories {
       icon: CategoryIcon = CategoryIcon("icon"),
       color: CategoryColor = CategoryColor.Blue,
       uid: Option[UserId] = Some(Users.uid1)
-  ): Category = Category(id, kind, name, icon, color, uid)
+  ): Category = Category(id, kind, name, icon, color, uid, hidden = false)
 
   def create(
       kind: CategoryKind = CategoryKind.Expense,

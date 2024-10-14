@@ -5,7 +5,6 @@ import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
 import expensetracker.auth.user.UserEmail
 import expensetracker.fixtures.{Categories, Transactions, Users}
-import expensetracker.sync.SyncRepository
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo

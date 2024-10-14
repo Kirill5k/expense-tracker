@@ -31,7 +31,8 @@ final case class Category(
     name: CategoryName,
     icon: CategoryIcon,
     color: CategoryColor,
-    userId: Option[UserId]
+    userId: Option[UserId],
+    hidden: Boolean
 )
 
 final case class CreateCategory(

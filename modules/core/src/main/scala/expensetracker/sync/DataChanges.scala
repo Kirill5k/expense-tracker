@@ -13,9 +13,8 @@ final case class DataChange[A](
     updated: List[A],
 )
 
-object DataChange {
+object DataChange:
   given [A](using ca: Codec[A]): Codec[DataChange[A]] = deriveCodec[DataChange[A]]
-}
 
 final case class DataChanges(
     transactions: DataChange[Transaction],

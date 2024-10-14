@@ -23,7 +23,7 @@ object Transactions {
       date: LocalDate = txdate,
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
-  ): Transaction = Transaction(id, uid, kind, catid, amount, date, note, tags)
+  ): Transaction = Transaction(id, uid, kind, catid, amount, date, note, tags, hidden = false)
 
   def create(
       uid: UserId = Users.uid1,

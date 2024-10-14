@@ -110,7 +110,8 @@ object CategoryController extends TapirSchema with TapirJson {
       kind: CategoryKind,
       name: NonEmptyString,
       icon: NonEmptyString,
-      color: ColorString
+      color: ColorString,
+      hidden: Option[Boolean]
   ) derives Codec.AsObject {
     def toDomain(aid: UserId): Category =
       Category(
@@ -119,7 +120,8 @@ object CategoryController extends TapirSchema with TapirJson {
         name = CategoryName(name.value),
         icon = CategoryIcon(icon.value),
         color = CategoryColor(color.value),
-        userId = Some(aid)
+        userId = Some(aid),
+        hidden = hidden.getOrElse(false)
       )
   }
 

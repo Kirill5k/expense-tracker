@@ -14,6 +14,7 @@ final case class CategoryEntity(
     name: String,
     icon: String,
     color: String,
+    hidden: Option[Boolean],
     createdAt: Option[Instant],
     userId: Option[ObjectId],
     lastUpdatedAt: Option[Instant]
@@ -25,7 +26,8 @@ final case class CategoryEntity(
       name = CategoryName(name),
       icon = CategoryIcon(icon),
       color = CategoryColor(color),
-      userId = userId.map(uid => UserId(uid))
+      userId = userId.map(uid => UserId(uid)),
+      hidden = hidden.getOrElse(false)
     )
 }
 
@@ -37,6 +39,7 @@ object CategoryEntity {
       name = cat.name.value,
       icon = cat.icon.value,
       color = cat.color.value,
+      hidden = Some(false),
       userId = Some(cat.userId.toObjectId),
       createdAt = Some(Instant.now),
       lastUpdatedAt = None

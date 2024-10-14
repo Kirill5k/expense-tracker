@@ -20,6 +20,7 @@ final case class TransactionEntity(
     amount: Money,
     date: LocalDate,
     note: Option[String],
+    hidden: Option[Boolean],
     createdAt: Option[Instant],
     lastUpdatedAt: Option[Instant],
     tags: Option[Set[String]],
@@ -35,7 +36,8 @@ final case class TransactionEntity(
       date = date,
       note = note,
       tags = tags.getOrElse(Set.empty),
-      category = category.map(_.toDomain)
+      category = category.map(_.toDomain),
+      hidden = hidden.getOrElse(false)
     )
 }
 
@@ -51,5 +53,6 @@ object TransactionEntity:
       tx.note,
       tags = Some(tx.tags),
       createdAt = Some(Instant.now),
-      lastUpdatedAt = None
+      lastUpdatedAt = None,
+      hidden = Some(false)
     )
