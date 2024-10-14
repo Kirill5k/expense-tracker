@@ -31,18 +31,22 @@ final private class LiveSyncRepository[F[_]](
       .flatMap(r => F.whenA(r.getMatchedCount == 0)(collection.insertOne(SyncEntity.from(uid))))
 
   private def createdAgg(collection: String, from: Option[Instant]) =
-    Aggregate.matchBy(
-      from match
-        case Some(value) => Filter.gt(collection + Field.CreatedAt, value) && Filter.isNull(collection + Field.LastUpdatedAt)
-        case None        => Filter.empty
-    ).project(Projection.include(collection))
+    Aggregate
+      .matchBy(
+        from match
+          case Some(value) => Filter.gt(collection + Field.CreatedAt, value) && Filter.isNull(collection + Field.LastUpdatedAt)
+          case None        => notHidden
+      )
+      .project(Projection.include(collection))
 
   private def updatedAgg(collection: String, from: Option[Instant]) =
-    Aggregate.matchBy(
-      from match
-        case Some(value) => Filter.gt(collection + "." + Field.LastUpdatedAt, value)
-        case None        => Filter.isNull(Field.Id)
-    ).project(Projection.include(collection))
+    Aggregate
+      .matchBy(
+        from match
+          case Some(value) => Filter.gt(collection + "." + Field.LastUpdatedAt, value)
+          case None        => Filter.isNull(Field.Id)
+      )
+      .project(Projection.include(collection))
 
   def pullChanges(uid: UserId, from: Option[Instant]): F[DataChanges] =
     updateTimestamp(uid, "lastPulledAt") >>
@@ -56,20 +60,20 @@ final private class LiveSyncRepository[F[_]](
             .unwind("$categories")
             .unwind("$users")
             .facet(
-              Aggregate.Facet("transactionsCreated", createdAgg("transactions", from)),
-              Aggregate.Facet("categoriesCreated", createdAgg("categories", from)),
-              Aggregate.Facet("usersCreated", createdAgg("users", from)),
-              Aggregate.Facet("transactionsUpdated", updatedAgg("transactions", from)),
-              Aggregate.Facet("categoriesUpdated", updatedAgg("categories", from)),
-              Aggregate.Facet("usersUpdated", updatedAgg("users", from)),
+              Aggregate.Facet("txCreated", createdAgg("transactions", from)),
+              Aggregate.Facet("catCreated", createdAgg("categories", from)),
+              Aggregate.Facet("uCreated", createdAgg("users", from)),
+              Aggregate.Facet("txUpdated", updatedAgg("transactions", from)),
+              Aggregate.Facet("catUpdated", updatedAgg("categories", from)),
+              Aggregate.Facet("uUpdated", updatedAgg("users", from))
             )
             .addFields("time" -> "$$NOW")
             .project(
               Projection
                 .include("time")
-                .computed("users", Document("created" := "$usersCreated.users", "updated" := "$usersUpdated.users"))
-                .computed("categories", Document("created" := "$categoriesCreated.categories", "updated" := "$categoriesUpdated.categories"))
-                .computed("transactions", Document("created" := "$transactionsCreated.transactions", "updated" := "$transactionsUpdated.transactions"))
+                .computed("users", Document("created" := "$uCreated.users", "updated" := "$uUpdated.users"))
+                .computed("categories", Document("created" := "$catCreated.categories", "updated" := "$catUpdated.categories"))
+                .computed("transactions", Document("created" := "$txCreated.transactions", "updated" := "$txUpdated.transactions"))
             )
         )
         .first
