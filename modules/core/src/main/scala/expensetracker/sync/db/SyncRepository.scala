@@ -10,9 +10,9 @@ import expensetracker.sync.DataChanges
 import mongo4cats.bson.syntax.*
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
-import mongo4cats.operations.{Aggregate, Filter, Projection, Update}
+import mongo4cats.operations.{Aggregate, Update}
 import kirill5k.common.cats.syntax.monadthrow.*
-import mongo4cats.bson.{BsonValue, Document}
+import mongo4cats.bson.{BsonValue as BV, Document}
 
 import java.time.Instant
 
@@ -30,23 +30,38 @@ final private class LiveSyncRepository[F[_]](
       .updateOne(idEq(uid.toObjectId), Update.currentDate(field))
       .flatMap(r => F.whenA(r.getMatchedCount == 0)(collection.insertOne(SyncEntity.from(uid))))
 
-  private def createdAgg(collection: String, from: Option[Instant]) =
-    Aggregate
-      .matchBy(
-        from match
-          case Some(value) => Filter.gt(collection + Field.CreatedAt, value) && Filter.isNull(collection + Field.LastUpdatedAt)
-          case None        => notHidden
-      )
-      .project(Projection.include(collection))
+  private def createdComp(collection: String, item: String, from: Option[Instant]) =
+    from match
+      case Some(value) =>
+        Document("$filter" := Document(
+          "input" := "$" + collection,
+          "as" := item,
+          "cond" := Document("$and" := BV.array(
+            BV.document("$lt" := BV.array(BV.string("$$" + item + ".createdAt"), BV.instant(value))),
+            BV.document("$eq" := BV.array(BV.string("$$" + item + ".lastUpdatedAt"), BV.Null))
+          ))
+        ))
+      case None =>
+        Document("$filter" := Document(
+          "input" := "$" + collection,
+          "as" := item,
+          "cond" := BV.document("$ne" := BV.array(BV.string("$$" + item + ".hidden"), BV.False))
+        ))
 
-  private def updatedAgg(collection: String, from: Option[Instant]) =
-    Aggregate
-      .matchBy(
-        from match
-          case Some(value) => Filter.gt(collection + "." + Field.LastUpdatedAt, value)
-          case None        => Filter.isNull(Field.Id)
-      )
-      .project(Projection.include(collection))
+  private def updatedComp(collection: String, item: String, from: Option[Instant]) =
+    from match
+      case Some(value) =>
+        Document("$filter" := Document(
+          "input" := "$" + collection,
+          "as" := item,
+          "cond" := BV.document("$gt" := BV.array(BV.string("$$" + item + ".lastUpdatedAt"), BV.instant(value)))
+        ))
+      case None =>
+        Document("$filter" := Document(
+          "input" := "$" + collection,
+          "as" := item,
+          "cond" := BV.document("$eq" := BV.array(BV.string("$$" + item + "._id"), BV.Null))
+        ))
 
   def pullChanges(uid: UserId, from: Option[Instant]): F[DataChanges] =
     updateTimestamp(uid, "lastPulledAt") >>
@@ -56,24 +71,19 @@ final private class LiveSyncRepository[F[_]](
             .lookup("transactions", "_id", "userId", "transactions")
             .lookup("categories", "_id", "userId", "categories")
             .lookup("users", "_id", "_id", "users")
-            .unwind("$transactions")
-            .unwind("$categories")
-            .unwind("$users")
-            .facet(
-              Aggregate.Facet("txCreated", createdAgg("transactions", from)),
-              Aggregate.Facet("catCreated", createdAgg("categories", from)),
-              Aggregate.Facet("uCreated", createdAgg("users", from)),
-              Aggregate.Facet("txUpdated", updatedAgg("transactions", from)),
-              Aggregate.Facet("catUpdated", updatedAgg("categories", from)),
-              Aggregate.Facet("uUpdated", updatedAgg("users", from))
-            )
-            .addFields("time" -> "$$NOW")
-            .project(
-              Projection
-                .include("time")
-                .computed("users", Document("created" := "$uCreated.users", "updated" := "$uUpdated.users"))
-                .computed("categories", Document("created" := "$catCreated.categories", "updated" := "$catUpdated.categories"))
-                .computed("transactions", Document("created" := "$txCreated.transactions", "updated" := "$txUpdated.transactions"))
+            .addFields(
+              "time" -> "$$NOW",
+              "userCreated" -> createdComp("users", "user", from),
+              "userUpdated" -> updatedComp("users", "user", from),
+              "transactionCreated" -> createdComp("transactions", "transaction", from),
+              "transactionUpdated" -> updatedComp("transactions", "transaction", from),
+              "categoryCreated" -> createdComp("categories", "category", from),
+              "categoryUpdated" -> updatedComp("categories", "category", from),
+            ).addFields(
+              "transactions" -> Document(
+                "created" := "$transactionCreated",
+                "updated" := "$transactionUpdated"
+              )
             )
         )
         .first
