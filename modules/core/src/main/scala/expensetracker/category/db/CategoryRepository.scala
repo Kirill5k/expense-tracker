@@ -71,6 +71,7 @@ final private class LiveCategoryRepository[F[_]](
           .set(Field.Name, cat.name)
           .set(Field.Icon, cat.icon)
           .set(Field.Color, cat.color)
+          .set(Field.Hidden, cat.hidden)
           .currentDate(Field.LastUpdatedAt)
       )
       .flatMap(errorIfNoMatches(AppError.CategoryDoesNotExist(cat.id)))

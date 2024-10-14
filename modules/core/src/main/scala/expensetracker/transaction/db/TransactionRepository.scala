@@ -89,6 +89,7 @@ final private class LiveTransactionRepository[F[_]](
           .set(Field.Note, tx.note)
           .set(Field.Date, tx.date)
           .set(Field.Tags, tx.tags)
+          .set(Field.Hidden, tx.hidden)
           .currentDate(Field.LastUpdatedAt)
       )
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(tx.id)))
