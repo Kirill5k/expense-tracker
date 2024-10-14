@@ -9,10 +9,12 @@ import expensetracker.sync.SyncRepository
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
+import mongo4cats.operations.{Filter, Update}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
@@ -24,12 +26,50 @@ class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       "return initial state when from timestamp is not provided" in {
         withEmbeddedMongoDb { db =>
           for
-            repo <- SyncRepository.make(db)
+            repo    <- SyncRepository.make(db)
             changes <- repo.pullChanges(Users.uid1, None)
           yield {
-            changes.transactions.created must have size 1
-            changes.categories.created must have size 1
-            changes.users.created must have size 1
+            changes.transactions.created.map(_.id) mustBe List(Transactions.txid)
+            changes.categories.created.map(_.id) mustBe List(Categories.cid)
+            changes.users.created.map(_.id) mustBe List(Users.uid1)
+
+            changes.transactions.updated mustBe empty
+            changes.categories.updated mustBe empty
+            changes.users.updated mustBe empty
+          }
+        }
+      }
+
+      "return data changes when from timestamp is before lastUpdatedAt" in {
+        withEmbeddedMongoDb { db =>
+          for
+            categories <- db.getCollection("categories")
+            _ <- categories.updateOne(Filter.idEq(Categories.cid.toObjectId), Update.currentDate("lastUpdatedAt"))
+            transactions <- db.getCollection("transactions")
+            _ <- transactions.updateOne(Filter.idEq(Transactions.txid.toObjectId), Update.currentDate("lastUpdatedAt"))
+            repo       <- SyncRepository.make(db)
+            changes    <- repo.pullChanges(Users.uid1, Some(Instant.now().minusSeconds(3600)))
+          yield {
+            changes.transactions.created.map(_.id) mustBe empty
+            changes.categories.created.map(_.id) mustBe empty
+            changes.users.created.map(_.id) mustBe empty
+
+            changes.transactions.updated.map(_.id) mustBe List(Transactions.txid)
+            changes.categories.updated.map(_.id) mustBe List(Categories.cid)
+            changes.users.updated mustBe empty
+          }
+        }
+      }
+
+      "return empty change dataset when from timestamp is in the future" in {
+        withEmbeddedMongoDb { db =>
+          for
+            repo    <- SyncRepository.make(db)
+            changes <- repo.pullChanges(Users.uid1, Some(Instant.now()))
+          yield {
+            changes.transactions.created.map(_.id) mustBe empty
+            changes.categories.created.map(_.id) mustBe empty
+            changes.users.created.map(_.id) mustBe empty
 
             changes.transactions.updated mustBe empty
             changes.categories.updated mustBe empty
