@@ -192,7 +192,7 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
           .withBody("""{"id":"BC0C5342AB0C5342AB0C5342","categoryId":"foo"}""")
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        val resBody = """{"message":"kind is required, foo is not a valid categoryId, amount is required, date is required"}"""
+        val resBody = """{"message":"foo is not a valid categoryId, amount is required, date is required"}"""
         res mustHaveStatus (Status.UnprocessableEntity, Some(resBody))
         verifyNoInteractions(svc)
       }
