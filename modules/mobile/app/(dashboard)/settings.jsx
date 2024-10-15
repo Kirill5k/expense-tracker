@@ -16,7 +16,7 @@ import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from
 import {AccordionContentText} from '@/components/ui/accordion'
 import {ProgressBar} from '@/components/common/progress'
 import Classes from '@/constants/classes'
-import Client from '@/store/client'
+import Client from '@/api/client'
 import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {useDatabase} from '@nozbe/watermelondb/react'

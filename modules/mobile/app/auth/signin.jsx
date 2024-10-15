@@ -12,7 +12,7 @@ import {AuthLayout} from '@/components/auth/layout'
 import {LoginForm} from '@/components/auth/login'
 import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
-import Client from '@/store/client'
+import Client from '@/api/client'
 import {updateStateAuthStatus, saveUser, saveCategories, saveTransactions} from '@/db/operations'
 
 

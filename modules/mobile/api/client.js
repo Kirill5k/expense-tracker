@@ -1,4 +1,4 @@
-import config from '@/config'
+const apiUrl = process.env.EXPO_PUBLIC_API_URL
 
 const DEFAULT_REQUEST_PARAMS = {
   mode: 'cors',
@@ -7,7 +7,7 @@ const DEFAULT_REQUEST_PARAMS = {
 }
 
 const dispatchReq = (path, request, params = {}) => {
-  let fullUrl = `${config.apiUrl}/${path}`
+  let fullUrl = `${apiUrl}/${path}`
   const args = Object.entries(params).map(([k, v]) => v ? `${k}=${v}` : '').join('&')
   if (args) {
     fullUrl += `?${args}`
