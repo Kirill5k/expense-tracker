@@ -2,7 +2,7 @@ package expensetracker.fixtures
 
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
-import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import mongo4cats.bson.ObjectId
 import squants.Money
 import squants.market.GBP
@@ -17,28 +17,25 @@ object Transactions {
   def tx(
       id: TransactionId = txid,
       uid: UserId = Users.uid1,
-      kind: TransactionKind = TransactionKind.Expense,
       catid: CategoryId = Categories.cid,
       amount: Money = GBP(15.0),
       date: LocalDate = txdate,
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
-  ): Transaction = Transaction(id, uid, kind, catid, amount, date, note, tags, hidden = false)
+  ): Transaction = Transaction(id, uid, catid, amount, date, note, tags, hidden = false)
 
   def create(
       uid: UserId = Users.uid1,
-      kind: TransactionKind = TransactionKind.Expense,
       catid: CategoryId = Categories.cid,
       amount: Money = GBP(15.0),
       date: LocalDate = txdate,
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
-  ): CreateTransaction = CreateTransaction(uid, kind, catid, amount, date, note, tags)
+  ): CreateTransaction = CreateTransaction(uid, catid, amount, date, note, tags)
 
   val txjson =
     s"""{
        |    "id" : "${Transactions.txid}",
-       |    "kind" : "expense",
        |    "categoryId" : "${Categories.cid}",
        |    "amount" : {
        |      "value" : 15.00,

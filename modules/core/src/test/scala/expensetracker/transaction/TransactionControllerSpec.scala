@@ -26,7 +26,6 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
           .withBody(
             s"""{
                |"categoryId":"${Categories.cid}",
-               |"kind":"expense",
                |"date": "${Transactions.txdate}",
                |"amount": {"value":15.0,"currency":{"code":"GBP","symbol":"£"}},
                |"note": "test tx",
@@ -39,22 +38,6 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
         verify(svc).create(Transactions.create())
       }
 
-      "return 422 when invalid kind passed" in {
-        val svc = mock[TransactionService[IO]]
-
-        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
-
-        val req = Request[IO](Method.POST, uri"/transactions")
-          .withAuthHeader()
-          .withBody("""{"name":"cat-1","icon":"icon","kind":"foo"}""")
-        val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
-
-        val responseBody =
-          """{"message":"Invalid value foo for enum TransactionKind, Accepted values: expense,income, categoryId is required, amount is required, date is required"}"""
-        res mustHaveStatus (Status.UnprocessableEntity, Some(responseBody))
-        verifyNoInteractions(svc)
-      }
-
       "return 422 when invalid category id passed" in {
         val svc = mock[TransactionService[IO]]
         when(svc.create(any[CreateTransaction])).thenReturnIO(Transactions.txid)
@@ -65,7 +48,6 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
           .withAuthHeader()
           .withBody("""{
               |"categoryId":"FOO",
-              |"kind":"expense",
               |"date": "2021-01-01",
               |"amount": {"value":5.99,"currency":{"code":"GBP","symbol":"£"}}
               |}""".stripMargin)

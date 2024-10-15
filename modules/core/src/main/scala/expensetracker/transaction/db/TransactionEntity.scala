@@ -5,7 +5,7 @@ import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.category.db.CategoryEntity
 import expensetracker.common.json.given
-import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId, TransactionKind}
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.given
 import squants.market.*
@@ -16,7 +16,6 @@ final case class TransactionEntity(
     _id: ObjectId,
     userId: ObjectId,
     categoryId: ObjectId,
-    kind: TransactionKind,
     amount: Money,
     date: LocalDate,
     note: Option[String],
@@ -31,7 +30,6 @@ final case class TransactionEntity(
       id = TransactionId(_id),
       userId = UserId(userId),
       categoryId = CategoryId(categoryId),
-      kind = kind,
       amount = amount,
       date = date,
       note = note,
@@ -47,7 +45,6 @@ object TransactionEntity:
       ObjectId(),
       tx.userId.toObjectId,
       tx.categoryId.toObjectId,
-      tx.kind,
       tx.amount,
       tx.date,
       tx.note,

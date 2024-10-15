@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import expensetracker.auth.user.UserId
 import expensetracker.category.{Category, CategoryId}
-import expensetracker.common.types.{EnumType, IdType}
+import expensetracker.common.types.IdType
 import squants.market.Money
 
 import java.time.LocalDate
@@ -10,15 +10,9 @@ import java.time.LocalDate
 opaque type TransactionId = String
 object TransactionId extends IdType[TransactionId]
 
-object TransactionKind extends EnumType[TransactionKind](() => TransactionKind.values, _.print)
-enum TransactionKind:
-  case Expense, Income
-
 final case class Transaction(
     id: TransactionId,
     userId: UserId,
-    //TODO: Deprecate
-    kind: TransactionKind,
     categoryId: CategoryId,
     amount: Money,
     date: LocalDate,
@@ -30,7 +24,6 @@ final case class Transaction(
 
 final case class CreateTransaction(
     userId: UserId,
-    kind: TransactionKind,
     categoryId: CategoryId,
     amount: Money,
     date: LocalDate,

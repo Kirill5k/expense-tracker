@@ -96,7 +96,6 @@ object TransactionController extends TapirSchema with TapirJson {
   import Controller.given
 
   final case class CreateTransactionRequest(
-      kind: TransactionKind,
       categoryId: IdString,
       amount: Money,
       date: LocalDate,
@@ -106,7 +105,6 @@ object TransactionController extends TapirSchema with TapirJson {
     def toDomain(aid: UserId): CreateTransaction =
       CreateTransaction(
         userId = aid,
-        kind = kind,
         categoryId = CategoryId(categoryId.value),
         amount = amount,
         date = date,
@@ -117,7 +115,6 @@ object TransactionController extends TapirSchema with TapirJson {
   
   final case class TransactionView(
       id: String,
-      kind: TransactionKind,
       categoryId: String,
       amount: Money,
       date: LocalDate,
@@ -130,7 +127,6 @@ object TransactionController extends TapirSchema with TapirJson {
     def from(tx: Transaction): TransactionView =
       TransactionView(
         id = tx.id.value,
-        kind = tx.kind,
         categoryId = tx.categoryId.value,
         amount = tx.amount,
         date = tx.date,
@@ -144,7 +140,6 @@ object TransactionController extends TapirSchema with TapirJson {
 
   final case class UpdateTransactionRequest(
       id: IdString,
-      kind: TransactionKind,
       categoryId: IdString,
       amount: Money,
       date: LocalDate,
@@ -155,7 +150,6 @@ object TransactionController extends TapirSchema with TapirJson {
     def toDomain(aid: UserId): Transaction =
       Transaction(
         id = TransactionId(id.value),
-        kind = kind,
         categoryId = CategoryId(categoryId.value),
         userId = aid,
         amount = amount,

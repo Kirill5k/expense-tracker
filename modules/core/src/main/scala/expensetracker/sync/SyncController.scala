@@ -3,8 +3,9 @@ package expensetracker.sync
 import cats.Monad
 import cats.effect.Async
 import expensetracker.auth.Authenticator
-import expensetracker.auth.user.{User, UserId}
-import expensetracker.category.{Category, CategoryId, CategoryKind}
+import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserName, UserSettings}
+import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName}
+import expensetracker.common.errors.AppError
 import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPullResponse}
@@ -12,6 +13,7 @@ import expensetracker.transaction.{Transaction, TransactionId}
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
+import squants.market.{Currency, Money, defaultMoneyContext}
 import sttp.tapir.*
 
 import java.time.{Instant, LocalDate}
@@ -38,7 +40,6 @@ final private class SyncController[F[_]](
     Controller
       .serverInterpreter[F]
       .toRoutes(List(pullChanges))
-
 }
 
 object SyncController extends TapirSchema with TapirJson {
@@ -59,7 +60,24 @@ object SyncController extends TapirSchema with TapirJson {
       settings_future_transaction_visibility_days: Option[Int],
       settings_dark_mode: Option[Boolean],
       registration_date: Instant
-  ) derives Codec.AsObject
+  ) derives Codec.AsObject {
+    def toDomain: Either[AppError, User] =
+      Currency(settings_currency_code)(defaultMoneyContext)
+        .toEither
+        .left.map(e => AppError.FailedValidation(s"Invalid currency code $settings_currency_code"))
+        .map { currency =>
+          User(
+            id = id,
+            email = UserEmail(email),
+            name = UserName(first_name, last_name),
+            password = PasswordHash(""),
+            settings = UserSettings(currency, false, settings_dark_mode, settings_future_transaction_visibility_days),
+            registrationDate = registration_date,
+            categories = None,
+            totalTransactionCount = None
+         )
+        }
+  }
 
   object WatermelonUser:
     def from(u: User): WatermelonUser =
@@ -83,7 +101,18 @@ object SyncController extends TapirSchema with TapirJson {
       color: String,
       hidden: Boolean,
       user_id: UserId
-  ) derives Codec.AsObject
+  ) derives Codec.AsObject {
+    def toDomain: Category =
+      Category(
+        id = id,
+        kind = kind,
+        name = CategoryName(name),
+        icon = CategoryIcon(icon),
+        color = CategoryColor(color),
+        userId = Some(user_id),
+        hidden = hidden
+      )
+  }
 
   object WatermelonCategory:
     def from(cat: Category): WatermelonCategory =
@@ -108,7 +137,25 @@ object SyncController extends TapirSchema with TapirJson {
       tags: Option[String],
       hidden: Boolean,
       user_id: UserId
-  ) derives Codec.AsObject
+  ) derives Codec.AsObject {
+    def toDomain: Either[AppError, Transaction] =
+      Currency(amount_currency_code)(defaultMoneyContext)
+        .toEither
+        .left.map(e => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
+        .map { currency =>
+          Transaction(
+            id = id,
+            userId = user_id,
+            categoryId = category_id,
+            amount = Money(amount_value, currency),
+            date = date,
+            note = note,
+            tags = tags.fold(Set.empty)(t => t.split(",").toSet),
+            hidden = hidden,
+            category = None
+          )
+        }
+  }
 
   object WatermelonTransaction:
     def from(tx: Transaction): WatermelonTransaction =

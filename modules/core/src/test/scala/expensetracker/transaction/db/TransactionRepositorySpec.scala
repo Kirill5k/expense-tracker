@@ -8,7 +8,7 @@ import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
 import expensetracker.fixtures.{Categories, Transactions, Users}
-import expensetracker.transaction.{Transaction, TransactionId, TransactionKind}
+import expensetracker.transaction.{Transaction, TransactionId}
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.{ClientSession, MongoClient}
 import mongo4cats.database.MongoDatabase
@@ -57,11 +57,10 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
         for
           repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create())
-          _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
+          _    <- repo.create(Transactions.create(catid = Categories.cid2, amount = GBP(45.0)))
           txs  <- repo.getAll(Users.uid1, None, None)
         yield {
           txs must have size 2
-          txs.map(_.kind) mustBe List(TransactionKind.Expense, TransactionKind.Income)
           txs.map(_.amount) mustBe List(GBP(15.0), GBP(45.0))
           txs.map(_.categoryId) mustBe List(Categories.cid, Categories.cid2)
         }
@@ -73,7 +72,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
         val result = for
           repo <- TransactionRepository.make(db, sess, false)
           _    <- repo.create(Transactions.create())
-          _    <- repo.create(Transactions.create(catid = Categories.cid2, kind = TransactionKind.Income, amount = GBP(45.0)))
+          _    <- repo.create(Transactions.create(catid = Categories.cid2, amount = GBP(45.0)))
           txs  <- repo.getAll(Users.uid1, None, None)
         yield txs
 
