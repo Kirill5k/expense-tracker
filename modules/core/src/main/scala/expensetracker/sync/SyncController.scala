@@ -7,7 +7,7 @@ import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.{Category, CategoryId, CategoryKind}
 import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
-import expensetracker.sync.SyncController.WatermelonDataChanges
+import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPullResponse}
 import expensetracker.transaction.{Transaction, TransactionId}
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
@@ -26,7 +26,12 @@ final private class SyncController[F[_]](
     .serverLogic { sess => lastPulledAt =>
       service
         .pullChanges(sess.userId, lastPulledAt.map(Instant.ofEpochMilli))
-        .mapResponse(dc => WatermelonDataChanges.from(dc))
+        .mapResponse { dc =>
+          WatermelonPullResponse(
+            changes = WatermelonDataChanges.from(dc),
+            timestamp = dc.time.toEpochMilli
+          )
+        }
     }
 
   override def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
@@ -133,8 +138,7 @@ object SyncController extends TapirSchema with TapirJson {
       state: WatermelonDataChange[WatermelonState],
       transactions: WatermelonDataChange[WatermelonTransaction],
       categories: WatermelonDataChange[WatermelonCategory],
-      users: WatermelonDataChange[WatermelonUser],
-      timestamp: Long
+      users: WatermelonDataChange[WatermelonUser]
   ) derives Codec.AsObject
 
   object WatermelonDataChanges:
@@ -155,16 +159,20 @@ object SyncController extends TapirSchema with TapirJson {
           created = dc.users.created.map(WatermelonUser.from),
           updated = dc.users.updated.map(WatermelonUser.from),
           deleted = Nil
-        ),
-        timestamp = dc.time.toEpochMilli
+        )
       )
+
+  final case class WatermelonPullResponse(
+      changes: WatermelonDataChanges,
+      timestamp: Long
+  ) derives Codec.AsObject
 
   val queryParams = query[Option[Long]]("last_pulled_at")
 
   val pullChangesEndpoint = Controller.securedEndpoint.get
     .in(watermelonPath)
     .in(queryParams)
-    .out(jsonBody[WatermelonDataChanges])
+    .out(jsonBody[WatermelonPullResponse])
 
   def make[F[_]: Async](service: SyncService[F]): F[Controller[F]] =
     Monad[F].pure(SyncController[F](service))
