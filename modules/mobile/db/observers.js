@@ -1,4 +1,4 @@
-import {combineLatest} from 'rxjs'
+import {combineLatest, of as of$} from 'rxjs'
 import {switchMap} from 'rxjs/operators'
 import {Q} from '@nozbe/watermelondb'
 import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
@@ -39,7 +39,7 @@ const transactionsObservable =
 
 const transactionCountObservable =
     withObservables(['user'], ({user}) => ({
-      totalTransactionCount: user.activeTransactions.observeCount(),
+      totalTransactionCount: user ? user.activeTransactions.observeCount() : of$(null),
     }))
 
 export const enhanceWithCompleteState = compose(

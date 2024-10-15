@@ -26,7 +26,7 @@ export const printAmount = (total, currency, withSign = true) => {
 
   const sign = withSign ? (total < 0 ? '-' : '+') : '';
 
-  return `${sign}${currency.symbol}${formattedNumber}`
+  return `${sign}${currency ? currency.symbol : ''}${formattedNumber}`
 }
 
 export const formatDate = (tx) => {

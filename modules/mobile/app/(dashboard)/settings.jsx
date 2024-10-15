@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
@@ -89,6 +89,12 @@ const Settings = ({user, state, totalTransactionCount}) => {
         .then(({access_token}) => updateStateAuthStatus(database, access_token))
         .finally(() => setLoading(false))
   }
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/')
+    }
+  }, [])
 
   if (!user) {
     return null

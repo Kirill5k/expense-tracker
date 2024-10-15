@@ -134,13 +134,17 @@ export const updateStateAuthStatus = async (database, accessToken) => {
 }
 
 export const resetState = async (database) => {
-  const txsToDelete = await database.get('transactions').query().fetch()
-  const catsToDelete = await database.get('categories').query().fetch()
   await database.write(async () => {
-    const state = await database.get('state').find('expense-tracker')
-    await state.update(rec => resetStateRec(rec))
-    await database.batch(txsToDelete.map(t => t.prepareDestroyPermanently()))
-    await database.batch(catsToDelete.map(c => c.prepareDestroyPermanently()))
+    try {
+      await database.unsafeResetDatabase()
+      console.log('Database reset successfully.')
+      await database.get('state').create(state => {
+        state._raw.id = 'expense-tracker'
+        resetStateRec(state)
+      })
+    } catch (error) {
+      console.error('Error resetting database:', error)
+    }
   })
 }
 
