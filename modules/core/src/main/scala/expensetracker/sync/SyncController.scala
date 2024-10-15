@@ -214,7 +214,7 @@ object SyncController extends TapirSchema with TapirJson {
       timestamp: Long
   ) derives Codec.AsObject
 
-  val queryParams = query[Option[Long]]("last_pulled_at")
+  val queryParams = query[Option[Long]]("lastPulledAt")
 
   val pullChangesEndpoint = Controller.securedEndpoint.get
     .in(watermelonPath)

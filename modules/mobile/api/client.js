@@ -28,6 +28,7 @@ const requestWithBody = (reqBody, method, token) => ({ ...simpleRequest(token), 
 
 export const reject = async res => {
   const text = await res.text()
+  console.log(`${res.status} error sending request to ${res.url}: ${text}`)
   try {
     const e = JSON.parse(text)
     return Promise.reject({ message: e.message, status: res.status })
@@ -89,6 +90,10 @@ class BackendClient {
   updateTransaction = (token, requestBody) =>
       dispatchReq(`api/transactions/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
           .then(res => res.status === 204 ? requestBody : reject(res))
+
+  pullChanges = (token, lastPulledAt) =>
+      dispatchReq(`api/sync/watermelon?lastPulledAt=${lastPulledAt}`, simpleRequest(token))
+          .then(res => res.status === 200 ? res.json() : reject(res))
 }
 
 export default new BackendClient()
