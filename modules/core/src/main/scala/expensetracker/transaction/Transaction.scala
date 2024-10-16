@@ -19,7 +19,9 @@ final case class Transaction(
     note: Option[String],
     tags: Set[String],
     hidden: Boolean,
-    category: Option[Category] = None
+    category: Option[Category] = None,
+    createdAt: Option[Instant] = None,
+    lastUpdatedAt: Option[Instant] = None,
 )
 
 final case class CreateTransaction(

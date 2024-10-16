@@ -7,6 +7,7 @@ import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.*
 import expensetracker.common.errors.AppError.{CategoryAlreadyExists, CategoryDoesNotExist}
 import expensetracker.fixtures.{Categories, Users}
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
@@ -199,6 +200,38 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           yield res
 
           result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.cid)))
+        }
+      }
+    }
+    
+    "save" should {
+      "insert data into db if it doesn't exist" in {
+        withEmbeddedMongoDb { db =>
+          val newCat = Categories.cat(id = CategoryId(ObjectId().toHexString), name = CategoryName("cx"), uid = Some(Users.uid1))
+          val result = for
+            repo <- CategoryRepository.make(db)
+            _ <- repo.save(List(newCat))
+            cat <- repo.get(Users.uid1, newCat.id)
+          yield cat
+
+          result.map { cat =>
+            cat mustBe newCat
+          }
+        }
+      }
+
+      "update existing data" in {
+        withEmbeddedMongoDb { db =>
+          val updatedCat = Categories.cat(id = Categories.cid2, name = CategoryName("cx"), uid = Some(Users.uid2))
+          val result = for
+            repo <- CategoryRepository.make(db)
+            _ <- repo.save(List(updatedCat))
+            cat <- repo.get(Users.uid2, updatedCat.id)
+          yield cat
+
+          result.map { cat =>
+            cat mustBe updatedCat
+          }
         }
       }
     }

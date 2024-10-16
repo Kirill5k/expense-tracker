@@ -20,8 +20,6 @@ import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 import squants.Money
 
-import java.time.Instant
-
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[Transaction]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
@@ -39,6 +37,25 @@ final private class LiveTransactionRepository[F[_]](
 )(using
     F: Async[F]
 ) extends TransactionRepository[F] {
+
+  extension (tx: Transaction)
+    private def toFilterById: Filter =
+      userIdEq(tx.userId) && idEq(tx.id.toObjectId)
+    private def toUpdate: Update = {
+      var upd = Update
+        .setOnInsert(Field.Id, tx.id.toObjectId)
+        .setOnInsert(Field.UId, tx.userId.toObjectId)
+        .set(Field.CId, tx.categoryId.toObjectId)
+        .set(Field.Amount, tx.amount)
+        .set(Field.Note, tx.note)
+        .set(Field.Date, tx.date)
+        .set(Field.Tags, tx.tags)
+        .set(Field.Hidden, tx.hidden)
+
+      upd = tx.createdAt.fold(upd)(ts => upd.set(Field.CreatedAt, ts))
+      upd = tx.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
+      upd
+    }
 
   private val findWithCategory = (filter: Filter) =>
     Aggregate
@@ -81,17 +98,7 @@ final private class LiveTransactionRepository[F[_]](
 
   override def update(tx: Transaction): F[Unit] =
     collection
-      .updateOne(
-        userIdEq(tx.userId) && idEq(tx.id.toObjectId),
-        Update
-          .set(Field.CId, tx.categoryId.toObjectId)
-          .set(Field.Amount, tx.amount)
-          .set(Field.Note, tx.note)
-          .set(Field.Date, tx.date)
-          .set(Field.Tags, tx.tags)
-          .set(Field.Hidden, tx.hidden)
-          .currentDate(Field.LastUpdatedAt)
-      )
+      .updateOne(tx.toFilterById, tx.toUpdate)
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(tx.id)))
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =

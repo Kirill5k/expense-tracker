@@ -14,6 +14,7 @@ import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
+import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
 
 trait CategoryRepository[F[_]] extends Repository[F]:
   def create(cat: CreateCategory): F[Category]
@@ -24,12 +25,34 @@ trait CategoryRepository[F[_]] extends Repository[F]:
   def assignDefault(uid: UserId): F[Unit]
   def hide(uid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit]
   def isHidden(uid: UserId, cid: CategoryId): F[Boolean]
+  def save(cats: List[Category]): F[Unit]
 
 final private class LiveCategoryRepository[F[_]](
     private val collection: MongoCollection[F, CategoryEntity]
 )(using
     F: Async[F]
 ) extends CategoryRepository[F] {
+
+  extension (cat: Category)
+    private def toFilterById: Filter = userIdEq(cat.userId) && idEq(cat.id.toObjectId)
+    private def toUpdate: Update = {
+      var upd = Update
+        .setOnInsert(Field.Id, cat.id.toObjectId)
+        .setOnInsert(Field.UId, cat.userId.map(_.toObjectId))
+        .set(Field.Kind, cat.kind)
+        .set(Field.Name, cat.name)
+        .set(Field.Icon, cat.icon)
+        .set(Field.Color, cat.color)
+        .set(Field.Hidden, cat.hidden)
+
+      upd = cat.createdAt.fold(upd)(ts => upd.set(Field.CreatedAt, ts))
+      upd = cat.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
+      upd
+    }
+
+  override def save(cats: List[Category]): F[Unit] =
+    val commands = cats.map(c => WriteCommand.UpdateOne(c.toFilterById, c.toUpdate, UpdateOptions(upsert = true)))
+    collection.bulkWrite(commands).void
 
   override def getAll(uid: UserId): F[List[Category]] =
     collection
@@ -64,16 +87,7 @@ final private class LiveCategoryRepository[F[_]](
 
   override def update(cat: Category): F[Unit] =
     collection
-      .updateOne(
-        userIdEq(cat.userId) && idEq(cat.id.toObjectId),
-        Update
-          .set(Field.Kind, cat.kind)
-          .set(Field.Name, cat.name)
-          .set(Field.Icon, cat.icon)
-          .set(Field.Color, cat.color)
-          .set(Field.Hidden, cat.hidden)
-          .currentDate(Field.LastUpdatedAt)
-      )
+      .updateOne(cat.toFilterById, cat.toUpdate)
       .flatMap(errorIfNoMatches(AppError.CategoryDoesNotExist(cat.id)))
 
   override def assignDefault(uid: UserId): F[Unit] =

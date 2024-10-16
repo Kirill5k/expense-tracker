@@ -14,6 +14,7 @@ import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
 import squants.market.{Currency, Money, defaultMoneyContext}
+import sttp.model.StatusCode
 import sttp.tapir.*
 
 import java.time.{Instant, LocalDate}
@@ -221,6 +222,12 @@ object SyncController extends TapirSchema with TapirJson {
     .in(queryParams)
     .out(jsonBody[WatermelonPullResponse])
 
+  val pushChangesEndpoint = Controller.securedEndpoint.post
+    .in(watermelonPath)
+    .in(queryParams)
+    .in(jsonBody[WatermelonDataChanges])
+    .out(statusCode(StatusCode.NoContent))
+  
   def make[F[_]: Async](service: SyncService[F]): F[Controller[F]] =
     Monad[F].pure(SyncController[F](service))
 }
