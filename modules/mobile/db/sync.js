@@ -21,7 +21,7 @@ async function initSync(database, accessToken) {
     console.log('Performing db sync')
     await synchronize(syncArgs)
   } catch (err) {
-    console.log(`Error performing db sync. will try again: ${err}`)
+    console.log(`Error performing db sync. Will try again: ${err}`)
     await synchronize(syncArgs)
   }
 }

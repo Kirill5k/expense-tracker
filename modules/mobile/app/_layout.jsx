@@ -1,7 +1,7 @@
 import '@/global.css'
 import 'react-native-reanimated'
 import 'react-native-get-random-values'
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
@@ -55,13 +55,25 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken} = useStore()
 
   useEffect(() => {
-    if (accessToken) {
-      //TODO: Init db sync
+    const syncDb = () => {
       console.log('starting db sync')
     }
+
+    if (accessToken) {
+      //TODO: Init db sync
+      syncDb()
+      const intervalId = setInterval(syncDb, 5000)
+      setIntervalId(intervalId)
+    } else if (intervalId) {
+      clearInterval(intervalId)
+      setIntervalId(null)
+    }
+
+    return () => intervalId ? clearInterval(intervalId) : true
   }, [accessToken]);
 
   return (
@@ -75,9 +87,10 @@ function RootLayoutNav() {
                     onToastClose={clearAlert}
                     notification={alert}
                 >
-                  <Stack.Screen name="(dashboard)"/>
+                  <Stack.Screen name="index"/>
                   <Stack.Screen name="auth/signin"/>
                   <Stack.Screen name="auth/signup"/>
+                  <Stack.Screen name="(dashboard)"/>
                 </StackWithToast>
               </DatabaseProvider>
             </ThemeProvider>
