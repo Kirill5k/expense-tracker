@@ -9,7 +9,7 @@ import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
 
 const Index = ({state, user}) => {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading, setAccessToken] = useState(true)
   const colorScheme = useColorScheme()
   const {mode, setMode} = useStore()
 
@@ -20,6 +20,10 @@ const Index = ({state, user}) => {
       setMode('light')
     } else {
       setMode(colorScheme === ' dark' ? 'dark' : 'light')
+    }
+
+    if (state.accessToken) {
+      setAccessToken(state.accessToken)
     }
 
     if (state.isAuthenticated && user) {

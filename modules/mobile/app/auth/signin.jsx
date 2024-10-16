@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useEffect} from 'react'
 import {Link, router} from 'expo-router'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import {HStack} from '@/components/ui/hstack'
@@ -17,9 +17,8 @@ import {updateStateAuthStatus, saveUser, saveCategories, saveTransactions} from 
 
 
 const SignIn = () => {
-  const [accessToken, setAccessToken] = useState(null)
   const database = useDatabase()
-  const {setLoginSuccessAlert, mode} = useStore()
+  const {setLoginSuccessAlert, mode, accessToken, setAccessToken} = useStore()
 
   const handleLogin = async (credentials) => {
     const {access_token} = await Client.login(credentials)

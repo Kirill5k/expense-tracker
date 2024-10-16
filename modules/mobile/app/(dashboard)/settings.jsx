@@ -54,13 +54,14 @@ const showSecuritySettings = false
 const Settings = ({user, state, totalTransactionCount}) => {
   const colorScheme = useColorScheme()
   const database = useDatabase()
-  const {mode, setMode, logout, changeUserPassword} = useStore()
+  const {mode, setMode, clearAccessToken} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleLogout = () => {
     setLoading(true)
+    clearAccessToken()
     resetState(database)
         .then(() => router.push('/'))
         .finally(() => setLoading(false))

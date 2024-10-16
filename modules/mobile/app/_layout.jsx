@@ -55,7 +55,14 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const {mode, alert, clearAlert} = useStore()
+  const {mode, alert, clearAlert, accessToken} = useStore()
+
+  useEffect(() => {
+    if (accessToken) {
+      //TODO: Init db sync
+      console.log('starting db sync')
+    }
+  }, [accessToken]);
 
   return (
       <SafeAreaProvider>

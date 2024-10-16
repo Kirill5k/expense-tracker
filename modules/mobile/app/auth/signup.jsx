@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Heading} from '@/components/ui/heading'
@@ -17,9 +17,8 @@ import {updateStateAuthStatus, saveUser, saveCategories, saveTransactions} from 
 
 
 const SignUp = () => {
-  const [accessToken, setAccessToken] = useState(null)
   const database = useDatabase()
-  const {setRegistrationSuccessAlert, mode} = useStore()
+  const {setRegistrationSuccessAlert, mode, accessToken, setAccessToken} = useStore()
 
   const handleCreateAccount = async (account) => {
     await Client.createUser(account)
