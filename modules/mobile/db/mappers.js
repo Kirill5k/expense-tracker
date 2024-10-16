@@ -12,7 +12,7 @@ export const mapTransactions = (dbTxs, dbCats, dbUser) => {
       .map(t => ({...t.toDomain, category: catsById[t.categoryId]}))
       .filter(t => {
         return (t?.hidden !== true) &&
-            (t?.category?.hidden !== true) &&
+            (t?.category && t?.category?.hidden !== true) &&
             (t?.amount?.currency?.code === user?.settings?.currency?.code) &&
             (user.settings?.futureTransactionVisibilityDays === null || new Date(t.date) <= maxTxDate)
       })
