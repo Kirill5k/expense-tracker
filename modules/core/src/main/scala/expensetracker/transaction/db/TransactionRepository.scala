@@ -18,6 +18,7 @@ import mongo4cats.client.ClientSession
 import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
+import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
 import squants.Money
 
 import java.time.Instant
@@ -31,6 +32,7 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
+  def save(txs: List[Transaction]): F[Unit]
 
 final private class LiveTransactionRepository[F[_]](
     private val collection: MongoCollection[F, TransactionEntity],
@@ -124,6 +126,10 @@ final private class LiveTransactionRepository[F[_]](
     collection
       .count(userIdEq(uid) && idEq(txid.toObjectId) && Filter.eq(Field.Hidden, true))
       .map(_ > 0)
+
+  override def save(txs: List[Transaction]): F[Unit] =
+    val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, UpdateOptions(upsert = true)))
+    collection.bulkWrite(cmds).void
 }
 
 object TransactionRepository extends MongoJsonCodecs with JsonCodecs:

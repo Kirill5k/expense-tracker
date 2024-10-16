@@ -240,6 +240,30 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
         }
       }
     }
+
+    "save" should {
+      "insert new tx into db" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          val tx = Transactions.tx()
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            _    <- repo.save(List(Transactions.tx()))
+            txs  <- repo.getAll(Users.uid1, None, None)
+          yield txs.map(_.copy(category = None)) mustBe List(tx)
+        }
+      }
+
+      "update existing tx in db" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            _    <- repo.save(List(tx.copy(amount = GBP(10.0))))
+            txs  <- repo.getAll(Users.uid1, None, None)
+          yield txs mustBe List(tx.copy(amount = GBP(10.0)))
+        }
+      }
+    }
   }
 
   def withEmbeddedMongoDb[A](test: (MongoDatabase[IO], ClientSession[IO]) => IO[A]): Future[A] =
