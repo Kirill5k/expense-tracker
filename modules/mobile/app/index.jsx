@@ -9,9 +9,9 @@ import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
 
 const Index = ({state, user}) => {
-  const [isLoading, setIsLoading, setAccessToken] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const colorScheme = useColorScheme()
-  const {mode, setMode} = useStore()
+  const {mode, setMode, setAccessToken} = useStore()
 
   useEffect(() => {
     if (user?.settingsDarkMode === true) {
