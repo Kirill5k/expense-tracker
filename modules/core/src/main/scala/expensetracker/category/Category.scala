@@ -3,6 +3,8 @@ package expensetracker.category
 import expensetracker.common.types.{EnumType, IdType, StringType}
 import expensetracker.auth.user.UserId
 
+import java.time.Instant
+
 opaque type CategoryId = String
 object CategoryId extends IdType[CategoryId]
 

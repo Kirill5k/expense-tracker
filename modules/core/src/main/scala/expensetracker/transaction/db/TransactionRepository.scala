@@ -20,6 +20,8 @@ import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 import squants.Money
 
+import java.time.Instant
+
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[Transaction]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]

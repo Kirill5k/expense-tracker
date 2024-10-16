@@ -5,7 +5,7 @@ import expensetracker.category.{Category, CategoryId}
 import expensetracker.common.types.IdType
 import squants.market.Money
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 
 opaque type TransactionId = String
 object TransactionId extends IdType[TransactionId]
