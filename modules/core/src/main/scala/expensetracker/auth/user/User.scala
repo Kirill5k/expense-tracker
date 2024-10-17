@@ -51,7 +51,8 @@ final case class User(
     settings: UserSettings,
     registrationDate: Instant,
     categories: Option[List[Category]] = None,
-    totalTransactionCount: Option[Int] = None
+    totalTransactionCount: Option[Int] = None,
+    lastUpdatedAt: Option[Instant] = None
 )
 
 final case class UserDetails(

@@ -13,7 +13,8 @@ import expensetracker.transaction.{Transaction, TransactionId}
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
-import squants.market.{Currency, Money, defaultMoneyContext}
+import org.typelevel.log4cats.Logger
+import squants.market.{defaultMoneyContext, Currency, Money}
 import sttp.model.StatusCode
 import sttp.tapir.*
 
@@ -22,7 +23,8 @@ import java.time.{Instant, LocalDate}
 final private class SyncController[F[_]](
     private val service: SyncService[F]
 )(using
-    F: Async[F]
+    F: Async[F],
+    logger: Logger[F]
 ) extends Controller[F] {
 
   def pullChanges(using authenticator: Authenticator[F]) = SyncController.pullChangesEndpoint.withAuthenticatedSession
@@ -35,6 +37,27 @@ final private class SyncController[F[_]](
             timestamp = dc.time.toEpochMilli
           )
         }
+    }
+
+  def pushChanges(using authenticator: Authenticator[F]) = SyncController.pushChangesEndpoint.withAuthenticatedSession
+    .serverLogic { sess => (lastPulledAt, changes) =>
+      val ts = lastPulledAt.map(Instant.ofEpochMilli)
+
+      val updatedUsers = changes.users.updated.filter(_.id == sess.userId).map(_.toDomain(ts))
+      val createdCats  = changes.categories.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+      val updatedCats  = changes.categories.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+      val createdTxs   = changes.transactions.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+      val updatedTxs   = changes.transactions.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+
+      val users = updatedUsers.flatMap(_.toOption)
+      val cats  = createdCats ::: updatedCats
+      val txs   = createdTxs.flatMap(_.toOption) ::: updatedTxs.flatMap(_.toOption)
+
+      logger.info(
+        s"Push changes for ${sess.userId} at $ts: ${changes.summary}. Valid data: users - ${users.size} | categories - ${cats.size} | transactions - ${txs.size}"
+      )
+
+      service.pushChanges(users, cats, txs).voidResponse
     }
 
   override def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
@@ -62,10 +85,9 @@ object SyncController extends TapirSchema with TapirJson {
       settings_dark_mode: Option[Boolean],
       registration_date: Instant
   ) derives Codec.AsObject {
-    def toDomain: Either[AppError, User] =
-      Currency(settings_currency_code)(defaultMoneyContext)
-        .toEither
-        .left.map(e => AppError.FailedValidation(s"Invalid currency code $settings_currency_code"))
+    def toDomain(lastUpdatedAt: Option[Instant]): Either[AppError, User] =
+      Currency(settings_currency_code)(defaultMoneyContext).toEither.left
+        .map(e => AppError.FailedValidation(s"Invalid currency code $settings_currency_code"))
         .map { currency =>
           User(
             id = id,
@@ -75,8 +97,9 @@ object SyncController extends TapirSchema with TapirJson {
             settings = UserSettings(currency, false, settings_dark_mode, settings_future_transaction_visibility_days),
             registrationDate = registration_date,
             categories = None,
-            totalTransactionCount = None
-         )
+            totalTransactionCount = None,
+            lastUpdatedAt = lastUpdatedAt
+          )
         }
   }
 
@@ -103,7 +126,7 @@ object SyncController extends TapirSchema with TapirJson {
       hidden: Boolean,
       user_id: UserId
   ) derives Codec.AsObject {
-    def toDomain: Category =
+    def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Category =
       Category(
         id = id,
         kind = kind,
@@ -111,7 +134,9 @@ object SyncController extends TapirSchema with TapirJson {
         icon = CategoryIcon(icon),
         color = CategoryColor(color),
         userId = Some(user_id),
-        hidden = hidden
+        hidden = hidden,
+        createdAt = createdAt,
+        lastUpdatedAt = lastUpdatedAt
       )
   }
 
@@ -139,10 +164,9 @@ object SyncController extends TapirSchema with TapirJson {
       hidden: Boolean,
       user_id: UserId
   ) derives Codec.AsObject {
-    def toDomain: Either[AppError, Transaction] =
-      Currency(amount_currency_code)(defaultMoneyContext)
-        .toEither
-        .left.map(e => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
+    def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, Transaction] =
+      Currency(amount_currency_code)(defaultMoneyContext).toEither.left
+        .map(e => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
         .map { currency =>
           Transaction(
             id = id,
@@ -153,7 +177,9 @@ object SyncController extends TapirSchema with TapirJson {
             note = note,
             tags = tags.fold(Set.empty)(t => t.split(",").toSet),
             hidden = hidden,
-            category = None
+            category = None,
+            createdAt = createdAt,
+            lastUpdatedAt = lastUpdatedAt
           )
         }
   }
@@ -187,7 +213,13 @@ object SyncController extends TapirSchema with TapirJson {
       transactions: WatermelonDataChange[WatermelonTransaction],
       categories: WatermelonDataChange[WatermelonCategory],
       users: WatermelonDataChange[WatermelonUser]
-  ) derives Codec.AsObject
+  ) derives Codec.AsObject {
+    def summary: String =
+      s"""state - ${state.created.size}/${state.updated.size}/${state.deleted.size} |""" +
+        s"""users - ${users.created.size}/${users.updated.size}/${users.deleted.size} |""" +
+        s"""categories - ${categories.created.size}/${categories.updated.size}/${categories.deleted.size} |""" +
+        s"""transactions - ${transactions.created.size}/${transactions.updated.size}/${transactions.deleted.size}"""
+  }
 
   object WatermelonDataChanges:
     def from(dc: DataChanges): WatermelonDataChanges =
@@ -227,7 +259,7 @@ object SyncController extends TapirSchema with TapirJson {
     .in(queryParams)
     .in(jsonBody[WatermelonDataChanges])
     .out(statusCode(StatusCode.NoContent))
-  
-  def make[F[_]: Async](service: SyncService[F]): F[Controller[F]] =
+
+  def make[F[_]: Async: Logger](service: SyncService[F]): F[Controller[F]] =
     Monad[F].pure(SyncController[F](service))
 }
