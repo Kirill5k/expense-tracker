@@ -26,7 +26,7 @@ object Application extends IOApp.Simple:
           auth       <- Auth.make(config.auth, res, dispatcher)
           cats       <- Categories.make(res, dispatcher)
           txs        <- Transactions.make(res)
-          sync       <- Sync.make(res)
+          sync       <- Sync.make(res, dispatcher)
           http       <- Http.make(health, auth, cats, txs, sync)
           processor  <- ActionProcessor.make[IO](dispatcher, cats.service, txs.service)
           _ <- logger.info("starting http server") >> http
