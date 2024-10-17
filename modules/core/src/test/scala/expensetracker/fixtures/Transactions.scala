@@ -12,6 +12,7 @@ import java.time.LocalDate
 object Transactions {
 
   lazy val txid: TransactionId = TransactionId(ObjectId().toHexString)
+  lazy val txid2: TransactionId = TransactionId(ObjectId().toHexString)
   lazy val txdate: LocalDate   = LocalDate.now()
 
   def tx(

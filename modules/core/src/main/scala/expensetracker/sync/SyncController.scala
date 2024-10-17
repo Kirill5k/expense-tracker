@@ -63,7 +63,7 @@ final private class SyncController[F[_]](
   override def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
     Controller
       .serverInterpreter[F]
-      .toRoutes(List(pullChanges))
+      .toRoutes(List(pullChanges, pushChanges))
 }
 
 object SyncController extends TapirSchema with TapirJson {
