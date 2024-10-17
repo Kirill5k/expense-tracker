@@ -14,6 +14,7 @@ import mongo4cats.bson.{BsonValue, Document}
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
+import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Aggregate, Filter, Projection, Update}
 
 trait UserRepository[F[_]] extends Repository[F]:
@@ -22,12 +23,22 @@ trait UserRepository[F[_]] extends Repository[F]:
   def create(details: UserDetails, password: PasswordHash): F[UserId]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def updatePassword(uid: UserId)(password: PasswordHash): F[Unit]
+  def save(users: List[User]): F[Unit]
 
 final private class LiveUserRepository[F[_]](
     private val collection: MongoCollection[F, UserEntity]
 )(using
     F: Async[F]
 ) extends UserRepository[F] {
+
+  override def save(users: List[User]): F[Unit] = {
+    val cmds = users.map { u =>
+      var upd = Update.set(Field.Settings, u.settings)
+      upd = u.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
+      WriteCommand.UpdateOne(idEq(u.id.toObjectId), upd)
+    }
+    collection.bulkWrite(cmds).void
+  }
 
   override def findBy(email: UserEmail): F[Option[User]] =
     collection

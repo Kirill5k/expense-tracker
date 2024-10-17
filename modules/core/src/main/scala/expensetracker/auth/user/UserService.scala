@@ -60,7 +60,8 @@ final private class LiveUserService[F[_]](
       }
       .flatMap(repository.updatePassword(cp.id))
 
-  override def save(users: List[User]): F[Unit] = ???
+  override def save(users: List[User]): F[Unit] =
+    repository.save(users)
 }
 
 object UserService:
