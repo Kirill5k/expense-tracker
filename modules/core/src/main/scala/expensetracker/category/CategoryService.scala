@@ -14,6 +14,7 @@ trait CategoryService[F[_]] {
   def delete(uid: UserId, cid: CategoryId): F[Unit]
   def assignDefault(uid: UserId): F[Unit]
   def hide(uid: UserId, cid: CategoryId, hidden: Boolean): F[Unit]
+  def save(cats: List[Category]): F[Unit]
 }
 
 final private class LiveCategoryService[F[_]: Monad](
@@ -42,6 +43,9 @@ final private class LiveCategoryService[F[_]: Monad](
   override def hide(uid: UserId, cid: CategoryId, hidden: Boolean): F[Unit] =
     repository.hide(uid: UserId, cid: CategoryId, hidden: Boolean) >>
       dispatcher.dispatch(Action.HideTransactionsByCategory(cid, hidden))
+
+  override def save(cats: List[Category]): F[Unit] =
+    repository.save(cats)
 }
 
 object CategoryService:

@@ -28,7 +28,7 @@ object Application extends IOApp.Simple:
           txs        <- Transactions.make(res)
           sync       <- Sync.make(res, dispatcher)
           http       <- Http.make(health, auth, cats, txs, sync)
-          processor  <- ActionProcessor.make[IO](dispatcher, cats.service, txs.service)
+          processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service)
           _ <- logger.info("starting http server") >> http
             .serve(config.server)
             .concurrently(processor.run)

@@ -4,7 +4,9 @@ import cats.Monad
 import cats.effect.Temporal
 import cats.syntax.apply.*
 import cats.syntax.applicativeError.*
+import expensetracker.auth.user.UserService
 import expensetracker.category.CategoryService
+import expensetracker.common.actions.Action.{SaveCategories, SaveTransactions, SaveUsers}
 import expensetracker.common.errors.AppError
 import expensetracker.transaction.TransactionService
 import fs2.Stream
@@ -17,6 +19,7 @@ trait ActionProcessor[F[_]]:
 
 final private class LiveActionProcessor[F[_]](
     private val dispatcher: ActionDispatcher[F],
+    private val userService: UserService[F],
     private val categoryService: CategoryService[F],
     private val transactionService: TransactionService[F]
 )(using
@@ -32,6 +35,9 @@ final private class LiveActionProcessor[F[_]](
     (action match {
       case Action.SetupNewUser(uid)                       => categoryService.assignDefault(uid)
       case Action.HideTransactionsByCategory(cid, hidden) => transactionService.hide(cid, hidden)
+      case SaveUsers(users)                               => userService.save(users)
+      case SaveCategories(categories)                     => categoryService.save(categories)
+      case SaveTransactions(transactions)                 => transactionService.save(transactions)
     }).handleErrorWith {
       case error: AppError =>
         logger.warn(error)(s"domain error while processing action $action")
@@ -45,7 +51,8 @@ final private class LiveActionProcessor[F[_]](
 object ActionProcessor:
   def make[F[_]: Temporal: Logger](
       dispatcher: ActionDispatcher[F],
+      userSvc: UserService[F],
       catSvc: CategoryService[F],
       txSvc: TransactionService[F]
   ): F[ActionProcessor[F]] =
-    Monad[F].pure(LiveActionProcessor[F](dispatcher, catSvc, txSvc))
+    Monad[F].pure(LiveActionProcessor[F](dispatcher, userSvc, catSvc, txSvc))

@@ -15,6 +15,7 @@ import jwt.JwtEncoder
 import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]] private (
+    val userService: UserService[F],
     val authenticator: Authenticator[F],
     val controller: Controller[F]
 )
@@ -29,4 +30,4 @@ object Auth:
       encr     <- PasswordEncryptor.make[F](config)
       usrSvc   <- UserService.make[F](accRepo, encr, dispatcher)
       authCtrl <- AuthController.make[F](usrSvc, sessSvc)
-    yield Auth[F](sessSvc.authenticate(_), authCtrl)
+    yield Auth[F](usrSvc, sessSvc.authenticate(_), authCtrl)

@@ -12,6 +12,7 @@ trait UserService[F[_]]:
   def find(uid: UserId): F[User]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
+  def save(users: List[User]): F[Unit]
 
 final private class LiveUserService[F[_]](
     private val repository: UserRepository[F],
@@ -45,7 +46,7 @@ final private class LiveUserService[F[_]](
 
   override def find(uid: UserId): F[User] =
     repository.find(uid)
-  
+
   override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     repository.updateSettings(uid, settings)
 
@@ -59,6 +60,7 @@ final private class LiveUserService[F[_]](
       }
       .flatMap(repository.updatePassword(cp.id))
 
+  override def save(users: List[User]): F[Unit] = ???
 }
 
 object UserService:
