@@ -94,6 +94,10 @@ class BackendClient {
   pullChanges = (token, lastPulledAt) =>
       dispatchReq(`api/sync/watermelon?lastPulledAt=${lastPulledAt}`, simpleRequest(token))
           .then(res => res.status === 200 ? res.json() : reject(res))
+
+  pushChanges = (token, lastPulledAt, changes) =>
+      dispatchReq(`api/sync/watermelon?lastPulledAt=${lastPulledAt}`, requestWithBody(changes, 'POST', token))
+          .then(res => res.status === 204 ? {} : reject(res))
 }
 
 export default new BackendClient()

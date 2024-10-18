@@ -1,20 +1,11 @@
 import {synchronize} from '@nozbe/watermelondb/sync'
 import Client from '@/api/client'
 
-
 async function initSync(database, accessToken) {
   const syncArgs = {
     database,
     pullChanges: ({lastPulledAt}) => Client.pullChanges(accessToken, lastPulledAt),
-    pushChanges: async ({changes, lastPulledAt}) => {
-      const response = await fetch(`https://my.backend/sync?last_pulled_at=${lastPulledAt}`, {
-        method: 'POST',
-        body: JSON.stringify(changes),
-      })
-      if (!response.ok) {
-        throw new Error(await response.text())
-      }
-    },
+    pushChanges: async ({changes, lastPulledAt}) => Client.pushChanges(accessToken, lastPulledAt, changes),
     migrationsEnabledAtVersion: 1,
   }
   try {
