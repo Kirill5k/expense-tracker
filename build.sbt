@@ -41,7 +41,8 @@ val core = project
     name                 := "expense-tracker-core",
     moduleName           := "expense-tracker-core",
     Docker / packageName := "expense-tracker-core",
-    libraryDependencies ++= Dependencies.core ++ Dependencies.test
+    libraryDependencies ++= Dependencies.core ++ Dependencies.test,
+    Test / scalacOptions += "-Wconf:msg=unused value of type:silent"
   )
 
 val openapi = project

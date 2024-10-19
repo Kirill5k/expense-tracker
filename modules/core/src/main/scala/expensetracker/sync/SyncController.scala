@@ -2,6 +2,7 @@ package expensetracker.sync
 
 import cats.Monad
 import cats.effect.Async
+import cats.syntax.flatMap.*
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName}
@@ -55,9 +56,8 @@ final private class SyncController[F[_]](
 
       logger.info(
         s"Push changes for ${sess.userId} at $ts: ${changes.summary}. Valid data: users - ${users.size} | categories - ${cats.size} | transactions - ${txs.size}"
-      )
-
-      service.pushChanges(users, cats, txs).voidResponse
+      ) >>
+        service.pushChanges(users, cats, txs).voidResponse
     }
 
   override def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
