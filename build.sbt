@@ -1,11 +1,11 @@
 import com.typesafe.sbt.packager.docker.*
 import sbtghactions.JavaSpec
 
-ThisBuild / scalaVersion                        := "3.4.1"
+ThisBuild / scalaVersion                        := "3.5.1"
 ThisBuild / version                             := scala.sys.process.Process("git rev-parse HEAD").!!.trim.slice(0, 7)
 ThisBuild / organization                        := "io.github.kirill5k"
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
-ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("22"))
+ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("23"))
 
 val noPublish = Seq(
   publish         := {},
@@ -18,7 +18,7 @@ val docker = Seq(
   packageName        := moduleName.value,
   version            := version.value,
   maintainer         := "immotional@aol.com",
-  dockerBaseImage    := "amazoncorretto:22.0.0-alpine",
+  dockerBaseImage    := "amazoncorretto:23-alpine",
   dockerUpdateLatest := true,
   dockerUsername     := sys.env.get("DOCKER_USERNAME"),
   dockerRepository   := sys.env.get("DOCKER_REPO_URI"),
