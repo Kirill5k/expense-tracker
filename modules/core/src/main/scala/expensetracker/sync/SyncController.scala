@@ -7,7 +7,6 @@ import expensetracker.auth.Authenticator
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserName, UserSettings}
 import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryId, CategoryKind, CategoryName}
 import expensetracker.common.errors.AppError
-import expensetracker.common.validations.*
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPullResponse}
 import expensetracker.transaction.{Transaction, TransactionId}
