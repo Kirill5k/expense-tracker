@@ -50,7 +50,7 @@ final private class LiveSyncRepository[F[_]](
           "$filter" := Document(
             "input" := "$" + collection,
             "as"    := item,
-            "cond"  := BV.document("$ne" := BV.array(BV.string("$$" + item + ".hidden"), BV.False))
+            "cond"  := BV.document("$ne" := BV.array(BV.string("$$" + item + ".hidden"), BV.True))
           )
         )
 

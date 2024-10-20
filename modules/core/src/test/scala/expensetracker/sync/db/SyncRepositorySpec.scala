@@ -87,7 +87,10 @@ class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
           for
             db           <- client.getDatabase("expense-tracker")
             categories   <- db.getCollection("categories")
-            _            <- categories.insertMany(List(categoryDoc(Categories.cid, "c1", Some(Users.uid1))))
+            _            <- categories.insertMany(List(
+              categoryDoc(Categories.cid, "c1", Some(Users.uid1)),
+              categoryDoc(Categories.cid2, "c2", Some(Users.uid1), hidden = Some(true))
+            ))
             users        <- db.getCollection("users")
             _            <- users.insertMany(List(userDoc(Users.uid1, UserEmail("acc1"))))
             transactions <- db.getCollection("transactions")
