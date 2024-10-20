@@ -5,6 +5,7 @@ import React, {useEffect, useState} from 'react'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
+import {useNetInfo} from '@react-native-community/netinfo'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
 import {Stack} from 'expo-router'
@@ -57,14 +58,20 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken} = useStore()
+  const {type, isConnected, isInternetReachable} = useNetInfo()
 
   useEffect(() => {
     const syncDb = () => {
-      console.log('starting db sync')
+      if (isInternetReachable) {
+        console.log('starting db sync', type)
+      } else {
+        console.log('not connected to the internet')
+      }
     }
 
     if (accessToken) {
       //TODO: Init db sync
+      //TODO: Check if online
       syncDb()
       const intervalId = setInterval(syncDb, 5000)
       setIntervalId(intervalId)

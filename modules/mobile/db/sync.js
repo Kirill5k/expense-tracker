@@ -1,7 +1,7 @@
 import {synchronize} from '@nozbe/watermelondb/sync'
 import Client from '@/api/client'
 
-async function initSync(database, accessToken) {
+export const initSync = async (database, accessToken) => {
   const syncArgs = {
     database,
     pullChanges: ({lastPulledAt}) => Client.pullChanges(accessToken, lastPulledAt),
