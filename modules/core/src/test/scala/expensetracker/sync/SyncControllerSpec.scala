@@ -2,7 +2,7 @@ package expensetracker.sync
 
 import cats.effect.IO
 import expensetracker.auth.Authenticator
-import expensetracker.auth.user.{PasswordHash, User, UserId}
+import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.Category
 import expensetracker.transaction.Transaction
 import expensetracker.fixtures.{Categories, Sessions, Transactions, Users}
@@ -24,6 +24,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |      "created" : [
        |      ],
        |      "updated" : [
+       |        { "id": "expense-tracker", "user_id" : "${Users.uid1}" }
        |      ],
        |      "deleted" : [
        |      ]
@@ -87,9 +88,9 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |      ]
        |    },
        |    "users" : {
-       |      "created" : [
-       |      ],
        |      "updated" : [
+       |      ],
+       |      "created" : [
        |        {
        |          "id" : "${Users.uid1}",
        |          "first_name" : "John",
@@ -121,7 +122,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
             DataChanges(
               transactions = DataChange(created = List(Transactions.tx()), updated = List(Transactions.tx(Transactions.txid2))),
               categories = DataChange(created = List(Categories.cat()), updated = List(Categories.cat(Categories.cid2))),
-              users = DataChange(created = Nil, updated = List(Users.user)),
+              users = DataChange(created = List(Users.user), updated = Nil),
               time = time
             )
           )
@@ -150,7 +151,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
 
         res mustHaveStatus (Status.NoContent, None)
         verify(svc).pushChanges(
-          List(Users.user.copy(password = PasswordHash(""), lastUpdatedAt = Some(time))),
+          List(),
           List(
             Categories.cat().copy(createdAt = Some(time), lastUpdatedAt = Some(time)),
             Categories.cat(Categories.cid2).copy(lastUpdatedAt = Some(time))

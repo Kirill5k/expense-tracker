@@ -71,7 +71,10 @@ object SyncController extends TapirSchema with TapirJson {
   private val basePath       = "sync"
   private val watermelonPath = basePath / "watermelon"
 
-  final case class WatermelonState() derives Codec.AsObject
+  final case class WatermelonState(
+      id: String,
+      user_id: UserId
+  ) derives Codec.AsObject
 
   final case class WatermelonUser(
       id: UserId,
@@ -223,7 +226,11 @@ object SyncController extends TapirSchema with TapirJson {
   object WatermelonDataChanges:
     def from(dc: DataChanges): WatermelonDataChanges =
       WatermelonDataChanges(
-        state = WatermelonDataChange(Nil, Nil, Nil),
+        state = WatermelonDataChange(
+          created = Nil,
+          updated = Option.when(dc.users.created.nonEmpty)(WatermelonState("expense-tracker", dc.users.created.head.id)).toList,
+          deleted = Nil
+       ),
         transactions = WatermelonDataChange(
           created = dc.transactions.created.map(WatermelonTransaction.from),
           updated = dc.transactions.updated.map(WatermelonTransaction.from),
