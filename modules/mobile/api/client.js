@@ -24,20 +24,22 @@ const simpleRequest = (token) => {
 }
 const requestWithBody = (reqBody, method, token) => ({...simpleRequest(token), method, body: JSON.stringify(reqBody)})
 
-/* eslint-disable */
+const errorWithStatus = (message, status) => {
+  const error = new Error(message)
+  error.status = status
+  return error
+}
 
 export const reject = async res => {
   const text = await res.text()
   console.log(`${res.status} error sending request to ${res.url}: ${text}`)
   try {
     const e = JSON.parse(text)
-    return Promise.reject({message: e.message, status: res.status})
+    return Promise.reject(errorWithStatus(e.message, res.status))
   } catch (err) {
-    return Promise.reject({message: 'Server not available. Try again later', status: res.status})
+    return Promise.reject(errorWithStatus('Server not available. Try again later', res.status))
   }
 }
-
-/* eslint-enable */
 
 class BackendClient {
   getUser = (token) =>
@@ -93,20 +95,12 @@ class BackendClient {
           .then(res => res.status === 204 ? requestBody : reject(res))
 
   pullChanges = (token, lastPulledAt) => {
-    let url = 'api/sync/watermelon'
-    if (lastPulledAt) {
-      url = `${url}?lastPulledAt=${lastPulledAt}`
-    }
-    return dispatchReq(url, simpleRequest(token))
+    return dispatchReq('api/sync/watermelon', simpleRequest(token), {lastPulledAt})
         .then(res => res.status === 200 ? res.json() : reject(res))
   }
 
   pushChanges = (token, lastPulledAt, changes) => {
-    let url = 'api/sync/watermelon'
-    if (lastPulledAt) {
-      url = `${url}?lastPulledAt=${lastPulledAt}`
-    }
-    return dispatchReq(url, requestWithBody(changes, 'POST', token))
+    return dispatchReq('api/sync/watermelon', requestWithBody(changes, 'POST', token), {lastPulledAt})
         .then(res => res.status === 204 ? {} : reject(res))
   }
 }

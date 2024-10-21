@@ -13,22 +13,24 @@ const simpleRequest = (token) => {
 }
 const requestWithBody = (reqBody, method, token) => ({ ...simpleRequest(token), method, body: JSON.stringify(reqBody) })
 
-/* eslint-disable */
-const notConnectedToTheInternet = () => Promise.reject({
-  message: 'Unable to complete the action - no internet connection',
-  status: 500
-})
+const errorWithStatus = (message, status) => {
+  const error = new Error(message)
+  error.status = status
+  return error
+}
+
+const notConnectedToTheInternet = () =>
+  Promise.reject(errorWithStatus('Unable to complete the action - no internet connection', 500))
 
 export const reject = async res => {
   const text = await res.text()
   try {
     const e = JSON.parse(text)
-    return Promise.reject({ message: e.message, status: res.status })
+    return Promise.reject(errorWithStatus(e.message, res.status))
   } catch (err) {
-    return Promise.reject({ message: 'Server not available. Try again later', status: res.status })
+    return Promise.reject(errorWithStatus('Server not available. Try again later', res.status))
   }
 }
-/* eslint-enable */
 
 class StubClient {
   getUser = () => notConnectedToTheInternet()
