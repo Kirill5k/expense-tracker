@@ -13,10 +13,11 @@ import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
 import Client from '@/api/client'
 import {useDatabase} from '@nozbe/watermelondb/react'
-import {updateStateAuthStatus, saveUser, saveCategories, saveTransactions} from '@/db/operations'
+import {updateStateAuthStatus} from '@/db/operations'
+import {enhanceWithUser} from '@/db/observers'
 
 
-const SignUp = () => {
+const SignUp = ({user}) => {
   const database = useDatabase()
   const {setRegistrationSuccessAlert, mode, accessToken, setAccessToken} = useStore()
 
@@ -29,19 +30,12 @@ const SignUp = () => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const user = await Client.getUser(accessToken)
-      await saveUser(database, user)
-      await saveCategories(database, user.id, user.categories)
-      const transactions = await Client.getTransactions(accessToken)
-      await saveTransactions(database, user.id, transactions)
-      router.push('/analytics')
-    }
-
-    if (accessToken) {
-      fetchData()
-    }
-  }, [accessToken]);
+    useEffect(() => {
+      if (user) {
+        router.push('/analytics')
+      }
+    }, [user]);
+  }, [user]);
 
   return (
       <AuthLayout>
@@ -86,4 +80,4 @@ const SignUp = () => {
   )
 }
 
-export default SignUp
+export default enhanceWithUser(SignUp)

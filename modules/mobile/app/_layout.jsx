@@ -15,6 +15,7 @@ import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {withToast} from '@/components/ui/toast'
 import useStore from '@/store'
 import database from '@/db'
+import {initSync} from '@/db/sync'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -63,17 +64,13 @@ function RootLayoutNav() {
   useEffect(() => {
     const syncDb = () => {
       if (isInternetReachable) {
-        console.log('starting db sync', type)
-      } else {
-        console.log('not connected to the internet')
+        initSync(database, accessToken)
       }
     }
 
     if (accessToken) {
-      //TODO: Init db sync
-      //TODO: Check if online
       syncDb()
-      const intervalId = setInterval(syncDb, 5000)
+      const intervalId = setInterval(syncDb, 300000) // 5 minutes
       setIntervalId(intervalId)
     } else if (intervalId) {
       clearInterval(intervalId)

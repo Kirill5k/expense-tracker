@@ -93,7 +93,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
 
   useEffect(() => {
     if (!user) {
-      router.push('/')
+      handleLogout()
     }
   }, [])
 

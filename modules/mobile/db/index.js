@@ -5,14 +5,15 @@ import {ObjectId} from 'bson'
 import {User, Transaction, Category, State} from './models'
 import {initState} from './operations'
 import schema from './schema'
+import migrations from './migrations'
 
 setGenerator(() => new ObjectId().toHexString())
 
 const adapter = new SQLiteAdapter({
   schema,
-  // migrations,
+  migrations,
   // (optional database name or file system path)
-  dbName: 'et-7',
+  dbName: 'et-9',
   // (recommended option, should work flawlessly out of the box on iOS. On Android,
   // additional installation steps have to be taken - disable if you run into issues...)
   jsi: true, /* Platform.OS === 'ios' */

@@ -1,6 +1,7 @@
 import {synchronize} from '@nozbe/watermelondb/sync'
 import Client from '@/api/client'
 
+//TODO: handle 403
 export const initSync = async (database, accessToken) => {
   const syncArgs = {
     database,

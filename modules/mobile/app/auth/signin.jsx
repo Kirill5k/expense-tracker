@@ -13,10 +13,11 @@ import {LoginForm} from '@/components/auth/login'
 import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
 import Client from '@/api/client'
-import {updateStateAuthStatus, saveUser, saveCategories, saveTransactions} from '@/db/operations'
+import {updateStateAuthStatus} from '@/db/operations'
+import {enhanceWithUser} from '@/db/observers'
 
 
-const SignIn = () => {
+const SignIn = ({user}) => {
   const database = useDatabase()
   const {setLoginSuccessAlert, mode, accessToken, setAccessToken} = useStore()
 
@@ -28,19 +29,10 @@ const SignIn = () => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const user = await Client.getUser(accessToken)
-      await saveUser(database, user)
-      await saveCategories(database, user.id, user.categories)
-      const transactions = await Client.getTransactions(accessToken)
-      await saveTransactions(database, user.id, transactions)
+    if (user) {
       router.push('/analytics')
     }
-
-    if (accessToken) {
-      fetchData()
-    }
-  }, [accessToken]);
+  }, [user]);
 
   return (
       <AuthLayout>
@@ -82,4 +74,4 @@ const SignIn = () => {
   )
 }
 
-export default SignIn
+export default enhanceWithUser(SignIn)
