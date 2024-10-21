@@ -16,13 +16,13 @@ const dispatchReq = (path, request, params = {}) => {
 }
 
 const simpleRequest = (token) => {
-  const headers = { 'Content-Type': 'application/json' }
+  const headers = {'Content-Type': 'application/json'}
   if (token) {
     headers.Authorization = `Bearer ${token}`
   }
-  return { headers, ...DEFAULT_REQUEST_PARAMS }
+  return {headers, ...DEFAULT_REQUEST_PARAMS}
 }
-const requestWithBody = (reqBody, method, token) => ({ ...simpleRequest(token), method, body: JSON.stringify(reqBody) })
+const requestWithBody = (reqBody, method, token) => ({...simpleRequest(token), method, body: JSON.stringify(reqBody)})
 
 /* eslint-disable */
 
@@ -31,11 +31,12 @@ export const reject = async res => {
   console.log(`${res.status} error sending request to ${res.url}: ${text}`)
   try {
     const e = JSON.parse(text)
-    return Promise.reject({ message: e.message, status: res.status })
+    return Promise.reject({message: e.message, status: res.status})
   } catch (err) {
-    return Promise.reject({ message: 'Server not available. Try again later', status: res.status })
+    return Promise.reject({message: 'Server not available. Try again later', status: res.status})
   }
 }
+
 /* eslint-enable */
 
 class BackendClient {
@@ -67,8 +68,8 @@ class BackendClient {
       dispatchReq('api/categories', requestWithBody(requestBody, 'POST', token))
           .then(res => res.status === 201 ? res.json() : reject(res))
 
-  hideCategory = (token, { id, hidden }) =>
-      dispatchReq(`api/categories/${id}/hidden`, requestWithBody({ hidden }, 'PUT', token))
+  hideCategory = (token, {id, hidden}) =>
+      dispatchReq(`api/categories/${id}/hidden`, requestWithBody({hidden}, 'PUT', token))
           .then(res => res.status === 204 ? {} : reject(res))
 
   updateCategory = (token, requestBody) =>
@@ -83,21 +84,31 @@ class BackendClient {
       dispatchReq('api/transactions', requestWithBody(requestBody, 'POST', token))
           .then(res => res.status === 201 ? res.json() : reject(res))
 
-  hideTransaction = (token, { id, hidden }) =>
-      dispatchReq(`api/transactions/${id}/hidden`, requestWithBody({ hidden }, 'PUT', token))
+  hideTransaction = (token, {id, hidden}) =>
+      dispatchReq(`api/transactions/${id}/hidden`, requestWithBody({hidden}, 'PUT', token))
           .then(res => res.status === 204 ? {} : reject(res))
 
   updateTransaction = (token, requestBody) =>
       dispatchReq(`api/transactions/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
           .then(res => res.status === 204 ? requestBody : reject(res))
 
-  pullChanges = (token, lastPulledAt) =>
-      dispatchReq(`api/sync/watermelon?lastPulledAt=${lastPulledAt}`, simpleRequest(token))
-          .then(res => res.status === 200 ? res.json() : reject(res))
+  pullChanges = (token, lastPulledAt) => {
+    let url = 'api/sync/watermelon'
+    if (lastPulledAt) {
+      url = `${url}?lastPulledAt=${lastPulledAt}`
+    }
+    return dispatchReq(url, simpleRequest(token))
+        .then(res => res.status === 200 ? res.json() : reject(res))
+  }
 
-  pushChanges = (token, lastPulledAt, changes) =>
-      dispatchReq(`api/sync/watermelon?lastPulledAt=${lastPulledAt}`, requestWithBody(changes, 'POST', token))
-          .then(res => res.status === 204 ? {} : reject(res))
+  pushChanges = (token, lastPulledAt, changes) => {
+    let url = 'api/sync/watermelon'
+    if (lastPulledAt) {
+      url = `${url}?lastPulledAt=${lastPulledAt}`
+    }
+    return dispatchReq(url, requestWithBody(changes, 'POST', token))
+        .then(res => res.status === 204 ? {} : reject(res))
+  }
 }
 
 export default new BackendClient()
