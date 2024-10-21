@@ -252,7 +252,7 @@ export default {
       }
     },
     update (tx) {
-      this.newTransaction = { ...tx, amount: tx.amount.value, date: tx.date.slice(0, 10) }
+      this.newTransaction = { ...tx, amount: tx.amount.value, date: tx.date.slice(0, 10), kind: tx.category.kind }
       this.dialog = true
     },
     formatTag (tag) {
