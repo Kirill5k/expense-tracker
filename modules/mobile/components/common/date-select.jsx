@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import DateTimePicker from 'react-native-ui-datepicker'
 import {Button, ButtonIcon, ButtonText} from "../ui/button";
 import {Box} from "../ui/box";
+import {HStack} from "../ui/hstack";
 import {MaterialIcon} from "../ui/icon";
 import {Modal, ModalBackdrop, ModalContent, ModalBody} from "../ui/modal";
 import colors from '@/constants/colors'
@@ -72,11 +73,23 @@ const DateSelect = ({value, onSelect, mode}) => {
                     fontWeight: 'bold'
                   }}
               />
-              <Box className="ml-auto">
+              <HStack className="mx-3 justify-end" space="sm">
+                <Button
+                    size="xs"
+                    variant="outline"
+                    action="secondary"
+                    onPress={() => {
+                      setShow(false)
+                    }}
+                >
+                  <ButtonText>
+                    Cancel
+                  </ButtonText>
+                </Button>
                 <Button
                     size="xs"
                     action="secondary"
-                    className={`mx-3 ${mode === 'light' ? 'bg-blue-600' : 'bg-blue-300'}`}
+                    className={`${mode === 'light' ? 'bg-blue-600' : 'bg-blue-300'}`}
                     onPress={() => {
                       onSelect(new Date())
                       setShow(false)
@@ -86,7 +99,7 @@ const DateSelect = ({value, onSelect, mode}) => {
                     Today
                   </ButtonText>
                 </Button>
-              </Box>
+              </HStack>
             </ModalBody>
           </ModalContent>
         </Modal>
