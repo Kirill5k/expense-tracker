@@ -1,16 +1,18 @@
-import React from "react";
+import {Modal as ReactNativeModal} from 'react-native'
 import {
-  Modal as GSModal,
+  Modal as GlueStackModal,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
   ModalBody
-} from "@/components/ui/modal";
-import {Heading} from "@/components/ui/heading";
+} from '@/components/ui/modal'
+import {Heading} from '@/components/ui/heading'
+import {VStack} from '@/components/ui/vstack'
 
-const Modal = ({isOpen, onClose, headerTitle, children}) => {
+export const GSModal = ({isOpen, onClose, headerTitle, children}) => {
   return (
-      <GSModal
+      <GlueStackModal
+          useRNModal
           size="md"
           isOpen={isOpen}
           onClose={onClose}
@@ -27,8 +29,27 @@ const Modal = ({isOpen, onClose, headerTitle, children}) => {
             {children}
           </ModalBody>
         </ModalContent>
-      </GSModal>
+      </GlueStackModal>
   )
 }
 
-export default Modal
+export const RNModal = ({isOpen, onClose, headerTitle, children}) => {
+  return (
+      <ReactNativeModal
+          presentationStyle="formSheet"
+          animationType="slide"
+          visible={isOpen}
+          onDismiss={onClose}
+          avoidKeyboard
+      >
+        <VStack className="py-12 px-8">
+          <Heading size="md" className="font-semibold">
+            {headerTitle}
+          </Heading>
+          {children}
+        </VStack>
+      </ReactNativeModal>
+  )
+}
+
+export default GSModal
