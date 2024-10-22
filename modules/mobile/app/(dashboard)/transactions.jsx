@@ -61,6 +61,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
         <DatePeriodSelect
+            className="mb-1 max-h-9"
             disabled={loading}
             mode={mode}
             value={state.displayDate}

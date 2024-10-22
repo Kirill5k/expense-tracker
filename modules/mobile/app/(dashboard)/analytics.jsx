@@ -5,7 +5,7 @@ import {Divider} from '@/components/ui/divider'
 import {Heading} from '@/components/ui/heading'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {ProgressBar} from '@/components/common/progress'
-import DatePeriodSelect from '@/components/common/date-period-select'
+import NewDatePeriodSelect from '@/components/common/date-period-select'
 import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
 import CategoryGroupedTransactionList from '@/components/analytics/list'
@@ -37,7 +37,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
   }, [state.displayDateText])
 
   return (
-      <VStack className={Classes.dashboardLayout}>
+      <VStack className={`${Classes.dashboardLayout} items-start`}>
         <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Analytics
         </Heading>
@@ -68,8 +68,8 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
               currency={user?.currency}
               onChartPress={setSelectedTransactions}
           />
-          <DatePeriodSelect
-              className="my-2"
+          <NewDatePeriodSelect
+              className="mt-3 mb-2"
               disabled={loading}
               mode={mode}
               value={state.displayDate}
