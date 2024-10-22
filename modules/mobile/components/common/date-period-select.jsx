@@ -61,13 +61,13 @@ const ranges = {
 }
 
 export const FlatDatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
-  const [dates, setDates] = useState([incrementBy(value, -1), value, incrementBy(value, 1)])
+  const dates = [incrementBy(value, -1), value, incrementBy(value, 1)]
 
   const handleRangeChange = (newRange) => {
     const newDateRange = newDisplayDateForToday(newRange.value)
     const previous = incrementBy(newDateRange, -1)
     const next = incrementBy(newDateRange, 1)
-    setDates([previous, newDateRange, next])
+    // setDates([previous, newDateRange, next])
     onSelect({...newDateRange, previous, next})
   }
 
@@ -75,7 +75,7 @@ export const FlatDatePeriodSelect = ({disabled, value, onSelect, mode, className
     const newDateRange = newDate.value
     const previous = incrementBy(newDateRange, -1)
     const next = incrementBy(newDateRange, 1)
-    setDates([previous, newDateRange, next])
+    // setDates([previous, newDateRange, next])
     onSelect({...newDateRange, previous, next})
   }
 
