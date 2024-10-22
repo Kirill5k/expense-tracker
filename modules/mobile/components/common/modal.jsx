@@ -12,7 +12,6 @@ import {VStack} from '@/components/ui/vstack'
 export const GSModal = ({isOpen, onClose, headerTitle, children}) => {
   return (
       <GlueStackModal
-          useRNModal
           size="md"
           isOpen={isOpen}
           onClose={onClose}
