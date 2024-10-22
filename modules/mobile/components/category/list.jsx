@@ -5,10 +5,16 @@ import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
 import {ListItemPressable, ListItemIcon} from '@/components/common/list'
 import Classes from '@/constants/classes'
+import {mergeClasses} from '@/utils/css'
+
 
 const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}) => {
   return (
-      <Box className={`bg-background-50 px-1 ${item.isFirst && 'rounded-t-xl pt-1'} ${item.isLast && 'rounded-b-xl pb-1'}`}>
+      <Box className={mergeClasses(
+          'bg-background-50 px-1',
+          item.isFirst && 'rounded-t-xl pt-1',
+          item.isLast && 'rounded-b-xl pb-1'
+      )}>
         <ListItemPressable
             disabled={disabled}
             onPress={() => onItemPress(item)}

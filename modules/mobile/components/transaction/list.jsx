@@ -8,6 +8,7 @@ import {groupBy} from '@/utils/arrays'
 import {calcTotal, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
 import {VirtualizedList} from '@/components/ui/virtualized-list'
+import {mergeClasses} from '@/utils/css'
 
 const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
@@ -39,7 +40,10 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                   </HStack>}
                 </VStack>
                 <Text
-                    className={`rounded-xl border text-xs font-medium p-1 px-2 ml-auto ${isExpense(tx) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'}`}>
+                    className={mergeClasses(
+                        'rounded-xl border text-xs font-medium p-1 px-2 ml-auto',
+                        isExpense(tx) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
+                    )}>
                   {formatAmount(tx)}
                 </Text>
               </HStack>
