@@ -1,13 +1,10 @@
 import {useEffect} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
-import {Heading} from '@/components/ui/heading'
 import {Link, router} from 'expo-router'
 import {Text} from '@/components/ui/text'
 import {LinkText} from '@/components/ui/link'
-import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
-import {Pressable} from '@/components/ui/pressable'
-import {AuthLayout} from '@/components/auth/layout'
+import {AuthLayout, AuthHeader} from '@/components/auth/layout'
 import {RegistrationForm} from '@/components/auth/registration'
 import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
@@ -15,7 +12,6 @@ import Client from '@/api/client'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import {updateStateAuthStatus} from '@/db/operations'
 import {enhanceWithUser} from '@/db/observers'
-
 
 const SignUp = ({user}) => {
   const database = useDatabase()
@@ -30,30 +26,19 @@ const SignUp = ({user}) => {
   }
 
   useEffect(() => {
-    useEffect(() => {
-      if (user) {
-        router.push('/analytics')
-      }
-    }, [user]);
-  }, [user]);
+    if (user) {
+      router.push('/analytics')
+    }
+  }, [user])
 
   return (
       <AuthLayout>
         {!accessToken && (
             <VStack className="md:items-center" space="md">
-              <Pressable onPress={() => router.back()}>
-                <Icon
-                    as={ArrowLeftIcon}
-                    className="md:hidden stroke-background-800"
-                    size="xl"
-                />
-              </Pressable>
-              <VStack>
-                <Heading className="md:text-center" size="3xl">
-                  Sign Up
-                </Heading>
-                <Text>Create an account and start using Expense-Tracker</Text>
-              </VStack>
+              <AuthHeader
+                  heading="Sign Up"
+                  subHeading="Create an account and start using Expense-Tracker"
+              />
               <RegistrationForm
                   mode={mode}
                   onSubmit={handleCreateAccount}
