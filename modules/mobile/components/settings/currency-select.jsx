@@ -1,9 +1,10 @@
-import React from 'react';
-import {ButtonIcon, ButtonText, Button} from '../ui/button';
-import {MaterialIcon} from '../ui/icon';
-import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
+import {useState} from 'react'
+import {ButtonIcon, ButtonText, Button} from '../ui/button'
+import {MaterialIcon} from '../ui/icon'
+import {Menu, MenuItem, MenuItemLabel} from '../ui/menu'
 import colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
+import {mergeClasses} from '@/utils/css'
 
 export const currencies = [
   { country: 'United States Dollar', code: 'USD', symbol: '$' },
@@ -16,13 +17,14 @@ export const currencies = [
   { country: 'Turkish Lira', code: 'TRY', symbol: '₺' }
 ]
 
-export const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'sm'}) => {
+  const [isOpen, setIsOpen] = useState(false)
   const currenciesByCode = createLookup(currencies, c => c.code)
-  const [selected, setSelected] = React.useState(value?.code ? new Set([value.code]) : new Set([]))
+  const [selected, setSelected] = useState(value?.code ? new Set([value.code]) : new Set([]))
 
   return (
       <Menu
+          className="min-w-80"
           closeOnSelect={true}
           placement="bottom start"
           offset={0}
@@ -37,16 +39,16 @@ export const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
           trigger={(triggerProps) => (
               <Button
                   isDisabled={isDisabled}
-                  size="xs"
+                  size={size}
                   variant="outline"
                   action="secondary"
                   className="justify-between align-center px-3"
                   {...triggerProps}
               >
-                <ButtonText className="px-0 text-lg">
+                <ButtonText className="px-0 text-lg text-secondary-500">
                   {value?.symbol}
                 </ButtonText>
-                <ButtonText className="pl-2 grow text-sm text-left">
+                <ButtonText className="pl-2 grow text-sm text-left text-secondary-500 font-medium">
                   {currenciesByCode[value?.code]?.country}
                 </ButtonText>
                 <ButtonIcon
@@ -62,7 +64,7 @@ export const CurrencySelect = ({isDisabled, value, onSelect, mode}) => {
             <MenuItem
                 key={c.code}
                 textValue={c.code}
-                className={`${value?.code === c.code ? 'bg-background-100' : ''}`}
+                className={mergeClasses(value?.code === c.code && 'bg-background-100')}
             >
               <MenuItemLabel size="md" className="px-2">{c.symbol}</MenuItemLabel>
               <MenuItemLabel size="sm" className="px-2">{c.country}</MenuItemLabel>

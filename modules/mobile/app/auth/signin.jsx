@@ -29,7 +29,7 @@ const SignIn = ({user}) => {
     if (user) {
       router.push('/analytics')
     }
-  }, [user]);
+  }, [user])
 
   return (
       <AuthLayout>

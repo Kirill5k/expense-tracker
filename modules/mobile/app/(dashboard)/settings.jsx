@@ -137,6 +137,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                     their original currency.
                   </AccordionContentText>
                   <CurrencySelect
+                      size="xs"
                       isDisabled={loading}
                       mode={mode}
                       value={user?.currency}
