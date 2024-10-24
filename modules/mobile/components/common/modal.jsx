@@ -8,17 +8,7 @@ import {
 } from '@/components/ui/modal'
 import {Heading} from '@/components/ui/heading'
 import {VStack} from '@/components/ui/vstack'
-
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-  ActionsheetIcon,
-} from '@/components/ui/actionsheet'
+import {Actionsheet, ActionsheetBackdrop, ActionsheetContent} from '@/components/ui/actionsheet'
 import {KeyboardAvoidingView} from '@/components/ui/keyboard-avoiding-view'
 
 export const GSModal = ({isOpen, onClose, headerTitle, children}) => {
@@ -69,10 +59,14 @@ export const ASModal = ({isOpen, onClose, headerTitle, children}) => {
       <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <Actionsheet isOpen={isOpen} onClose={onClose}>
+        <Actionsheet
+            className=""
+            isOpen={isOpen}
+            onClose={onClose}
+        >
           <ActionsheetBackdrop />
-          <ActionsheetContent className="py-4 px-8">
-            <Heading size="md" className="w-full text-left font-semibold">
+          <ActionsheetContent className="rounded-xl py-4 px-8">
+            <Heading size="lg" className="py-2 w-full text-left font-semibold">
               {headerTitle}
             </Heading>
             {children}
