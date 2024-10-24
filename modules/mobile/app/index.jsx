@@ -3,10 +3,13 @@ import {router} from 'expo-router'
 import {Button, ButtonText} from '@/components/ui/button'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import {VStack} from '@/components/ui/vstack'
+import {Heading} from '@/components/ui/heading'
 import {ProgressCircle} from '@/components/common/progress'
+import {LogoChart} from '@/components/common/logo'
 import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
+import Text from '@/constants/text'
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -34,15 +37,26 @@ const Index = ({state, user}) => {
   }, []);
 
   return (
-      <SafeAreaView className="md:flex flex-col items-center justify-center md:w-full h-full">
+      <SafeAreaView className="flex-col items-center justify-center w-full h-full bg-background-0">
         {!isLoading && (
-            <VStack className="p-2 md:max-w-[440px] w-full" space="xl">
-              <Button onPress={() => router.push("auth/signin")}>
-                <ButtonText>Sign In</ButtonText>
-              </Button>
-              <Button onPress={() => router.push("auth/signup")}>
-                <ButtonText>Sign Up</ButtonText>
-              </Button>
+            <VStack className="px-9 h-full w-full justify-between" space="xl">
+              <VStack></VStack>
+              <VStack className="items-center">
+                <LogoChart
+                    mode={mode}
+                />
+                <Heading size="3xl">
+                  {Text.appName}
+                </Heading>
+              </VStack>
+              <VStack className="w-full pb-16" space="xl">
+                <Button onPress={() => router.push("auth/signin")}>
+                  <ButtonText>Log in</ButtonText>
+                </Button>
+                <Button onPress={() => router.push("auth/signup")}>
+                  <ButtonText>Create new account</ButtonText>
+                </Button>
+              </VStack>
             </VStack>
         )}
         {isLoading && <ProgressCircle mode={mode}/>}
