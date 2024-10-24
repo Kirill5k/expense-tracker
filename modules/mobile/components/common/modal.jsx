@@ -1,4 +1,4 @@
-import {Modal as ReactNativeModal} from 'react-native'
+import {Modal as ReactNativeModal, Platform} from 'react-native'
 import {
   Modal as GlueStackModal,
   ModalBackdrop,
@@ -8,6 +8,18 @@ import {
 } from '@/components/ui/modal'
 import {Heading} from '@/components/ui/heading'
 import {VStack} from '@/components/ui/vstack'
+
+import {
+  Actionsheet,
+  ActionsheetBackdrop,
+  ActionsheetContent,
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetItem,
+  ActionsheetItemText,
+  ActionsheetIcon,
+} from '@/components/ui/actionsheet'
+import {KeyboardAvoidingView} from '@/components/ui/keyboard-avoiding-view'
 
 export const GSModal = ({isOpen, onClose, headerTitle, children}) => {
   return (
@@ -51,4 +63,23 @@ export const RNModal = ({isOpen, onClose, headerTitle, children}) => {
   )
 }
 
-export default GSModal
+export const ASModal = ({isOpen, onClose, headerTitle, children}) => {
+
+  return (
+      <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Actionsheet isOpen={isOpen} onClose={onClose}>
+          <ActionsheetBackdrop />
+          <ActionsheetContent className="py-4 px-8">
+            <Heading size="md" className="w-full text-left font-semibold">
+              {headerTitle}
+            </Heading>
+            {children}
+          </ActionsheetContent>
+        </Actionsheet>
+      </KeyboardAvoidingView>
+  )
+}
+
+export default ASModal
