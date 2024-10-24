@@ -12,6 +12,7 @@ import useStore from '@/store'
 import Client from '@/api/client'
 import {updateStateAuthStatus} from '@/db/operations'
 import {enhanceWithUser} from '@/db/observers'
+import Wordings from '@/constants/text'
 
 
 const SignIn = ({user}) => {
@@ -36,8 +37,8 @@ const SignIn = ({user}) => {
         {!accessToken && (
             <VStack className="md:items-center" space="md">
               <AuthHeader
-                  heading="Sign In"
-                  subHeading="Login to start using Expense-Tracker"
+                  heading={Wordings.signinHeading}
+                  subHeading={Wordings.signinSubHeading}
               />
               <LoginForm onSubmit={handleLogin}/>
               <HStack className="self-center" space="sm">

@@ -156,7 +156,7 @@ export const LoginForm = ({onSubmit}) => {
             />
             <Link href="/auth/forgot-password">
               <LinkText className="font-medium text-sm text-primary-700 group-hover/link:text-primary-600">
-                Forgot Password?
+                Forgot password?
               </LinkText>
             </Link>
           </HStack>

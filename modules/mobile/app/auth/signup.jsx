@@ -12,6 +12,8 @@ import Client from '@/api/client'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import {updateStateAuthStatus} from '@/db/operations'
 import {enhanceWithUser} from '@/db/observers'
+import Wordings from '@/constants/text'
+
 
 const SignUp = ({user}) => {
   const database = useDatabase()
@@ -36,8 +38,8 @@ const SignUp = ({user}) => {
         {!accessToken && (
             <VStack className="md:items-center" space="md">
               <AuthHeader
-                  heading="Sign Up"
-                  subHeading="Create an account and start using Expense-Tracker"
+                  heading={Wordings.signupHeading}
+                  subHeading={Wordings.signupSubHeading}
               />
               <RegistrationForm
                   mode={mode}
