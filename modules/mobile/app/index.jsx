@@ -10,6 +10,7 @@ import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
 import Text from '@/constants/text'
+import Colors from '@/constants/colors'
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -37,9 +38,12 @@ const Index = ({state, user}) => {
   }, []);
 
   return (
-      <SafeAreaView className="flex-col items-center justify-center w-full h-full bg-background-0">
+      <SafeAreaView
+          className="flex-col items-center justify-center w-full h-full"
+          style={{backgroundColor: Colors[mode].splashScreenBackground}}
+      >
         {!isLoading && (
-            <VStack className="px-9 h-full w-full justify-between" space="xl">
+            <VStack className="h-full w-full justify-between" space="xl">
               <VStack></VStack>
               <VStack className="items-center">
                 <LogoChart
@@ -49,7 +53,7 @@ const Index = ({state, user}) => {
                   {Text.appName}
                 </Heading>
               </VStack>
-              <VStack className="w-full pb-16" space="xl">
+              <VStack className="rounded-xl bg-background-0 w-full p-10" space="xl">
                 <Button onPress={() => router.push("auth/signin")}>
                   <ButtonText>Log in</ButtonText>
                 </Button>

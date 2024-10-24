@@ -7,11 +7,11 @@ import Colors from '@/constants/colors'
 export const LogoChart = ({mode}) => {
 
   const data = [
-    {color: '#a78bfa', value: 20},
-    {color: '#57c2f6', value: 15},
-    {color: '#34d399', value: 25},
-    {color: '#fb7185', value: 10},
-    {color: '#22d3ee', value: 30},
+    {color: '#2563eb', value: 20},
+    {color: '#3b82f6', value: 15},
+    {color: '#60a5fa', value: 23},
+    {color: '#93c5fd', value: 12},
+    {color: '#bfdbfe', value: 30},
   ]
 
   return (
@@ -20,14 +20,14 @@ export const LogoChart = ({mode}) => {
             sectionAutoFocus
             data={data}
             donut
-            radius={90}
-            innerRadius={60}
-            innerCircleColor={Colors[mode].background}
-            strokeColor={Colors[mode].background}
+            radius={110}
+            innerRadius={70}
+            innerCircleColor={Colors[mode].splashScreenBackground}
+            strokeColor={Colors[mode].splashScreenBackground}
             strokeWidth={6}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Heading size="4xl" className="text-primary-400">
+                  <Heading size="5xl" className="text-blue-600">
                     $
                   </Heading>
                 </VStack>

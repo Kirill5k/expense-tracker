@@ -10,6 +10,7 @@ export default {
     tabIconSelected: colors.blue[600], // Equivalent to text-blue-600
     progressMain: colors.blue[500],
     progressBackground: colors.blue[200],
+    splashScreenBackground: colors.white,
     expense: {
       barChartMain: colors.rose[400],
       barChartSecondary: colors.rose[100],
@@ -28,6 +29,7 @@ export default {
     tabIconSelected: colors.blue[300], // Equivalent to text-blue-300
     progressMain: colors.blue[300],
     progressBackground: colors.blue[100],
+    splashScreenBackground: colors.black,
     expense: {
       barChartMain: colors.rose[500],
       barChartSecondary: colors.rose[950],
