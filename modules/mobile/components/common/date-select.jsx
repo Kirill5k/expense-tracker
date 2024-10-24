@@ -16,7 +16,7 @@ const DateSelect = ({value, onSelect, mode}) => {
   }
 
   return (
-      <Box className="border border-secondary-200 rounded-lg pb-8">
+      <Box className="border border-secondary-200 rounded-md pb-8">
         <DateTimePicker
             height={200}
             displayFullDays={false}
