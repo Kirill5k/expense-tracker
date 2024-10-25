@@ -27,8 +27,8 @@ export const LogoChart = ({mode}) => {
             strokeWidth={6}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Heading size="5xl" className="text-blue-600">
-                    $
+                  <Heading size="5xl" className="text-blue-500">
+                    €$£
                   </Heading>
                 </VStack>
             )}
