@@ -1,10 +1,11 @@
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Link, router} from 'expo-router'
 import {Text} from '@/components/ui/text'
 import {LinkText} from '@/components/ui/link'
 import {AuthLayout, AuthHeader} from '@/components/auth/layout'
+import {GoogleSignInButton} from '@/components/auth/google'
 import {RegistrationForm} from '@/components/auth/registration'
 import {ProgressCircle} from '@/components/common/progress'
 import useStore from '@/store'
@@ -13,6 +14,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 import {updateStateAuthStatus} from '@/db/operations'
 import {enhanceWithUser} from '@/db/observers'
 import Wordings from '@/constants/text'
+import Features from '@/config/features'
 
 
 const SignUp = ({user}) => {
@@ -45,6 +47,7 @@ const SignUp = ({user}) => {
                   mode={mode}
                   onSubmit={handleCreateAccount}
               />
+              {Features.googleSignIn && <GoogleSignInButton/>}
               <HStack className="self-center" space="sm">
                 <Text size="md">Already have an account?</Text>
                 <Link href="/auth/signin">

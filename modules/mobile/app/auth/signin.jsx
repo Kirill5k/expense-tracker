@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
 import {Link, router} from 'expo-router'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import {HStack} from '@/components/ui/hstack'
@@ -8,11 +8,13 @@ import {Text} from '@/components/ui/text'
 import {AuthLayout, AuthHeader} from '@/components/auth/layout'
 import {LoginForm} from '@/components/auth/login'
 import {ProgressCircle} from '@/components/common/progress'
+import {GoogleSignInButton} from '@/components/auth/google'
 import useStore from '@/store'
 import Client from '@/api/client'
 import {updateStateAuthStatus} from '@/db/operations'
 import {enhanceWithUser} from '@/db/observers'
 import Wordings from '@/constants/text'
+import Features from '@/config/features'
 
 
 const SignIn = ({user}) => {
@@ -40,7 +42,12 @@ const SignIn = ({user}) => {
                   heading={Wordings.signinHeading}
                   subHeading={Wordings.signinSubHeading}
               />
-              <LoginForm onSubmit={handleLogin}/>
+              <LoginForm
+                  passwordReset={Features.passwordReset}
+                  rememberMe={Features.rememberMe}
+                  onSubmit={handleLogin}
+              />
+              {Features.googleSignIn && <GoogleSignInButton/>}
               <HStack className="self-center" space="sm">
                 <Text size="md">Don't have an account?</Text>
                 <Link href="/auth/signup">
