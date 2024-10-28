@@ -135,13 +135,13 @@ const iconGroups = {
 
 const IconSelect = ({value, onChange, valueColor, mode}) => {
   return (
-      <ScrollView className="max-h-60" persistentScrollbar={true}>
+      <ScrollView className="max-h-60 border border-secondary-200 rounded-md pb-8" persistentScrollbar={true}>
         <VStack>
           {Object.entries(iconGroups).map(([g, icons]) => (
               <VStack key={g}>
-                <Text className="pl-2 text-sm text-primary-900">{g}</Text>
-                <Divider/>
-                <HStack className="py-2 px-1 w-full flex flex-wrap" space="md">
+                <Text className="p-3 text-md font-medium text-primary-900">{g}</Text>
+                <Divider className="mx-3"/>
+                <HStack className="p-3 pl-4 w-full flex flex-wrap" space="lg">
                   {icons.map((i) => (
                       <Pressable
                           key={i}

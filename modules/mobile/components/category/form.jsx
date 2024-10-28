@@ -52,7 +52,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
   }
 
   return (
-      <VStack space="md" className="w-full">
+      <VStack space="lg" className="w-full">
         <FormControl isInvalid={!!formState.errors.kind}>
           <Controller
               name="kind"
@@ -89,10 +89,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               name="name"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input
-                      size="sm"
-                      className="py-0 px-3"
-                  >
+                  <Input>
                     <InputField
                         placeholder="Name"
                         value={value}
@@ -156,7 +153,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
         </FormControl>
         <HStack space="md" className="justify-end">
           <Button
-              size="xs"
+              size="sm"
               variant="outline"
               action="secondary"
               onPress={onCancel}
@@ -164,7 +161,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
             <ButtonText>Cancel</ButtonText>
           </Button>
           <Button
-              size="xs"
+              size="sm"
               onPress={handleSubmit(handleFormSubmit)}
           >
             <ButtonText>Save</ButtonText>
