@@ -22,7 +22,8 @@ const DashboardLayout = () => {
               // Disable the static render of the header on web
               // to prevent a hydration error in React Navigation v6.
               headerShown: false,
-              tabBarStyle: { paddingBottom: 5 }
+              tabBarStyle: { paddingBottom: 5, paddingTop: 5 },
+              tabBarLabelStyle: { fontSize: 12 },
             }}
         >
           {tabs.map((tab, i) => (

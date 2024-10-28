@@ -324,7 +324,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
             onPress={handleSubmit(handleFormSubmit)}
             isDisabled={loading}
         >
-          {loading && <ButtonSpinner color={Colors[mode].tabIconDefault} className="pr-2"/>}
+          {loading && <ButtonSpinner color={Colors[mode].background} className="pr-2"/>}
           <ButtonText className="font-medium">{loading ? 'Creating an account...' : 'Sign up'}</ButtonText>
         </Button>
       </VStack>
