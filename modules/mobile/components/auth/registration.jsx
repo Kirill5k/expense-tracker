@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {Keyboard} from 'react-native'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
@@ -19,8 +19,7 @@ import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
 import {AlertTriangle} from 'lucide-react-native'
-import colors from 'tailwindcss/colors'
-
+import Colors from '@/constants/colors'
 
 const currencySchema = z.object({
   country: z.string().min(1, 'Currency country is required'),
@@ -63,6 +62,10 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     formState: {errors},
     setError
   } = useForm({resolver: zodResolver(signUpSchema)})
+  const firstNameRef = useRef(null)
+  const lastNameRef = useRef(null)
+  const passwordRef = useRef(null)
+  const confirmPasswordRef = useRef(null)
 
   const handleFormSubmit = (data) => {
     if (data.password !== data.confirmPassword) {
@@ -98,19 +101,18 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="sm">
+                  <Input>
                     <InputField
                         autoComplete="email"
                         textContentType="emailAddress"
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholder="Email"
-                        className="text-sm"
                         type="text"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
-                        onSubmitEditing={handleKeyPress}
+                        onSubmitEditing={() => firstNameRef.current.focus()}
                         returnKeyType="next"
                     />
                   </Input>
@@ -134,18 +136,18 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 defaultValue=""
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input size="sm">
+                    <Input>
                       <InputField
                           textContentType="givenName"
                           autoComplete="given-name"
-                          className="text-sm"
                           placeholder="First Name"
                           type="text"
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
-                          onSubmitEditing={handleKeyPress}
+                          onSubmitEditing={() => lastNameRef.current.focus()}
                           returnKeyType="next"
+                          ref={firstNameRef}
                       />
                     </Input>
                 )}
@@ -167,18 +169,18 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 defaultValue=""
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input size="sm">
+                    <Input>
                       <InputField
                           textContentType="familyName"
                           autoComplete="family-name"
-                          className="text-sm"
                           placeholder="Last Name"
                           type="text"
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
-                          onSubmitEditing={handleKeyPress}
+                          onSubmitEditing={() => passwordRef.current.focus()}
                           returnKeyType="next"
+                          ref={lastNameRef}
                       />
                     </Input>
                 )}
@@ -226,18 +228,18 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="sm">
+                  <Input>
                     <InputField
                         autoComplete="off"
                         textContentType="newPassword"
-                        className="text-sm"
                         placeholder="Password"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
-                        onSubmitEditing={handleKeyPress}
+                        onSubmitEditing={() => confirmPasswordRef.current.focus()}
                         returnKeyType="next"
                         type={showPassword ? "text" : "password"}
+                        ref={passwordRef}
                     />
                     <InputSlot onPress={() => setShowPassword((s) => !s)} className="pr-3">
                       <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}/>
@@ -262,18 +264,18 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               name="confirmPassword"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="sm">
+                  <Input>
                     <InputField
                         autoComplete="off"
                         textContentType="password"
                         placeholder="Confirm Password"
-                        className="text-sm"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
                         type={showConfirmPassword ? "text" : "password"}
+                        ref={confirmPasswordRef}
                     />
 
                     <InputSlot onPress={() => setShowConfirmPassword(s => !s)} className="pr-3">
@@ -297,7 +299,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               control={control}
               render={({field: {onChange, value}}) => (
                   <Checkbox
-                      size="sm"
                       value="accepterTerms"
                       isChecked={value}
                       onChange={onChange}
@@ -320,12 +321,11 @@ export const RegistrationForm = ({onSubmit, mode}) => {
           </FormControlError>
         </FormControl>
         <Button
-            size="sm"
             className="w-full"
             onPress={handleSubmit(handleFormSubmit)}
             isDisabled={loading}
         >
-          {loading && <ButtonSpinner color={colors.gray[400]} className="pr-2" />}
+          {loading && <ButtonSpinner color={Colors[mode].tabIconDefault} className="pr-2"/>}
           <ButtonText className="font-medium">{loading ? 'Creating an account...' : 'Sign up'}</ButtonText>
         </Button>
       </VStack>

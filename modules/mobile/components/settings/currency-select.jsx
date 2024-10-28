@@ -17,7 +17,7 @@ export const currencies = [
   { country: 'Turkish Lira', code: 'TRY', symbol: '₺' }
 ]
 
-export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'sm'}) => {
+export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'md'}) => {
   const [isOpen, setIsOpen] = useState(false)
   const currenciesByCode = createLookup(currencies, c => c.code)
   const [selected, setSelected] = useState(value?.code ? new Set([value.code]) : new Set([]))
@@ -42,13 +42,13 @@ export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'sm'})
                   size={size}
                   variant="outline"
                   action="secondary"
-                  className="justify-between align-center px-3"
+                  className="flex justify-between items-center px-3"
                   {...triggerProps}
               >
                 <ButtonText className="px-0 text-lg text-secondary-500">
                   {value?.symbol}
                 </ButtonText>
-                <ButtonText className="pl-2 grow text-sm text-left text-secondary-500 font-medium">
+                <ButtonText className="pl-2 grow text-left text-secondary-500 font-medium">
                   {currenciesByCode[value?.code]?.country}
                 </ButtonText>
                 <ButtonIcon
@@ -66,8 +66,8 @@ export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'sm'})
                 textValue={c.code}
                 className={mergeClasses(value?.code === c.code && 'bg-background-100')}
             >
-              <MenuItemLabel size="md" className="px-2">{c.symbol}</MenuItemLabel>
-              <MenuItemLabel size="sm" className="px-2">{c.country}</MenuItemLabel>
+              <MenuItemLabel size={size} className="px-2">{c.symbol}</MenuItemLabel>
+              <MenuItemLabel size={size} className="px-2">{c.country}</MenuItemLabel>
             </MenuItem>
         ))}
       </Menu>

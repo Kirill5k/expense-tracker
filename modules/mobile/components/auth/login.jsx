@@ -1,5 +1,4 @@
 import React, {useState, useRef} from 'react'
-import colors from 'tailwindcss/colors'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {LinkText} from '@/components/ui/link'
@@ -26,6 +25,8 @@ import {useForm, Controller} from 'react-hook-form'
 import {z} from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {AlertTriangle} from 'lucide-react-native'
+import Colors from '@/constants/colors'
+
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
@@ -33,7 +34,7 @@ const loginSchema = z.object({
   rememberme: z.boolean().optional(),
 })
 
-export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
+export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
   const {
     control,
     handleSubmit,
@@ -156,7 +157,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
           )}
           {passwordReset && (
               <Link href="/auth/forgot-password">
-                <LinkText className="font-medium text-sm text-primary-700 group-hover/link:text-primary-600">
+                <LinkText className="font-medium text-md text-primary-700 group-hover/link:text-primary-600">
                   Forgot password?
                 </LinkText>
               </Link>
@@ -167,7 +168,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
             onPress={handleSubmit(handleFormSubmit)}
             isDisabled={loading}
         >
-          {loading && <ButtonSpinner color={colors.gray[400]} className="pr-2" />}
+          {loading && <ButtonSpinner color={Colors[mode].tabIconDefault} className="pr-2" />}
           <ButtonText className="font-medium">{loading ? 'Signing you in...' : 'Sign in'}</ButtonText>
         </Button>
       </VStack>

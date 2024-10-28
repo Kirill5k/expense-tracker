@@ -46,6 +46,7 @@ const SignIn = ({user}) => {
                   passwordReset={Features.passwordReset}
                   rememberMe={Features.rememberMe}
                   onSubmit={handleLogin}
+                  mode={mode}
               />
               {Features.googleSignIn && <GoogleSignInButton/>}
               <HStack className="self-center" space="sm">
