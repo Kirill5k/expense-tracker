@@ -66,7 +66,7 @@ export const ASModal = ({isOpen, onClose, headerTitle, children}) => {
         >
           <ActionsheetBackdrop />
           <ActionsheetContent className="rounded-xl py-4 px-8">
-            <Heading size="lg" className="py-2 w-full text-left font-semibold">
+            <Heading size="xl" className="py-2 w-full text-left font-semibold">
               {headerTitle}
             </Heading>
             {children}

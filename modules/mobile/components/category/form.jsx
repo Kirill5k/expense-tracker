@@ -48,7 +48,6 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
 
   const handleKeyPress = () => {
     Keyboard.dismiss();
-    handleSubmit(handleFormSubmit)();
   }
 
   return (
@@ -91,6 +90,11 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        autoComplete="off"
+                        autoCorrect={false}
+                        enterKeyHint="done"
+                        returnKeyType="done"
+                        importantForAutofill="no"
                         placeholder="Name"
                         value={value}
                         onChangeText={onChange}

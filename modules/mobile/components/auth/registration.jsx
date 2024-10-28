@@ -86,7 +86,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
   const handleKeyPress = () => {
     if (!loading) {
       Keyboard.dismiss()
-      handleSubmit(handleFormSubmit)()
     }
   }
 
