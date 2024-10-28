@@ -76,4 +76,4 @@ export const ASModal = ({isOpen, onClose, headerTitle, children}) => {
   )
 }
 
-export default ASModal
+export default GSModal
