@@ -54,10 +54,10 @@ const Index = ({state, user}) => {
                 </Heading>
               </VStack>
               <VStack className="rounded-xl bg-background-0 w-full p-10" space="xl">
-                <Button onPress={() => router.push("auth/signin")}>
+                <Button size="lg" onPress={() => router.push("auth/signin")}>
                   <ButtonText>Log in</ButtonText>
                 </Button>
-                <Button onPress={() => router.push("auth/signup")}>
+                <Button size="lg" onPress={() => router.push("auth/signup")}>
                   <ButtonText>Create new account</ButtonText>
                 </Button>
               </VStack>

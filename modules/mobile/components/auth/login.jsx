@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import colors from 'tailwindcss/colors'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
@@ -41,8 +41,9 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
     formState,
     setError
   } = useForm({resolver: zodResolver(loginSchema)});
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const passwordRef = useRef(null)
 
   const handleFormSubmit = (data) => {
     setLoading(true)
@@ -73,7 +74,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
               name="email"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="sm">
+                  <Input>
                     <InputField
                         autoComplete="email"
                         textContentType="emailAddress"
@@ -83,7 +84,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
-                        onSubmitEditing={handleKeyPress}
+                        onSubmitEditing={() => passwordRef.current.focus()}
                         returnKeyType="next"
                     />
                   </Input>
@@ -108,7 +109,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="sm">
+                  <Input>
                     <InputField
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -117,6 +118,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
                         onBlur={onBlur}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
+                        ref={passwordRef}
                     />
                     <InputSlot onPress={() => setShowPassword((s) => !s)} className="pr-3">
                       <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}/>
@@ -139,7 +141,6 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
                   control={control}
                   render={({field: {onChange, value}}) => (
                       <Checkbox
-                          size="sm"
                           value="Remember me"
                           isChecked={value}
                           onChange={onChange}
@@ -162,7 +163,6 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset}) => {
           )}
         </HStack>
         <Button
-            size="sm"
             className="w-full"
             onPress={handleSubmit(handleFormSubmit)}
             isDisabled={loading}
