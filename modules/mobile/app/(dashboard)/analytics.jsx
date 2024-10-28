@@ -5,7 +5,7 @@ import {Divider} from '@/components/ui/divider'
 import {Heading} from '@/components/ui/heading'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {ProgressBar} from '@/components/common/progress'
-import NewDatePeriodSelect from '@/components/common/date-period-select'
+import DatePeriodSelect from '@/components/common/date-period-select'
 import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
 import CategoryGroupedTransactionList from '@/components/analytics/list'
@@ -68,8 +68,8 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
               currency={user?.currency}
               onChartPress={setSelectedTransactions}
           />
-          <NewDatePeriodSelect
-              className="mt-3 mb-2"
+          <DatePeriodSelect
+              className="mt-2 mb-1"
               disabled={loading}
               mode={mode}
               value={state.displayDate}

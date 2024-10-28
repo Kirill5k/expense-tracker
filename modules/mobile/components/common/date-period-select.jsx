@@ -6,6 +6,7 @@ import {Menu, MenuItem, MenuItemLabel} from '@/components/ui/menu'
 import {ButtonIcon, ButtonText, Button} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
 import colors from '@/constants/colors'
+import {mergeClasses} from '@/utils/css'
 import ToggleButton from './toggle-button'
 import {
   format,
@@ -143,10 +144,10 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
           trigger={(triggerProps) => (
               <HStack
                   space="lg"
-                  className={`align-center justify-center ${className}`}
+                  className={`items-center justify-center ${className}`}
               >
                 <Button
-                    size="sm"
+                    size="md"
                     variant="link"
                     action="primary"
                     onPress={goBack}
@@ -160,7 +161,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   />
                 </Button>
                 <Button
-                    size="sm"
+                    size="md"
                     variant="link"
                     action="primary"
                     className="w-40"
@@ -177,7 +178,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   />
                 </Button>
                 <Button
-                    size="sm"
+                    size="md"
                     variant="link"
                     action="primary"
                     onPress={goForward}
@@ -194,8 +195,8 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
           )}
       >
         {Object.values(ranges).map(o => (
-            <MenuItem key={o.value} textValue={o.text} className={o.value === value?.range ? 'bg-background-100' : ''}>
-              <MenuItemLabel size="sm" className="px-2">{o.text}</MenuItemLabel>
+            <MenuItem key={o.value} textValue={o.label} className={mergeClasses(o.value === value?.range && 'bg-background-100')}>
+              <MenuItemLabel className="px-2">{o.label}</MenuItemLabel>
             </MenuItem>
         ))}
       </Menu>
