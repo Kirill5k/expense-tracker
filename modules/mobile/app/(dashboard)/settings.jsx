@@ -238,7 +238,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
             <Button
                 isDisabled={loading}
                 className="my-4 w-full"
-                size="xs"
+                size="sm"
                 variant="outline"
                 action="secondary"
                 onPress={handleLogout}

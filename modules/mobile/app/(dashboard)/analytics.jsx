@@ -37,7 +37,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
   }, [state.displayDateText])
 
   return (
-      <VStack className={`${Classes.dashboardLayout} items-start`}>
+      <VStack className={`${Classes.dashboardLayout}`}>
         <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Analytics
         </Heading>

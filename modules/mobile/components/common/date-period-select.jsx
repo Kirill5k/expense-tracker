@@ -202,4 +202,4 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
   )
 }
 
-export default FlatDatePeriodSelect
+export default MenuDatePeriodSelect
