@@ -4,6 +4,7 @@ import {MaterialIcon} from '../ui/icon';
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
 import colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
+import {mergeClasses} from '@/utils/css'
 
 const CategorySelect = ({items, value, onSelect, mode}) => {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -24,10 +25,9 @@ const CategorySelect = ({items, value, onSelect, mode}) => {
           onClose={() => setIsOpen(false)}
           trigger={(triggerProps) => (
               <Button
-                  size="sm"
                   variant="outline"
                   action="secondary"
-                  className="justify-between align-center"
+                  className="justify-between items-center"
                   {...triggerProps}
               >
                 {value?.icon && <ButtonIcon
@@ -37,7 +37,7 @@ const CategorySelect = ({items, value, onSelect, mode}) => {
                     dsize={20}
                     className="flex-grow-0"
                 />}
-                <ButtonText className={`flex-grow ${value?.icon ? 'px-2' : 'px-1'}`}>
+                <ButtonText className={mergeClasses('flex-grow', value?.icon && 'px-2')}>
                   {value?.name ? value.name : 'Category'}
                 </ButtonText>
                 <ButtonIcon
@@ -50,13 +50,13 @@ const CategorySelect = ({items, value, onSelect, mode}) => {
           )}
       >
         {items.map(c => (
-            <MenuItem key={c.id} textValue={c.id} className={`${c.id === value?.id ? 'bg-background-100' : ''}`}>
+            <MenuItem key={c.id} textValue={c.id} className={mergeClasses(c.id === value?.id && 'bg-background-100')}>
               <MaterialIcon
                   code={c.icon}
                   dsize={24}
                   dcolor={colors[mode].text}
               />
-              <MenuItemLabel size="sm" className="px-2">{c.name}</MenuItemLabel>
+              <MenuItemLabel className="px-2">{c.name}</MenuItemLabel>
             </MenuItem>
         ))}
       </Menu>

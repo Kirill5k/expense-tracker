@@ -4,7 +4,7 @@ import {Text} from '@/components/ui/text'
 import {Input, InputSlot, InputField} from '@/components/ui/input'
 import {HStack} from "../ui/hstack";
 
-const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'sm'}) => {
+const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
   const [currentTags, setCurrentTags] = useState(value || [])
   const [latestTag, setLatestTag] = useState('')
 

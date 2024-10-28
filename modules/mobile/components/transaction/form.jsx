@@ -96,7 +96,6 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
 
   const handleKeyPress = () => {
     Keyboard.dismiss();
-    handleSubmit(handleFormSubmit)();
   }
 
   return (
@@ -158,10 +157,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input
-                      variant="outline"
-                      size="sm"
-                  >
+                  <Input variant="outline">
                     <InputSlot>
                       <Text className="pr-1 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
@@ -234,10 +230,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Textarea
-                      size="sm"
-                      className="h-14 py-0 px-3"
-                  >
+                  <Textarea className="h-14 py-0 px-3">
                     <TextareaInput
                         placeholder="Note"
                         value={value}

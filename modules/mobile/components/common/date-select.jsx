@@ -7,8 +7,8 @@ import dayjs from 'dayjs'
 
 const DateSelect = ({value, onSelect, mode}) => {
   const textStyle = {
-    fontSize: 12,
-    lineHeight: 20
+    fontSize: 16,
+    lineHeight: 24
   }
 
   const handleDateChange = (params) => {
@@ -18,7 +18,7 @@ const DateSelect = ({value, onSelect, mode}) => {
   return (
       <Box className="border border-secondary-200 rounded-md pb-8">
         <DateTimePicker
-            height={200}
+            height={220}
             displayFullDays={false}
             mode="single"
             date={dayjs(value)}
