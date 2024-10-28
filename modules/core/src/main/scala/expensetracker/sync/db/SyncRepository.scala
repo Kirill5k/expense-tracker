@@ -78,6 +78,7 @@ final private class LiveSyncRepository[F[_]](
       collection
         .aggregate[EntityChanges](
           Aggregate
+            .matchBy(idEq(uid.toObjectId))
             .lookup("transactions", "_id", "userId", "transactionsColl")
             .lookup("categories", "_id", "userId", "categoriesColl")
             .lookup("users", "_id", "_id", "usersColl")
