@@ -10,7 +10,7 @@ import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
 import CategoryGroupedTransactionList from '@/components/analytics/list'
 import Classes from '@/constants/classes'
-import useStore from '@/store'
+import {useColorScheme} from '@/components/useColorScheme'
 import {updateStateDisplayDate} from '@/db/operations'
 import {mapTransactions} from '@/db/mappers'
 import {enhanceWithCompleteState} from '@/db/observers'
@@ -23,7 +23,7 @@ const kinds = [
 
 const Analytics = ({state, user, displayedTransactions, categories}) => {
   const database = useDatabase()
-  const {mode} = useStore()
+  const mode = useColorScheme()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)

@@ -52,9 +52,9 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 const showSecuritySettings = false
 
 const Settings = ({user, state, totalTransactionCount}) => {
-  const colorScheme = useColorScheme()
+  const mode = useColorScheme()
   const database = useDatabase()
-  const {mode, setMode, clearAccessToken} = useStore()
+  const {setMode, clearAccessToken} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -76,7 +76,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
           } else if (darkMode === true) {
             setMode('dark')
           } else {
-            setMode(colorScheme === 'dark' ? 'dark' : 'light')
+            setMode('system')
           }
         })
         .finally(() => setLoading(false))

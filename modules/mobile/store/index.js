@@ -3,7 +3,7 @@ import Alerts from './alerts'
 
 const useStore = create((set, get) => ({
   alert: null,
-  mode: 'light',
+  mode: 'system',
   accessToken: null,
   setAccessToken: (accessToken) => set({accessToken}),
   clearAccessToken: () => set({accessToken: null}),

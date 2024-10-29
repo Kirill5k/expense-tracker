@@ -14,17 +14,16 @@ import Colors from '@/constants/colors'
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
-  const colorScheme = useColorScheme()
-  const {mode, setMode, setAccessToken} = useStore()
+  const mode = useColorScheme()
+  const {setMode, setAccessToken} = useStore()
 
   useEffect(() => {
-    if (user?.settingsDarkMode === true && mode !== 'dark') {
+    if (user?.settingsDarkMode === true) {
       setMode('dark')
-    } else if (user?.settingsDarkMode === false && mode !== 'light') {
+    } else if (user?.settingsDarkMode === false) {
       setMode('light')
-    } else {
-      setMode(colorScheme === 'dark' ? 'dark' : 'light')
     }
+
     if (user) {
       setTimeout(() => router.push('/analytics'), 1000)
     }

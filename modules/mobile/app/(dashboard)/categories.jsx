@@ -8,6 +8,7 @@ import Modal from '@/components/common/modal'
 import CategoryList from '@/components/category/list'
 import CategoryForm from '@/components/category/form'
 import Classes from '@/constants/classes'
+import {useColorScheme} from '@/components/useColorScheme'
 import useStore from '@/store'
 import {mapCategories} from '@/db/mappers'
 import {enhanceWithCategories} from '@/db/observers'
@@ -16,7 +17,8 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Categories = ({user, categories, state}) => {
   const database = useDatabase()
-  const {mode, setUndoAlert} = useStore()
+  const mode = useColorScheme()
+  const {setUndoAlert} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)

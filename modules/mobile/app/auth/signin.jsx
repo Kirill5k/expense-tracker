@@ -13,13 +13,15 @@ import useStore from '@/store'
 import Client from '@/api/client'
 import {updateStateAuthStatus} from '@/db/operations'
 import {enhanceWithUser} from '@/db/observers'
+import {useColorScheme} from '@/components/useColorScheme'
 import Wordings from '@/constants/text'
 import Features from '@/config/features'
 
 
 const SignIn = ({user}) => {
   const database = useDatabase()
-  const {setLoginSuccessAlert, mode, accessToken, setAccessToken} = useStore()
+  const mode = useColorScheme()
+  const {setLoginSuccessAlert, accessToken, setAccessToken} = useStore()
 
   const handleLogin = async (credentials) => {
     const {access_token} = await Client.login(credentials)

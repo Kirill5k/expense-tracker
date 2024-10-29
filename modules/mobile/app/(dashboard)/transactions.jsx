@@ -10,6 +10,7 @@ import TransactionList from '@/components/transaction/list'
 import {ProgressBar} from '@/components/common/progress'
 import useStore from '@/store'
 import Classes from '@/constants/classes'
+import {useColorScheme} from '@/components/useColorScheme'
 import {mapTransactions} from '@/db/mappers'
 import {updateStateDisplayDate, updateTransaction, createTransaction, hideTransaction} from '@/db/operations'
 import {enhanceWithCompleteState} from '@/db/observers'
@@ -17,7 +18,8 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Transactions = ({state, user, displayedTransactions, categories}) => {
   const database = useDatabase()
-  const {mode, setUndoAlert} = useStore()
+  const {setUndoAlert} = useStore()
+  const mode = useColorScheme()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)

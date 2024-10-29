@@ -1,8 +1,8 @@
 import {Tabs} from 'expo-router'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
-import colors from '@/constants/colors'
+import Colors from '@/constants/colors'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import useStore from '@/store'
+import {useColorScheme} from '@/components/useColorScheme'
 
 const tabs = [
   {icon: 'chart-bar', text: 'Analytics', path: 'analytics'},
@@ -12,17 +12,17 @@ const tabs = [
 ]
 
 const DashboardLayout = () => {
-  const {mode} = useStore()
+  const mode = useColorScheme()
 
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
             screenOptions={{
-              tabBarActiveTintColor: colors[mode].text,
+              tabBarActiveTintColor: Colors[mode].text,
               // Disable the static render of the header on web
               // to prevent a hydration error in React Navigation v6.
               headerShown: false,
-              tabBarStyle: { paddingTop: 5 },
+              tabBarStyle: { paddingTop: 5, backgroundColor: Colors[mode].backgroundColor },
               tabBarLabelStyle: { fontSize: 12, paddingBottom: 3, paddingTop: 3 },
             }}
         >

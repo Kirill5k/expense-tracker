@@ -4,6 +4,7 @@ import {HStack} from '@/components/ui/hstack'
 import {Link, router} from 'expo-router'
 import {Text} from '@/components/ui/text'
 import {LinkText} from '@/components/ui/link'
+import {useColorScheme} from '@/components/useColorScheme'
 import {AuthLayout, AuthHeader} from '@/components/auth/layout'
 import {GoogleSignInButton} from '@/components/auth/google'
 import {RegistrationForm} from '@/components/auth/registration'
@@ -16,10 +17,10 @@ import {enhanceWithUser} from '@/db/observers'
 import Wordings from '@/constants/text'
 import Features from '@/config/features'
 
-
 const SignUp = ({user}) => {
   const database = useDatabase()
-  const {setRegistrationSuccessAlert, mode, accessToken, setAccessToken} = useStore()
+  const mode = useColorScheme()
+  const {setRegistrationSuccessAlert, accessToken, setAccessToken} = useStore()
 
   const handleCreateAccount = async (account) => {
     await Client.createUser(account)
