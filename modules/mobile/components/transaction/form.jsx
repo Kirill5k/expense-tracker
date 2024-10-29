@@ -137,6 +137,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, value}}) => (
                   <CategorySelect
+                      isInvalid={!!formState.errors.category}
                       mode={mode}
                       items={categories}
                       value={value}

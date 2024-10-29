@@ -3,5 +3,13 @@ export default {
   scrollList: 'max-w-[600px] w-full',
   listItemLayout: 'items-center p-3',
   listItemMainText: 'font-bold text-primary-800 line-clamp-1 p-0 m-0 text-lg',
-  listItemTag: 'rounded-lg border border-typography-800 text-typography-800 text-sm font-medium px-1'
+  listItemTag: 'rounded-lg border border-typography-800 text-typography-800 text-sm font-medium px-1',
+  dark: {
+    inputFieldBorder: 'border-secondary-400',
+    invalidInputFieldBorder: 'border-red-300'
+  },
+  light: {
+    inputFieldBorder: 'border-secondary-200',
+    invalidInputFieldBorder: 'border-red-600'
+  }
 }

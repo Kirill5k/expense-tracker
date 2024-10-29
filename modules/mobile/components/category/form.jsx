@@ -141,6 +141,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <IconSelect
+                      isInvalid={!!formState.errors.icon}
                       mode={mode}
                       value={value}
                       valueColor={color}

@@ -8,6 +8,8 @@ import {Divider} from '@/components/ui/divider'
 import {MaterialIcon} from '@/components/ui/icon'
 import {Avatar} from '@/components/ui/avatar'
 import Colors from '@/constants/colors'
+import Classes from '@/constants/classes'
+import {mergeClasses} from '@/utils/css'
 
 const iconGroups = {
   'Banking': [
@@ -133,9 +135,16 @@ const iconGroups = {
   ]
 }
 
-const IconSelect = ({value, onChange, valueColor, mode}) => {
+const IconSelect = ({value, onChange, valueColor, mode, isInvalid}) => {
   return (
-      <ScrollView className="max-h-60 border border-secondary-200 rounded-md pb-8" persistentScrollbar={true}>
+      <ScrollView
+          className={mergeClasses(
+              'max-h-60 border rounded-md pb-8',
+              Classes[mode].inputFieldBorder,
+              isInvalid && Classes[mode].invalidInputFieldBorder
+          )}
+          persistentScrollbar={true}
+      >
         <VStack>
           {Object.entries(iconGroups).map(([g, icons]) => (
               <VStack key={g}>

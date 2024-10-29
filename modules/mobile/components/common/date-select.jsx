@@ -1,6 +1,7 @@
 import DateTimePicker from 'react-native-ui-datepicker'
 import {Fab, FabLabel} from '../ui/fab'
 import {Box} from '../ui/box'
+import Classes from '@/constants/classes'
 import colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
 import dayjs from 'dayjs'
@@ -16,7 +17,10 @@ const DateSelect = ({value, onSelect, mode}) => {
   }
 
   return (
-      <Box className="border border-secondary-200 rounded-md pb-8">
+      <Box className={mergeClasses(
+          'border rounded-md pb-8',
+          Classes[mode].inputFieldBorder
+      )}>
         <DateTimePicker
             height={220}
             displayFullDays={false}

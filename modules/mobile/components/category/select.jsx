@@ -3,10 +3,11 @@ import {ButtonIcon, ButtonText, Button} from '../ui/button';
 import {MaterialIcon} from '../ui/icon';
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
 import colors from '@/constants/colors'
+import Classes from '@/constants/classes'
 import {createLookup} from '@/utils/arrays'
 import {mergeClasses} from '@/utils/css'
 
-const CategorySelect = ({items, value, onSelect, mode}) => {
+const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const itemsByIds = createLookup(items, c => c.id)
   const [selected, setSelected] = React.useState(value?.id ? new Set([value.id]) : new Set([]))
@@ -26,8 +27,12 @@ const CategorySelect = ({items, value, onSelect, mode}) => {
           trigger={(triggerProps) => (
               <Button
                   variant="outline"
-                  action="negative"
-                  className="justify-between items-center"
+                  action="primary"
+                  className={mergeClasses(
+                      'justify-between items-center',
+                      Classes[mode].inputFieldBorder,
+                      isInvalid && Classes[mode].invalidInputFieldBorder
+                  )}
                   {...triggerProps}
               >
                 {value?.icon && <ButtonIcon
