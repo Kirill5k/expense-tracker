@@ -3,7 +3,6 @@ import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
-import {Divider} from '@/components/ui/divider'
 import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
 import Profile from '@/components/settings/profile'
@@ -56,7 +55,6 @@ const Settings = ({user, state, totalTransactionCount}) => {
   const database = useDatabase()
   const {mode, setMode, clearAccessToken} = useStore()
 
-  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleLogout = () => {
@@ -103,20 +101,12 @@ const Settings = ({user, state, totalTransactionCount}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size="3xl" className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
-        {isScrolling && <Divider/>}
         {loading && <ProgressBar mode={mode}/>}
         <ScrollView
             showsVerticalScrollIndicator={false}
-            onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
-                setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
-                setIsScrolling(true)
-              }
-            }}
         >
           <Profile user={{...user.toDomain, totalTransactionCount}}/>
           <Heading className="py-2" size="xl">

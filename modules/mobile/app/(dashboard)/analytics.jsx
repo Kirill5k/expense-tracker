@@ -38,7 +38,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
 
   return (
       <VStack className={`${Classes.dashboardLayout}`}>
-        <Heading size={isScrolling ? 'sm' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size={isScrolling ? 'md' : '3xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Analytics
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
