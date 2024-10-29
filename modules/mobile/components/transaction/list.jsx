@@ -26,11 +26,11 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                   icon={tx.category.icon}
                   color={tx.category.color}
                 />
-                <VStack>
+                <VStack className="justify-center">
                   <Text className={Classes.listItemMainText}>
                     {tx.category.name}
                   </Text>
-                  {tx.note && <Text className="line-clamp-1 text-sm">{tx.note}</Text>}
+                  {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
                   {tx.tags.length > 0 && <HStack space="xs" className="mt-1">
                     {tx.tags.map(t => (
                         <Text key={t} className={Classes.listItemTag}>
@@ -41,7 +41,7 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                 </VStack>
                 <Text
                     className={mergeClasses(
-                        'rounded-xl border text-xs font-medium p-1 px-2 ml-auto',
+                        'rounded-xl border text-md font-medium p-1 px-2 ml-auto',
                         isExpense(tx) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
                     )}>
                   {formatAmount(tx)}
@@ -56,9 +56,9 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
 const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy, onItemDelete}) => {
   return (
       <VStack className="mb-5">
-        <HStack className="items-center">
-          <Heading size="xs" className="mb-1">{formatDate(item)}</Heading>
-          <Text className="text-xs ml-auto">{calcTotal(item.txGroup)}</Text>
+        <HStack className="items-center justify-between">
+          <Heading size="md" className="mb-1">{formatDate(item)}</Heading>
+          <Text className="text-sm">{calcTotal(item.txGroup)}</Text>
         </HStack>
         <TransactionGroup
             disabled={disabled}

@@ -75,10 +75,10 @@ export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete
 
 export const ListItemIcon = ({icon, color}) => {
   return (
-      <Avatar size="sm" className="mr-4" style={{backgroundColor: color}}>
+      <Avatar size="md" className="mr-4" style={{backgroundColor: color}}>
         <MaterialIcon
             code={icon}
-            dsize={20}
+            dsize={32}
             dcolor="white"
         />
       </Avatar>
