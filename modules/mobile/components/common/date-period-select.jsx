@@ -175,6 +175,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                       as={MaterialIcon}
                       code={isOpen ? 'chevron-up' : 'chevron-down'}
                       dcolor={colors[mode].text}
+                      dsize={20}
                   />
                 </Button>
                 <Button
