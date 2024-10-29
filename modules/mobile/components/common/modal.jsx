@@ -22,7 +22,7 @@ export const GSModal = ({isOpen, onClose, headerTitle, children}) => {
         <ModalBackdrop/>
         <ModalContent className="p-4">
           <ModalHeader>
-            <Heading size="md" className="font-semibold">
+            <Heading size="xl" className="font-semibold">
               {headerTitle}
             </Heading>
           </ModalHeader>
