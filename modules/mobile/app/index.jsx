@@ -35,7 +35,7 @@ const Index = ({state, user}) => {
     } else {
       setIsLoading(false)
     }
-  }, []);
+  }, [user, state]);
 
   return (
       <SafeAreaView
