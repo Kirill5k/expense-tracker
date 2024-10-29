@@ -147,7 +147,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   className={`items-center justify-center ${className}`}
               >
                 <Button
-                    size="md"
+                    size="lg"
                     variant="link"
                     action="primary"
                     onPress={goBack}
@@ -156,19 +156,19 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   <ButtonIcon
                       as={MaterialIcon}
                       code="chevron-left"
-                      dsize={20}
+                      dsize={28}
                       dcolor={colors[mode].text}
                   />
                 </Button>
                 <Button
-                    size="md"
+                    size="lg"
                     variant="link"
                     action="primary"
                     className="w-40"
                     isDisabled={disabled}
                     {...triggerProps}
                 >
-                  <ButtonText>
+                  <ButtonText className="text-xl">
                     {value?.text}
                   </ButtonText>
                   <ButtonIcon
@@ -178,7 +178,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   />
                 </Button>
                 <Button
-                    size="md"
+                    size="lg"
                     variant="link"
                     action="primary"
                     onPress={goForward}
@@ -187,7 +187,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   <ButtonIcon
                       as={MaterialIcon}
                       code="chevron-right"
-                      dsize={20}
+                      dsize={28}
                       dcolor={colors[mode].text}
                   />
                 </Button>
