@@ -77,8 +77,8 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        autoFocus
                         autoComplete="email"
-                        textContentType="emailAddress"
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholder="Email"
@@ -114,6 +114,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
                     <InputField
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
+                        autoComplete="current-password"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}

@@ -102,8 +102,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        autoFocus
                         autoComplete="email"
-                        textContentType="emailAddress"
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholder="Email"
@@ -137,7 +137,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
-                          textContentType="givenName"
                           autoComplete="given-name"
                           placeholder="First Name"
                           type="text"
@@ -170,7 +169,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
-                          textContentType="familyName"
                           autoComplete="family-name"
                           placeholder="Last Name"
                           type="text"
@@ -229,8 +227,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
-                        autoComplete="off"
-                        textContentType="newPassword"
+                        autoComplete="new-password"
                         placeholder="Password"
                         value={value}
                         onChangeText={onChange}
@@ -265,8 +262,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
-                        autoComplete="off"
-                        textContentType="password"
+                        autoComplete="new-password"
                         placeholder="Confirm Password"
                         value={value}
                         onChangeText={onChange}
