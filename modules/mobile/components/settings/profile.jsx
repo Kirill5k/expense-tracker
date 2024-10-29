@@ -19,10 +19,10 @@ const Profile = ({user}) => {
         <Text size="2xl" className="font-bold">
           {fullName}
         </Text>
-        <Text className="text-sm font-semibold">
+        <Text className="text-md font-semibold">
           {user.email}
         </Text>
-        <Text className="text-2xs">
+        <Text className="text-sm">
           {user.totalTransactionCount} transactions since {format(new Date(user.registrationDate), 'dd MMM yyyy')}
         </Text>
       </VStack>

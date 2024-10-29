@@ -32,7 +32,7 @@ const DaysSelect = ({isDisabled, value = 7, onSelect, mode}) => {
           trigger={(triggerProps) => (
               <Button
                   isDisabled={isDisabled}
-                  size="xs"
+                  size="md"
                   variant="link"
                   action="secondary"
                   {...triggerProps}
@@ -54,7 +54,7 @@ const DaysSelect = ({isDisabled, value = 7, onSelect, mode}) => {
                 textValue={`${d} days`}
                 className={`w-18 ${Number(value) === d ? 'bg-background-100' : ''}`}
             >
-              <MenuItemLabel size="xs" className="w-20">{`${d} days`}</MenuItemLabel>
+              <MenuItemLabel size="md" className="w-20">{`${d} days`}</MenuItemLabel>
             </MenuItem>
         ))}
       </Menu>
@@ -76,18 +76,18 @@ const HideFutureTransactionsToggle = ({isDisabled, value, onSelect, mode}) => {
       >
         <VStack space="sm">
           <Box>
-            <Radio isDisabled={isDisabled} value={0} size="sm">
+            <Radio isDisabled={isDisabled} value={0} size="md">
               <RadioIndicator>
                 <RadioIcon as={CircleIcon}/>
               </RadioIndicator>
               <RadioLabel className="pl-0.5">Hide all future transactions</RadioLabel>
             </Radio>
-            <Text size="xs" className="ml-6 text-typography-500">
+            <Text size="md" className="ml-[26px] text-typography-500">
               Only show transactions with today’s or past dates
             </Text>
           </Box>
           <Box>
-            <Radio isDisabled={isDisabled} value={1} size="sm">
+            <Radio isDisabled={isDisabled} value={1} size="md">
               <RadioIndicator>
                 <RadioIcon as={CircleIcon}/>
               </RadioIndicator>
@@ -102,18 +102,18 @@ const HideFutureTransactionsToggle = ({isDisabled, value, onSelect, mode}) => {
                   mode={mode}
               />
             </Radio>
-            <Text size="xs" className="ml-6 text-typography-500" style={{marginTop: -5}}>
+            <Text size="md" className="ml-[26px] text-typography-500" style={{marginTop: -5}}>
               View upcoming transactions within a selected range
             </Text>
           </Box>
           <Box>
-            <Radio isDisabled={isDisabled} value={null} size="sm">
+            <Radio isDisabled={isDisabled} value={null} size="md">
               <RadioIndicator>
                 <RadioIcon as={CircleIcon}/>
               </RadioIndicator>
               <RadioLabel className="pl-0.5">Always show all transactions</RadioLabel>
             </Radio>
-            <Text size="xs" className="ml-6 text-typography-500">
+            <Text size="md" className="ml-[26px] text-typography-500">
               View all transactions, including those scheduled for future dates
             </Text>
           </Box>

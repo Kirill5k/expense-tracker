@@ -17,15 +17,14 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
       <>
         <Alert action="error" variant="solid">
           <AlertIcon as={MaterialIcon} code="alert-circle-outline" dcolor={Colors[mode].error} dsize={16}/>
-          <AlertText size="sm">
+          <AlertText size="md">
             {alertText}
           </AlertText>
         </Alert>
         <Input
             variant="outline"
-            size="sm"
+            size="md"
             className="mt-4"
-
         >
           <InputField
               value={input}
@@ -42,7 +41,7 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
         <Button
             isDisabled={isDisabled || !isConfirmed}
             className="my-4 w-full"
-            size="xs"
+            size="sm"
             action="negative"
             variant={outline ? 'outline' : 'solid'}
             onPress={onPress}

@@ -127,7 +127,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                     their original currency.
                   </AccordionContentText>
                   <CurrencySelect
-                      size="xs"
+                      size="md"
                       isDisabled={loading}
                       mode={mode}
                       value={user?.currency}
@@ -228,7 +228,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
             <Button
                 isDisabled={loading}
                 className="my-4 w-full"
-                size="sm"
+                size="md"
                 variant="outline"
                 action="secondary"
                 onPress={handleLogout}

@@ -16,7 +16,7 @@ export const SettingsAccordion = ({isDisabled, className, children}) => {
   return (
       <Accordion
           isDisabled={isDisabled}
-          size="sm"
+          size="md"
           variant="unfilled"
           type="single"
           isCollapsible={true}
@@ -50,7 +50,7 @@ export const SettingsAccordionHeader = ({title, value}) => {
               <>
                 <AccordionTitleText>{title}</AccordionTitleText>
                 <HStack className="items-center">
-                  {value != null && <Text size="sm" className="text-secondary-400">{value}</Text>}
+                  {value != null && <Text size="md" className="text-secondary-400">{value}</Text>}
                   {isExpanded ? (
                       <AccordionIcon as={ChevronUpIcon} className="ml-3"/>
                   ) : (
