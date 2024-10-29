@@ -28,7 +28,7 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
             <Text className={Classes.listItemMainText}>
               {item.name}
             </Text>
-            <Text className="uppercase ml-auto text-typography-500 text-xs font-medium">
+            <Text className="uppercase ml-auto text-typography-500 text-md font-medium">
               {item.kind}
             </Text>
           </HStack>

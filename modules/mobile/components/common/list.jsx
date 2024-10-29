@@ -29,7 +29,7 @@ const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
                     swipeableRef?.current?.close()
                   }}
               >
-                <ButtonIcon as={MaterialIcon} code="content-copy" dsize={16} dcolor="white" />
+                <ButtonIcon as={MaterialIcon} code="content-copy" dsize={20} dcolor="white" />
               </Button>
           )}
           <Button
@@ -41,7 +41,7 @@ const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
                 swipeableRef?.current?.close()
               }}
           >
-            <ButtonIcon as={MaterialIcon} code="trash-can" dsize={16} dcolor="white" />
+            <ButtonIcon as={MaterialIcon} code="trash-can" dsize={20} dcolor="white" />
           </Button>
         </HStack>
       </Animated.View>
@@ -75,10 +75,10 @@ export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete
 
 export const ListItemIcon = ({icon, color}) => {
   return (
-      <Avatar size="sm" className="mr-4" style={{backgroundColor: color}}>
+      <Avatar size="md" className="mr-4" style={{backgroundColor: color}}>
         <MaterialIcon
             code={icon}
-            dsize={20}
+            dsize={32}
             dcolor="white"
         />
       </Avatar>

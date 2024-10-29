@@ -13,7 +13,7 @@ const FloatingButton = ({onPress, mode, iconCode}) => {
             as={MaterialIcon}
             className="fill-typography-50 text-primary-100"
             code={iconCode}
-            dsize={18}
+            dsize={20}
             dcolor={colors[mode].text}
         />
       </Fab>

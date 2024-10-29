@@ -32,7 +32,9 @@ const Index = ({state, user}) => {
 
   useEffect(() => {
     if (state) {
-      setIsLoading(false)
+      if (state.isAuthenticated === false) {
+        setIsLoading(false)
+      }
 
       if (state?.accessToken) {
         setAccessToken(state.accessToken)

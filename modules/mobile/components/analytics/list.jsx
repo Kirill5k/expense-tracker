@@ -61,15 +61,15 @@ const CategoryGroupedTransactionList = ({items}) => {
                             icon={item.category.icon}
                             color={item.category.color}
                         />
-                        <VStack>
+                        <VStack className="justify-center">
                           <Text className={Classes.listItemMainText}>{item.category.name}</Text>
-                          <Text className="line-clamp-1 text-sm">
+                          <Text className="line-clamp-1 text-md">
                             {item.transactions.length} {item.transactions.length === 1 ? 'transaction' : 'transactions'}
                           </Text>
                         </VStack>
-                        <VStack className="ml-auto">
+                        <VStack className="justify-center ml-auto">
                           <Text className={Classes.listItemMainText}>{printAmountAdjusted(item)}</Text>
-                          <Text className="line-clamp-1 text-sm text-right">{printPercentage(item)}</Text>
+                          <Text className="line-clamp-1 text-md text-right">{printPercentage(item)}</Text>
                         </VStack>
                       </HStack>
                   )}
@@ -78,10 +78,10 @@ const CategoryGroupedTransactionList = ({items}) => {
               <AccordionContent className="pt-0 mt-0">
                 <VStack space="sm">
                   {item.transactions.map(tx => (
-                      <HStack key={tx.id} className="w-full justify-between bg-background-100 rounded-xl py-2 px-4">
+                      <HStack key={tx.id} className="w-full justify-between bg-background-100 rounded-xl py-3 px-3">
                         <VStack className="items-start">
-                          <Text className="line-clamp-1 text-xs text-right font-semibold">{formatDate(tx)}</Text>
-                          {tx.note && <Text className="line-clamp-1 text-sm">{tx.note}</Text>}
+                          <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
+                          {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
                           {tx.tags.length > 0 && <HStack space="xs" className="mt-1">
                             {tx.tags.map(t => (
                                 <Text key={t} className={Classes.listItemTag}>
@@ -90,7 +90,7 @@ const CategoryGroupedTransactionList = ({items}) => {
                             ))}
                           </HStack>}
                         </VStack>
-                        <Text className="line-clamp-1 text-xs text-right font-semibold">{formatAmount(tx)}</Text>
+                        <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
                       </HStack>
                   ))}
                 </VStack>
