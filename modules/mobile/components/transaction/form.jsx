@@ -162,7 +162,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
                       <Text className="pr-1 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
                     <InputField
-                        inputMode="numeric"
+                        inputMode="decimal"
                         keyboardType="decimal-pad"
                         placeholder="Amount"
                         value={value}
