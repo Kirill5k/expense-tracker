@@ -75,8 +75,8 @@ const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
             strokeWidth={1}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Text size="sm">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
-                  <Heading size="xl">
+                  <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
+                  <Heading size="2xl">
                     {printAmount(total, currency, false)}
                   </Heading>
                 </VStack>

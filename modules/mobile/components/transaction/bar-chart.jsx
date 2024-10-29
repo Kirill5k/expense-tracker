@@ -96,8 +96,8 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
 
   return (
       <VStack>
-        <Text size="sm">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
-        <Heading size="xl" className="mb-4">{printAmount(total, currency, false)}</Heading>
+        <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
+        <Heading size="2xl" className="mb-4">{printAmount(total, currency, false)}</Heading>
         <BarChart
             frontColor={Colors[mode][kind].barChartMain}
             height={140}

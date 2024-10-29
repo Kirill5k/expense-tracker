@@ -44,7 +44,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
         {loading && <ProgressBar mode={mode}/>}
         <ToggleButton
             className="mb-2"
-            size="md"
+            size="lg"
             value={kind}
             items={kinds}
             onChange={setKind}
