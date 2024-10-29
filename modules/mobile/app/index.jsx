@@ -58,7 +58,7 @@ const Index = ({state, user}) => {
                   {Text.appName}
                 </Heading>
               </VStack>
-              <VStack className="rounded-xl bg-background-0 w-full p-10" space="xl">
+              <VStack className="rounded-xl w-full p-10" space="xl">
                 <Button size="lg" onPress={() => router.push("auth/signin")}>
                   <ButtonText>Log in</ButtonText>
                 </Button>

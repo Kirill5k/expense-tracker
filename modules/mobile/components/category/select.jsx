@@ -26,7 +26,7 @@ const CategorySelect = ({items, value, onSelect, mode}) => {
           trigger={(triggerProps) => (
               <Button
                   variant="outline"
-                  action="secondary"
+                  action="negative"
                   className="justify-between items-center"
                   {...triggerProps}
               >
