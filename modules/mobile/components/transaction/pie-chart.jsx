@@ -68,14 +68,14 @@ const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
             onPress={handlePress}
             data={data}
             donut
-            radius={90}
-            innerRadius={60}
+            radius={105}
+            innerRadius={75}
             innerCircleColor={Colors[mode].background}
             strokeColor={Colors[mode].background}
             strokeWidth={1}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Text size="xs">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
+                  <Text size="sm">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
                   <Heading size="xl">
                     {printAmount(total, currency, false)}
                   </Heading>
