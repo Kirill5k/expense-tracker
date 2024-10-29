@@ -76,7 +76,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
           } else if (darkMode === true) {
             setMode('dark')
           } else {
-            setMode(colorScheme === ' dark' ? 'dark' : 'light')
+            setMode(colorScheme === 'dark' ? 'dark' : 'light')
           }
         })
         .finally(() => setLoading(false))

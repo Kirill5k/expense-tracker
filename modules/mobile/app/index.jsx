@@ -18,24 +18,27 @@ const Index = ({state, user}) => {
   const {mode, setMode, setAccessToken} = useStore()
 
   useEffect(() => {
-    if (user?.settingsDarkMode === true) {
+    if (user?.settingsDarkMode === true && mode !== 'dark') {
       setMode('dark')
-    } else if (user?.settingsDarkMode === false) {
+    } else if (user?.settingsDarkMode === false && mode !== 'light') {
       setMode('light')
     } else {
-      setMode(colorScheme === ' dark' ? 'dark' : 'light')
+      setMode(colorScheme === 'dark' ? 'dark' : 'light')
     }
-
-    if (state.accessToken) {
-      setAccessToken(state.accessToken)
-    }
-
-    if (state.isAuthenticated && user) {
+    if (user) {
       setTimeout(() => router.push('/analytics'), 1000)
-    } else {
-      setIsLoading(false)
     }
-  }, [user, state]);
+  }, [user])
+
+  useEffect(() => {
+    if (state) {
+      setIsLoading(false)
+
+      if (state?.accessToken) {
+        setAccessToken(state.accessToken)
+      }
+    }
+  }, [state?.accessToken])
 
   return (
       <SafeAreaView
