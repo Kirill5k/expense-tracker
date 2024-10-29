@@ -14,14 +14,16 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.github.kirill5k.spendsense"
+      "bundleIdentifier": "com.github.kirill5k.spendsense",
+      "userInterfaceStyle": "automatic"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.github.kirill5k.spendsense"
+      "package": "com.github.kirill5k.spendsense",
+      "userInterfaceStyle": "automatic"
     },
     "web": {
       "bundler": "metro",
