@@ -4,7 +4,14 @@ import {HStack} from '@/components/ui/hstack'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Input, InputField} from '@/components/ui/input'
 import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/components/ui/radio'
-import {FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText} from "@/components/ui/form-control"
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText
+} from "@/components/ui/form-control"
 import {CircleIcon} from '@/components/ui/icon'
 import IconSelect from '@/components/common/icon-select'
 import {AlertTriangle} from 'lucide-react-native'
@@ -51,7 +58,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
   }
 
   return (
-      <VStack space="xl" className="w-full">
+      <VStack space="lg" className="w-full">
         <FormControl isInvalid={!!formState.errors.kind}>
           <Controller
               name="kind"
@@ -84,6 +91,9 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.name}>
+          <FormControlLabel>
+            <FormControlLabelText>Name</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="name"
               control={control}
@@ -112,6 +122,9 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.color}>
+          <FormControlLabel>
+            <FormControlLabelText>Color</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="color"
               control={control}
@@ -136,6 +149,9 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.icon}>
+          <FormControlLabel>
+            <FormControlLabelText>Icon</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="icon"
               control={control}

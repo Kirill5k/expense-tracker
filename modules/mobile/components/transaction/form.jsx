@@ -100,7 +100,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
   }
 
   return (
-      <VStack space="xl" className="w-full">
+      <VStack space="lg" className="w-full">
         <FormControl isInvalid={!!formState.errors.kind}>
           <Controller
               name="kind"
@@ -133,6 +133,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.category}>
+          <FormControlLabel>
+            <FormControlLabelText>Category</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="category"
               control={control}
@@ -154,6 +157,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.amount}>
+          <FormControlLabel>
+            <FormControlLabelText>Amount</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="amount"
               defaultValue=""
@@ -186,6 +192,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.date}>
+          <FormControlLabel>
+            <FormControlLabelText>Date</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="date"
               control={control}
@@ -205,6 +214,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.tags}>
+          <FormControlLabel>
+            <FormControlLabelText>Tags</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="tags"
               control={control}
@@ -228,6 +240,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           </FormControlError>
         </FormControl>
         <FormControl isInvalid={!!formState.errors.note}>
+          <FormControlLabel>
+            <FormControlLabelText>Note</FormControlLabelText>
+          </FormControlLabel>
           <Controller
               name="note"
               control={control}
