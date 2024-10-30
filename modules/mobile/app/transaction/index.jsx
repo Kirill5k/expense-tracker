@@ -1,5 +1,6 @@
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
+import {Box} from '@/components/ui/box'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import TransactionForm from '@/components/transaction/form'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -43,6 +44,9 @@ const Transaction = ({user, categories}) => {
               incomeCategories={incomeCategories}
               onCancel={goBack}
               onSubmit={handleFormSubmit}
+          />
+          <Box
+              className="h-80"
           />
         </VStack>
       </ScreenLayout>

@@ -13,7 +13,6 @@ import {
   FormControlHelper,
   FormControlHelperText
 } from '@/components/ui/form-control'
-import {Textarea, TextareaInput} from '@/components/ui/textarea'
 import {Input, InputField, InputSlot} from '@/components/ui/input'
 import {z} from 'zod'
 import {format} from 'date-fns'
@@ -40,7 +39,7 @@ const transactionSchema = z.object({
   date: z.date().refine((val) => val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
   tags: z.array(z.string()).optional(),
-  note: z.string().max(40, "Note is too long").optional(),
+  note: z.string().max(30, "Note is too long").optional(),
 });
 
 const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
@@ -160,9 +159,10 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               render={({field: {onChange, onBlur, value}}) => (
                   <Input variant="outline">
                     <InputSlot>
-                      <Text className="pr-1 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
+                      <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
                     <InputField
+                        autoComplete="off"
                         inputMode="decimal"
                         keyboardType="decimal-pad"
                         placeholder="Amount"
@@ -171,8 +171,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
                         onBlur={onBlur}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
-                        autoComplete="off"
-                        textContentType="none"
+                        importantForAutofill="no"
                     />
                   </Input>
               )}
@@ -231,15 +230,17 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Textarea className="h-14 py-0 px-3">
-                    <TextareaInput
+                  <Input variant="outline" className="pl-2">
+                    <InputField
+                        autoComplete="off"
                         placeholder="Note"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
                         onSubmitEditing={handleKeyPress}
+                        returnKeyType="done"
                     />
-                  </Textarea>
+                  </Input>
               )}
           />
           <FormControlError>

@@ -4,6 +4,7 @@ export default {
   light: {
     error: colors.red[800],
     text: colors.gray[900], // Equivalent to text-gray-900
+    textSecondary: colors.gray[400],
     background: colors.white, // Equivalent to bg-white
     tint: colors.blue[600], // Equivalent to text-blue-600
     tabIconDefault: colors.gray[500], // Equivalent to text-gray-500
@@ -23,6 +24,7 @@ export default {
   dark: {
     error: colors.red[200],
     text: colors.white, // Equivalent to text-white
+    textSecondary: colors.gray[400],
     background: colors.black, // Equivalent to bg-gray-900
     tint: colors.blue[300], // Equivalent to text-blue-300
     tabIconDefault: colors.gray[400], // Equivalent to text-gray-400

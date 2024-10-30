@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 const DateSelect = ({value, onSelect, mode}) => {
   const textStyle = {
     fontSize: 16,
-    lineHeight: 24
+    lineHeight: 20
   }
 
   const handleDateChange = (params) => {
@@ -18,11 +18,11 @@ const DateSelect = ({value, onSelect, mode}) => {
 
   return (
       <Box className={mergeClasses(
-          'border rounded-md pb-8',
+          'border rounded-md p-2 pb-8',
           Classes[mode].inputFieldBorder
       )}>
         <DateTimePicker
-            height={220}
+            height={240}
             displayFullDays={false}
             mode="single"
             date={dayjs(value)}
@@ -31,7 +31,7 @@ const DateSelect = ({value, onSelect, mode}) => {
             headerButtonColor={colors[mode].tint}
             selectedItemColor={colors[mode].tint}
             selectedTextStyle={{
-              fontWeight: 'bold',
+              fontWeight: 600,
               color: colors[mode].background,
               ...textStyle
             }}
@@ -40,37 +40,38 @@ const DateSelect = ({value, onSelect, mode}) => {
               ...textStyle
             }}
             headerTextStyle={{
-              fontWeight: 'bold',
+              fontWeight: 500,
               color: colors[mode].text,
+              fontSize: 18,
+              lineHeight: 18
             }}
             weekDaysTextStyle={{
-              color: colors[mode].text,
-              fontWeight: 600,
-              ...textStyle
+              color: colors[mode].textSecondary,
+              fontSize: 14,
+              lineHeight: 20
             }}
             todayTextStyle={{
-              fontWeight: 'bold'
+              fontWeight: 600,
             }}
             dayContainerStyle={{
-              borderRadius: 8
+              height: 10
             }}
             todayContainerStyle={{
-              borderRadius: 8
             }}
             headerContainerStyle={{
               height: 24
             }}
         />
         <Fab
-            size="sm"
+            size="md"
             placement="bottom right"
             className={mergeClasses(
-                'right-1 bottom-2 rounded-lg px-0 py-1.5',
+                'right-3 bottom-3 rounded-lg px-0 py-1.5',
                 mode === 'light' ? 'bg-blue-600' : 'bg-blue-300'
             )}
             onPress={() => onSelect(new Date())}
         >
-          <FabLabel className="text-xs">Today</FabLabel>
+          <FabLabel className="font-semibold">Today</FabLabel>
         </Fab>
       </Box>
   )

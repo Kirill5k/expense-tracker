@@ -54,7 +54,7 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
                 {currentTags.map((t, i) => (
                     <Pressable key={i} onPress={() => removeTag(i)}>
                       <Text
-                          className="rounded-lg px-1 border border-secondary-300 text-typography-700 text-2xs">{t}</Text>
+                          className="rounded-lg px-1 border border-secondary-300 text-typography-700 text-md">{t}</Text>
                     </Pressable>
                 ))}
               </HStack>
@@ -68,7 +68,6 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
             onSubmitEditing={handleSumit}
             returnKeyType="done"
             autoComplete="off"
-            textContentType="none"
             onKeyPress={(e) => handleKeyPress(e.nativeEvent.key)}
             autoCapitalize="none"
             autoCorrect="none"
