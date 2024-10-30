@@ -25,8 +25,7 @@ const DashboardLayout = () => {
               tabBarStyle: {
                 paddingTop: 5,
                 backgroundColor: Colors[mode].backgroundColor,
-                borderColor: Colors[mode].backgroundColor,
-                border: 0
+                borderTopColor: Colors[mode].tabTopBorder,
               },
               tabBarLabelStyle: { fontSize: 12, paddingBottom: 3, paddingTop: 3 },
             }}

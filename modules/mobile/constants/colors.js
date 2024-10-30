@@ -9,6 +9,7 @@ export default {
     tint: colors.blue[600], // Equivalent to text-blue-600
     tabIconDefault: colors.gray[500], // Equivalent to text-gray-500
     tabIconSelected: colors.blue[600], // Equivalent to text-blue-600
+    tabTopBorder: colors.gray[200],
     progressMain: colors.blue[500],
     progressBackground: colors.blue[200],
     splashScreenBackground: colors.white,
@@ -29,6 +30,7 @@ export default {
     tint: colors.blue[300], // Equivalent to text-blue-300
     tabIconDefault: colors.gray[400], // Equivalent to text-gray-400
     tabIconSelected: colors.blue[300], // Equivalent to text-blue-300
+    tabTopBorder: colors.gray[700],
     progressMain: colors.blue[300],
     progressBackground: colors.blue[100],
     splashScreenBackground: colors.black,
