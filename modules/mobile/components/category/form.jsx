@@ -158,7 +158,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
         </FormControl>
         <HStack space="md" className="justify-end">
           <Button
-              size="sm"
+              size="md"
               variant="outline"
               action="secondary"
               onPress={onCancel}
@@ -166,7 +166,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
             <ButtonText>Cancel</ButtonText>
           </Button>
           <Button
-              size="sm"
+              size="md"
               onPress={handleSubmit(handleFormSubmit)}
           >
             <ButtonText>Save</ButtonText>

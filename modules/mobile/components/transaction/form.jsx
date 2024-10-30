@@ -251,7 +251,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
         </FormControl>
         <HStack space="md" className="justify-end">
           <Button
-              size="sm"
+              size="md"
               variant="outline"
               action="secondary"
               onPress={onCancel}
@@ -259,7 +259,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
             <ButtonText>Cancel</ButtonText>
           </Button>
           <Button
-              size="sm"
+              size="md"
               onPress={handleSubmit(handleFormSubmit)}
           >
             <ButtonText>Save</ButtonText>

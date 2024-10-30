@@ -49,7 +49,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'md' : '3xl'} className={loading ? 'pb-0' : 'pb-1'}>
+        <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-1'}>
           Transactions
         </Heading>
         {loading && <ProgressBar mode={mode}/>}

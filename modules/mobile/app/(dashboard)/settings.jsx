@@ -103,7 +103,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size="3xl" className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
         {isScrolling && <Divider/>}
