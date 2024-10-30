@@ -5,6 +5,8 @@ const useStore = create((set, get) => ({
   alert: null,
   mode: 'system',
   accessToken: null,
+  txToUpdate: null,
+  setTxToUpdate: (txToUpdate) => set({txToUpdate}),
   setAccessToken: (accessToken) => set({accessToken}),
   clearAccessToken: () => set({accessToken: null}),
   setMode: (mode) => set({mode}),
