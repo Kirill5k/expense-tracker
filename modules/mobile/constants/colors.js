@@ -33,7 +33,7 @@ export default {
     tabTopBorder: colors.gray[700],
     progressMain: colors.blue[300],
     progressBackground: colors.blue[100],
-    splashScreenBackground: colors.black,
+    splashScreenBackground: '#121212', // bg-background-0
     expense: {
       barChartMain: colors.rose[500],
       barChartSecondary: colors.rose[950],
