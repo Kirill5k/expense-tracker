@@ -7,39 +7,36 @@ import {Pressable} from '@/components/ui/pressable'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {router} from 'expo-router'
 
-export const AuthHeader = ({heading, subHeading}) => {
+export const ScreenHeader = ({heading, subHeading}) => {
   return (
       <>
         <Pressable onPress={() => router.back()}>
           <Icon
               as={ArrowLeftIcon}
-              className="md:hidden text-background-800"
+              className="text-background-800"
               size="xl"
           />
         </Pressable>
         <VStack>
-          <Heading className="md:text-center" size="2xl">
+          <Heading size="2xl">
             {heading}
           </Heading>
-          <Text>{subHeading}</Text>
+          {subHeading && <Text>{subHeading}</Text>}
         </VStack>
       </>
   )
 }
 
 
-export const AuthLayout = ({children}) => {
+export const ScreenLayout = ({children}) => {
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
         <ScrollView
             className="w-full h-full"
             contentContainerStyle={{flexGrow: 1}}
         >
-          <VStack className="w-full h-full flex-grow justify-center">
-            <VStack
-                className="md:items-center md:justify-center flex-1 w-full p-9 md:gap-10 gap-16 md:m-auto md:w-[500px] h-full">
-              {children}
-            </VStack>
+          <VStack className="w-full h-full p-9 gap-16">
+            {children}
           </VStack>
         </ScrollView>
       </SafeAreaView>

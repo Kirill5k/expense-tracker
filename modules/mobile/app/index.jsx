@@ -1,16 +1,15 @@
 import {useEffect, useState} from 'react'
 import {router} from 'expo-router'
 import {Button, ButtonText} from '@/components/ui/button'
-import {SafeAreaView} from '@/components/ui/safe-area-view'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import {ProgressCircle} from '@/components/common/progress'
 import {LogoChart} from '@/components/common/logo'
 import {useColorScheme} from '@/components/useColorScheme'
+import {ScreenLayout} from '@/components/common/layout'
 import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
 import Text from '@/constants/text'
-import Colors from '@/constants/colors'
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -42,22 +41,17 @@ const Index = ({state, user}) => {
   }, [state?.accessToken])
 
   return (
-      <SafeAreaView
-          className="flex-col items-center justify-center w-full h-full"
-          style={{backgroundColor: Colors[mode].splashScreenBackground}}
-      >
+      <ScreenLayout>
         {!isLoading && (
             <VStack className="h-full w-full justify-between" space="xl">
               <VStack></VStack>
               <VStack className="items-center">
-                <LogoChart
-                    mode={mode}
-                />
+                <LogoChart mode={mode}/>
                 <Heading size="3xl">
                   {Text.appName}
                 </Heading>
               </VStack>
-              <VStack className="rounded-xl w-full p-10" space="xl">
+              <VStack className="rounded-xl w-full" space="xl">
                 <Button size="lg" onPress={() => router.push("auth/signin")}>
                   <ButtonText>Log in</ButtonText>
                 </Button>
@@ -67,8 +61,12 @@ const Index = ({state, user}) => {
               </VStack>
             </VStack>
         )}
-        {isLoading && <ProgressCircle mode={mode}/>}
-      </SafeAreaView>
+        {isLoading && (
+            <VStack className="justify-center items-center w-full h-full">
+              <ProgressCircle mode={mode}/>
+            </VStack>
+        )}
+      </ScreenLayout>
   )
 }
 

@@ -1,4 +1,4 @@
-import {AuthLayout, AuthHeader} from '@/components/auth/layout'
+import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {VStack} from '@/components/ui/vstack'
 import {
   FormControl,
@@ -41,9 +41,9 @@ const ForgotPassword = () => {
   };
 
   return (
-      <AuthLayout>
+      <ScreenLayout>
         <VStack className="md:items-center" space="md">
-          <AuthHeader
+          <ScreenHeader
             heading="Forgot Password?"
             subHeading="Enter email ID associated with your account."
           />
@@ -87,7 +87,7 @@ const ForgotPassword = () => {
             </Button>
           </VStack>
         </VStack>
-      </AuthLayout>
+      </ScreenLayout>
   )
 }
 

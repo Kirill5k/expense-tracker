@@ -5,7 +5,7 @@ import {Link, router} from 'expo-router'
 import {Text} from '@/components/ui/text'
 import {LinkText} from '@/components/ui/link'
 import {useColorScheme} from '@/components/useColorScheme'
-import {AuthLayout, AuthHeader} from '@/components/auth/layout'
+import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {GoogleSignInButton} from '@/components/auth/google'
 import {RegistrationForm} from '@/components/auth/registration'
 import {ProgressCircle} from '@/components/common/progress'
@@ -37,10 +37,10 @@ const SignUp = ({user}) => {
   }, [user])
 
   return (
-      <AuthLayout>
+      <ScreenLayout>
         {!accessToken && (
             <VStack className="md:items-center" space="md">
-              <AuthHeader
+              <ScreenHeader
                   heading={Wordings.signupHeading}
                   subHeading={Wordings.signupSubHeading}
               />
@@ -67,7 +67,7 @@ const SignUp = ({user}) => {
               <ProgressCircle mode={mode}/>
             </VStack>
         )}
-      </AuthLayout>
+      </ScreenLayout>
   )
 }
 

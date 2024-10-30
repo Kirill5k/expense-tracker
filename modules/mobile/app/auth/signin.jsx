@@ -5,7 +5,7 @@ import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {LinkText} from '@/components/ui/link'
 import {Text} from '@/components/ui/text'
-import {AuthLayout, AuthHeader} from '@/components/auth/layout'
+import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {LoginForm} from '@/components/auth/login'
 import {ProgressCircle} from '@/components/common/progress'
 import {GoogleSignInButton} from '@/components/auth/google'
@@ -37,10 +37,10 @@ const SignIn = ({user}) => {
   }, [user])
 
   return (
-      <AuthLayout>
+      <ScreenLayout>
         {!accessToken && (
             <VStack className="md:items-center" space="md">
-              <AuthHeader
+              <ScreenHeader
                   heading={Wordings.signinHeading}
                   subHeading={Wordings.signinSubHeading}
               />
@@ -69,7 +69,7 @@ const SignIn = ({user}) => {
               <ProgressCircle mode={mode}/>
             </VStack>
         )}
-      </AuthLayout>
+      </ScreenLayout>
   )
 }
 
