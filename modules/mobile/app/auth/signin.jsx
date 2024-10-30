@@ -1,5 +1,4 @@
-import React, {useEffect} from 'react'
-import {Link, router} from 'expo-router'
+import {Link} from 'expo-router'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
@@ -12,13 +11,12 @@ import {GoogleSignInButton} from '@/components/auth/google'
 import useStore from '@/store'
 import Client from '@/api/client'
 import {updateStateAuthStatus} from '@/db/operations'
-import {enhanceWithUser} from '@/db/observers'
 import {useColorScheme} from '@/components/useColorScheme'
 import Wordings from '@/constants/text'
 import Features from '@/config/features'
 
 
-const SignIn = ({user}) => {
+const SignIn = () => {
   const database = useDatabase()
   const mode = useColorScheme()
   const {setLoginSuccessAlert, accessToken, setAccessToken} = useStore()
@@ -29,12 +27,6 @@ const SignIn = ({user}) => {
     setLoginSuccessAlert()
     setAccessToken(access_token)
   }
-
-  useEffect(() => {
-    if (user) {
-      router.push('/analytics')
-    }
-  }, [user])
 
   return (
       <ScreenLayout>
@@ -73,4 +65,4 @@ const SignIn = ({user}) => {
   )
 }
 
-export default enhanceWithUser(SignIn)
+export default SignIn

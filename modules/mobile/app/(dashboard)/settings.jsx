@@ -63,8 +63,10 @@ const Settings = ({user, state, totalTransactionCount}) => {
     setLoading(true)
     clearAccessToken()
     resetState(database)
-        .then(() => router.push('/'))
-        .finally(() => setLoading(false))
+        .then(() => {
+          setLoading(false)
+          router.push('/')
+        })
   }
 
   const handleModeChange = (darkMode) => {

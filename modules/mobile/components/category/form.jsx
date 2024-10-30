@@ -51,7 +51,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
   }
 
   return (
-      <VStack space="lg" className="w-full">
+      <VStack space="xl" className="w-full">
         <FormControl isInvalid={!!formState.errors.kind}>
           <Controller
               name="kind"

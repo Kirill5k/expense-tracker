@@ -73,6 +73,7 @@ function RootLayoutNav() {
       const intervalId = setInterval(syncDb, 300000) // 5 minutes
       setIntervalId(intervalId)
     } else if (intervalId) {
+      console.log('stopping db sync')
       clearInterval(intervalId)
       setIntervalId(null)
     }

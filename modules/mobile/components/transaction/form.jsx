@@ -11,7 +11,9 @@ import {
   FormControlErrorIcon,
   FormControlErrorText,
   FormControlHelper,
-  FormControlHelperText
+  FormControlHelperText,
+  FormControlLabel,
+  FormControlLabelText
 } from '@/components/ui/form-control'
 import {Input, InputField, InputSlot} from '@/components/ui/input'
 import {z} from 'zod'
@@ -98,7 +100,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
   }
 
   return (
-      <VStack space="md" className="w-full">
+      <VStack space="xl" className="w-full">
         <FormControl isInvalid={!!formState.errors.kind}>
           <Controller
               name="kind"
