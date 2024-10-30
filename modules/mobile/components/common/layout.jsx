@@ -7,10 +7,10 @@ import {Pressable} from '@/components/ui/pressable'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
 import {router} from 'expo-router'
 
-export const ScreenHeader = ({heading, subHeading}) => {
+export const ScreenHeader = ({heading, subHeading, onBack = () => router.back()}) => {
   return (
       <>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={onBack}>
           <Icon
               as={ArrowLeftIcon}
               className="text-background-800"

@@ -39,7 +39,7 @@ const SignIn = ({user}) => {
   return (
       <ScreenLayout>
         {!accessToken && (
-            <VStack className="md:items-center" space="md">
+            <VStack space="md">
               <ScreenHeader
                   heading={Wordings.signinHeading}
                   subHeading={Wordings.signinSubHeading}

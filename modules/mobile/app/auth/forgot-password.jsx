@@ -42,7 +42,7 @@ const ForgotPassword = () => {
 
   return (
       <ScreenLayout>
-        <VStack className="md:items-center" space="md">
+        <VStack space="md">
           <ScreenHeader
             heading="Forgot Password?"
             subHeading="Enter email ID associated with your account."
