@@ -139,7 +139,7 @@ const IconSelect = ({value, onChange, valueColor, mode, isInvalid}) => {
   return (
       <ScrollView
           className={mergeClasses(
-              'max-h-60 border rounded-md pb-8',
+              'max-h-60 border rounded-md p-3 pb-8',
               Classes[mode].inputFieldBorder,
               isInvalid && Classes[mode].invalidInputFieldBorder
           )}
@@ -148,9 +148,9 @@ const IconSelect = ({value, onChange, valueColor, mode, isInvalid}) => {
         <VStack>
           {Object.entries(iconGroups).map(([g, icons]) => (
               <VStack key={g}>
-                <Text className="p-3 text-md font-medium text-primary-900">{g}</Text>
-                <Divider className="mx-3"/>
-                <HStack className="p-3 pl-4 w-full flex flex-wrap" space="lg">
+                <Text className="py-3 text-md font-medium text-primary-900">{g}</Text>
+                <Divider />
+                <HStack className="py-3 pl-1 w-full flex flex-wrap" space="lg">
                   {icons.map((i) => (
                       <Pressable
                           key={i}
