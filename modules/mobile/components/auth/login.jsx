@@ -78,10 +78,11 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
                   <Input>
                     <InputField
                         autoFocus
-                        autoComplete="email"
+                        autoComplete="username"
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholder="Email"
+                        type="text"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
