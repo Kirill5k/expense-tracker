@@ -63,7 +63,7 @@ function RootLayoutNav() {
 
   useEffect(() => {
     const syncDb = () => {
-      if (isInternetReachable) {
+      if (isConnected && isInternetReachable) {
         initSync(database, accessToken)
       }
     }
