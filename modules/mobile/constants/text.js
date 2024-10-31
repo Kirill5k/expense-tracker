@@ -1,4 +1,4 @@
-const appName = 'SpendSense'
+const appName = 'SpendSync'
 
 export default {
   appName,
