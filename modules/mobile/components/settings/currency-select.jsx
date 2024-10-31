@@ -42,13 +42,16 @@ export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'md'})
                   size={size}
                   variant="outline"
                   action="secondary"
-                  className="flex justify-between items-center px-3"
+                  className={mergeClasses(
+                      'flex justify-between items-center px-3',
+                      isOpen && 'border-primary-600'
+                  )}
                   {...triggerProps}
               >
-                <ButtonText className="px-0 text-lg text-secondary-500">
+                <ButtonText className="px-0 text-lg">
                   {value?.symbol}
                 </ButtonText>
-                <ButtonText className="pl-2 grow text-left text-secondary-500 font-medium">
+                <ButtonText className="pl-2 grow text-left font-medium">
                   {currenciesByCode[value?.code]?.country}
                 </ButtonText>
                 <ButtonIcon
