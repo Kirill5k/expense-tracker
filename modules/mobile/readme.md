@@ -1,6 +1,8 @@
 ## Run on device
 
 ```shell
+npx expo start --clear
+
 npx expo run:ios --device
 ```
 
