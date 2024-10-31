@@ -105,7 +105,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
                         enterKeyHint="done"
                         returnKeyType="done"
                         importantForAutofill="no"
-                        placeholder="Name"
+                        placeholder="New Category"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}

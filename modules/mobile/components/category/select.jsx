@@ -43,7 +43,7 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
                     className="flex-grow-0"
                 />}
                 <ButtonText className={mergeClasses('flex-grow', value?.icon && 'px-2')}>
-                  {value?.name ? value.name : 'Category'}
+                  {value?.name ? value.name : 'Select category'}
                 </ButtonText>
                 <ButtonIcon
                     className="flex-grow-0"

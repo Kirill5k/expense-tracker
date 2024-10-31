@@ -173,7 +173,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
                         autoComplete="off"
                         inputMode="decimal"
                         keyboardType="decimal-pad"
-                        placeholder="Amount"
+                        placeholder="1.00"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
@@ -222,7 +222,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
-                    placeholder="Tags"
+                    placeholder=""
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
@@ -250,7 +250,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
                   <Input variant="outline" className="pl-2">
                     <InputField
                         autoComplete="off"
-                        placeholder="Note"
+                        placeholder=""
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
