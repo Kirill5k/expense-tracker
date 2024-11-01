@@ -1,6 +1,6 @@
+import {useEffect} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
-import {Box} from '@/components/ui/box'
 import CategoryForm from '@/components/category/form'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {createCategory, updateCategory} from '@/db/operations'
@@ -14,29 +14,27 @@ const Category = ({user}) => {
   const database = useDatabase()
   const mode = useColorScheme()
 
-  const goBack = () => {
-    setCatToUpdate(null)
-    router.back()
-  }
-
   const withUserId = obj => ({...obj, userId: user.id})
 
   const handleFormSubmit = (cat) => {
     const res = cat.id ? updateCategory(database, withUserId(cat)) : createCategory(database, withUserId(cat))
-    return res.then(goBack)
+    return res.then(() => router.back())
   }
+
+  useEffect(() => {
+    return () => setCatToUpdate(null)
+  }, [])
 
   return (
       <ScreenLayout>
         <VStack space="md">
           <ScreenHeader
               heading={catToUpdate?.id ? 'Edit Category' : 'New Category'}
-              onBack={goBack}
           />
           <CategoryForm
               mode={mode}
               category={catToUpdate}
-              onCancel={goBack}
+              onCancel={() => router.back()}
               onSubmit={handleFormSubmit}
           />
         </VStack>

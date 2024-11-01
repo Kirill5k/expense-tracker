@@ -1,3 +1,4 @@
+import {useEffect} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {Box} from '@/components/ui/box'
@@ -21,20 +22,18 @@ const Transaction = ({user, categories}) => {
 
   const handleFormSubmit = (tx) => {
     const res = tx.id ? updateTransaction(database, withUserId(tx)) : createTransaction(database, withUserId(tx))
-    return res.then(goBack)
+    return res.then(() => router.back())
   }
 
-  const goBack = () => {
-    setTxToUpdate(null)
-    router.back()
-  }
+  useEffect(() => {
+    return () => setTxToUpdate(null)
+  }, [])
 
   return (
       <ScreenLayout>
         <VStack space="md">
           <ScreenHeader
               heading={txToUpdate?.id ? 'Edit Transaction' : 'New Transaction'}
-              onBack={goBack}
           />
           <TransactionForm
               mode={mode}
@@ -42,7 +41,7 @@ const Transaction = ({user, categories}) => {
               currency={user?.currency}
               expenseCategories={expenseCategories}
               incomeCategories={incomeCategories}
-              onCancel={goBack}
+              onCancel={() => router.back()}
               onSubmit={handleFormSubmit}
           />
           <Box
