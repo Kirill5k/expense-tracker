@@ -78,7 +78,7 @@ export const ListItemIcon = ({icon, color}) => {
       <Avatar size="md" className="mr-4" style={{backgroundColor: color}}>
         <MaterialIcon
             code={icon}
-            dsize={32}
+            dsize={28}
             dcolor="white"
         />
       </Avatar>
