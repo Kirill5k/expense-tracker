@@ -76,6 +76,7 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
 
   return (
       <VirtualizedList
+          bounces={false}
           onScroll={onScroll}
           showsVerticalScrollIndicator={false}
           className={Classes.scrollList}

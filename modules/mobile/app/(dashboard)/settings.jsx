@@ -111,6 +111,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
         {isScrolling && <Divider/>}
         {loading && <ProgressBar mode={mode}/>}
         <ScrollView
+            bounces={false}
             showsVerticalScrollIndicator={false}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 10 && isScrolling) {

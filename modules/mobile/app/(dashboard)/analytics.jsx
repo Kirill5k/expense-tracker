@@ -51,6 +51,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
         />
         {isScrolling && <Divider/>}
         <ScrollView
+            bounces={false}
             showsVerticalScrollIndicator={false}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
@@ -79,7 +80,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
               items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
           />
           <Box
-            className="p-2"
+            className="mb-5"
           />
         </ScrollView>
       </VStack>

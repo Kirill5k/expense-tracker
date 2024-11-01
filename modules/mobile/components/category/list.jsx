@@ -13,7 +13,7 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
       <Box className={mergeClasses(
           'bg-background-50 px-1',
           item.isFirst && 'rounded-t-xl pt-1',
-          item.isLast && 'rounded-b-xl pb-1'
+          item.isLast && 'rounded-b-xl pb-1 mb-5'
       )}>
         <ListItemPressable
             disabled={disabled}
@@ -40,6 +40,7 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
 const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) => {
   return (
       <VirtualizedList
+          bounces={false}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
           initialNumToRender={11}
