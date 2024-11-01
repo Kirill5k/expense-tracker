@@ -138,11 +138,10 @@ const iconGroups = {
 const IconSelect = ({value, onChange, valueColor, mode, isInvalid}) => {
   return (
       <ScrollView
-          className={mergeClasses(
-              'max-h-60 border rounded-md p-3 pb-8',
-              Classes[mode].inputFieldBorder,
-              isInvalid && Classes[mode].invalidInputFieldBorder
-          )}
+          className={mergeClasses('max-h-60 border rounded-md p-3 pb-8')}
+          style={{
+            borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
+          }}
           persistentScrollbar={true}
       >
         <VStack>

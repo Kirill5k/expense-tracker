@@ -21,6 +21,8 @@ export default {
       barChartMain: colors.blue[400],
       barChartSecondary: colors.blue[100],
     },
+    border: '#dbdbdb', //secondary-200
+    borderInvalid: colors.red[700]
   },
   dark: {
     error: colors.red[200],
@@ -41,6 +43,8 @@ export default {
     income: {
       barChartMain: colors.blue[500],
       barChartSecondary: colors.blue[950],
-    }
+    },
+    border: '#727373', // secondary-400
+    borderInvalid: colors.red[300]
   },
 };

@@ -2,8 +2,7 @@ import React from 'react';
 import {ButtonIcon, ButtonText, Button} from '../ui/button';
 import {MaterialIcon} from '../ui/icon';
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
-import colors from '@/constants/colors'
-import Classes from '@/constants/classes'
+import Colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
 import {mergeClasses} from '@/utils/css'
 
@@ -28,17 +27,16 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
               <Button
                   variant="outline"
                   action="primary"
-                  className={mergeClasses(
-                      'justify-between items-center',
-                      Classes[mode].inputFieldBorder,
-                      isInvalid && Classes[mode].invalidInputFieldBorder
-                  )}
+                  className={mergeClasses('justify-between items-center')}
+                  style={{
+                    borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
+                  }}
                   {...triggerProps}
               >
                 {value?.icon && <ButtonIcon
                     as={MaterialIcon}
                     code={value.icon}
-                    dcolor={colors[mode].text}
+                    dcolor={Colors[mode].text}
                     dsize={20}
                     className="flex-grow-0"
                 />}
@@ -49,7 +47,7 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
                     className="flex-grow-0"
                     as={MaterialIcon}
                     code={isOpen ? 'chevron-up' : 'chevron-down'}
-                    dcolor={value ? colors[mode].tabIconSelected : colors[mode].text}
+                    dcolor={value ? Colors[mode].tabIconSelected : Colors[mode].text}
                 />
               </Button>
           )}
@@ -59,7 +57,7 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
               <MaterialIcon
                   code={c.icon}
                   dsize={24}
-                  dcolor={colors[mode].text}
+                  dcolor={Colors[mode].text}
               />
               <MenuItemLabel className="px-2">{c.name}</MenuItemLabel>
             </MenuItem>

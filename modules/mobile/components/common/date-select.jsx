@@ -71,7 +71,7 @@ const DateSelect = ({value, onSelect, mode}) => {
             )}
             onPress={() => onSelect(new Date())}
         >
-          <FabLabel className="font-semibold">Today</FabLabel>
+          <FabLabel className="font-bold">Today</FabLabel>
         </Fab>
       </Box>
   )
