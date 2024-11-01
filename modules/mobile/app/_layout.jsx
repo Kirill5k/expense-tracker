@@ -92,10 +92,21 @@ function RootLayoutNav() {
                     onToastClose={clearAlert}
                     notification={alert}
                 >
-                  <Stack.Screen name="index"/>
-                  <Stack.Screen name="auth/signin"/>
-                  <Stack.Screen name="auth/signup"/>
-                  <Stack.Screen name="(dashboard)"/>
+                  <Stack.Screen
+                      name="index"
+                  />
+                  <Stack.Screen
+                      name="auth/signin"
+                  />
+                  <Stack.Screen
+                      name="auth/signup"
+                  />
+                  <Stack.Screen
+                      name="(dashboard)"
+                      options={{
+                        gestureEnabled: false, // Disable the swipe back gesture
+                      }}
+                  />
                 </StackWithToast>
               </DatabaseProvider>
             </ThemeProvider>
