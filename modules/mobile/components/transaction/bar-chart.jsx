@@ -97,7 +97,7 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
   return (
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
-        <Heading size="2xl" className="mb-4">{printAmount(total, currency, false)}</Heading>
+        <Heading size="3xl" className="mb-4">{printAmount(total, currency, false)}</Heading>
         <BarChart
             frontColor={Colors[mode][kind].barChartMain}
             height={140}
@@ -114,15 +114,24 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
             xAxisColor={Colors[mode].tabIconDefault}
             yAxisTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16, textAlign: 'right'}}
             xAxisLabelTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16}}
-            noOfSections={3}
+            noOfSections={1}
             onPress={handleItemPress}
             showReferenceLine1
             referenceLine1Position={chartData.average}
             referenceLine1Config={{
               color: pressedItem ? Colors[mode][kind].barChartSecondary : Colors[mode][kind].barChartMain,
-              dashWidth: 2,
-              dashGap: 3,
-              zIndex: -1
+              dashWidth: 5,
+              dashGap: 7,
+              zIndex: -1,
+              labelText: chartData.average === 0 ? '' : `${chartData.average}`,
+              labelTextStyle: {
+                color: pressedItem ? Colors[mode][kind].barChartSecondary : Colors[mode][kind].barChartMain,
+                textAlign: 'right',
+                width: '100%',
+                marginLeft: 26 + (displayDate.range === 'yearly' ? 4 : 0),
+                marginTop: -7,
+                fontSize: 12
+              }
             }}
         />
       </VStack>
