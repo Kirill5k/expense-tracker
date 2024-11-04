@@ -12,8 +12,12 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
-    }
+      "autoIncrement": true,
+      "env": {
+        "EXPO_USE_DEV_SERVER": "true",
+        "NODE_OPTIONS": "--max-old-space-size=4096"
+      }
+    },
   },
   "submit": {
     "production": {}
