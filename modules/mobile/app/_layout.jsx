@@ -70,7 +70,7 @@ function RootLayoutNav() {
 
     if (accessToken) {
       syncDb()
-      const intervalId = setInterval(syncDb, 300000) // 5 minutes
+      const intervalId = setInterval(syncDb, 60000) // 1 minute
       setIntervalId(intervalId)
     } else if (intervalId) {
       console.log('stopping db sync')
