@@ -103,10 +103,10 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoFocus
-                        autoComplete="email"
+                        textContentType="username"
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        placeholder="Email"
+                        placeholder="Enter your email address"
                         type="text"
                         value={value}
                         onChangeText={onChange}
@@ -137,8 +137,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
-                          autoComplete="given-name"
-                          placeholder="First Name"
+                          textContentType="givenName"  // For first name autofill
+                          placeholder="First name"
                           type="text"
                           value={value}
                           onChangeText={onChange}
@@ -169,8 +169,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
-                          autoComplete="family-name"
-                          placeholder="Last Name"
+                          textContentType="familyName"
+                          placeholder="Last name"
                           type="text"
                           value={value}
                           onChangeText={onChange}
@@ -227,8 +227,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
-                        autoComplete="new-password"
-                        placeholder="Password"
+                        textContentType="newPassword"
+                        placeholder="Create a password"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
@@ -262,8 +262,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
-                        autoComplete="new-password"
-                        placeholder="Confirm Password"
+                        textContentType="newPassword"
+                        placeholder="Re-enter your password"
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}

@@ -79,9 +79,10 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
                     <InputField
                         autoFocus
                         autoComplete="username"
+                        textContentType="username"
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        placeholder="Email"
+                        placeholder="Your email address"
                         type="text"
                         value={value}
                         onChangeText={onChange}
@@ -114,7 +115,8 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
                   <Input>
                     <InputField
                         type={showPassword ? "text" : "password"}
-                        placeholder="Password"
+                        textContentType="password"
+                        placeholder="Your password"
                         autoComplete="current-password"
                         value={value}
                         onChangeText={onChange}
