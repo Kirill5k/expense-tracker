@@ -228,6 +228,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         textContentType="newPassword"
+                        passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Create a password"
                         value={value}
                         onChangeText={onChange}
@@ -263,6 +264,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         textContentType="newPassword"
+                        passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Re-enter your password"
                         value={value}
                         onChangeText={onChange}
