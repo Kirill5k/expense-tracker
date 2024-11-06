@@ -16,6 +16,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
+      "associatedDomains": ["applinks:kirill5k.github.io"]
     },
     "android": {
       "adaptiveIcon": {

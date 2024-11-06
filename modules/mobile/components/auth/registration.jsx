@@ -79,6 +79,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     }
   }
 
+  const [secureTextEntry, setSecureTextEntry] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -103,10 +104,11 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoFocus
-                        textContentType="username"
+                        inputMode="email"
+                        textContentType="emailAddress"
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        placeholder="Enter your email address"
+                        placeholder="EEnter your email address"
                         type="text"
                         value={value}
                         onChangeText={onChange}
@@ -137,6 +139,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
+                          inputMode="text"
                           textContentType="givenName"  // For first name autofill
                           placeholder="First name"
                           type="text"
@@ -169,7 +172,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
-                          textContentType="familyName"
+                          inputMode="text"
+                          textContentType="username"
                           placeholder="Last name"
                           type="text"
                           value={value}
@@ -227,12 +231,17 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        secureTextEntry={secureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Create a password"
                         value={value}
+                        onFocus={() => setSecureTextEntry(true)}
                         onChangeText={onChange}
-                        onBlur={onBlur}
+                        onBlur={() => {
+                          setSecureTextEntry(false)
+                          onBlur()
+                        }}
                         onSubmitEditing={() => confirmPasswordRef.current.focus()}
                         returnKeyType="next"
                         type={showPassword ? "text" : "password"}
@@ -263,12 +272,17 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        secureTextEntry={secureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Re-enter your password"
                         value={value}
                         onChangeText={onChange}
-                        onBlur={onBlur}
+                        onFocus={() => setSecureTextEntry(true)}
+                        onBlur={() => {
+                          setSecureTextEntry(false)
+                          onBlur()
+                        }}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
                         type={showConfirmPassword ? "text" : "password"}

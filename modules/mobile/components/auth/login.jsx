@@ -42,6 +42,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
     formState,
     setError
   } = useForm({resolver: zodResolver(loginSchema)});
+  const [secureTextEntry, setSecureTextEntry] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const passwordRef = useRef(null)
@@ -114,13 +115,18 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        secureTextEntry={secureTextEntry}
                         type={showPassword ? "text" : "password"}
                         textContentType="password"
                         placeholder="Your password"
                         // autoComplete="current-password"
                         value={value}
+                        onFocus={() => setSecureTextEntry(true)}
                         onChangeText={onChange}
-                        onBlur={onBlur}
+                        onBlur={() => {
+                          setSecureTextEntry(false)
+                          onBlur()
+                        }}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
                         ref={passwordRef}
