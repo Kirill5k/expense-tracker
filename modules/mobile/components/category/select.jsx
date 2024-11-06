@@ -27,7 +27,10 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
               <Button
                   variant="outline"
                   action="primary"
-                  className={mergeClasses('justify-between items-center')}
+                  className={mergeClasses(
+                      'justify-between items-center',
+                      isOpen && 'border-primary-600'
+                  )}
                   style={{
                     borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
                   }}

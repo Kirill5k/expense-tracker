@@ -79,6 +79,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
                   <Input>
                     <InputField
                         autoFocus
+                        autoCorrect={false}
                         // autoComplete="username"
                         textContentType="username"
                         keyboardType="email-address"
@@ -115,6 +116,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        autoCorrect={false}
                         secureTextEntry={secureTextEntry}
                         type={showPassword ? "text" : "password"}
                         textContentType="password"

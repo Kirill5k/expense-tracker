@@ -104,6 +104,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoFocus
+                        autoCorrect={false}
                         inputMode="email"
                         textContentType="emailAddress"
                         keyboardType="email-address"
@@ -139,6 +140,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
+                          autoCorrect={false}
                           inputMode="text"
                           textContentType="givenName"  // For first name autofill
                           placeholder="First name"
@@ -172,6 +174,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
+                          autoCorrect={false}
                           inputMode="text"
                           textContentType="username"
                           placeholder="Last name"
@@ -231,6 +234,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        autoCorrect={false}
                         secureTextEntry={secureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
@@ -272,6 +276,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
+                        autoCorrect={false}
                         secureTextEntry={secureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
