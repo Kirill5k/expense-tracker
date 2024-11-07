@@ -7,7 +7,7 @@ import {ListItemPressable, ListItemIcon} from '@/components/common/list'
 import {groupBy} from '@/utils/arrays'
 import {calcTotal, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
-import {VirtualizedList} from '@/components/ui/virtualized-list'
+import {FlatList} from '@/components/ui/flat-list'
 import {mergeClasses} from '@/utils/css'
 
 const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
@@ -71,20 +71,18 @@ const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy
   )
 })
 
-const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
+const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll = () => {}}) => {
   const groupedItems = Object.entries(groupBy(items, i => i.date))
-
+  const data = groupedItems.map(([date, txGroup]) => ({date, txGroup}))
   return (
-      <VirtualizedList
+      <FlatList
           bounces={false}
           onScroll={onScroll}
           showsVerticalScrollIndicator={false}
           className={Classes.scrollList}
-          data={groupedItems.map(([date, txGroup]) => ({date, txGroup}))}
           initialNumToRender={10}
-          getItem={(data, index) => data[index]}
+          data={data}
           keyExtractor={(item) => item.date}
-          getItemCount={(d) => d.length}
           renderItem={({item}) => (
               <TransactionListItem
                   item={item}
@@ -94,6 +92,7 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
                   onItemDelete={onItemDelete}
               />
           )}
+          ListEmptyComponent={<Text className="py-10 text-center">No transactions for this period</Text>}
       />
   )
 }
