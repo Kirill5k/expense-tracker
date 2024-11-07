@@ -109,7 +109,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                         textContentType="emailAddress"
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        placeholder="EEnter your email address"
+                        placeholder="Your email address"
                         type="text"
                         value={value}
                         onChangeText={onChange}

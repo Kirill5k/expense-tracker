@@ -1,0 +1,5 @@
+package-lock.json
+/ios
+__tests__
+/android
+node_modules

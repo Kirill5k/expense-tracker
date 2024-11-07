@@ -17,9 +17,13 @@
         "EXPO_USE_DEV_SERVER": "true",
         "NODE_OPTIONS": "--max-old-space-size=4096"
       }
-    },
+    }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6737627331"
+      }
+    }
   }
 }
