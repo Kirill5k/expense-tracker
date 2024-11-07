@@ -106,7 +106,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                         autoFocus
                         autoCorrect={false}
                         inputMode="email"
-                        textContentType="emailAddress"
+                        textContentType="username"
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholder="Your email address"
