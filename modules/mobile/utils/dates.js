@@ -1,8 +1,14 @@
-import {format, startOfMonth, endOfMonth} from 'date-fns'
+import {format, startOfMonth, endOfMonth, subMonths} from 'date-fns'
 
 export const defaultDisplayDate = () => {
   const now = new Date()
-  return {range: 'monthly', start: startOfMonth(now), end: endOfMonth(now), text: format(now, 'LLLL yyyy')}
+  return {
+    range: 'monthly',
+    prevStart: startOfMonth(subMonths(now, 1)),
+    start: startOfMonth(now),
+    end: endOfMonth(now),
+    text: format(now, 'LLLL yyyy')
+  }
 }
 
 export const toIsoDateString = (date) => {
