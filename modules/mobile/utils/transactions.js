@@ -1,16 +1,14 @@
 import {format, isToday, isYesterday, parseISO} from "date-fns";
 
 export const calcTotal = (transactions) => {
-  if (!transactions.length) {
-    return '0';
+  if (!transactions?.length) {
+    return 0;
   }
 
-  const total = transactions.reduce((acc, transaction) => {
+  return transactions.reduce((acc, transaction) => {
     const value = transaction.amount.value;
     return isExpense(transaction) ? acc - value : acc + value;
-  }, 0);
-
-  return printAmount(total, transactions[0].amount.currency)
+  }, 0)
 }
 
 export const formatAmount = (tx) => {

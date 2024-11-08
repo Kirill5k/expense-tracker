@@ -21,7 +21,7 @@ const kinds = [
   {label: 'Income', value: 'income'}
 ]
 
-const Analytics = ({state, user, displayedTransactions, categories}) => {
+const Analytics = ({state, user, displayedTransactions, categories, previousDisplayedTransactions}) => {
   const database = useDatabase()
   const mode = useColorScheme()
 
@@ -31,6 +31,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
   const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind.value)
+  const previousTransactions = mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind.value)
 
   useEffect(() => {
     setSelectedTransactions([])
@@ -65,6 +66,7 @@ const Analytics = ({state, user, displayedTransactions, categories}) => {
               kind={kind.value}
               mode={mode}
               items={analysedTransactions}
+              previousPeriodItems={previousTransactions}
               displayDate={state.displayDate}
               currency={user?.currency}
               onChartPress={setSelectedTransactions}

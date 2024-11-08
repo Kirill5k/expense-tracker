@@ -8,7 +8,7 @@ import TransactionBarChart from './bar-chart'
 import TransactionPieChart from './pie-chart'
 
 
-const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPress}) => {
+const TransactionChart = ({items, previousPeriodItems, mode, displayDate, currency, kind, onChartPress}) => {
   const screenWidth = Dimensions.get('window').width
   const chartWidth = screenWidth - 92
   const [showPieChart, setShowPieChart] = useState(false)
@@ -34,6 +34,7 @@ const TransactionChart = ({items, mode, displayDate, currency, kind, onChartPres
             <TransactionBarChart
                 kind={kind}
                 items={items}
+                previousPeriodItems={previousPeriodItems}
                 displayDate={displayDate}
                 currency={currency}
                 mode={mode}

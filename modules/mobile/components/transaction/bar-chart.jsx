@@ -6,12 +6,22 @@ import {getDaysInMonth} from 'date-fns'
 import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 import {nonEmpty} from '@/utils/arrays'
-import {printAmount} from '@/utils/transactions'
+import {printAmount, calcTotal} from '@/utils/transactions'
 
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const weeks = ['1-7', '8-14', '15-21', '22-28']
 const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+
+const percentageChangeLabel = (currentTotal, previousTotal, displayDate) => {
+  if (currentTotal === 0 || previousTotal === 0) {
+    return ''
+  }
+
+  const change = ((currentTotal - previousTotal) / previousTotal) * 100
+  const sign = change >= 0 ? '+' : '-'
+  return `${sign}${Math.abs(change).toFixed(0)}% from previous ${displayDate.range.replaceAll('ly', '')}`
+}
 
 const getNumberOfBucketsForDateRange = (range) => {
   switch (range) {
@@ -70,7 +80,7 @@ const focusItem = (items, index, mode, kind) => items.map((d, i) => {
       : {...d, frontColor: Colors[mode][kind].barChartSecondary}
 })
 
-const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, kind, onChartPress}) => {
+const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, currency, chartWidth, kind, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
 
   const chartData = prepareChartData(items, displayDate, chartWidth)
@@ -94,13 +104,17 @@ const TransactionBarChart = ({items, mode, displayDate, currency, chartWidth, ki
     }
   }
 
+  const previousPeriodTotal = Math.abs(calcTotal(previousPeriodItems))
+  const previousPeriodAverage = Math.floor(previousPeriodTotal / data.length)
+
   return (
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
-        <Heading size="3xl" className="mb-4">{printAmount(total, currency, false)}</Heading>
+        <Heading size="3xl">{printAmount(total, currency, false)}</Heading>
+        <Text size="sm" className="py-0">{percentageChangeLabel(total, previousPeriodTotal, displayDate)}</Text>
         <BarChart
             frontColor={Colors[mode][kind].barChartMain}
-            height={140}
+            height={134}
             width={chartWidth}
             initialSpacing={10}
             roundToDigits={0}

@@ -5,7 +5,7 @@ import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
 import {ListItemPressable, ListItemIcon} from '@/components/common/list'
 import {groupBy} from '@/utils/arrays'
-import {calcTotal, formatAmount, formatDate, isExpense} from '@/utils/transactions'
+import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
 import {FlatList} from '@/components/ui/flat-list'
 import {mergeClasses} from '@/utils/css'
@@ -58,7 +58,7 @@ const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy
       <VStack className="mb-5">
         <HStack className="items-center justify-between">
           <Heading size="md" className="mb-1">{formatDate(item)}</Heading>
-          <Text className="text-md">{calcTotal(item.txGroup)}</Text>
+          <Text className="text-md">{printAmount(calcTotal(item.txGroup), item.txGroup[0].amount.currency)}</Text>
         </HStack>
         <TransactionGroup
             disabled={disabled}
