@@ -104,6 +104,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                 render={({field: {onChange, onBlur, value}}) => (
                     <Input>
                       <InputField
+                          autoFocus
                           autoCorrect={false}
                           inputMode="text"
                           textContentType="givenName"  // For first name autofill
@@ -140,7 +141,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                       <InputField
                           autoCorrect={false}
                           inputMode="text"
-                          textContentType="username"
+                          textContentType="familyName"
                           placeholder="Last name"
                           type="text"
                           value={value}
@@ -198,7 +199,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               render={({field: {onChange, onBlur, value}}) => (
                   <Input>
                     <InputField
-                        autoFocus
                         autoCorrect={false}
                         inputMode="email"
                         textContentType="username"
