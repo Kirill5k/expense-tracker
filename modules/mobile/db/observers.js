@@ -1,5 +1,5 @@
 import {combineLatest, of as of$} from 'rxjs'
-import {switchMap} from 'rxjs/operators'
+import {switchMap, map as map$} from 'rxjs/operators'
 import {Q} from '@nozbe/watermelondb'
 import {withDatabase, compose, withObservables} from '@nozbe/watermelondb/react'
 
@@ -34,7 +34,17 @@ const transactionsObservable =
                   Q.sortBy('date', Q.desc),
               ).observe()
           )
-      )
+      ),
+      previousDisplayedTransactions: combineLatest([state.observe()]).pipe(
+          switchMap(([currentState]) =>
+              state.collections.get('transactions').query(
+                  Q.where('date', Q.gte(currentState.displayDatePrevStart)),
+                  Q.where('date', Q.lt(currentState.displayDateStart)),
+                  Q.where('user_id', Q.eq(currentState.userId)),
+                  Q.where('hidden', Q.notEq(true)),
+              ).observe()
+          )
+      ),
     }))
 
 const transactionCountObservable =

@@ -15,7 +15,6 @@ const Category = tableSchema({
 const Transaction = tableSchema({
   name: 'transactions',
   columns: [
-    {name: 'kind', type: 'string'},
     {name: 'category_id', type: 'string', isIndexed: true},
     {name: 'amount_value', type: 'number'},
     {name: 'amount_currency_code', type: 'string'},

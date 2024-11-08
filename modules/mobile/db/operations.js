@@ -24,7 +24,6 @@ const updateCatRec = (rec, c) => {
 }
 
 const updateTxRec = (rec, tx) => {
-  rec.kind = tx.category.kind
   rec.categoryId = tx.category.id
   rec.date = tx.date
   rec.userId = tx.userId
