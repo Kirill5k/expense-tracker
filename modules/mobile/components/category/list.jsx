@@ -1,5 +1,5 @@
 import React from 'react'
-import {VirtualizedList} from '@/components/ui/virtualized-list'
+import {FlatList} from '@/components/ui/flat-list'
 import {Box} from '@/components/ui/box'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -38,17 +38,16 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
 })
 
 const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) => {
+  const data = items.map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
   return (
-      <VirtualizedList
+      <FlatList
           bounces={false}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
           initialNumToRender={11}
           onScroll={onScroll}
-          data={items}
-          getItem={(data, index) => ({...data[index], isLast: index === data.length - 1, isFirst: index === 0})}
+          data={data}
           keyExtractor={(item) => item.id}
-          getItemCount={data => data.length}
           renderItem={({item}) => (
               <CategoryListItem
                   onItemPress={onItemPress}
