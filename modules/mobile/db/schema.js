@@ -52,6 +52,7 @@ const State = tableSchema({
     {name: 'display_date_text', type: 'string', isOptional: true},
     {name: 'display_date_start', type: 'string', isOptional: true},
     {name: 'display_date_end', type: 'string', isOptional: true},
+    {name: 'display_date_prev_start', type: 'string', isOptional: true},
   ],
 })
 

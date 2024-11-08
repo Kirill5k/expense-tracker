@@ -11,6 +11,7 @@ const resetStateRec = (rec) => {
   rec.displayDateText = dd.text
   rec.displayDateStart = toIsoDateString(dd.start)
   rec.displayDateEnd = toIsoDateString(dd.end)
+  rec.displayDatePrevStart = toIsoDateString(dd.prevStart)
 }
 
 const updateCatRec = (rec, c) => {
@@ -119,6 +120,7 @@ export const updateStateDisplayDate = async (database, displayDate) => {
       record.displayDateText = displayDate.text
       record.displayDateStart = toIsoDateString(displayDate.start)
       record.displayDateEnd = toIsoDateString(displayDate.end)
+      record.displayDatePrevStart = toIsoDateString(displayDate.previous.start)
     })
   })
 }
