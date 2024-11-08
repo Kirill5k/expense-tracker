@@ -92,42 +92,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
 
   return (
       <VStack space="xl" className="w-full">
-        <FormControl isInvalid={!!errors.email}>
-          <FormControlLabel>
-            <FormControlLabelText>Email</FormControlLabelText>
-          </FormControlLabel>
-          <Controller
-              name="email"
-              defaultValue=""
-              control={control}
-              render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
-                    <InputField
-                        autoFocus
-                        autoCorrect={false}
-                        inputMode="email"
-                        textContentType="username"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        placeholder="Your email address"
-                        type="text"
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        onSubmitEditing={() => firstNameRef.current.focus()}
-                        returnKeyType="next"
-                    />
-                  </Input>
-              )}
-          />
-          <FormControlError>
-            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
-            <FormControlErrorText className="text-sm">
-              {errors?.email?.message}
-            </FormControlErrorText>
-          </FormControlError>
-        </FormControl>
-
         <HStack className="w-full flex-row" space="md">
           <FormControl isInvalid={!!errors.firstName} className="flex-1">
             <FormControlLabel>
@@ -219,6 +183,42 @@ export const RegistrationForm = ({onSubmit, mode}) => {
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-sm">
               {errors?.currency?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl isInvalid={!!errors.email}>
+          <FormControlLabel>
+            <FormControlLabelText>Email</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+              name="email"
+              defaultValue=""
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <Input>
+                    <InputField
+                        autoFocus
+                        autoCorrect={false}
+                        inputMode="email"
+                        textContentType="username"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        placeholder="Your email address"
+                        type="text"
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        onSubmitEditing={() => firstNameRef.current.focus()}
+                        returnKeyType="next"
+                    />
+                  </Input>
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-sm">
+              {errors?.email?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
