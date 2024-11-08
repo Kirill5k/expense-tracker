@@ -37,6 +37,7 @@ export class Category extends Model {
 export class Transaction extends Model {
   static table = 'transactions'
 
+  @field('kind') kind
   @field('category_id') categoryId
   @field('amount_value') amountValue
   @field('amount_currency_code') amountCurrencyCode
