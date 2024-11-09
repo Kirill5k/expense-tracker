@@ -111,10 +111,10 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
         <Heading size="3xl">{printAmount(total, currency, false)}</Heading>
-        <Text size="sm" className="py-0">{percentageChangeLabel(total, previousPeriodTotal, displayDate)}</Text>
+        <Text size="sm" className="py-0 mb-1">{percentageChangeLabel(total, previousPeriodTotal, displayDate)}</Text>
         <BarChart
             frontColor={Colors[mode][kind].barChartMain}
-            height={134}
+            height={132}
             width={chartWidth}
             initialSpacing={10}
             roundToDigits={0}

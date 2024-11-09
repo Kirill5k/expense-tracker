@@ -79,7 +79,8 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     }
   }
 
-  const [secureTextEntry, setSecureTextEntry] = useState(false)
+  const [passwordSecureTextEntry, setPasswordSecureTextEntry] = useState(false)
+  const [confirmPasswordSecureTextEntry, setConfirmPasswordSecureTextEntry] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -235,15 +236,15 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoCorrect={false}
-                        secureTextEntry={secureTextEntry}
+                        secureTextEntry={passwordSecureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Create a password"
                         value={value}
-                        onFocus={() => setSecureTextEntry(true)}
+                        onFocus={() => setPasswordSecureTextEntry(true)}
                         onChangeText={onChange}
                         onBlur={() => {
-                          setSecureTextEntry(false)
+                          setPasswordSecureTextEntry(false)
                           onBlur()
                         }}
                         onSubmitEditing={() => confirmPasswordRef.current.focus()}
@@ -277,15 +278,15 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoCorrect={false}
-                        secureTextEntry={secureTextEntry}
+                        secureTextEntry={confirmPasswordSecureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Re-enter your password"
                         value={value}
                         onChangeText={onChange}
-                        onFocus={() => setSecureTextEntry(true)}
+                        onFocus={() => setConfirmPasswordSecureTextEntry(true)}
                         onBlur={() => {
-                          setSecureTextEntry(false)
+                          setConfirmPasswordSecureTextEntry(false)
                           onBlur()
                         }}
                         onSubmitEditing={handleKeyPress}
