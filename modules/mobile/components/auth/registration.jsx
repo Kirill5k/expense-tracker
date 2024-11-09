@@ -79,8 +79,6 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     }
   }
 
-  const [passwordSecureTextEntry, setPasswordSecureTextEntry] = useState(false)
-  const [confirmPasswordSecureTextEntry, setConfirmPasswordSecureTextEntry] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -108,6 +106,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                           autoFocus
                           autoCorrect={false}
                           inputMode="text"
+                          autoCapitalize="words"
                           textContentType="givenName"  // For first name autofill
                           placeholder="First name"
                           type="text"
@@ -143,6 +142,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                           autoCorrect={false}
                           inputMode="text"
                           textContentType="familyName"
+                          autoCapitalize="words"
                           placeholder="Last name"
                           type="text"
                           value={value}
@@ -201,6 +201,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoCorrect={false}
+                        spellCheck={false}
                         inputMode="email"
                         textContentType="username"
                         keyboardType="email-address"
@@ -236,17 +237,12 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoCorrect={false}
-                        secureTextEntry={passwordSecureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Create a password"
                         value={value}
-                        onFocus={() => setPasswordSecureTextEntry(true)}
                         onChangeText={onChange}
-                        onBlur={() => {
-                          setPasswordSecureTextEntry(false)
-                          onBlur()
-                        }}
+                        onBlur={onBlur}
                         onSubmitEditing={() => confirmPasswordRef.current.focus()}
                         returnKeyType="next"
                         type={showPassword ? "text" : "password"}
@@ -278,17 +274,12 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                   <Input>
                     <InputField
                         autoCorrect={false}
-                        secureTextEntry={confirmPasswordSecureTextEntry}
                         textContentType="newPassword"
                         passwordrules="minlength: 20; required: lower; required: upper; required: digit; required: [$@];"
                         placeholder="Re-enter your password"
                         value={value}
                         onChangeText={onChange}
-                        onFocus={() => setConfirmPasswordSecureTextEntry(true)}
-                        onBlur={() => {
-                          setConfirmPasswordSecureTextEntry(false)
-                          onBlur()
-                        }}
+                        onBlur={onBlur}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
                         type={showConfirmPassword ? "text" : "password"}

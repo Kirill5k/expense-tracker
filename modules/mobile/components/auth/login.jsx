@@ -117,19 +117,14 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
                   <Input>
                     <InputField
                         autoCorrect={false}
-                        secureTextEntry={secureTextEntry}
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         textContentType="password"
                         placeholder="Your password"
                         // autoComplete="current-password"
                         value={value}
-                        onFocus={() => setSecureTextEntry(true)}
                         onChangeText={onChange}
-                        onBlur={() => {
-                          setSecureTextEntry(false)
-                          onBlur()
-                        }}
+                        onBlur={onBlur}
                         onSubmitEditing={handleKeyPress}
                         returnKeyType="done"
                         ref={passwordRef}
