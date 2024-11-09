@@ -6,7 +6,7 @@ import {Heading} from '@/components/ui/heading'
 import {ProgressCircle} from '@/components/common/progress'
 import {LogoChart} from '@/components/common/logo'
 import {useColorScheme} from '@/components/useColorScheme'
-import {ScreenLayout} from '@/components/common/layout'
+import {SafeAreaView} from '@/components/ui/safe-area-view'
 import useStore from '@/store'
 import {enhanceWithUser} from '@/db/observers'
 import Text from '@/constants/text'
@@ -41,9 +41,9 @@ const Index = ({state, user}) => {
   }, [state?.accessToken])
 
   return (
-      <ScreenLayout>
+      <SafeAreaView className="w-full h-full bg-background-0">
         {!isLoading && (
-            <VStack className="h-full w-full justify-between" space="xl">
+            <VStack className="h-full w-full justify-between p-9" space="xl">
               <VStack></VStack>
               <VStack className="items-center">
                 <LogoChart mode={mode}/>
@@ -66,7 +66,7 @@ const Index = ({state, user}) => {
               <ProgressCircle mode={mode}/>
             </VStack>
         )}
-      </ScreenLayout>
+      </SafeAreaView>
   )
 }
 
