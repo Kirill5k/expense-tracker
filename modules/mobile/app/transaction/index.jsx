@@ -44,9 +44,6 @@ const Transaction = ({user, categories}) => {
               onCancel={() => router.back()}
               onSubmit={handleFormSubmit}
           />
-          <Box
-              className="h-80"
-          />
         </VStack>
       </ScreenLayout>
   )

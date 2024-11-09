@@ -1,11 +1,12 @@
+import {Platform} from 'react-native'
+import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import {Text} from '@/components/ui/text'
-import {SafeAreaView} from '@/components/ui/safe-area-view'
+import {KeyboardAvoidingView} from '@/components/ui/keyboard-avoiding-view'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {Pressable} from '@/components/ui/pressable'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
-import {router} from 'expo-router'
 
 export const ScreenHeader = ({heading, subHeading, onBack = () => router.back()}) => {
   return (
@@ -27,10 +28,12 @@ export const ScreenHeader = ({heading, subHeading, onBack = () => router.back()}
   )
 }
 
-
 export const ScreenLayout = ({children}) => {
   return (
-      <SafeAreaView className="w-full h-full bg-background-0">
+      <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="w-full h-full bg-background-0"
+      >
         <ScrollView
             className="w-full h-full"
             contentContainerStyle={{flexGrow: 1}}
@@ -39,6 +42,6 @@ export const ScreenLayout = ({children}) => {
             {children}
           </VStack>
         </ScrollView>
-      </SafeAreaView>
+      </KeyboardAvoidingView>
   )
 }
