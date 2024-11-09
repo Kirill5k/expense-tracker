@@ -32,16 +32,16 @@ export const ScreenLayout = ({children}) => {
   return (
       <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          className="w-full h-full bg-background-0"
+          className="w-full h-full"
       >
-        <ScrollView
-            className="w-full h-full"
-            contentContainerStyle={{flexGrow: 1}}
-        >
-          <VStack className="w-full h-full p-9 gap-16">
+          <VStack className="w-full h-full py-9 gap-16">
+            <ScrollView
+                className="w-full h-full px-9"
+                contentContainerStyle={{flexGrow: 1}}
+            >
             {children}
-          </VStack>
         </ScrollView>
+          </VStack>
       </KeyboardAvoidingView>
   )
 }

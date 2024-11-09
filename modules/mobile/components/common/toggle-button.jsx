@@ -14,7 +14,7 @@ const ToggleButton = ({value, items, onChange, className, size, disabled}) => {
                 key={`${i}-${item.value}`}
                 onPress={() => onChange(item)}
             >
-              <Box className={`py-1 px-2 ${isSelected(item, value) ? 'rounded-lg bg-background-100' : 'rounded-none'}`}>
+              <Box className={`py-1 px-2 ${isSelected(item, value) ? 'rounded-lg bg-background-200' : 'rounded-none'}`}>
                 <Text size={size} className={`font-medium ${isSelected(item, value) ? 'text-primary-900' : 'text-secondary-300'}`}>
                   {item.label}
                 </Text>

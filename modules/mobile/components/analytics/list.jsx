@@ -49,7 +49,7 @@ const CategoryGroupedTransactionList = ({items}) => {
           size="sm"
           variant="unfilled"
           type="single"
-          className="rounded-xl bg-background-50"
+          className="rounded-xl bg-background-0"
       >
         {data.map((item) => (
             <AccordionItem key={item.category.id} value={item.category.id}>
@@ -78,7 +78,7 @@ const CategoryGroupedTransactionList = ({items}) => {
               <AccordionContent className="pt-0 mt-0">
                 <VStack space="sm">
                   {item.transactions.map(tx => (
-                      <HStack key={tx.id} className="w-full justify-between bg-background-100 rounded-xl py-3 px-3">
+                      <HStack key={tx.id} className="w-full justify-between bg-background-50 rounded-xl py-3 px-3">
                         <VStack className="items-start">
                           <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
                           {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}

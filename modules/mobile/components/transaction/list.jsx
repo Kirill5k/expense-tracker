@@ -12,7 +12,7 @@ import {mergeClasses} from '@/utils/css'
 
 const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
-      <VStack className="rounded-xl bg-background-50 p-1" space="sm">
+      <VStack className="rounded-xl bg-background-0 p-1" space="sm">
         {items.map(tx => (
             <ListItemPressable
                 disabled={disabled}
