@@ -11,7 +11,7 @@ import {mergeClasses} from '@/utils/css'
 const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}) => {
   return (
       <Box className={mergeClasses(
-          'bg-background-0 px-1',
+          'bg-background-50 px-1',
           item.isFirst && 'rounded-t-xl pt-1',
           item.isLast && 'rounded-b-xl pb-1 mb-5'
       )}>
