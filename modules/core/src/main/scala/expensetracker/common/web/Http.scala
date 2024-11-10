@@ -9,6 +9,7 @@ import expensetracker.common.config.ServerConfig
 import expensetracker.health.Health
 import expensetracker.sync.Sync
 import expensetracker.transaction.Transactions
+import expensetracker.wellknown.WellKnown
 import kirill5k.common.http4s.Server
 import org.http4s.*
 import org.http4s.server.Router
@@ -18,6 +19,7 @@ import scala.concurrent.duration.*
 
 final class Http[F[_]: Async] private (
     private val health: Health[F],
+    private val wellKnown: WellKnown[F],
     private val auth: Auth[F],
     private val categories: Categories[F],
     private val transactions: Transactions[F],
@@ -26,12 +28,15 @@ final class Http[F[_]: Async] private (
 
   private val routes: HttpRoutes[F] = {
     given Authenticator[F] = auth.authenticator
+    val core = health.controller.routes <+>
+      wellKnown.controller.routes
+
     val api = auth.controller.routes <+>
       categories.controller.routes <+>
       transactions.controller.routes <+>
       sync.controller.routes
 
-    Router("/api" -> api, "/" -> health.controller.routes)
+    Router("/api" -> api, "/" -> core)
   }
 
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => AutoSlash(http) }
@@ -49,8 +54,9 @@ final class Http[F[_]: Async] private (
 object Http:
   def make[F[_]: Async](
       health: Health[F],
+      wellKnown: WellKnown[F],
       auth: Auth[F],
       cats: Categories[F],
       txs: Transactions[F],
       sync: Sync[F]
-  ): F[Http[F]] = Monad[F].pure(Http(health, auth, cats, txs, sync))
+  ): F[Http[F]] = Monad[F].pure(Http(health, wellKnown, auth, cats, txs, sync))

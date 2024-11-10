@@ -7,6 +7,15 @@ import pureconfig.generic.derivation.default.*
 
 object config {
 
+  final case class WellKnownAppleConfig(
+      bundleId: String,
+      developerId: String
+  ) derives ConfigReader
+
+  final case class WellKnownConfig(
+      apple: WellKnownAppleConfig
+  ) derives ConfigReader
+
   final case class JwtConfig(
       alg: String,
       secret: String
@@ -33,6 +42,7 @@ object config {
   }
 
   final case class AppConfig(
+      wellKnown: WellKnownConfig,
       server: ServerConfig,
       auth: AuthConfig,
       mongo: MongoConfig
