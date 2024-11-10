@@ -16,7 +16,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
-      "associatedDomains": ["applinks:kirill5k.github.io"],
+      "associatedDomains": [
+        "applinks:kirill5k.github.io",
+        "webcredentials:kirill5k.github.io"
+      ],
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",
         "ITSAppUsesNonExemptEncryption": false
