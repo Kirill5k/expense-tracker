@@ -17,8 +17,8 @@
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
       "associatedDomains": [
-        "applinks:kirill5k.github.io",
-        "webcredentials:kirill5k.github.io"
+        "applinks:watery-mommy-kirill5k-185d3bc4.koyeb.app",
+        "webcredentials:watery-mommy-kirill5k-185d3bc4.koyeb.app"
       ],
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",
