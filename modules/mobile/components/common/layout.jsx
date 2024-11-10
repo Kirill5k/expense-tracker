@@ -32,7 +32,7 @@ export const ScreenLayout = ({children}) => {
   return (
       <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          className="w-full h-full bg-background-0 py-5"
+          className="w-full h-full bg-background-0 py-6"
       >
         <ScrollView
             className="w-full h-full"
