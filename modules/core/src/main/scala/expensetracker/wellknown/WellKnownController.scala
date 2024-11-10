@@ -35,6 +35,7 @@ final class WellKnownController[F[_]: Async](
              |  "webcredentials": {
              |    "apps": ["${config.apple.developerId}.${config.apple.bundleId}"]
              |  }
+             |}
              |""".stripMargin)
       }
 
@@ -42,7 +43,7 @@ final class WellKnownController[F[_]: Async](
 }
 
 object WellKnownController extends TapirSchema with TapirJson {
-  
+
   val basePath = ".well-known"
 
   val aasaEndpoint = infallibleEndpoint.get
