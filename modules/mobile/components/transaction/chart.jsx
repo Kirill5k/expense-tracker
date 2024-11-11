@@ -24,7 +24,7 @@ const TransactionChart = ({items, previousPeriodItems, mode, displayDate, curren
             isHovered={false}
             placement="top right"
             size="lg"
-            className="shadow-none rounded-full p-1.5 top-1 bg-background-100"
+            className="shadow-none rounded-full p-1.5 top-5 bg-background-100"
             variant="outline"
             onPress={handleFabPress}
         >
