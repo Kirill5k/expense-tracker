@@ -62,9 +62,11 @@ export const RegistrationForm = ({onSubmit, mode}) => {
     formState: {errors},
     setError
   } = useForm({resolver: zodResolver(signUpSchema)})
+  const emailRef = useRef(null)
   const firstNameRef = useRef(null)
   const lastNameRef = useRef(null)
   const passwordRef = useRef(null)
+  const currencySelRef = useRef(null)
   const confirmPasswordRef = useRef(null)
 
   const handleFormSubmit = (data) => {
@@ -107,7 +109,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                           autoCorrect={false}
                           inputMode="text"
                           autoCapitalize="words"
-                          textContentType="givenName"  // For first name autofill
+                          textContentType="givenName"
                           placeholder="First name"
                           type="text"
                           value={value}
@@ -148,7 +150,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
-                          onSubmitEditing={() => passwordRef.current.focus()}
+                          onSubmitEditing={() => emailRef.current.focus()}
                           returnKeyType="next"
                           ref={lastNameRef}
                       />
@@ -175,6 +177,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <CurrencySelect
+                      ref={currencySelRef}
                       mode={mode}
                       value={value}
                       onSelect={onChange}
@@ -211,8 +214,9 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}
-                        onSubmitEditing={() => firstNameRef.current.focus()}
+                        onSubmitEditing={() => passwordRef.current.focus()}
                         returnKeyType="next"
+                        ref={emailRef}
                     />
                   </Input>
               )}
