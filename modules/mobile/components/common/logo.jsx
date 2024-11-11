@@ -27,7 +27,7 @@ export const LogoChart = ({mode}) => {
             strokeWidth={6}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Heading size="5xl" className="pt-4 text-blue-500 text-7xl">
+                  <Heading size="5xl" className="pt-4 text-blue-500 text-8xl">
                     $
                   </Heading>
                 </VStack>
