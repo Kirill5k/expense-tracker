@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, forwardRef, useImperativeHandle} from 'react'
 import {ButtonIcon, ButtonText, Button} from '../ui/button'
 import {MaterialIcon} from '../ui/icon'
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu'
@@ -17,13 +17,20 @@ export const currencies = [
   { country: 'Turkish Lira', code: 'TRY', symbol: '₺' }
 ]
 
-export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'md'}) => {
+export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, size = 'md'}, ref) => {
   const [isOpen, setIsOpen] = useState(false)
   const currenciesByCode = createLookup(currencies, c => c.code)
   const [selected, setSelected] = useState(value?.code ? new Set([value.code]) : new Set([]))
 
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      setIsOpen(true)
+    }
+  }))
+
   return (
       <Menu
+          isOpen={isOpen}
           className="min-w-80"
           closeOnSelect={true}
           placement="bottom start"
@@ -75,4 +82,4 @@ export const CurrencySelect = ({isDisabled, value, onSelect, mode, size = 'md'})
         ))}
       </Menu>
   )
-}
+})

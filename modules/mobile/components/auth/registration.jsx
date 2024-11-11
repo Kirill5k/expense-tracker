@@ -150,7 +150,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
                           value={value}
                           onChangeText={onChange}
                           onBlur={onBlur}
-                          onSubmitEditing={() => emailRef.current.focus()}
+                          onSubmitEditing={() => currencySelRef.current.focus()}
                           returnKeyType="next"
                           ref={lastNameRef}
                       />
