@@ -1,3 +1,9 @@
+## Update dependencies
+
+```shell
+npx expo install --fix
+```
+
 ## Run on device
 
 ```shell
