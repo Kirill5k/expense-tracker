@@ -105,7 +105,6 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
   }
 
   const previousPeriodTotal = Math.abs(calcTotal(previousPeriodItems))
-  const previousPeriodAverage = Math.floor(previousPeriodTotal / data.length)
 
   return (
       <VStack>
