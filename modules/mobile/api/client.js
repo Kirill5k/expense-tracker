@@ -1,28 +1,24 @@
-const apiUrl = process.env.EXPO_PUBLIC_API_URL
+import axios from 'axios'
 
-const DEFAULT_REQUEST_PARAMS = {
-  mode: 'cors',
-  cache: 'no-cache',
-  credentials: 'include'
-}
+const instance = axios.create({
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  timeout: 60000,
+  headers: {'Content-Type': 'application/json'}
+})
 
-const dispatchReq = (path, request, params = {}) => {
-  let fullUrl = `${apiUrl}/${path}`
-  const args = Object.entries(params).map(([k, v]) => v ? `${k}=${v}` : '').join('&')
-  if (args) {
-    fullUrl += `?${args}`
-  }
-  return fetch(fullUrl, request)
-}
-
-const simpleRequest = (token) => {
-  const headers = {'Content-Type': 'application/json'}
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-  return {headers, ...DEFAULT_REQUEST_PARAMS}
-}
-const requestWithBody = (reqBody, method, token) => ({...simpleRequest(token), method, body: JSON.stringify(reqBody)})
+const dispatch = (config) =>
+    instance(config).then(r => r.data).catch(err => {
+      const req = err.request
+      if (err.response) {
+        const res = err.response
+        console.log(`${res.status} error sending request to ${req?._url}: ${JSON.stringify(res.data)}`)
+        const message = res?.data?.message || 'Server not available. Try again later'
+        return Promise.reject(errorWithStatus(message, res.status))
+      } else {
+        console.log(`Failed to send http request to ${req?._url}: ${err?.message}\n${err}`)
+        return Promise.reject(errorWithStatus('Failed to complete the request. Try again later', 500))
+      }
+    })
 
 const errorWithStatus = (message, status) => {
   const error = new Error(message)
@@ -30,79 +26,52 @@ const errorWithStatus = (message, status) => {
   return error
 }
 
-export const reject = async res => {
-  const text = await res.text()
-  console.log(`${res.status} error sending request to ${res.url}: ${text}`)
-  try {
-    const e = JSON.parse(text)
-    return Promise.reject(errorWithStatus(e.message, res.status))
-  } catch (err) {
-    return Promise.reject(errorWithStatus('Server not available. Try again later', res.status))
-  }
-}
-
 class BackendClient {
-  getUser = (token) =>
-      dispatchReq('api/auth/user', simpleRequest(token), {expanded: true})
-          .then(res => res.status === 200 ? res.json() : reject(res))
+  createUser = (data) =>
+      dispatch({
+        method: 'post',
+        url: '/api/auth/user',
+        data
+      })
 
-  login = (requestBody) =>
-      dispatchReq('api/auth/login', requestWithBody(requestBody, 'POST'))
-          .then(res => res.status === 200 ? res.json() : reject(res))
-
-  createUser = (requestBody) =>
-      dispatchReq('api/auth/user', requestWithBody(requestBody, 'POST'))
-          .then(res => res.status === 201 ? {} : reject(res))
-
-  updateUserSettings = (token, userId, requestBody) =>
-      dispatchReq(`api/auth/user/${userId}/settings`, requestWithBody(requestBody, 'PUT', token))
-          .then(res => res.status === 204 ? requestBody : reject(res))
-
-  changeUserPassword = (token, userId, requestBody) =>
-      dispatchReq(`api/auth/user/${userId}/password`, requestWithBody(requestBody, 'POST', token))
-          .then(res => res.status === 204 ? {} : reject(res))
+  changeUserPassword = (token, userId, data) =>
+      dispatch({
+        method: 'post',
+        url: `/api/auth/user/${userId}/password`,
+        data,
+        headers: {Authorization: `Bearer ${token}`}
+      })
 
   logout = (token) =>
-      dispatchReq('api/auth/logout', requestWithBody({}, 'POST', token))
-          .then(res => res.status === 204 ? {} : reject(res))
+      dispatch({
+        method: 'post',
+        url: `/api/auth/logout`,
+        headers: {Authorization: `Bearer ${token}`}
+      })
 
-  createCategory = (token, requestBody) =>
-      dispatchReq('api/categories', requestWithBody(requestBody, 'POST', token))
-          .then(res => res.status === 201 ? res.json() : reject(res))
+  login = (data) =>
+      dispatch({
+        method: 'post',
+        url: `/api/auth/login`,
+        data
+      })
 
-  hideCategory = (token, {id, hidden}) =>
-      dispatchReq(`api/categories/${id}/hidden`, requestWithBody({hidden}, 'PUT', token))
-          .then(res => res.status === 204 ? {} : reject(res))
+  pullChanges = (token, lastPulledAt) =>
+      dispatch({
+        method: 'get',
+        url: '/api/sync/watermelon',
+        headers: {Authorization: `Bearer ${token}`},
+        params: {lastPulledAt}
+      })
 
-  updateCategory = (token, requestBody) =>
-      dispatchReq(`api/categories/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
-          .then(res => res.status === 204 ? requestBody : reject(res))
-
-  getTransactions = (token, from, to) =>
-      dispatchReq('api/transactions', simpleRequest(token), {expanded: true, from: from || '', to: to || ''})
-          .then(res => res.status === 200 ? res.json() : reject(res))
-
-  createTransaction = (token, requestBody) =>
-      dispatchReq('api/transactions', requestWithBody(requestBody, 'POST', token))
-          .then(res => res.status === 201 ? res.json() : reject(res))
-
-  hideTransaction = (token, {id, hidden}) =>
-      dispatchReq(`api/transactions/${id}/hidden`, requestWithBody({hidden}, 'PUT', token))
-          .then(res => res.status === 204 ? {} : reject(res))
-
-  updateTransaction = (token, requestBody) =>
-      dispatchReq(`api/transactions/${requestBody.id}`, requestWithBody(requestBody, 'PUT', token))
-          .then(res => res.status === 204 ? requestBody : reject(res))
-
-  pullChanges = (token, lastPulledAt) => {
-    return dispatchReq('api/sync/watermelon', simpleRequest(token), {lastPulledAt})
-        .then(res => res.status === 200 ? res.json() : reject(res))
-  }
-
-  pushChanges = (token, lastPulledAt, changes) => {
-    return dispatchReq('api/sync/watermelon', requestWithBody(changes, 'POST', token), {lastPulledAt})
-        .then(res => res.status === 204 ? {} : reject(res))
-  }
+  pushChanges = (token, lastPulledAt, data) =>
+      dispatch({
+        method: 'post',
+        data,
+        url: '/api/sync/watermelon',
+        headers: {Authorization: `Bearer ${token}`},
+        params: {lastPulledAt}
+      })
 }
 
 export default new BackendClient()
