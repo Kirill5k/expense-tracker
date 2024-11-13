@@ -104,13 +104,15 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
     }
   }
 
-  const previousPeriodTotal = Math.abs(calcTotal(previousPeriodItems))
+  const previousPeriodChartData = prepareChartData(previousPeriodItems, displayDate, chartWidth)
+  const previousData = previousPeriodChartData.data
+  const previousTotal = previousPeriodChartData.total
 
   return (
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
         <Heading size="3xl">{printAmount(total, currency, false)}</Heading>
-        <Text size="sm" className="py-0 mb-1">{percentageChangeLabel(total, previousPeriodTotal, displayDate)}</Text>
+        <Text size="sm" className="py-0 mb-1">{pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)}</Text>
         <BarChart
             frontColor={Colors[mode][kind].barChartMain}
             height={132}
