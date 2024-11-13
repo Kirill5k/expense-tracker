@@ -20,14 +20,14 @@ export const LogoChart = ({mode}) => {
             sectionAutoFocus
             data={data}
             donut
-            radius={90}
-            innerRadius={65}
+            radius={60}
+            innerRadius={45}
             innerCircleColor={Colors[mode].splashScreenBackground}
             strokeColor={Colors[mode].splashScreenBackground}
             strokeWidth={6}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
-                  <Heading size="5xl" className="pt-4 text-blue-500 text-8xl">
+                  <Heading size="5xl" className="pt-4 text-blue-500">
                     $
                   </Heading>
                 </VStack>
