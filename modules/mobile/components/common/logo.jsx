@@ -26,11 +26,11 @@ export const LogoChart = ({mode}) => {
             strokeColor={Colors[mode].splashScreenBackground}
             strokeWidth={6}
             centerLabelComponent={() => (
-                <VStack className="items-center justify-center">
-                  <Heading size="5xl" className="pt-4 text-blue-500">
+                <Box className="w-full h-full flex items-center justify-center">
+                  <Heading size="5xl" className="pt-3.5 text-blue-500">
                     $
                   </Heading>
-                </VStack>
+                </Box>
             )}
         />
       </Box>

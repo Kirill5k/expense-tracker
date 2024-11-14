@@ -15,7 +15,7 @@ const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
 
 const percentageChangeLabel = (currentTotal, previousTotal, displayDate) => {
   if (currentTotal === 0 || previousTotal === 0) {
-    return ''
+    return ' '
   }
 
   const change = ((currentTotal - previousTotal) / previousTotal) * 100
