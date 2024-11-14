@@ -21,13 +21,13 @@ export const LogoChart = ({mode}) => {
             data={data}
             donut
             radius={60}
-            innerRadius={45}
+            innerRadius={42}
             innerCircleColor={Colors[mode].splashScreenBackground}
             strokeColor={Colors[mode].splashScreenBackground}
             strokeWidth={6}
             centerLabelComponent={() => (
                 <Box className="w-full h-full flex items-center justify-center">
-                  <Heading size="5xl" className="pt-3.5 text-blue-500">
+                  <Heading size="5xl" className="pt-[10px] text-blue-500">
                     $
                   </Heading>
                 </Box>

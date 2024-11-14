@@ -1,3 +1,7 @@
+## Splash screen and app icon
+
+[Documentation](https://docs.expo.dev/develop/user-interface/splash-screen-and-app-icon/)
+
 ## Update dependencies
 
 ```shell

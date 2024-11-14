@@ -217,8 +217,8 @@ export const withToast = (ChildComponent) => {
               >
                 <HStack className="justify-between align-center" space="md">
                   <VStack className="justify-center">
-                    {notification?.title && <ToastTitle size="sm">{notification.title}</ToastTitle>}
-                    <ToastDescription size="sm">{notification?.message}</ToastDescription>
+                    {notification?.title && <ToastTitle size="md">{notification.title}</ToastTitle>}
+                    <ToastDescription size="md">{notification?.message}</ToastDescription>
                   </VStack>
                   <VStack className="justify-center">
                     {notification?.undoAction && (
