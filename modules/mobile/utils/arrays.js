@@ -1,3 +1,15 @@
+export const zipFlat = (arr1, arr2) => {
+  const minLength = Math.min(arr1.length, arr2.length);
+  const zipped = [];
+
+  for (let i = 0; i < minLength; i++) {
+    zipped.push(arr1[i])
+    zipped.push(arr2[i])
+  }
+
+  return zipped;
+}
+
 export const groupBy = (arr, f) => arr.reduce((acc, item) => {
   const key = f(item);
   if (!acc[key]) {
