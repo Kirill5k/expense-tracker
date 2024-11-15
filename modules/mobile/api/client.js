@@ -1,9 +1,23 @@
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 
 const instance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
-  timeout: 180000,
+  timeout: 60000,
   headers: {'Content-Type': 'application/json'}
+})
+
+axiosRetry(instance, {
+  retries: 3,
+  retryDelay: (retryCount) => {
+    return retryCount * 1000
+  },
+  retryCondition: (error) => {
+    return axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error)
+  },
+  onMaxRetryTimesExceeded: (error) => {
+    throw error
+  }
 })
 
 const dispatch = (config) =>
