@@ -128,7 +128,8 @@ final private class LiveTransactionRepository[F[_]](
       .map(_ > 0)
 
   override def save(txs: List[Transaction]): F[Unit] =
-    val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, UpdateOptions(upsert = true)))
+    val options = UpdateOptions(upsert = true)
+    val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, options))
     collection.bulkWrite(cmds).void
 }
 
