@@ -144,7 +144,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
           trigger={(triggerProps) => (
               <HStack
                   space="lg"
-                  className={`bg-background-0 items-center justify-center ${className}`}
+                  className={`bg-background-0 items-center justify-between ${className}`}
               >
                 <Button
                     size="lg"
