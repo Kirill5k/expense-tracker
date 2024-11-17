@@ -13,6 +13,7 @@ axiosRetry(instance, {
     return retryCount * 1000
   },
   retryCondition: (error) => {
+    console.log('Error sending request', error)
     return axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error)
   },
   onMaxRetryTimesExceeded: (error) => {
