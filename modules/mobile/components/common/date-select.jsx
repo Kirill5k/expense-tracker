@@ -1,10 +1,71 @@
 import DateTimePicker from 'react-native-ui-datepicker'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionHeader,
+  AccordionTrigger,
+  AccordionTitleText,
+  AccordionContent,
+  AccordionIcon,
+} from '@/components/ui/accordion'
 import {Fab, FabLabel} from '../ui/fab'
 import {Box} from '../ui/box'
+import {MaterialIcon} from '../ui/icon';
 import Classes from '@/constants/classes'
-import colors from '@/constants/colors'
+import Colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
+import {format} from 'date-fns'
 import dayjs from 'dayjs'
+
+
+const AccordionDateSelect = ({value, onSelect, mode}) => {
+
+  const formatDate = (date) => {
+    return format(date, 'dd MMM yyyy')
+  }
+
+  return (
+      <Accordion
+          size="md"
+          variant="unfilled"
+          type="single"
+          isCollapsible={true}
+          isDisabled={false}
+          className={mergeClasses('border rounded-md', Classes[mode].inputFieldBorder)}
+      >
+        <AccordionItem value="a">
+          <AccordionHeader>
+            <AccordionTrigger className="px-5 py-2">
+              {({ isExpanded }) => {
+                return (
+                    <>
+                      <AccordionTitleText className="font-semibold">
+                        {formatDate(value)}
+                      </AccordionTitleText>
+                      <AccordionIcon
+                          className="flex-grow-0"
+                          as={MaterialIcon}
+                          code={isExpanded ? 'chevron-up' : 'chevron-down'}
+                          dcolor={value ? Colors[mode].tabIconSelected : Colors[mode].text}
+                      />
+                    </>
+                )
+              }}
+            </AccordionTrigger>
+          </AccordionHeader>
+          <AccordionContent className="pb-1">
+            <DateSelect
+                value={value}
+                mode={mode}
+                onSelect={onSelect}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+  )
+}
+
+
 
 const DateSelect = ({value, onSelect, mode}) => {
   const textStyle = {
@@ -17,10 +78,7 @@ const DateSelect = ({value, onSelect, mode}) => {
   }
 
   return (
-      <Box className={mergeClasses(
-          'border rounded-md p-2 pb-8',
-          Classes[mode].inputFieldBorder
-      )}>
+      <Box className="pb-8">
         <DateTimePicker
             height={240}
             displayFullDays={false}
@@ -28,25 +86,25 @@ const DateSelect = ({value, onSelect, mode}) => {
             date={dayjs(value)}
             onChange={handleDateChange}
             headerButtonsPosition="right"
-            headerButtonColor={colors[mode].tint}
-            selectedItemColor={colors[mode].tint}
+            headerButtonColor={Colors[mode].tint}
+            selectedItemColor={Colors[mode].tint}
             selectedTextStyle={{
               fontWeight: 600,
-              color: colors[mode].background,
+              color: Colors[mode].background,
               ...textStyle
             }}
             calendarTextStyle={{
-              color: colors[mode].text,
+              color: Colors[mode].text,
               ...textStyle
             }}
             headerTextStyle={{
               fontWeight: 500,
-              color: colors[mode].text,
+              color: Colors[mode].text,
               fontSize: 18,
               lineHeight: 18
             }}
             weekDaysTextStyle={{
-              color: colors[mode].textSecondary,
+              color: Colors[mode].textSecondary,
               fontSize: 14,
               lineHeight: 20
             }}
@@ -77,4 +135,4 @@ const DateSelect = ({value, onSelect, mode}) => {
   )
 }
 
-export default DateSelect
+export default AccordionDateSelect

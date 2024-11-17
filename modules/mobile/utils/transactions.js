@@ -1,4 +1,4 @@
-import {format, isToday, isYesterday, parseISO} from "date-fns";
+import {format, isToday, isYesterday, parseISO} from 'date-fns'
 
 export const calcTotal = (transactions) => {
   if (!transactions?.length) {
