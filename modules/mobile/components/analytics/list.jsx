@@ -2,6 +2,7 @@ import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
 import {ListItemIcon} from '@/components/common/list'
+import Tag from '@/components/common/tag'
 import Classes from '@/constants/classes'
 import {sortedBy} from '@/utils/arrays'
 import {printAmount, formatDate, formatAmount, isExpense} from '@/utils/transactions'
@@ -83,11 +84,7 @@ const CategoryGroupedTransactionList = ({items}) => {
                           <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
                           {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
                           {tx.tags.length > 0 && <HStack space="xs" className="mt-1">
-                            {tx.tags.map(t => (
-                                <Text key={t} className={Classes.listItemTag}>
-                                  {t}
-                                </Text>
-                            ))}
+                            {tx.tags.map(t => (<Tag key={t} text={t} className="bg-background-200"/>))}
                           </HStack>}
                         </VStack>
                         <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
