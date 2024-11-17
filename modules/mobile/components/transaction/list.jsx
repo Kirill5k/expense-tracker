@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useRef, useEffect} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -24,8 +24,8 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
             >
               <HStack className={Classes.listItemLayout}>
                 <ListItemIcon
-                  icon={tx.category.icon}
-                  color={tx.category.color}
+                    icon={tx.category.icon}
+                    color={tx.category.color}
                 />
                 <VStack className="justify-center">
                   <Text className={Classes.listItemMainText}>
@@ -68,11 +68,26 @@ const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy
   )
 })
 
-const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll = () => {}}) => {
+const TransactionList = ({
+  disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll = () => {
+  }
+}) => {
   const groupedItems = Object.entries(groupBy(items, i => i.date))
   const data = groupedItems.map(([date, txGroup]) => ({date, txGroup}))
+
+  const flatListRef = useRef(null)
+
+  const firstItem = items.length > 0 ? items[0].id : null
+
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({animated: true, offset: 0})
+    }
+  }, [firstItem])
+
   return (
       <FlatList
+          ref={flatListRef}
           bounces={false}
           onScroll={onScroll}
           showsVerticalScrollIndicator={false}
