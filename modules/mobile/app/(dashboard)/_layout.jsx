@@ -6,7 +6,7 @@ import {useColorScheme} from '@/components/useColorScheme'
 
 const tabs = [
   {icon: 'chart-bar', text: 'Analytics', path: 'analytics'},
-  {icon: 'bank-transfer', text: 'Transactions', path: 'transactions'},
+  {icon: 'bank-transfer', iconSize: 30, text: 'Transactions', path: 'transactions'},
   {icon: 'calendar-sync-outline', text: 'Recurring', path: 'recurring'},
   {icon: 'shape', text: 'Categories', path: 'categories'},
   {icon: 'account-cog', text: 'Settings', path: 'settings'}
@@ -40,7 +40,7 @@ const DashboardLayout = () => {
                     tabBarIcon: ({ color }) => (
                         <MaterialCommunityIcons
                             name={tab.icon}
-                            size={28}
+                            size={tab.iconSize || 26}
                             style={{ marginBottom: -3 }}
                             color={color}
                         />
