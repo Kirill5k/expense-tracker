@@ -73,7 +73,6 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
   const data = groupedItems.map(([date, txGroup]) => ({date, txGroup}))
 
   const flatListRef = useRef(null)
-
   const firstItem = items.length > 0 ? items[0].id : null
 
   useEffect(() => {
