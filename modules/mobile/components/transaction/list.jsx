@@ -68,10 +68,7 @@ const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy
   )
 })
 
-const TransactionList = ({
-  disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll = () => {
-  }
-}) => {
+const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
   const groupedItems = Object.entries(groupBy(items, i => i.date))
   const data = groupedItems.map(([date, txGroup]) => ({date, txGroup}))
 
@@ -83,7 +80,7 @@ const TransactionList = ({
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({animated: true, offset: 0})
     }
-  }, [firstItem])
+  }, [firstItem, items.length])
 
   return (
       <FlatList
