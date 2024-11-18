@@ -7,6 +7,7 @@ import {useColorScheme} from '@/components/useColorScheme'
 const tabs = [
   {icon: 'chart-bar', text: 'Analytics', path: 'analytics'},
   {icon: 'bank-transfer', text: 'Transactions', path: 'transactions'},
+  {icon: 'calendar-sync-outline', text: 'Recurring', path: 'recurring'},
   {icon: 'shape', text: 'Categories', path: 'categories'},
   {icon: 'account-cog', text: 'Settings', path: 'settings'}
 ]
