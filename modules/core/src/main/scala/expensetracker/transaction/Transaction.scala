@@ -54,6 +54,7 @@ final case class PeriodicTransaction(
 
 final case class RecurrencePattern(
     startDate: LocalDate,
+    nextDate: Option[LocalDate],
     endDate: Option[LocalDate],
     interval: PosInt,
     frequency: RecurrenceFrequency

@@ -25,7 +25,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
 
   override protected val mongoPort: Int = 12349
 
-  "A TransactionRepository" when {
+  "TransactionRepository" when {
 
     "create" should {
       "create new transaction and return it with category" in {
