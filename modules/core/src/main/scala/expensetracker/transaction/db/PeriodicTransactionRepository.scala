@@ -5,6 +5,7 @@ import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import expensetracker.auth.user.UserId
+import expensetracker.category.CategoryId
 import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
@@ -23,6 +24,7 @@ trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def getAll(uid: UserId): F[List[PeriodicTransaction]]
   def update(tx: PeriodicTransaction): F[Unit]
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
+  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
 
 final private class LivePeriodicTransactionRepository[F[_]](
@@ -87,6 +89,11 @@ final private class LivePeriodicTransactionRepository[F[_]](
     collection
       .updateOne(userIdEq(uid) && idEq(txid.toObjectId), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
+
+  override def hide(cid: CategoryId, hidden: Boolean): F[Unit] =
+    collection
+      .updateMany(Filter.eq(Field.CId, cid.toObjectId), updateHidden(hidden))
+      .void
 }
 
 object PeriodicTransactionRepository extends MongoJsonCodecs with JsonCodecs:
