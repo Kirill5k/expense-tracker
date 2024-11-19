@@ -157,6 +157,8 @@ object SyncController extends TapirSchema with TapirJson {
   final case class WatermelonTransaction(
       id: TransactionId,
       category_id: CategoryId,
+      parent_transaction_id: Option[TransactionId],
+      is_recurring: Option[Boolean],
       amount_value: Double,
       amount_currency_code: String,
       amount_currency_symbol: String,
@@ -174,6 +176,8 @@ object SyncController extends TapirSchema with TapirJson {
             id = id,
             userId = user_id,
             categoryId = category_id,
+            parentTransactionId = parent_transaction_id,
+            isRecurring = is_recurring.getOrElse(false),
             amount = Money(amount_value, currency),
             date = date,
             note = note,
@@ -191,6 +195,8 @@ object SyncController extends TapirSchema with TapirJson {
       WatermelonTransaction(
         id = tx.id,
         category_id = tx.categoryId,
+        parent_transaction_id = tx.parentTransactionId,
+        is_recurring = Some(tx.isRecurring),
         amount_value = tx.amount.value,
         amount_currency_code = tx.amount.currency.code,
         amount_currency_symbol = tx.amount.currency.symbol,

@@ -14,6 +14,8 @@ final case class Transaction(
     id: TransactionId,
     userId: UserId,
     categoryId: CategoryId,
+    parentTransactionId: Option[TransactionId],
+    isRecurring: Boolean,
     amount: Money,
     date: LocalDate,
     note: Option[String],

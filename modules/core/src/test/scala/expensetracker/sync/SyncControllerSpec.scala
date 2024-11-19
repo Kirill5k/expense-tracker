@@ -34,6 +34,8 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |        {
        |          "id" : "${Transactions.txid}",
        |          "category_id" : "${Categories.cid}",
+       |          "parent_transaction_id" : null,
+       |          "is_recurring" : false,
        |          "amount_value" : 15.0,
        |          "amount_currency_code" : "GBP",
        |          "amount_currency_symbol" : "£",
@@ -48,6 +50,8 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |        {
        |          "id" : "${Transactions.txid2}",
        |          "category_id" : "${Categories.cid}",
+       |          "parent_transaction_id" : null,
+       |          "is_recurring" : false,
        |          "amount_value" : 15.0,
        |          "amount_currency_code" : "GBP",
        |          "amount_currency_symbol" : "£",

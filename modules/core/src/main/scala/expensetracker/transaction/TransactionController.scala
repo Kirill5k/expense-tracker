@@ -116,6 +116,8 @@ object TransactionController extends TapirSchema with TapirJson {
   final case class TransactionView(
       id: String,
       categoryId: String,
+      parentTransactionId: Option[String],
+      isRecurring: Boolean,
       amount: Money,
       date: LocalDate,
       note: Option[String],
@@ -128,6 +130,8 @@ object TransactionController extends TapirSchema with TapirJson {
       TransactionView(
         id = tx.id.value,
         categoryId = tx.categoryId.value,
+        parentTransactionId = tx.parentTransactionId.map(_.value),
+        isRecurring = tx.isRecurring,
         amount = tx.amount,
         date = tx.date,
         note = tx.note,
@@ -141,6 +145,8 @@ object TransactionController extends TapirSchema with TapirJson {
   final case class UpdateTransactionRequest(
       id: IdString,
       categoryId: IdString,
+      parentTransactionId: Option[IdString],
+      isRecurring: Option[Boolean],
       amount: Money,
       date: LocalDate,
       note: Option[String],
@@ -151,6 +157,8 @@ object TransactionController extends TapirSchema with TapirJson {
       Transaction(
         id = TransactionId(id.value),
         categoryId = CategoryId(categoryId.value),
+        parentTransactionId = parentTransactionId.map(id => TransactionId(id.value)),
+        isRecurring = isRecurring.getOrElse(false),
         userId = aid,
         amount = amount,
         date = date,

@@ -23,7 +23,18 @@ object Transactions {
       date: LocalDate = txdate,
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
-  ): Transaction = Transaction(id, uid, catid, amount, date, note, tags, hidden = false)
+  ): Transaction = Transaction(
+    id = id, 
+    userId = uid, 
+    categoryId = catid, 
+    parentTransactionId = None,
+    isRecurring = false,
+    amount = amount, 
+    date =date, 
+    note = note, 
+    tags = tags, 
+    hidden = false
+  )
 
   def create(
       uid: UserId = Users.uid1,
@@ -38,6 +49,8 @@ object Transactions {
     s"""{
        |    "id" : "${Transactions.txid}",
        |    "categoryId" : "${Categories.cid}",
+       |    "parentTransactionId" : null,
+       |    "isRecurring" : false,
        |    "amount" : {
        |      "value" : 15.00,
        |      "currency":{"code":"GBP","symbol":"£"}
