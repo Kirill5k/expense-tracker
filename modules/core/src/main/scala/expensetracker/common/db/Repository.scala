@@ -5,7 +5,7 @@ import cats.syntax.option.*
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
-import mongo4cats.operations.{Filter, Update}
+import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 
 trait Repository[F[_]] {
 
@@ -28,6 +28,7 @@ trait Repository[F[_]] {
     val Status         = "status"
     val LastAccessedAt = "lastAccessedAt"
     val Date           = "date"
+    val Recurrence     = "recurrence"
     val Tags           = "tags"
     val Category       = "category"
     val Categories     = "categories"
@@ -36,6 +37,13 @@ trait Repository[F[_]] {
 
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)
   protected val isHidden: Filter  = Filter.eq(Field.Hidden, true)
+
+  protected val findTxWithCategory = (filter: Filter) =>
+    Aggregate
+      .matchBy(filter)
+      .sort(Sort.desc(Field.Date))
+      .lookup("categories", Field.CId, Field.Id, Field.Category)
+      .unwind("$" + Field.Category)
 
   private def idEqFilter(name: String, id: Option[ObjectId]): Filter = Filter.eq(name, id)
   protected def idEq(id: ObjectId): Filter                           = idEqFilter(Field.Id, id.some)

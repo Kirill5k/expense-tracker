@@ -56,10 +56,18 @@ final case class RecurrencePattern(
     startDate: LocalDate,
     endDate: Option[LocalDate],
     interval: PosInt,
-    frequency: RecurrenceFrequency,
-    nextDate: Option[LocalDate]
+    frequency: RecurrenceFrequency
 ) derives Codec.AsObject
 
 object RecurrenceFrequency extends EnumType[RecurrenceFrequency](() => RecurrenceFrequency.values, _.print)
 enum RecurrenceFrequency:
   case Daily, Weekly, Monthly
+
+final case class CreatePeriodicTransaction(
+    userId: UserId,
+    categoryId: CategoryId,
+    amount: Money,
+    recurrence: RecurrencePattern,
+    note: Option[String],
+    tags: Set[String]
+)

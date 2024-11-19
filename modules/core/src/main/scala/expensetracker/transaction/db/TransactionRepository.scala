@@ -1,24 +1,24 @@
 package expensetracker.transaction.db
 
 import cats.effect.Async
+import cats.syntax.applicativeError.*
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import cats.syntax.applicativeError.*
-import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
+import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
 import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.client.ClientSession
-import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
+import mongo4cats.operations.{Filter, Update}
 import squants.Money
 
 import java.time.Instant
@@ -61,19 +61,12 @@ final private class LiveTransactionRepository[F[_]](
       upd
     }
 
-  private val findWithCategory = (filter: Filter) =>
-    Aggregate
-      .matchBy(filter)
-      .sort(Sort.desc(Field.Date))
-      .lookup("categories", Field.CId, Field.Id, Field.Category)
-      .unwind("$" + Field.Category)
-
   override def create(ctx: CreateTransaction): F[Transaction] =
     (for
       _ <- session.startTransaction
       create = TransactionEntity.create(ctx)
       res <- if acid then collection.insertOne(session, create) else collection.insertOne(create)
-      agg = findWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
+      agg = findTxWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
       tx <- if acid then collection.aggregate[TransactionEntity](session, agg).first else collection.aggregate[TransactionEntity](agg).first
       _  <- F.raiseWhen(tx.isEmpty || tx.get.category.isEmpty)(AppError.CategoryDoesNotExist(ctx.categoryId))
       _  <- session.commitTransaction
@@ -83,7 +76,7 @@ final private class LiveTransactionRepository[F[_]](
 
   override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
-      .aggregate[TransactionEntity](findWithCategory(userIdEq(uid) && notHidden && dateRangeSelector(from, to)))
+      .aggregate[TransactionEntity](findTxWithCategory(userIdEq(uid) && notHidden && dateRangeSelector(from, to)))
       .all
       .mapList(_.toDomain)
 
