@@ -76,7 +76,7 @@ final case class RecurrencePattern(
   def dateSequence(untilDate: LocalDate): List[LocalDate] = {
     @scala.annotation.tailrec
     def generateDates(currentDate: LocalDate, dates: List[LocalDate]): List[LocalDate] =
-      if (currentDate.isAfter(untilDate) || endDate.exists(currentDate.isAfter)) dates
+      if (currentDate.isAfter(untilDate) || endDate.map(_.minusDays(1)).exists(currentDate.isAfter)) dates
       else generateDates(genNextDate(currentDate), currentDate :: dates)
 
     generateDates(nextDate.getOrElse(startDate), Nil).reverse
