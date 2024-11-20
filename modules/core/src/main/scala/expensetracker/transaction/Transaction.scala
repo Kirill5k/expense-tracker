@@ -53,7 +53,8 @@ final case class PeriodicTransaction(
 ) {
   def withUpdatedNextDate(currentDate: LocalDate): PeriodicTransaction =
     copy(recurrence = recurrence.withUpdatedNextDate(currentDate))
-  
+
+  // TODO: implement
   def toTransaction(date: LocalDate): Transaction = ???
 }
 

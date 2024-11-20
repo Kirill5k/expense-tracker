@@ -161,6 +161,18 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
           yield txs mustBe Nil
         }
       }
+
+      "not return anything when date is not matching" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          val date = LocalDate.of(2024, 10, 10)
+          val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date.plusDays(1)))
+          for
+            repo <- PeriodicTransactionRepository.make(db, sess, false)
+            tx <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            txs <- repo.getAllByRecurrenceDate(date)
+          yield txs mustBe Nil
+        }
+      }
     }
   }
 
