@@ -19,6 +19,8 @@ import mongo4cats.database.MongoDatabase
 import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
 import squants.market.Money
 
+import java.time.LocalDate
+
 trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction]
   def getAll(uid: UserId): F[List[PeriodicTransaction]]
@@ -26,6 +28,7 @@ trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
+  def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]]
 
 final private class LivePeriodicTransactionRepository[F[_]](
     private val collection: MongoCollection[F, PeriodicTransactionEntity],
@@ -94,6 +97,16 @@ final private class LivePeriodicTransactionRepository[F[_]](
     collection
       .updateMany(Filter.eq(Field.CId, cid.toObjectId), updateHidden(hidden))
       .void
+
+  override def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]] =
+    collection
+      .find(
+        notHidden &&
+          Filter.eq("recurrence.nextDate", date) &&
+          (Filter.isNull("recurrence.endDate") || Filter.gt("recurrence.endDate", date))
+      )
+      .all
+      .mapList(_.toDomain)
 }
 
 object PeriodicTransactionRepository extends MongoJsonCodecs with JsonCodecs:

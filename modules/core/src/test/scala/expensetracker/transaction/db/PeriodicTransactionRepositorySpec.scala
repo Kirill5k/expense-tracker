@@ -16,10 +16,11 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers with MongoOps {
-  override protected val mongoPort: Int = 12352
+  override protected val mongoPort: Int = 12353
 
   "PeriodicTransactionRepository" when {
     "create" should {
@@ -106,8 +107,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
           val tx = PeriodicTransactions.tx()
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            _ <- repo.save(List(PeriodicTransactions.tx()))
-            txs <- repo.getAll(Users.uid1)
+            _    <- repo.save(List(PeriodicTransactions.tx()))
+            txs  <- repo.getAll(Users.uid1)
           yield txs.map(_.copy(category = None)) mustBe List(tx)
         }
       }
@@ -116,10 +117,48 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            tx <- repo.create(PeriodicTransactions.create())
-            _ <- repo.save(List(tx.copy(amount = GBP(10.0))))
-            txs <- repo.getAll(Users.uid1)
+            tx   <- repo.create(PeriodicTransactions.create())
+            _    <- repo.save(List(tx.copy(amount = GBP(10.0))))
+            txs  <- repo.getAll(Users.uid1)
           yield txs mustBe List(tx.copy(amount = GBP(10.0)))
+        }
+      }
+    }
+
+    "getAllByOccurrenceDate" should {
+      "return all periodic transactions that are due to be executed on provided date" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          val date       = LocalDate.of(2024, 10, 10)
+          val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date))
+          for
+            repo <- PeriodicTransactionRepository.make(db, sess, false)
+            tx   <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            txs  <- repo.getAllByRecurrenceDate(date)
+          yield txs mustBe List(tx.copy(category = None))
+        }
+      }
+
+      "return all periodic transactions that are due to be executed on provided date when end date is after provided date" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          val date = LocalDate.of(2024, 10, 10)
+          val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date), endDate = Some(date.plusDays(1)))
+          for
+            repo <- PeriodicTransactionRepository.make(db, sess, false)
+            tx <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            txs <- repo.getAllByRecurrenceDate(date)
+          yield txs mustBe List(tx.copy(category = None))
+        }
+      }
+
+      "not return periodic transaction if its end date is same or before provided date" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          val date       = LocalDate.of(2024, 10, 10)
+          val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date), endDate = Some(date))
+          for
+            repo <- PeriodicTransactionRepository.make(db, sess, false)
+            _    <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            txs  <- repo.getAllByRecurrenceDate(date)
+          yield txs mustBe Nil
         }
       }
     }
