@@ -19,6 +19,8 @@ trait TransactionService[F[_]]:
 
 final private class LiveTransactionService[F[_]](
     private val repository: TransactionRepository[F]
+)(using
+    F: Monad[F]
 ) extends TransactionService[F] {
   override def create(tx: CreateTransaction): F[Transaction] =
     repository.create(tx)
@@ -42,7 +44,7 @@ final private class LiveTransactionService[F[_]](
     repository.hide(cid, hidden)
 
   override def save(txs: List[Transaction]): F[Unit] =
-    repository.save(txs)
+    F.whenA(txs.nonEmpty)(repository.save(txs))
 }
 
 object TransactionService:

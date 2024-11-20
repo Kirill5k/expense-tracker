@@ -50,7 +50,12 @@ final case class PeriodicTransaction(
     category: Option[Category] = None,
     createdAt: Option[Instant] = None,
     lastUpdatedAt: Option[Instant] = None
-)
+) {
+  def withUpdatedNextDate(currentDate: LocalDate): PeriodicTransaction =
+    copy(recurrence = recurrence.withUpdatedNextDate(currentDate))
+  
+  def toTransaction(date: LocalDate): Transaction = ???
+}
 
 final case class RecurrencePattern(
     startDate: LocalDate,

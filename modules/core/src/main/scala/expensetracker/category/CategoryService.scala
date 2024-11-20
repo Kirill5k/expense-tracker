@@ -17,9 +17,11 @@ trait CategoryService[F[_]] {
   def save(cats: List[Category]): F[Unit]
 }
 
-final private class LiveCategoryService[F[_]: Monad](
+final private class LiveCategoryService[F[_]](
     private val repository: CategoryRepository[F],
     private val dispatcher: ActionDispatcher[F]
+)(using
+  F: Monad[F]
 ) extends CategoryService[F] {
 
   override def getAll(uid: UserId): F[List[Category]] =
@@ -45,7 +47,7 @@ final private class LiveCategoryService[F[_]: Monad](
       dispatcher.dispatch(Action.HideTransactionsByCategory(cid, hidden))
 
   override def save(cats: List[Category]): F[Unit] =
-    repository.save(cats)
+    F.whenA(cats.nonEmpty)(repository.save(cats))
 }
 
 object CategoryService:
