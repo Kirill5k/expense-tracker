@@ -8,7 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import java.time.LocalDate
 
 class RecurrencePatternSpec extends AnyWordSpec with Matchers {
-
+  
   "RecurrencePattern#dateSequence" when {
     "nextDate is not defined" should {
       "generate list of monthly date sequences starting from startDate up until provided date" in {
@@ -150,6 +150,28 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
 
         result mustBe Nil
       }
+    }
+  }
+
+  "RecurrencePattern#withUpdatedNextDate" should {
+    "return a copy itself with nextDate generated" in {
+      val pattern = RecurrencePattern(
+        startDate = LocalDate.of(2023, 1, 1),
+        nextDate = None,
+        endDate = Some(LocalDate.of(2023, 12, 31)),
+        interval = refineV[Positive].unsafeFrom(1),
+        frequency = RecurrenceFrequency.Monthly
+      )
+
+      val result = pattern.withUpdatedNextDate(LocalDate.of(2023, 3, 1))
+
+      result mustBe RecurrencePattern(
+        startDate = LocalDate.of(2023, 1, 1),
+        nextDate = Some(LocalDate.of(2023, 4, 1)),
+        endDate = Some(LocalDate.of(2023, 12, 31)),
+        interval = refineV[Positive].unsafeFrom(1),
+        frequency = RecurrenceFrequency.Monthly
+      )
     }
   }
 }
