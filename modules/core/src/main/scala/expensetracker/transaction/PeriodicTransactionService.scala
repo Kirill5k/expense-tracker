@@ -20,7 +20,7 @@ trait PeriodicTransactionService[F[_]]:
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
-  def generateTxInstances: F[Unit]
+  def generateTxInstancesForToday: F[Unit]
 
 final private class LivePeriodicTransactionService[F[_]](
     private val repository: PeriodicTransactionRepository[F],
@@ -57,7 +57,17 @@ final private class LivePeriodicTransactionService[F[_]](
     updatedPTx -> newTxs
   }
 
-  override def generateTxInstances: F[Unit] = ???
+  override def generateTxInstancesForToday: F[Unit] =
+    for
+      now <- C.now.map(_.toLocalDate)
+      txs <- repository.getAllByRecurrenceDate(now)
+      (updPTxs, updTxs) = txs.foldLeft((List.empty[PeriodicTransaction], List.empty[Transaction])) { case ((ptxs, txs), ptx) =>
+        val (updPtx, newTxs) = generateTxInstances(ptx, now)
+        (updPtx :: ptxs, newTxs ::: txs)
+      }
+      _ <- save(updPTxs)
+      _ <- dispatcher.dispatch(Action.SaveTransactions(updTxs))
+    yield ()
 }
 
 object PeriodicTransactionService:
