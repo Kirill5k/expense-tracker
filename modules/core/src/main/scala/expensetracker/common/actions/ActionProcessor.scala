@@ -6,7 +6,6 @@ import cats.syntax.apply.*
 import cats.syntax.applicativeError.*
 import expensetracker.auth.user.UserService
 import expensetracker.category.CategoryService
-import expensetracker.common.actions.Action.{SaveCategories, SaveTransactions, SaveUsers}
 import expensetracker.common.errors.AppError
 import expensetracker.transaction.TransactionService
 import fs2.Stream
@@ -35,9 +34,10 @@ final private class LiveActionProcessor[F[_]](
     (action match {
       case Action.SetupNewUser(uid)                       => categoryService.assignDefault(uid)
       case Action.HideTransactionsByCategory(cid, hidden) => transactionService.hide(cid, hidden)
-      case SaveUsers(users)                               => userService.save(users)
-      case SaveCategories(categories)                     => categoryService.save(categories)
-      case SaveTransactions(transactions)                 => transactionService.save(transactions)
+      case Action.SaveUsers(users)                        => userService.save(users)
+      case Action.SaveCategories(categories)              => categoryService.save(categories)
+      case Action.SaveTransactions(transactions)          => transactionService.save(transactions)
+      case Action.GenerateInstances(tx)                   => ???
     }).handleErrorWith {
       case error: AppError =>
         logger.warn(error)(s"domain error while processing action $action")

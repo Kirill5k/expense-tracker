@@ -58,7 +58,24 @@ final case class RecurrencePattern(
     endDate: Option[LocalDate],
     interval: PosInt,
     frequency: RecurrenceFrequency
-) derives Codec.AsObject
+) derives Codec.AsObject {
+  private def genNextDate(currentDate: LocalDate): LocalDate = {
+    frequency match {
+      case RecurrenceFrequency.Daily => currentDate.plusDays(interval.value)
+      case RecurrenceFrequency.Weekly => currentDate.plusWeeks(interval.value)
+      case RecurrenceFrequency.Monthly => currentDate.plusMonths(interval.value)
+    }
+  }
+
+  def dateSequence(untilDate: LocalDate): List[LocalDate] = {
+    @scala.annotation.tailrec
+    def generateDates(currentDate: LocalDate, dates: List[LocalDate]): List[LocalDate] =
+      if (currentDate.isAfter(untilDate) || endDate.exists(currentDate.isAfter)) dates
+      else generateDates(genNextDate(currentDate), currentDate :: dates)
+
+    generateDates(nextDate.getOrElse(startDate), Nil).reverse
+  }
+}
 
 object RecurrenceFrequency extends EnumType[RecurrenceFrequency](() => RecurrenceFrequency.values, _.print)
 enum RecurrenceFrequency:

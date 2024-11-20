@@ -2,7 +2,7 @@ package expensetracker.common.actions
 
 import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.{Category, CategoryId}
-import expensetracker.transaction.{PeriodicTransaction, Transaction, TransactionId}
+import expensetracker.transaction.{PeriodicTransaction, Transaction}
 
 enum Action:
   case SaveCategories(categories: List[Category])
