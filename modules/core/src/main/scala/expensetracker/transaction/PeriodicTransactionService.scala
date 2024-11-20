@@ -20,13 +20,14 @@ final private class LivePeriodicTransactionService[F[_]](
     private val dispatcher: ActionDispatcher[F]
 ) extends PeriodicTransactionService[F] {
 
-  override def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction]    = ???
-  override def update(tx: PeriodicTransaction): F[Unit]                         = ???
-  override def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] = ???
-  override def hide(cid: CategoryId, hidden: Boolean): F[Unit]                  = ???
-  override def save(txs: List[PeriodicTransaction]): F[Unit]                    = ???
-  override def generateTxInstances: F[Unit]                                     = ???
-  override def getAll(uid: UserId): F[List[PeriodicTransaction]]                = ???
+  def getAll(uid: UserId): F[List[PeriodicTransaction]]                = repository.getAll(uid)
+  def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] = repository.hide(uid, txid, hidden)
+  def hide(cid: CategoryId, hidden: Boolean): F[Unit]                  = repository.hide(cid, hidden)
+
+  override def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction] = ???
+  override def update(tx: PeriodicTransaction): F[Unit]                      = ???
+  override def save(txs: List[PeriodicTransaction]): F[Unit]                 = ???
+  override def generateTxInstances: F[Unit]                                  = ???
 }
 
 object PeriodicTransactionService:
