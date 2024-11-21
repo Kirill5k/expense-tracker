@@ -11,4 +11,5 @@ enum Action:
   case SaveUsers(users: List[User])
   case SetupNewUser(uid: UserId)
   case HideTransactionsByCategory(cid: CategoryId, hidden: Boolean)
-  case GeneratePeriodicTransactionInstances
+  case GeneratePeriodicTransactionRecurrences
+  case SchedulePeriodicTransactionRecurrenceGeneration

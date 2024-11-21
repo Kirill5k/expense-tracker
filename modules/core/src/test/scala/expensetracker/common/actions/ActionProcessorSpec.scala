@@ -2,17 +2,21 @@ package expensetracker.common.actions
 
 import cats.effect.IO
 import kirill5k.common.cats.test.IOWordSpec
-import expensetracker.fixtures.{Categories, Transactions, Users, PeriodicTransactions}
+import expensetracker.fixtures.{Categories, PeriodicTransactions, Transactions, Users}
 import expensetracker.auth.user.{User, UserId, UserService}
 import expensetracker.category.{Category, CategoryId, CategoryService}
-import expensetracker.transaction.{Transaction, PeriodicTransaction, TransactionService, PeriodicTransactionService}
+import expensetracker.transaction.{PeriodicTransaction, PeriodicTransactionService, Transaction, TransactionService}
+import kirill5k.common.cats.Clock
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.concurrent.duration.*
+import java.time.Instant
 
 class ActionProcessorSpec extends IOWordSpec {
-
+  
+  given Clock[IO]  = Clock.mock(Instant.parse("2024-11-10T01:00:00Z"))
+  
   given Logger[IO] = Slf4jLogger.getLogger[IO]
 
   "An ActionProcessor" should {
@@ -23,15 +27,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.GeneratePeriodicTransactionInstances)
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.GeneratePeriodicTransactionRecurrences)
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(ptxSvc).generateRecurrencesForToday
         verifyNoInteractions(txSvc, usrSvc, usrSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
 
@@ -97,15 +101,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.SaveCategories(List(Categories.cat())))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.SaveCategories(List(Categories.cat())))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(catSvc).save(List(Categories.cat()))
         verifyNoInteractions(txSvc, usrSvc, ptxSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
 
@@ -115,15 +119,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.SaveTransactions(List(Transactions.tx())))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.SaveTransactions(List(Transactions.tx())))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(txSvc).save(List(Transactions.tx()))
         verifyNoInteractions(catSvc, usrSvc, ptxSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
 
@@ -133,15 +137,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.SavePeriodicTransactions(List(PeriodicTransactions.tx())))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.SavePeriodicTransactions(List(PeriodicTransactions.tx())))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(ptxSvc).save(List(PeriodicTransactions.tx()))
         verifyNoInteractions(catSvc, usrSvc, txSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
   }
