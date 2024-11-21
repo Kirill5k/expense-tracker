@@ -21,7 +21,7 @@ object PeriodicTransactions {
     nextDate = None,
     endDate = None,
     interval = refineV[Positive].unsafeFrom(1),
-    frequency = RecurrenceFrequency.Weekly
+    frequency = RecurrenceFrequency.Monthly
   )
 
   def tx(

@@ -40,21 +40,21 @@ final private class LivePeriodicTransactionService[F[_]](
       newTx <- repository.create(tx)
       now   <- C.now.map(_.toLocalDate)
       (updatedTx, txInstances) = generateTxInstances(newTx, now)
-      _ <- repository.save(List(updatedTx))
-      _ <- dispatcher.dispatch(Action.SaveTransactions(txInstances))
+      _ <- F.whenA(txInstances.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(txInstances)))
+      _ <- save(List(updatedTx))
     yield updatedTx
 
   override def update(tx: PeriodicTransaction): F[Unit] =
     for
       now <- C.now.map(_.toLocalDate)
       dates = tx.recurrence.dateSequence(now)
-      _ <- repository.update(tx.withUpdatedNextDate(dates.head))
+      _ <- repository.update(tx.withUpdatedNextDate(dates.headOption.getOrElse(now)))
     yield ()
 
   private def generateTxInstances(tx: PeriodicTransaction, dateUntil: LocalDate): (PeriodicTransaction, List[Transaction]) = {
-    val dates      = tx.recurrence.dateSequence(dateUntil)
+    val dates      = tx.recurrence.copy(nextDate = None).dateSequence(dateUntil)
     val newTxs     = dates.reverse.map(tx.toTransaction)
-    val updatedPTx = tx.withUpdatedNextDate(dates.head)
+    val updatedPTx = tx.withUpdatedNextDate(dates.headOption.getOrElse(dateUntil))
     updatedPTx -> newTxs
   }
 
@@ -66,8 +66,8 @@ final private class LivePeriodicTransactionService[F[_]](
         val (updPtx, newTxs) = generateTxInstances(ptx, now)
         (updPtx :: ptxs, newTxs ::: txs)
       }
+      _ <- F.whenA(updTxs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(updTxs)))
       _ <- save(updPTxs)
-      _ <- dispatcher.dispatch(Action.SaveTransactions(updTxs))
     yield ()
 }
 

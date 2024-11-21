@@ -66,8 +66,9 @@ final case class RecurrencePattern(
     frequency: RecurrenceFrequency
 ) derives Codec.AsObject {
   def withUpdatedNextDate(currentDate: LocalDate): RecurrencePattern =
-    copy(nextDate = Some(genNextDate(currentDate)))
-  
+    if (currentDate.isBefore(startDate)) copy(nextDate = Some(startDate))
+    else copy(nextDate = Some(genNextDate(currentDate)))
+
   private def genNextDate(currentDate: LocalDate): LocalDate =
     frequency match
       case RecurrenceFrequency.Daily => currentDate.plusDays(interval.value)
