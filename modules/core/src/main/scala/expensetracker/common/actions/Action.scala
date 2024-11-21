@@ -7,7 +7,8 @@ import expensetracker.transaction.{PeriodicTransaction, Transaction}
 enum Action:
   case SaveCategories(categories: List[Category])
   case SaveTransactions(transactions: List[Transaction])
+  case SavePeriodicTransactions(periodicTransactions: List[PeriodicTransaction])
   case SaveUsers(users: List[User])
   case SetupNewUser(uid: UserId)
   case HideTransactionsByCategory(cid: CategoryId, hidden: Boolean)
-  case GenerateInstances(tx: PeriodicTransaction)
+  case GeneratePeriodicTransactionInstances

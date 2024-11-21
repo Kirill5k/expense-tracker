@@ -8,7 +8,7 @@ import expensetracker.common.config.AppConfig
 import expensetracker.common.web.Http
 import expensetracker.health.Health
 import expensetracker.sync.Sync
-import expensetracker.transaction.Transactions
+import expensetracker.transaction.{PeriodicTransactions, Transactions}
 import expensetracker.wellknown.WellKnown
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -28,9 +28,10 @@ object Application extends IOApp.Simple:
           auth       <- Auth.make(config.auth, res, dispatcher)
           cats       <- Categories.make(res, dispatcher)
           txs        <- Transactions.make(res)
+          ptxs       <- PeriodicTransactions.make(res, dispatcher)
           sync       <- Sync.make(res, dispatcher)
           http       <- Http.make(health, wellKnown, auth, cats, txs, sync)
-          processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service)
+          processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service, ptxs.service)
           _ <- logger.info("starting http server") >> http
             .serve(config.server)
             .concurrently(processor.run)

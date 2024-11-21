@@ -3,11 +3,12 @@ package expensetracker.common.actions
 import cats.Monad
 import cats.effect.Temporal
 import cats.syntax.apply.*
+import cats.syntax.flatMap.*
 import cats.syntax.applicativeError.*
 import expensetracker.auth.user.UserService
 import expensetracker.category.CategoryService
 import expensetracker.common.errors.AppError
-import expensetracker.transaction.TransactionService
+import expensetracker.transaction.{PeriodicTransactionService, TransactionService}
 import fs2.Stream
 import org.typelevel.log4cats.Logger
 
@@ -19,8 +20,9 @@ trait ActionProcessor[F[_]]:
 final private class LiveActionProcessor[F[_]](
     private val dispatcher: ActionDispatcher[F],
     private val userService: UserService[F],
-    private val categoryService: CategoryService[F],
-    private val transactionService: TransactionService[F]
+    private val catService: CategoryService[F],
+    private val txService: TransactionService[F],
+    private val ptxService: PeriodicTransactionService[F]
 )(using
     F: Temporal[F],
     logger: Logger[F]
@@ -32,12 +34,13 @@ final private class LiveActionProcessor[F[_]](
 
   private def handleAction(action: Action): F[Unit] =
     (action match {
-      case Action.SetupNewUser(uid)                       => categoryService.assignDefault(uid)
-      case Action.HideTransactionsByCategory(cid, hidden) => transactionService.hide(cid, hidden)
-      case Action.SaveUsers(users)                        => userService.save(users)
-      case Action.SaveCategories(categories)              => categoryService.save(categories)
-      case Action.SaveTransactions(transactions)          => transactionService.save(transactions)
-      case Action.GenerateInstances(tx)                   => ???
+      case Action.SetupNewUser(uid)                              => catService.assignDefault(uid)
+      case Action.HideTransactionsByCategory(cid, hidden)        => txService.hide(cid, hidden) >> ptxService.hide(cid, hidden)
+      case Action.SaveUsers(users)                               => userService.save(users)
+      case Action.SaveCategories(categories)                     => catService.save(categories)
+      case Action.SaveTransactions(transactions)                 => txService.save(transactions)
+      case Action.SavePeriodicTransactions(periodicTransactions) => ptxService.save(periodicTransactions)
+      case Action.GeneratePeriodicTransactionInstances           => ptxService.generateTxInstancesForToday
     }).handleErrorWith {
       case error: AppError =>
         logger.warn(error)(s"domain error while processing action $action")
@@ -53,6 +56,7 @@ object ActionProcessor:
       dispatcher: ActionDispatcher[F],
       userSvc: UserService[F],
       catSvc: CategoryService[F],
-      txSvc: TransactionService[F]
+      txSvc: TransactionService[F],
+      ptxSvc: PeriodicTransactionService[F]
   ): F[ActionProcessor[F]] =
-    Monad[F].pure(LiveActionProcessor[F](dispatcher, userSvc, catSvc, txSvc))
+    Monad[F].pure(LiveActionProcessor[F](dispatcher, userSvc, catSvc, txSvc, ptxSvc))
