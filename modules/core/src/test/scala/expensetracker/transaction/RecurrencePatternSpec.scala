@@ -179,6 +179,38 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
         result mustBe Nil
       }
     }
+
+    "nextDate == endDate && nextDate > untilDate" should {
+      "return single date" in {
+        val pattern = RecurrencePattern(
+          startDate = LocalDate.of(2023, 1, 1),
+          nextDate = Some(LocalDate.of(2023, 4, 1)),
+          endDate = Some(LocalDate.of(2024, 1, 1)),
+          interval = refineV[Positive].unsafeFrom(1),
+          frequency = RecurrenceFrequency.Monthly
+        )
+
+        val result = pattern.dateSequence(LocalDate.of(2023, 4, 1))
+
+        result mustBe List(LocalDate.of(2023, 4, 1))
+      }
+    }
+
+    "nextDate < endDate && nextDate > untilDate" should {
+      "not return anything" in {
+        val pattern = RecurrencePattern(
+          startDate = LocalDate.of(2023, 1, 1),
+          nextDate = Some(LocalDate.of(2023, 5, 1)),
+          endDate = Some(LocalDate.of(2024, 1, 1)),
+          interval = refineV[Positive].unsafeFrom(1),
+          frequency = RecurrenceFrequency.Monthly
+        )
+
+        val result = pattern.dateSequence(LocalDate.of(2023, 4, 1))
+
+        result mustBe Nil
+      }
+    }
   }
 
   "RecurrencePattern#withUpdatedNextDate" should {
