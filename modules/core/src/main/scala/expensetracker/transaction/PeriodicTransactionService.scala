@@ -47,13 +47,14 @@ final private class LivePeriodicTransactionService[F[_]](
   override def update(tx: PeriodicTransaction): F[Unit] =
     for
       now <- C.now.map(_.toLocalDate)
-      _   <- repository.update(tx.withUpdatedNextDate(now))
+      dates = tx.recurrence.dateSequence(now)
+      _ <- repository.update(tx.withUpdatedNextDate(dates.head))
     yield ()
 
-  private def generateTxInstances(tx: PeriodicTransaction, date: LocalDate): (PeriodicTransaction, List[Transaction]) = {
-    val dates      = tx.recurrence.dateSequence(date)
-    val newTxs     = dates.map(tx.toTransaction)
-    val updatedPTx = tx.withUpdatedNextDate(date)
+  private def generateTxInstances(tx: PeriodicTransaction, dateUntil: LocalDate): (PeriodicTransaction, List[Transaction]) = {
+    val dates      = tx.recurrence.dateSequence(dateUntil)
+    val newTxs     = dates.reverse.map(tx.toTransaction)
+    val updatedPTx = tx.withUpdatedNextDate(dates.head)
     updatedPTx -> newTxs
   }
 

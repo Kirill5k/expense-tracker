@@ -80,7 +80,7 @@ final case class RecurrencePattern(
       if (currentDate.isAfter(untilDate) || endDate.map(_.minusDays(1)).exists(currentDate.isAfter)) dates
       else generateDates(genNextDate(currentDate), currentDate :: dates)
 
-    generateDates(nextDate.getOrElse(startDate), Nil).reverse
+    generateDates(nextDate.getOrElse(startDate), Nil)
   }
 }
 

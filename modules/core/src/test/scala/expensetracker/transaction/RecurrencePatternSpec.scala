@@ -22,7 +22,11 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
 
         val result = pattern.dateSequence(LocalDate.of(2023, 3, 1))
 
-        result mustBe List(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 2, 1), LocalDate.of(2023, 3, 1))
+        result mustBe List(
+          LocalDate.of(2023, 3, 1),
+          LocalDate.of(2023, 2, 1),
+          LocalDate.of(2023, 1, 1)
+        )
       }
 
       "generate list of monthly date sequences starting from startDate up until end date when provided date is after" in {
@@ -36,7 +40,10 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
 
         val result = pattern.dateSequence(LocalDate.of(2023, 4, 1))
 
-        result mustBe List(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 2, 1))
+        result mustBe List(
+          LocalDate.of(2023, 2, 1),
+          LocalDate.of(2023, 1, 1)
+        )
       }
 
       "generate list of monthly date sequences with interval starting from startDate up until provided date" in {
@@ -50,7 +57,10 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
 
         val result = pattern.dateSequence(LocalDate.of(2023, 3, 1))
 
-        result mustBe List(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 3, 1))
+        result mustBe List(
+          LocalDate.of(2023, 3, 1),
+          LocalDate.of(2023, 1, 1)
+        )
       }
 
       "generate list of daily date sequences from startDate up until provided date" in {
@@ -64,7 +74,11 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
 
         val result = pattern.dateSequence(LocalDate.of(2023, 1, 3))
 
-        result mustBe List(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 3))
+        result mustBe List(
+          LocalDate.of(2023, 1, 3), 
+          LocalDate.of(2023, 1, 2), 
+          LocalDate.of(2023, 1, 1)
+        )
       }
 
       "generate list of weekly date sequences from startDate up until provided date" in {
@@ -79,11 +93,11 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
         val result = pattern.dateSequence(LocalDate.of(2023, 2, 1))
 
         result mustBe List(
-          LocalDate.of(2023, 1, 1),
-          LocalDate.of(2023, 1, 8),
-          LocalDate.of(2023, 1, 15),
-          LocalDate.of(2023, 1, 22),
           LocalDate.of(2023, 1, 29),
+          LocalDate.of(2023, 1, 22),
+          LocalDate.of(2023, 1, 15),
+          LocalDate.of(2023, 1, 8),
+          LocalDate.of(2023, 1, 1),
         )
       }
 
@@ -99,9 +113,9 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
         val result = pattern.dateSequence(LocalDate.of(2023, 2, 1))
 
         result mustBe List(
-          LocalDate.of(2023, 1, 1),
-          LocalDate.of(2023, 1, 15),
           LocalDate.of(2023, 1, 29),
+          LocalDate.of(2023, 1, 15),
+          LocalDate.of(2023, 1, 1),
         )
       }
     }
@@ -118,7 +132,7 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
 
         val result = pattern.dateSequence(LocalDate.of(2023, 3, 1))
 
-        result mustBe List(LocalDate.of(2023, 2, 1), LocalDate.of(2023, 3, 1))
+        result mustBe List(LocalDate.of(2023, 3, 1), LocalDate.of(2023, 2, 1))
       }
 
       "generate list of monthly date sequences starting from nextDate up until end date given that provided date is after" in {
