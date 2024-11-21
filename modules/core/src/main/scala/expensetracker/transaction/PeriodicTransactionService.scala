@@ -20,7 +20,7 @@ trait PeriodicTransactionService[F[_]]:
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
-  def generateTxInstancesForToday: F[Unit]
+  def generateRecurrencesForToday: F[Unit]
 
 final private class LivePeriodicTransactionService[F[_]](
     private val repository: PeriodicTransactionRepository[F],
@@ -58,7 +58,7 @@ final private class LivePeriodicTransactionService[F[_]](
     updatedPTx -> newTxs
   }
 
-  override def generateTxInstancesForToday: F[Unit] =
+  override def generateRecurrencesForToday: F[Unit] =
     for
       now <- C.now.map(_.toLocalDate)
       txs <- repository.getAllByRecurrenceDate(now)

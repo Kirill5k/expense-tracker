@@ -19,7 +19,7 @@ class ActionProcessorSpec extends IOWordSpec {
 
     "generate ptx instances" in {
       val (usrSvc, catSvc, txSvc, ptxSvc) = mocks
-      when(ptxSvc.generateTxInstancesForToday).thenReturn(IO.unit)
+      when(ptxSvc.generateRecurrencesForToday).thenReturn(IO.unit)
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
@@ -29,7 +29,7 @@ class ActionProcessorSpec extends IOWordSpec {
       yield res
 
       result.asserting { r =>
-        verify(ptxSvc).generateTxInstancesForToday
+        verify(ptxSvc).generateRecurrencesForToday
         verifyNoInteractions(txSvc, usrSvc, usrSvc)
         r mustBe()
       }

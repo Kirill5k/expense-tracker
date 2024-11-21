@@ -40,7 +40,7 @@ final private class LiveActionProcessor[F[_]](
       case Action.SaveCategories(categories)                     => catService.save(categories)
       case Action.SaveTransactions(transactions)                 => txService.save(transactions)
       case Action.SavePeriodicTransactions(periodicTransactions) => ptxService.save(periodicTransactions)
-      case Action.GeneratePeriodicTransactionInstances           => ptxService.generateTxInstancesForToday
+      case Action.GeneratePeriodicTransactionInstances           => ptxService.generateRecurrencesForToday
     }).handleErrorWith {
       case error: AppError =>
         logger.warn(error)(s"domain error while processing action $action")
