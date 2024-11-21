@@ -6,8 +6,12 @@ import expensetracker.category.{Category, CategoryId}
 import expensetracker.common.types.{EnumType, IdType}
 import io.circe.Codec
 import io.circe.refined.*
+import kirill5k.common.syntax.time.*
+import mongo4cats.bson.ObjectId
 import squants.market.Money
 
+import java.security.MessageDigest
+import java.nio.ByteBuffer
 import java.time.{Instant, LocalDate}
 
 opaque type TransactionId = String
@@ -54,8 +58,28 @@ final case class PeriodicTransaction(
   def withUpdatedNextDate(currentDate: LocalDate): PeriodicTransaction =
     copy(recurrence = recurrence.withUpdatedNextDate(currentDate))
 
-  // TODO: implement
-  def toTransaction(date: LocalDate): Transaction = ???
+  def toTransaction(date: LocalDate): Transaction = {
+    val ts = date.toInstantAtStartOfDay.getEpochSecond.toInt
+    val buffer = ByteBuffer.allocate(12)
+    buffer.putInt(ts)
+    val hashInput = id.value + "_" + date
+    val hash = MessageDigest.getInstance("SHA-256").digest(hashInput.getBytes("UTF-8"))
+    buffer.put(hash, 0, 8)
+    val oid = ObjectId(buffer.array())
+
+    Transaction(
+      id = TransactionId(oid.toHexString),
+      userId = userId,
+      categoryId = categoryId,
+      parentTransactionId = Some(id),
+      isRecurring = true,
+      amount = amount,
+      date = date,
+      note = note,
+      tags = tags,
+      hidden = false
+    )
+  }
 }
 
 final case class RecurrencePattern(
