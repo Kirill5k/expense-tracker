@@ -58,8 +58,8 @@ final private class LiveActionProcessor[F[_]: Temporal](
     for
       now <- clock.now
       nextDay  = now.toLocalDate.plusDays(1).toInstantAtStartOfDay
-      duration = JDuration.between(now, nextDay).getNano.nanos
-      _ <- logger.info(s"scheduling periodic transaction recurrences generation to happen in ${duration.toReadableString} ($nextDay)")
+      duration = nextDay.durationBetween(now)
+      _ <- logger.info(s"scheduling periodic transaction recurrences generation to happen in ${duration.toReadableString} ($now-$nextDay)")
       _ <- clock.sleep(duration)
       _ <- dispatcher.dispatch(Action.GeneratePeriodicTransactionRecurrences)
     yield ()
