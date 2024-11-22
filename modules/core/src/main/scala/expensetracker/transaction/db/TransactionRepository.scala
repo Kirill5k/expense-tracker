@@ -70,7 +70,7 @@ final private class LiveTransactionRepository[F[_]](
       res <- if acid then collection.insertOne(session, create) else collection.insertOne(create)
       agg = findTxWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
       tx <- if acid then collection.aggregate[TransactionEntity](session, agg).first else collection.aggregate[TransactionEntity](agg).first
-      txCat = tx.flatMap(_.category)
+      txCat = tx.flatMap(_.category).filterNot(_.hidden.getOrElse(false))
       _ <- F.raiseWhen(txCat.isEmpty || txCat.get.userId.exists(_ != ctx.userId.toObjectId))(AppError.CategoryDoesNotExist(ctx.categoryId))
       _ <- session.commitTransaction
     yield tx.get.toDomain).onError { case _ =>
