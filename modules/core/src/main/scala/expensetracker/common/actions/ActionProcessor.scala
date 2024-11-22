@@ -15,7 +15,6 @@ import fs2.Stream
 import org.typelevel.log4cats.Logger
 
 import scala.concurrent.duration.*
-import java.time.Duration as JDuration
 
 trait ActionProcessor[F[_]]:
   def run: Stream[F, Unit]
