@@ -29,7 +29,7 @@ final private class PeriodicTransactionController[F[_]](
 ) extends Controller[F] {
 
   private def validated(recurrence: RecurrencePattern): F[RecurrencePattern] =
-    F.ensure(recurrence.pure[F])(FailedValidation("end date must be after start date"))(r => r.nextDate.forall(_.isAfter(r.startDate)))
+    F.ensure(recurrence.pure[F])(FailedValidation("end date must be after start date"))(r => r.endDate.forall(_.isAfter(r.startDate)))
 
   private def getAllTransactions(using authenticator: Authenticator[F]) =
     PeriodicTransactionController.getAllEndpoint.withAuthenticatedSession

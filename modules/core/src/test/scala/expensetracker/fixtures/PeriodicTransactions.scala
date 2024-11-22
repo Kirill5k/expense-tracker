@@ -52,4 +52,23 @@ object PeriodicTransactions {
       tags: Set[String] = Set("foo")
   ): CreatePeriodicTransaction = CreatePeriodicTransaction(uid, catid, amount, recurrence, note, tags)
 
+  val txjson =
+    s"""{
+       |    "id" : "${txid}",
+       |    "categoryId" : "${Categories.cid}",
+       |    "amount" : {
+       |      "value" : 15.00,
+       |      "currency": {"code":"GBP","symbol":"£"}
+       |    },
+       |    "recurrence": {
+       |      "startDate": "${LocalDate.now}",
+       |      "interval": 1,
+       |      "nextDate" : null,
+       |      "endDate" : null,
+       |      "frequency": "monthly"
+       |    },
+       |    "note" : "test tx",
+       |    "tags" : ["foo"],
+       |    "category" : null
+       |  }""".stripMargin
 }
