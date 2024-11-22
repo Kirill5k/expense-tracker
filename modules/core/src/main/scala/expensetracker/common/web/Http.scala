@@ -8,7 +8,7 @@ import expensetracker.category.Categories
 import expensetracker.common.config.ServerConfig
 import expensetracker.health.Health
 import expensetracker.sync.Sync
-import expensetracker.transaction.Transactions
+import expensetracker.transaction.{PeriodicTransactions, Transactions}
 import expensetracker.wellknown.WellKnown
 import kirill5k.common.http4s.Server
 import org.http4s.*
@@ -23,6 +23,7 @@ final class Http[F[_]: Async] private (
     private val auth: Auth[F],
     private val categories: Categories[F],
     private val transactions: Transactions[F],
+    private val periodicTransactions: PeriodicTransactions[F],
     private val sync: Sync[F]
 ) {
 
@@ -34,6 +35,7 @@ final class Http[F[_]: Async] private (
     val api = auth.controller.routes <+>
       categories.controller.routes <+>
       transactions.controller.routes <+>
+      periodicTransactions.controller.routes <+>
       sync.controller.routes
 
     Router("/api" -> api, "/" -> core)
@@ -58,5 +60,6 @@ object Http:
       auth: Auth[F],
       cats: Categories[F],
       txs: Transactions[F],
+      ptxs: PeriodicTransactions[F],
       sync: Sync[F]
-  ): F[Http[F]] = Monad[F].pure(Http(health, wellKnown, auth, cats, txs, sync))
+  ): F[Http[F]] = Monad[F].pure(Http(health, wellKnown, auth, cats, txs, ptxs, sync))

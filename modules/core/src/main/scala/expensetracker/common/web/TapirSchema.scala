@@ -2,8 +2,10 @@ package expensetracker.common.web
 
 import cats.syntax.option.*
 import eu.timepit.refined.types.string.NonEmptyString
+import eu.timepit.refined.types.numeric.PosInt
 import expensetracker.category.CategoryKind
 import expensetracker.common.validations.{ColorString, EmailString, IdString}
+import expensetracker.transaction.RecurrenceFrequency
 import squants.Money
 import squants.market.Currency
 import sttp.tapir.{FieldName, Schema}
@@ -12,10 +14,12 @@ import sttp.tapir.SchemaType.{SProduct, SProductField}
 import sttp.tapir.generic.auto.SchemaDerivation
 
 transparent trait TapirSchema extends SchemaDerivation {
-  given Schema[IdString]       = Schema.string
-  given Schema[ColorString]    = Schema.string
-  given Schema[NonEmptyString] = Schema.string
-  given Schema[EmailString]    = Schema.string
+  given Schema[IdString]            = Schema.string
+  given Schema[ColorString]         = Schema.string
+  given Schema[NonEmptyString]      = Schema.string
+  given Schema[EmailString]         = Schema.string
+  given Schema[RecurrenceFrequency] = Schema.string
+  given Schema[PosInt]              = Schema.string
 
   given Schema[CategoryKind] = Schema.derivedEnumeration[CategoryKind].defaultStringBased
 

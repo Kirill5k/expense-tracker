@@ -4,12 +4,14 @@ import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.Resources
+import expensetracker.common.web.Controller
 import expensetracker.common.actions.ActionDispatcher
 import expensetracker.transaction.db.PeriodicTransactionRepository
 import org.typelevel.log4cats.Logger
 
 final class PeriodicTransactions[F[_]] private (
-    val service: PeriodicTransactionService[F]
+    val service: PeriodicTransactionService[F],
+    val controller: Controller[F]
 )
 
 object PeriodicTransactions:
@@ -17,4 +19,5 @@ object PeriodicTransactions:
     for
       repo <- PeriodicTransactionRepository.make[F](resources.mongoDb, resources.mongoSession)
       svc  <- PeriodicTransactionService.make[F](repo, dispatcher)
-    yield PeriodicTransactions[F](svc)
+      ctrl <- PeriodicTransactionController.make(svc)
+    yield PeriodicTransactions[F](svc, ctrl)
