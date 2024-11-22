@@ -36,7 +36,7 @@ final private class LiveActionProcessor[F[_]: Temporal](
       .parEvalMapUnordered(Int.MaxValue)(handleAction)
 
   private def handleAction(action: Action): F[Unit] =
-    (action match {
+    (action match
       case Action.SetupNewUser(uid)                               => catService.assignDefault(uid)
       case Action.HideTransactionsByCategory(cid, hidden)         => txService.hide(cid, hidden) >> ptxService.hide(cid, hidden)
       case Action.SaveUsers(users)                                => userService.save(users)
@@ -45,7 +45,7 @@ final private class LiveActionProcessor[F[_]: Temporal](
       case Action.SavePeriodicTransactions(periodicTransactions)  => ptxService.save(periodicTransactions)
       case Action.GeneratePeriodicTransactionRecurrences          => ptxService.generateRecurrencesForToday
       case Action.SchedulePeriodicTransactionRecurrenceGeneration => schedulePeriodicTransactionRecurrenceGeneration
-    }).handleErrorWith {
+    ).handleErrorWith {
       case error: AppError =>
         logger.warn(error)(s"domain error while processing action $action")
       case error =>
@@ -59,7 +59,7 @@ final private class LiveActionProcessor[F[_]: Temporal](
       now <- clock.now
       nextDay  = now.toLocalDate.plusDays(1).toInstantAtStartOfDay
       duration = JDuration.between(now, nextDay).getNano.nanos
-      _ <- logger.info(s"scheduling periodic transaction recurrences generation to happen in ${duration.toReadableString}")
+      _ <- logger.info(s"scheduling periodic transaction recurrences generation to happen in ${duration.toReadableString} ($nextDay)")
       _ <- clock.sleep(duration)
       _ <- dispatcher.dispatch(Action.GeneratePeriodicTransactionRecurrences)
     yield ()
