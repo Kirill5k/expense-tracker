@@ -93,6 +93,7 @@ object Controller extends TapirSchema with TapirJson {
 
   private val FailedRegexValidation  = "Predicate failed: \"(.*)\"\\.matches\\(.*\\)\\.".r
   private val MissingFieldValidation = "Missing required field".r
+  private val PositiveIntValidation  = "Predicate failed: \\((.*) > 0\\)\\.".r
   private val EmptyFieldValidation   = "Predicate isEmpty\\(\\) did not fail\\.".r
   private val IdValidation           = "Predicate failed: \\((.*) is valid id\\).".r
 
@@ -100,6 +101,7 @@ object Controller extends TapirSchema with TapirJson {
     err.errors
       .map { je =>
         je.msg match
+          case PositiveIntValidation(value) => s"$value is smaller than 1"
           case FailedRegexValidation(value) => s"$value is not a valid ${je.path.head.name}"
           case MissingFieldValidation()     => s"${je.path.head.name} is required"
           case EmptyFieldValidation()       => s"${je.path.head.name} must not be empty"

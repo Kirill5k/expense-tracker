@@ -66,7 +66,35 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
         val res = PeriodicTransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus(Status.UnprocessableEntity, Some("""{"message": "end date must be after start date"}"""))
-        verify(svc).create(PeriodicTransactions.create())
+        verifyNoInteractions(svc)
+      }
+
+      "return 422 error when interval is 0" in {
+        val tx = PeriodicTransactions.tx()
+        val svc = mock[PeriodicTransactionService[IO]]
+        when(svc.create(any[CreatePeriodicTransaction])).thenReturnIO(tx)
+
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
+        val req = Request[IO](uri = uri"/periodic-transactions", method = Method.POST)
+          .withAuthHeader()
+          .withBody(
+            s"""{
+               |"categoryId":"${Categories.cid}",
+               |"recurrence": {
+               |  "startDate": "${LocalDate.now}",
+               |  "interval": 0,
+               |  "frequency": "monthly"
+               |},
+               |"amount": {"value":15.0,"currency":{"code":"GBP","symbol":"£"}},
+               |"note": "test tx",
+               |"tags": ["Foo"]
+               |}""".stripMargin
+          )
+        val res = PeriodicTransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        res mustHaveStatus(Status.UnprocessableEntity, Some("""{"message": "0 is smaller than 1"}"""))
+        verifyNoInteractions(svc)
       }
     }
   }
