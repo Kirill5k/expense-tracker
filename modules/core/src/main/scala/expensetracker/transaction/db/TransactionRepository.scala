@@ -70,8 +70,9 @@ final private class LiveTransactionRepository[F[_]](
       res <- if acid then collection.insertOne(session, create) else collection.insertOne(create)
       agg = findTxWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
       tx <- if acid then collection.aggregate[TransactionEntity](session, agg).first else collection.aggregate[TransactionEntity](agg).first
-      _  <- F.raiseWhen(tx.isEmpty || tx.get.category.isEmpty)(AppError.CategoryDoesNotExist(ctx.categoryId))
-      _  <- session.commitTransaction
+      txCat = tx.flatMap(_.category)
+      _ <- F.raiseWhen(txCat.isEmpty || txCat.get.userId.exists(_ != ctx.userId.toObjectId))(AppError.CategoryDoesNotExist(ctx.categoryId))
+      _ <- session.commitTransaction
     yield tx.get.toDomain).onError { case _ =>
       session.abortTransaction
     }
@@ -124,7 +125,7 @@ final private class LiveTransactionRepository[F[_]](
 
   override def save(txs: List[Transaction]): F[Unit] =
     val options = UpdateOptions(upsert = true)
-    val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, options))
+    val cmds    = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, options))
     collection.bulkWrite(cmds).void
 }
 
