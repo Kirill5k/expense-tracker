@@ -97,6 +97,6 @@ object Dependencies {
     Libraries.commonScala.http4s,
     Libraries.tapir.swagger,
     Libraries.tapir.openapi,
-    Libraries.apispec.circeYaml,
+    Libraries.apispec.circeYaml
   )
 }

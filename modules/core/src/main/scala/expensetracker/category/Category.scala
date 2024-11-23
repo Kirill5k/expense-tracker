@@ -36,7 +36,7 @@ final case class Category(
     userId: Option[UserId],
     hidden: Boolean,
     createdAt: Option[Instant] = None,
-    lastUpdatedAt: Option[Instant] = None,
+    lastUpdatedAt: Option[Instant] = None
 )
 
 final case class CreateCategory(

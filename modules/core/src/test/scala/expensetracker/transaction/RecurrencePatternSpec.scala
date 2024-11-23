@@ -8,7 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import java.time.LocalDate
 
 class RecurrencePatternSpec extends AnyWordSpec with Matchers {
-  
+
   "RecurrencePattern#dateSequence" when {
     "nextDate=None" should {
       "startDate < untilDate && endDate > untilDate" in {
@@ -89,8 +89,8 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
         val result = pattern.dateSequence(LocalDate.of(2023, 1, 3))
 
         result mustBe List(
-          LocalDate.of(2023, 1, 3), 
-          LocalDate.of(2023, 1, 2), 
+          LocalDate.of(2023, 1, 3),
+          LocalDate.of(2023, 1, 2),
           LocalDate.of(2023, 1, 1)
         )
       }
@@ -111,7 +111,7 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
           LocalDate.of(2023, 1, 22),
           LocalDate.of(2023, 1, 15),
           LocalDate.of(2023, 1, 8),
-          LocalDate.of(2023, 1, 1),
+          LocalDate.of(2023, 1, 1)
         )
       }
 
@@ -129,7 +129,7 @@ class RecurrencePatternSpec extends AnyWordSpec with Matchers {
         result mustBe List(
           LocalDate.of(2023, 1, 29),
           LocalDate.of(2023, 1, 15),
-          LocalDate.of(2023, 1, 1),
+          LocalDate.of(2023, 1, 1)
         )
       }
     }

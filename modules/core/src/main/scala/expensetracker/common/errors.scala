@@ -68,7 +68,7 @@ object errors {
     final case class InvalidJwtToken(message: String) extends Forbidden
 
     final case class FailedValidation(message: String) extends Unprocessable
-    
+
     final case class Internal(message: String) extends AppError
   }
 }

@@ -79,24 +79,40 @@ final private class LiveSyncRepository[F[_]](
         .aggregate[EntityChanges](
           Aggregate
             .matchBy(idEq(uid.toObjectId))
+            .lookup("periodicTransactions", "_id", "userId", "periodicTransactionsColl")
             .lookup("transactions", "_id", "userId", "transactionsColl")
             .lookup("categories", "_id", "userId", "categoriesColl")
             .lookup("users", "_id", "_id", "usersColl")
             .addFields(
-              "time"               -> "$$NOW",
-              "userCreated"        -> createdComp("usersColl", "user", from),
-              "userUpdated"        -> updatedComp("usersColl", "user", from),
-              "transactionCreated" -> createdComp("transactionsColl", "transaction", from),
-              "transactionUpdated" -> updatedComp("transactionsColl", "transaction", from),
-              "categoryCreated"    -> createdComp("categoriesColl", "category", from),
-              "categoryUpdated"    -> updatedComp("categoriesColl", "category", from)
+              "time"                       -> "$$NOW",
+              "userCreated"                -> createdComp("usersColl", "user", from),
+              "userUpdated"                -> updatedComp("usersColl", "user", from),
+              "transactionCreated"         -> createdComp("transactionsColl", "transaction", from),
+              "transactionUpdated"         -> updatedComp("transactionsColl", "transaction", from),
+              "periodicTransactionCreated" -> createdComp("periodicTransactionsColl", "periodicTransaction", from),
+              "periodicTransactionUpdated" -> updatedComp("periodicTransactionsColl", "periodicTransaction", from),
+              "categoryCreated"            -> createdComp("categoriesColl", "category", from),
+              "categoryUpdated"            -> updatedComp("categoriesColl", "category", from)
             )
             .project(
               Projection
                 .include("time")
-                .computed("users", Document("created" := "$userCreated", "updated" := "$userUpdated"))
-                .computed("categories", Document("created" := "$categoryCreated", "updated" := "$categoryUpdated"))
-                .computed("transactions", Document("created" := "$transactionCreated", "updated" := "$transactionUpdated"))
+                .computed("users", Document(
+                  "created" := "$userCreated", 
+                  "updated" := "$userUpdated"
+                ))
+                .computed("categories", Document(
+                  "created" := "$categoryCreated", 
+                  "updated" := "$categoryUpdated"
+                ))
+                .computed("transactions", Document(
+                  "created" := "$transactionCreated", 
+                  "updated" := "$transactionUpdated"
+                ))
+                .computed("periodicTransactions", Document(
+                  "created" := "$periodicTransactionCreated", 
+                  "updated" := "$periodicTransactionUpdated"
+                ))
             )
         )
         .first

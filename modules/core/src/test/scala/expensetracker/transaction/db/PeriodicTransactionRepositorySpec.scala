@@ -140,12 +140,12 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
 
       "return all periodic transactions that are due to be executed on provided date when end date is after provided date" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val date = LocalDate.of(2024, 10, 10)
+          val date       = LocalDate.of(2024, 10, 10)
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date), endDate = Some(date.plusDays(1)))
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            tx <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
-            txs <- repo.getAllByRecurrenceDate(date)
+            tx   <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe List(tx.copy(category = None))
         }
       }
@@ -164,12 +164,12 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
 
       "not return anything when date is not matching" in {
         withEmbeddedMongoDb { case (db, sess) =>
-          val date = LocalDate.of(2024, 10, 10)
+          val date       = LocalDate.of(2024, 10, 10)
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date.plusDays(1)))
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            tx <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
-            txs <- repo.getAllByRecurrenceDate(date)
+            tx   <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe Nil
         }
       }

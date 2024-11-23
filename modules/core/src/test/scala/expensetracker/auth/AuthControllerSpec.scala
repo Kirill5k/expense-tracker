@@ -130,8 +130,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
         when(usrSvc.create(any[UserDetails], any[Password])).thenRaiseError(AccountAlreadyExists(UserEmail("foo@bar.com")))
 
         val req = Request[IO](Method.POST, uri"/auth/user")
-          .withBody(
-            """{
+          .withBody("""{
               |"email":"foo@bar.com",
               |"password":"pwd",
               |"firstName":"John",
@@ -165,8 +164,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
         when(usrSvc.create(any[UserDetails], any[Password])).thenReturnIO(Users.uid1)
 
         val req = Request[IO](Method.POST, uri"/auth/user")
-          .withBody(
-            """{
+          .withBody("""{
               |"email":"foo@bar.com",
               |"password":"pwd",
               |"firstName":"John",
@@ -202,8 +200,8 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
       "return bad req on parsing error" in {
         val (usrSvc, sessSvc) = mocks
 
-        val req     = Request[IO](Method.POST, uri"/auth/login").withBody("""{"email":"foo","password":""}""")
-        val res     = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
+        val req = Request[IO](Method.POST, uri"/auth/login").withBody("""{"email":"foo","password":""}""")
+        val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"foo is not a valid email, password must not be empty"}"""
         res mustHaveStatus (Status.UnprocessableEntity, Some(resBody))
@@ -215,9 +213,9 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
 
         when(usrSvc.login(any[Login])).thenRaiseError(InvalidEmailOrPassword)
 
-        val req     = Request[IO](Method.POST, uri"/auth/login")
+        val req = Request[IO](Method.POST, uri"/auth/login")
           .withBody("""{"email":"foo@bar.com","password":"bar"}""")
-        val res     = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
+        val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Unauthorized, Some("""{"message":"Invalid email or password"}"""))
         verify(usrSvc).login(Login(UserEmail("foo@bar.com"), Password("bar")))
@@ -230,9 +228,9 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
         when(usrSvc.login(any[Login])).thenReturnIO(Users.user)
         when(sessSvc.create(any[CreateSession])).thenReturnIO(BearerToken("token"))
 
-        val req     = Request[IO](Method.POST, uri"/auth/login")
+        val req = Request[IO](Method.POST, uri"/auth/login")
           .withBody("""{"email":"foo@bar.com","password":"bar"}""")
-        val res     = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
+        val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.Ok, Some(s"""{"access_token":"token","token_type":"Bearer"}"""))
         verify(usrSvc).login(Login(UserEmail("foo@bar.com"), Password("bar")))

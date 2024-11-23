@@ -236,7 +236,7 @@ object SyncController extends TapirSchema with TapirJson {
           created = Nil,
           updated = Option.when(dc.users.created.nonEmpty)(WatermelonState("expense-tracker", dc.users.created.head.id)).toList,
           deleted = Nil
-       ),
+        ),
         transactions = WatermelonDataChange(
           created = dc.transactions.created.map(WatermelonTransaction.from),
           updated = dc.transactions.updated.map(WatermelonTransaction.from),

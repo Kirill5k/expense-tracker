@@ -75,7 +75,7 @@ final private class LiveUserRepository[F[_]](
           .addFields(
             Field.Categories -> Document(
               "$sortArray" := Document(
-                "input" := "$categories",
+                "input"  := "$categories",
                 "sortBy" := Document("name" := 1)
               )
             )

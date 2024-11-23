@@ -75,16 +75,18 @@ final private class CategoryController[F[_]](
       }
 
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
-    Controller.serverInterpreter[F].toRoutes(
-      List(
-        getAllCategories,
-        getCategoryById,
-        createCategory,
-        updateCategory,
-        hideCategory,
-        deleteCategory
+    Controller
+      .serverInterpreter[F]
+      .toRoutes(
+        List(
+          getAllCategories,
+          getCategoryById,
+          createCategory,
+          updateCategory,
+          hideCategory,
+          deleteCategory
+        )
       )
-    )
 }
 
 object CategoryController extends TapirSchema with TapirJson {
@@ -104,7 +106,7 @@ object CategoryController extends TapirSchema with TapirJson {
         userId = aid
       )
   }
-  
+
   final case class UpdateCategoryRequest(
       id: NonEmptyString,
       kind: CategoryKind,

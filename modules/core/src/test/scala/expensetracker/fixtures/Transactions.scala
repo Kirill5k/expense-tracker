@@ -11,9 +11,9 @@ import java.time.LocalDate
 
 object Transactions {
 
-  lazy val txid: TransactionId = TransactionId(ObjectId().toHexString)
+  lazy val txid: TransactionId  = TransactionId(ObjectId().toHexString)
   lazy val txid2: TransactionId = TransactionId(ObjectId().toHexString)
-  lazy val txdate: LocalDate   = LocalDate.now()
+  lazy val txdate: LocalDate    = LocalDate.now()
 
   def tx(
       id: TransactionId = txid,
@@ -24,15 +24,15 @@ object Transactions {
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
   ): Transaction = Transaction(
-    id = id, 
-    userId = uid, 
-    categoryId = catid, 
+    id = id,
+    userId = uid,
+    categoryId = catid,
     parentTransactionId = None,
     isRecurring = false,
-    amount = amount, 
-    date =date, 
-    note = note, 
-    tags = tags, 
+    amount = amount,
+    date = date,
+    note = note,
+    tags = tags,
     hidden = false
   )
 

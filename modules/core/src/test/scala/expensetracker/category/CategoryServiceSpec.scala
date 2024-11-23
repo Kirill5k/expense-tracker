@@ -61,7 +61,7 @@ class CategoryServiceSpec extends IOWordSpec {
     }
 
     "create new category in db" in {
-      val cat = Categories.cat()
+      val cat          = Categories.cat()
       val (repo, disp) = mocks
       when(repo.create(any[CreateCategory])).thenReturnIO(cat)
 
@@ -126,7 +126,7 @@ class CategoryServiceSpec extends IOWordSpec {
       }
     }
   }
-  
+
   def mocks: (CategoryRepository[IO], ActionDispatcher[IO]) =
     (mock[CategoryRepository[IO]], mock[ActionDispatcher[IO]])
 }

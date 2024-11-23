@@ -112,7 +112,7 @@ object TransactionController extends TapirSchema with TapirJson {
         tags = tags.map(_.toSet.map(_.toLowerCase.replaceAll(" ", "-"))).getOrElse(Set.empty)
       )
   }
-  
+
   final case class TransactionView(
       id: String,
       categoryId: String,
@@ -151,7 +151,7 @@ object TransactionController extends TapirSchema with TapirJson {
       date: LocalDate,
       note: Option[String],
       tags: Option[List[String]],
-      hidden: Option[Boolean],
+      hidden: Option[Boolean]
   ) derives Codec.AsObject {
     def toDomain(aid: UserId): Transaction =
       Transaction(
@@ -164,7 +164,7 @@ object TransactionController extends TapirSchema with TapirJson {
         date = date,
         note = note,
         tags = tags.map(_.toSet.map(_.trim.toLowerCase)).getOrElse(Set.empty),
-        hidden = hidden.getOrElse(false),
+        hidden = hidden.getOrElse(false)
       )
   }
 

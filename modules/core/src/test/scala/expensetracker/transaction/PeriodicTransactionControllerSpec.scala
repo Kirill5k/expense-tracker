@@ -13,7 +13,7 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
   "A PeriodicTransactionController" when {
     "POST /periodic-transactions" should {
       "create new tx" in {
-        val tx = PeriodicTransactions.tx()
+        val tx  = PeriodicTransactions.tx()
         val svc = mock[PeriodicTransactionService[IO]]
         when(svc.create(any[CreatePeriodicTransaction])).thenReturnIO(tx)
 
@@ -41,7 +41,7 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
       }
 
       "return 422 error when endDate is before startDate" in {
-        val tx = PeriodicTransactions.tx()
+        val tx  = PeriodicTransactions.tx()
         val svc = mock[PeriodicTransactionService[IO]]
         when(svc.create(any[CreatePeriodicTransaction])).thenReturnIO(tx)
 
@@ -65,12 +65,12 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
           )
         val res = PeriodicTransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.UnprocessableEntity, Some("""{"message": "end date must be after start date"}"""))
+        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message": "end date must be after start date"}"""))
         verifyNoInteractions(svc)
       }
 
       "return 422 error when interval is 0" in {
-        val tx = PeriodicTransactions.tx()
+        val tx  = PeriodicTransactions.tx()
         val svc = mock[PeriodicTransactionService[IO]]
         when(svc.create(any[CreatePeriodicTransaction])).thenReturnIO(tx)
 
@@ -93,7 +93,7 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
           )
         val res = PeriodicTransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.UnprocessableEntity, Some("""{"message": "0 is smaller than 1"}"""))
+        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message": "0 is smaller than 1"}"""))
         verifyNoInteractions(svc)
       }
     }

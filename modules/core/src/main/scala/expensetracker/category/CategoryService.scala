@@ -21,7 +21,7 @@ final private class LiveCategoryService[F[_]](
     private val repository: CategoryRepository[F],
     private val dispatcher: ActionDispatcher[F]
 )(using
-  F: Monad[F]
+    F: Monad[F]
 ) extends CategoryService[F] {
 
   override def getAll(uid: UserId): F[List[Category]] =

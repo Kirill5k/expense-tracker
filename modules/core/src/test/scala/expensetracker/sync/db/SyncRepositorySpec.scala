@@ -42,12 +42,12 @@ class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
       "return data changes when from timestamp is before lastUpdatedAt" in {
         withEmbeddedMongoDb { db =>
           for
-            categories <- db.getCollection("categories")
-            _ <- categories.updateOne(Filter.idEq(Categories.cid.toObjectId), Update.currentDate("lastUpdatedAt"))
+            categories   <- db.getCollection("categories")
+            _            <- categories.updateOne(Filter.idEq(Categories.cid.toObjectId), Update.currentDate("lastUpdatedAt"))
             transactions <- db.getCollection("transactions")
-            _ <- transactions.updateOne(Filter.idEq(Transactions.txid.toObjectId), Update.currentDate("lastUpdatedAt"))
-            repo       <- SyncRepository.make(db)
-            changes    <- repo.pullChanges(Users.uid1, Some(Instant.now().minusSeconds(3600)))
+            _            <- transactions.updateOne(Filter.idEq(Transactions.txid.toObjectId), Update.currentDate("lastUpdatedAt"))
+            repo         <- SyncRepository.make(db)
+            changes      <- repo.pullChanges(Users.uid1, Some(Instant.now().minusSeconds(3600)))
           yield {
             changes.transactions.created.map(_.id) mustBe empty
             changes.categories.created.map(_.id) mustBe empty
@@ -85,12 +85,14 @@ class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
         .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
         .use { client =>
           for
-            db           <- client.getDatabase("expense-tracker")
-            categories   <- db.getCollection("categories")
-            _            <- categories.insertMany(List(
-              categoryDoc(Categories.cid, "c1", Some(Users.uid1)),
-              categoryDoc(Categories.cid2, "c2", Some(Users.uid1), hidden = Some(true))
-            ))
+            db         <- client.getDatabase("expense-tracker")
+            categories <- db.getCollection("categories")
+            _ <- categories.insertMany(
+              List(
+                categoryDoc(Categories.cid, "c1", Some(Users.uid1)),
+                categoryDoc(Categories.cid2, "c2", Some(Users.uid1), hidden = Some(true))
+              )
+            )
             users        <- db.getCollection("users")
             _            <- users.insertMany(List(userDoc(Users.uid1, UserEmail("acc1"))))
             transactions <- db.getCollection("transactions")

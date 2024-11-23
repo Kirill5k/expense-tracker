@@ -59,11 +59,11 @@ final case class PeriodicTransaction(
     copy(recurrence = recurrence.withUpdatedNextDate(currentDate))
 
   def toTransaction(date: LocalDate): Transaction = {
-    val ts = date.toInstantAtStartOfDay.getEpochSecond.toInt
+    val ts     = date.toInstantAtStartOfDay.getEpochSecond.toInt
     val buffer = ByteBuffer.allocate(12)
     buffer.putInt(ts)
     val hashInput = id.value + "_" + date
-    val hash = MessageDigest.getInstance("SHA-256").digest(hashInput.getBytes("UTF-8"))
+    val hash      = MessageDigest.getInstance("SHA-256").digest(hashInput.getBytes("UTF-8"))
     buffer.put(hash, 0, 8)
     val oid = ObjectId(buffer.array())
 
@@ -95,8 +95,8 @@ final case class RecurrencePattern(
 
   private def genNextDate(currentDate: LocalDate): LocalDate =
     frequency match
-      case RecurrenceFrequency.Daily => currentDate.plusDays(interval.value)
-      case RecurrenceFrequency.Weekly => currentDate.plusWeeks(interval.value)
+      case RecurrenceFrequency.Daily   => currentDate.plusDays(interval.value)
+      case RecurrenceFrequency.Weekly  => currentDate.plusWeeks(interval.value)
       case RecurrenceFrequency.Monthly => currentDate.plusMonths(interval.value)
 
   def dateSequence(untilDate: LocalDate): List[LocalDate] = {

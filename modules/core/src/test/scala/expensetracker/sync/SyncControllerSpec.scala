@@ -5,7 +5,7 @@ import expensetracker.auth.Authenticator
 import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.Category
 import expensetracker.transaction.Transaction
-import expensetracker.fixtures.{Categories, Sessions, Transactions, Users}
+import expensetracker.fixtures.{Categories, Sessions, Transactions, PeriodicTransactions, Users}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.{Method, Request, Status, Uri}
 import org.http4s.implicits.*
@@ -124,9 +124,22 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
         when(svc.pullChanges(any[UserId], anyOpt[Instant]))
           .thenReturnIO(
             DataChanges(
-              transactions = DataChange(created = List(Transactions.tx()), updated = List(Transactions.tx(Transactions.txid2))),
-              categories = DataChange(created = List(Categories.cat()), updated = List(Categories.cat(Categories.cid2))),
-              users = DataChange(created = List(Users.user), updated = Nil),
+              periodicTransactions = DataChange(
+                created = List(PeriodicTransactions.tx()), 
+                updated = List(PeriodicTransactions.tx(PeriodicTransactions.txid2))
+              ),
+              transactions = DataChange(
+                created = List(Transactions.tx()), 
+                updated = List(Transactions.tx(Transactions.txid2))
+              ),
+              categories = DataChange(
+                created = List(Categories.cat()), 
+                updated = List(Categories.cat(Categories.cid2))
+              ),
+              users = DataChange(
+                created = List(Users.user), 
+                updated = Nil
+              ),
               time = time
             )
           )
@@ -179,7 +192,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
 
         val res = SyncController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.NoContent, None)
+        res mustHaveStatus (Status.NoContent, None)
         verify(svc).pushChanges(Nil, Nil, Nil)
       }
     }

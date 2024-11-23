@@ -14,9 +14,9 @@ import scala.concurrent.duration.*
 import java.time.Instant
 
 class ActionProcessorSpec extends IOWordSpec {
-  
-  given Clock[IO]  = Clock.mock(Instant.parse("2024-11-10T01:00:00Z"))
-  
+
+  given Clock[IO] = Clock.mock(Instant.parse("2024-11-10T01:00:00Z"))
+
   given Logger[IO] = Slf4jLogger.getLogger[IO]
 
   "An ActionProcessor" should {

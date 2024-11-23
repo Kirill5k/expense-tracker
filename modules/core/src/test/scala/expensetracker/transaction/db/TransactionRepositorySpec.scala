@@ -34,9 +34,7 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             repo <- TransactionRepository.make(db, sess, false)
             tx   <- repo.create(Transactions.create())
             txs  <- repo.getAll(Users.uid1, None, None)
-          yield {
-            txs mustBe List(tx)
-          }
+          yield txs mustBe List(tx)
         }
       }
 
