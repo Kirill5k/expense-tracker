@@ -7,13 +7,18 @@ import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.Category
 import expensetracker.common.actions.Action
 import expensetracker.common.actions.ActionDispatcher
-import expensetracker.transaction.Transaction
+import expensetracker.transaction.{PeriodicTransaction, Transaction}
 
 import java.time.Instant
 
 trait SyncService[F[_]]:
   def pullChanges(uid: UserId, from: Option[Instant]): F[DataChanges]
-  def pushChanges(users: List[User], cats: List[Category], txs: List[Transaction]): F[Unit]
+  def pushChanges(
+      users: List[User],
+      cats: List[Category],
+      txs: List[Transaction],
+      ptxs: List[PeriodicTransaction]
+  ): F[Unit]
 
 final private class LiveSyncService[F[_]](
     private val repository: SyncRepository[F],
@@ -25,10 +30,16 @@ final private class LiveSyncService[F[_]](
   override def pullChanges(uid: UserId, from: Option[Instant]): F[DataChanges] =
     repository.pullChanges(uid, from)
 
-  override def pushChanges(users: List[User], cats: List[Category], txs: List[Transaction]): F[Unit] =
+  override def pushChanges(
+      users: List[User],
+      cats: List[Category],
+      txs: List[Transaction],
+      ptxs: List[PeriodicTransaction]
+  ): F[Unit] =
     F.whenA(users.nonEmpty)(dispatcher.dispatch(Action.SaveUsers(users))) >>
       F.whenA(cats.nonEmpty)(dispatcher.dispatch(Action.SaveCategories(cats))) >>
-      F.whenA(txs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(txs)))
+      F.whenA(txs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(txs))) >>
+      F.whenA(ptxs.nonEmpty)(dispatcher.dispatch(Action.SavePeriodicTransactions(ptxs)))
 }
 
 object SyncService:

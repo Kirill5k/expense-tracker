@@ -9,7 +9,9 @@ import expensetracker.category.{Category, CategoryColor, CategoryIcon, CategoryI
 import expensetracker.common.errors.AppError
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPullResponse}
-import expensetracker.transaction.{Transaction, TransactionId}
+import expensetracker.transaction.{PeriodicTransaction, RecurrenceFrequency, RecurrencePattern, Transaction, TransactionId}
+import eu.timepit.refined.numeric.Positive
+import eu.timepit.refined.refineV
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
@@ -27,37 +29,46 @@ final private class SyncController[F[_]](
     logger: Logger[F]
 ) extends Controller[F] {
 
-  def pullChanges(using authenticator: Authenticator[F]) = SyncController.pullChangesEndpoint.withAuthenticatedSession
-    .serverLogic { sess => lastPulledAt =>
-      service
-        .pullChanges(sess.userId, lastPulledAt.map(Instant.ofEpochMilli))
-        .mapResponse { dc =>
-          WatermelonPullResponse(
-            changes = WatermelonDataChanges.from(dc),
-            timestamp = dc.time.toEpochMilli
-          )
-        }
-    }
+  private def pullChanges(using authenticator: Authenticator[F]) =
+    SyncController.pullChangesEndpoint.withAuthenticatedSession
+      .serverLogic { sess => lastPulledAt =>
+        service
+          .pullChanges(sess.userId, lastPulledAt.map(Instant.ofEpochMilli))
+          .mapResponse { dc =>
+            WatermelonPullResponse(
+              changes = WatermelonDataChanges.from(dc),
+              timestamp = dc.time.toEpochMilli
+            )
+          }
+      }
 
-  def pushChanges(using authenticator: Authenticator[F]) = SyncController.pushChangesEndpoint.withAuthenticatedSession
-    .serverLogic { sess => (lastPulledAt, changes) =>
-      val ts = lastPulledAt.map(Instant.ofEpochMilli)
+  private def pushChanges(using authenticator: Authenticator[F]) =
+    SyncController.pushChangesEndpoint.withAuthenticatedSession
+      .serverLogic { sess => (lastPulledAt, changes) =>
+        val ts = lastPulledAt.map(Instant.ofEpochMilli)
 
-      val updatedUsers = changes.users.updated.filter(_.id == sess.userId).map(_.toDomain(ts))
-      val createdCats  = changes.categories.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
-      val updatedCats  = changes.categories.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
-      val createdTxs   = changes.transactions.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
-      val updatedTxs   = changes.transactions.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+        val updatedUsers = changes.users.updated.filter(_.id == sess.userId).map(_.toDomain(ts))
+        val createdCats  = changes.categories.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+        val updatedCats  = changes.categories.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+        val createdTxs   = changes.transactions.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+        val updatedTxs   = changes.transactions.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+        val createdPtxs  = changes.ptxs.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+        val updatedPtxs  = changes.ptxs.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
 
-      val users = updatedUsers.flatMap(_.toOption)
-      val cats  = createdCats ::: updatedCats
-      val txs   = createdTxs.flatMap(_.toOption) ::: updatedTxs.flatMap(_.toOption)
+        val users = updatedUsers.flatMap(_.toOption)
+        val cats  = createdCats ::: updatedCats
+        val txs   = createdTxs.flatMap(_.toOption) ::: updatedTxs.flatMap(_.toOption)
+        val ptxs  = createdPtxs.flatMap(_.toOption) ::: updatedPtxs.flatMap(_.toOption)
 
-      logger.info(
-        s"Push changes for ${sess.userId} at $ts: ${changes.summary}. Valid data: users - ${users.size} | categories - ${cats.size} | transactions - ${txs.size}"
-      ) >>
-        service.pushChanges(users, cats, txs).voidResponse
-    }
+        logger.info(
+          s"Push changes for ${sess.userId} at $ts: ${changes.summary}. Valid data: " +
+            s"users - ${users.size} | " +
+            s"categories - ${cats.size} | " +
+            s"transactions - ${txs.size} | " +
+            s"periodicTransactions - ${ptxs.size}"
+        ) >>
+          service.pushChanges(users, cats, txs, ptxs).voidResponse
+      }
 
   override def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
     Controller
@@ -207,6 +218,67 @@ object SyncController extends TapirSchema with TapirJson {
         user_id = tx.userId
       )
 
+  final case class WatermelonPeriodicTransaction(
+      id: TransactionId,
+      category_id: CategoryId,
+      amount_value: Double,
+      amount_currency_code: String,
+      amount_currency_symbol: String,
+      recurrence_start_date: LocalDate,
+      recurrence_next_date: Option[LocalDate],
+      recurrence_end_date: Option[LocalDate],
+      recurrence_interval: Int,
+      recurrence_frequency: RecurrenceFrequency,
+      note: Option[String],
+      tags: Option[String],
+      hidden: Boolean,
+      user_id: UserId
+  ) derives Codec.AsObject {
+    def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, PeriodicTransaction] =
+      Currency(amount_currency_code)(defaultMoneyContext).toEither.left
+        .map(e => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
+        .map { currency =>
+          PeriodicTransaction(
+            id = id,
+            userId = user_id,
+            categoryId = category_id,
+            recurrence = RecurrencePattern(
+              startDate = recurrence_start_date,
+              nextDate = recurrence_next_date,
+              endDate = recurrence_end_date,
+              interval = refineV[Positive].unsafeFrom(Option(recurrence_interval).filter(_ > 0).getOrElse(1)),
+              frequency = recurrence_frequency
+            ),
+            amount = Money(amount_value, currency),
+            note = note,
+            tags = tags.fold(Set.empty)(t => t.split(",").toSet),
+            hidden = hidden,
+            category = None,
+            createdAt = createdAt,
+            lastUpdatedAt = lastUpdatedAt
+          )
+        }
+  }
+
+  object WatermelonPeriodicTransaction:
+    def from(tx: PeriodicTransaction): WatermelonPeriodicTransaction =
+      WatermelonPeriodicTransaction(
+        id = tx.id,
+        category_id = tx.categoryId,
+        recurrence_start_date = tx.recurrence.startDate,
+        recurrence_next_date = tx.recurrence.nextDate,
+        recurrence_end_date = tx.recurrence.endDate,
+        recurrence_frequency = tx.recurrence.frequency,
+        recurrence_interval = tx.recurrence.interval.value,
+        amount_value = tx.amount.value,
+        amount_currency_code = tx.amount.currency.code,
+        amount_currency_symbol = tx.amount.currency.symbol,
+        note = tx.note,
+        tags = Option.when(tx.tags.nonEmpty)(tx.tags.mkString(",")),
+        hidden = tx.hidden,
+        user_id = tx.userId
+      )
+
   final case class WatermelonDataChange[A](
       created: List[A],
       updated: List[A],
@@ -220,13 +292,18 @@ object SyncController extends TapirSchema with TapirJson {
       state: WatermelonDataChange[WatermelonState],
       transactions: WatermelonDataChange[WatermelonTransaction],
       categories: WatermelonDataChange[WatermelonCategory],
-      users: WatermelonDataChange[WatermelonUser]
+      users: WatermelonDataChange[WatermelonUser],
+      periodicTransactions: Option[WatermelonDataChange[WatermelonPeriodicTransaction]]
   ) derives Codec.AsObject {
+
+    val ptxs = periodicTransactions.getOrElse(WatermelonDataChange[WatermelonPeriodicTransaction](Nil, Nil, Nil))
+
     def summary: String =
       s"""state - ${state.created.size}/${state.updated.size}/${state.deleted.size} |""" +
         s"""users - ${users.created.size}/${users.updated.size}/${users.deleted.size} |""" +
         s"""categories - ${categories.created.size}/${categories.updated.size}/${categories.deleted.size} |""" +
-        s"""transactions - ${transactions.created.size}/${transactions.updated.size}/${transactions.deleted.size}"""
+        s"""transactions - ${transactions.created.size}/${transactions.updated.size}/${transactions.deleted.size} |""" +
+        s"""periodicTransactions - ${ptxs.created.size}/${ptxs.updated.size}/${ptxs.deleted.size}"""
   }
 
   object WatermelonDataChanges:
@@ -251,6 +328,13 @@ object SyncController extends TapirSchema with TapirJson {
           created = dc.users.created.map(WatermelonUser.from),
           updated = dc.users.updated.map(WatermelonUser.from),
           deleted = Nil
+        ),
+        periodicTransactions = Some(
+          WatermelonDataChange(
+            created = dc.periodicTransactions.created.map(WatermelonPeriodicTransaction.from),
+            updated = dc.periodicTransactions.updated.map(WatermelonPeriodicTransaction.from),
+            deleted = Nil
+          )
         )
       )
 
