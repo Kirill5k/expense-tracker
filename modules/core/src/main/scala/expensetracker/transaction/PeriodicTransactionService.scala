@@ -68,7 +68,6 @@ final private class LivePeriodicTransactionService[F[_]](
       }
       _ <- F.whenA(updTxs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(updTxs)))
       _ <- save(updPTxs)
-      _ <- dispatcher.dispatch(Action.SchedulePeriodicTransactionRecurrenceGeneration)
     yield ()
 }
 

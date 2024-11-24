@@ -55,7 +55,6 @@ class PeriodicTransactionServiceSpec extends IOWordSpec {
             )
           )
           verify(repo).save(List(ptx.withUpdatedNextDate(now)))
-          verify(disp).dispatch(Action.SchedulePeriodicTransactionRecurrenceGeneration)
           verifyNoMoreInteractions(disp, repo)
           res mustBe ()
         }

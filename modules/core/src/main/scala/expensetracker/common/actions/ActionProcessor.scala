@@ -61,6 +61,7 @@ final private class LiveActionProcessor[F[_]: Temporal](
       _ <- logger.info(s"scheduling periodic transaction recurrences generation to happen in ${duration.toReadableString} ($now-$nextDay)")
       _ <- clock.sleep(duration)
       _ <- dispatcher.dispatch(Action.GeneratePeriodicTransactionRecurrences)
+      _ <- dispatcher.dispatch(Action.SchedulePeriodicTransactionRecurrenceGeneration)
     yield ()
 }
 
