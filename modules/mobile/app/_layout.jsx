@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
-import {useNetInfo} from '@react-native-community/netinfo'
+import {fetch} from '@react-native-community/netinfo'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {useFonts} from 'expo-font'
 import {Stack} from 'expo-router'
@@ -59,27 +59,40 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken} = useStore()
-  const {type, isConnected, isInternetReachable} = useNetInfo()
 
-  useEffect(() => {
+  const startSync = () => {
     const syncDb = () => {
-      if (isConnected && isInternetReachable) {
-        initSync(database, accessToken)
-      }
+      console.log('Initiating db sync')
+      fetch().then(state => {
+        if (state.isInternetReachable) {
+          initSync(database, accessToken)
+        } else {
+          console.log('Not connected to the internet. skipping db sync')
+        }
+      })
     }
 
     if (accessToken) {
       syncDb()
       const intervalId = setInterval(syncDb, 180000) // 3 minutes
       setIntervalId(intervalId)
-    } else if (intervalId) {
+    }
+  }
+
+  const stopSync = () => {
+    if (intervalId) {
       console.log('stopping db sync')
       clearInterval(intervalId)
       setIntervalId(null)
     }
+    return true
+  }
 
-    return () => intervalId ? clearInterval(intervalId) : true
-  }, [accessToken]);
+  useEffect(() => {
+    stopSync()
+    startSync()
+    return stopSync
+  }, [accessToken])
 
   return (
       <SafeAreaProvider>
