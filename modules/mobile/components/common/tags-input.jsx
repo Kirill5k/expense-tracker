@@ -53,8 +53,9 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
               <HStack className="pl-2" space="xs">
                 {currentTags.map((t, i) => (
                     <Pressable key={i} onPress={() => removeTag(i)}>
-                      <Text
-                          className="rounded-lg px-1 border border-secondary-300 text-typography-700 text-md">{t}</Text>
+                      <Text className="rounded-lg px-1 border border-secondary-700 text-typography-700 text-md">
+                        {t}
+                      </Text>
                     </Pressable>
                 ))}
               </HStack>
@@ -73,6 +74,7 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
             autoCorrect="none"
             importantForAutofill="no"
             inputMode="text"
+            textContentType="none"
         />
       </Input>
   )

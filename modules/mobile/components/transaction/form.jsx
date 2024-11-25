@@ -40,7 +40,12 @@ const transactionSchema = z.object({
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   date: z.date().refine((val) => val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string())
+      .max(4, "You can add a maximum of 4 tags")
+      .refine((tags) => new Set(tags).size === tags.length, {
+        message: "Tags must be unique",
+      })
+      .optional(),
   note: z.string().max(30, "Note is too long").optional(),
 });
 

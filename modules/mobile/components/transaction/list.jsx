@@ -32,8 +32,8 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                     {tx.category.name}
                   </Text>
                   {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
-                  {tx.tags.length > 0 && <HStack space="xs" className="mt-1">
-                    {tx.tags.map(t => (<Tag key={t} text={t}/>))}
+                  {tx.tags.length > 0 && <HStack space="xs" className="mt-1 w-64 flex flex-wrap">
+                    {tx.tags.map(((t, i) => (<Tag key={`${t}-${i}`} text={t}/>)))}
                   </HStack>}
                 </VStack>
                 <Text
