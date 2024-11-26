@@ -16,10 +16,31 @@ const Transaction = tableSchema({
   name: 'transactions',
   columns: [
     {name: 'category_id', type: 'string', isIndexed: true},
+    {name: 'parent_transaction_id', type: 'string', isOptional: true},
     {name: 'amount_value', type: 'number'},
     {name: 'amount_currency_code', type: 'string'},
     {name: 'amount_currency_symbol', type: 'string'},
+    {name: 'is_recurring', type: 'boolean', isOptional: true},
     {name: 'date', type: 'string', isIndexed: true},
+    {name: 'note', type: 'string', isOptional: true},
+    {name: 'tags', type: 'string', isOptional: true},
+    {name: 'hidden', type: 'boolean', isOptional: true},
+    {name: 'user_id', type: 'string', isIndexed: true},
+  ],
+})
+
+const PeriodicTransaction = tableSchema({
+  name: 'periodic-transactions',
+  columns: [
+    {name: 'category_id', type: 'string', isIndexed: true},
+    {name: 'amount_value', type: 'number'},
+    {name: 'amount_currency_code', type: 'string'},
+    {name: 'amount_currency_symbol', type: 'string'},
+    {name: 'recurrence_start_date', type: 'string'},
+    {name: 'recurrence_next_date', type: 'string',  isOptional: true, isIndexed: true},
+    {name: 'recurrence_end_date', type: 'string', isOptional: true},
+    {name: 'recurrence_interval', type: 'number'},
+    {name: 'recurrence_frequency', type: 'string'},
     {name: 'note', type: 'string', isOptional: true},
     {name: 'tags', type: 'string', isOptional: true},
     {name: 'hidden', type: 'boolean', isOptional: true},
@@ -60,6 +81,7 @@ export default appSchema({
   tables: [
     Category,
     Transaction,
+    PeriodicTransaction,
     User,
     State
   ]

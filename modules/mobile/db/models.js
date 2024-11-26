@@ -38,10 +38,63 @@ export class Transaction extends Model {
   static table = 'transactions'
 
   @field('category_id') categoryId
+  @field('parent_transaction_id') parentTransactionId
+  @field('is_recurring') isRecurring
   @field('amount_value') amountValue
   @field('amount_currency_code') amountCurrencyCode
   @field('amount_currency_symbol') amountCurrencySymbol
   @field('date') date
+  @field('note') note
+  @field('tags') tags
+  @field('hidden') hidden
+  @field('user_id') userId
+
+  @relation('categories', 'category_id') category
+
+  get isNotHidden() {
+    return this.hidden !== true && this.category.hidden !== true
+  }
+
+  @writer async setHidden(hidden) {
+    await this.update(transaction => {
+      transaction.hidden = hidden
+    })
+  }
+
+  get toDomain() {
+    return {
+      id: this.id,
+      kind: this.kind,
+      categoryId: this.categoryId,
+      parentTransactionId: this.parentTransactionId,
+      isRecurring: this.isRecurring,
+      amount: {
+        value: this.amountValue,
+        currency: {
+          code: this.amountCurrencyCode,
+          symbol: this.amountCurrencySymbol
+        }
+      },
+      date: this.date,
+      note: this.note,
+      tags: this.tags === null || this.tags === '' ? [] : this.tags.split(','),
+      hidden: this.hidden
+    }
+  }
+}
+
+export class PeriodicTransaction extends Model {
+  static table = 'periodic-transactions'
+
+  @field('category_id') categoryId
+  @field('amount_value') amountValue
+  @field('amount_currency_code') amountCurrencyCode
+  @field('amount_currency_symbol') amountCurrencySymbol
+  @field('recurrence_start_date') recurrenceStartDate
+  @field('recurrence_next_date') recurrenceNextDate
+  @field('recurrence_end_date') recurrenceEndDate
+  @field('recurrence_interval') recurrenceInterval
+  @field('recurrence_frequency') recurrenceFrequency
   @field('note') note
   @field('tags') tags
   @field('hidden') hidden
@@ -71,13 +124,20 @@ export class Transaction extends Model {
           symbol: this.amountCurrencySymbol
         }
       },
-      date: this.date,
+      recurrence: {
+        startDate: this.recurrenceStartDate,
+        endDate: this.recurrenceEndDate,
+        nextDate: this.recurrenceNextDate,
+        interval: this.recurrenceInterval,
+        frequency: this.recurrenceFrequency
+      },
       note: this.note,
       tags: this.tags === null || this.tags === '' ? [] : this.tags.split(','),
       hidden: this.hidden
     }
   }
 }
+
 
 export class User extends Model {
   static table = 'users'
