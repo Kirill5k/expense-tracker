@@ -1,6 +1,18 @@
 import {defaultDisplayDate} from '@/utils/dates'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
+import {ObjectId} from 'bson'
+import crypto from 'crypto'
+
+export const generatePeriodTransactionRecurrenceInstanceId = (ptxId, date) => {
+  const timestamp = Math.floor(new Date(date).getTime() / 1000)
+  const buffer = Buffer.alloc(12)
+  buffer.writeUInt32BE(timestamp, 0)
+  const hashInput = `${ptxId.toString()}_${date}`
+  const hash = crypto.createHash('sha256').update(hashInput).digest()
+  hash.copy(buffer, 4, 0, 8)
+  return new ObjectId(buffer).toHexString()
+}
 
 const resetStateRec = (rec) => {
   const dd = defaultDisplayDate()
