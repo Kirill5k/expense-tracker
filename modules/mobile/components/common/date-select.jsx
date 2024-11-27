@@ -21,7 +21,10 @@ import dayjs from 'dayjs'
 const AccordionDateSelect = ({value, onSelect, mode}) => {
 
   const formatDate = (date) => {
-    return format(date, 'dd MMM yyyy')
+    if (date) {
+      return format(date, 'dd MMM yyyy')
+    }
+    return ''
   }
 
   return (

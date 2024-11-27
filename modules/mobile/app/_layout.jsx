@@ -59,10 +59,10 @@ function RootLayoutNav() {
   const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken} = useStore()
 
-  const startSync = () => {
+  const startSync = (accessToken) => {
     const syncDb = () => {
       console.log('Initiating db sync')
-      initSync(database, accessToken)
+      initSync(database)
     }
 
     if (accessToken) {
@@ -72,19 +72,18 @@ function RootLayoutNav() {
     }
   }
 
-  const stopSync = () => {
+  const stopSync = (intervalId) => {
     if (intervalId) {
       console.log('stopping db sync')
       clearInterval(intervalId)
       setIntervalId(null)
     }
-    return true
   }
 
   useEffect(() => {
-    stopSync()
-    startSync()
-    return stopSync
+    stopSync(intervalId)
+    startSync(accessToken)
+    return () => stopSync(intervalId)
   }, [accessToken])
 
   return (
