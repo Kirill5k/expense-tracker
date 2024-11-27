@@ -8,22 +8,32 @@ import Colors from '@/constants/colors'
 import {nonEmpty} from '@/utils/arrays'
 import {printAmount} from '@/utils/transactions'
 
-const prepareChartData = (items, mode) => {
-  let total = 0
-
-  if (items.length === 0) {
-    return {total, data: [{value: 100, color: Colors[mode].tabIconDefault}]}
+const percentageChange = (currentTotal, previousTotal) => {
+  if (!currentTotal || !previousTotal) {
+    return ' '
   }
-  const transactionsByCategory = items.reduce((acc, tx) => {
-    const catId = tx.category.id
-    if (!acc[catId]) {
-      acc[catId] = {transactions: [], totalAmount: 0, category: tx.category}
-    }
-    total += tx.amount.value
-    acc[catId].totalAmount += tx.amount.value
-    acc[catId].transactions.push(tx)
-    return acc
-  }, {})
+
+  const change = ((currentTotal - previousTotal) / previousTotal) * 100
+  const sign = change >= 0 ? '+' : '-'
+  return `${sign}${Math.abs(change).toFixed(0)}%`
+}
+
+const groupTxByCat = (items) => items.reduce((acc, tx) => {
+  const catId = tx.category.id
+  if (!acc.transactionsByCategory[catId]) {
+    acc.transactionsByCategory[catId] = {transactions: [], totalAmount: 0, category: tx.category}
+  }
+  acc.total += tx.amount.value
+  acc.transactionsByCategory[catId].totalAmount += tx.amount.value
+  acc.transactionsByCategory[catId].transactions.push(tx)
+  return acc
+}, {total: 0, transactionsByCategory: {}})
+
+const prepareChartData = (items, mode) => {
+  if (items.length === 0) {
+    return {total: 0, data: [{value: 100, color: Colors[mode].tabIconDefault}]}
+  }
+  const {total, transactionsByCategory} = groupTxByCat(items)
 
   const data = Object.values(transactionsByCategory).map((group) => ({
     transactions: group.transactions,
@@ -37,7 +47,7 @@ const prepareChartData = (items, mode) => {
 
 const focusItem = (items, index) => items.map((d, i) => i === index ? { ...d, focused: true } : { ...d, focused: false })
 
-const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
+const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
   const chartData = prepareChartData(items, mode)
 
@@ -50,6 +60,11 @@ const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
   const [data, total] = pressedItem
       ? [focusItem(chartData.data, pressedItem.index), pressedItem.value]
       : [chartData.data, chartData.total]
+
+  const prevData = groupTxByCat(previousPeriodItems)
+  const prevTotal = pressedItem
+      ? prevData.transactionsByCategory[chartData.data[pressedItem.index].category.id]?.totalAmount
+      : prevData.total
 
   const handlePress = (item, i) => {
     if (pressedItem === i || !item.category) {
@@ -79,6 +94,7 @@ const TransactionPieChart = ({items, mode, currency, kind, onChartPress}) => {
                   <Heading size="2xl">
                     {printAmount(total, currency, false)}
                   </Heading>
+                  <Text size="md">{percentageChange(total, prevTotal)}</Text>
                 </VStack>
             )}
         />

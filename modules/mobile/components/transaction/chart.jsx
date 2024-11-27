@@ -46,6 +46,7 @@ const TransactionChart = ({items, previousPeriodItems, mode, displayDate, curren
             <TransactionPieChart
                 kind={kind}
                 items={items}
+                previousPeriodItems={previousPeriodItems}
                 currency={currency}
                 mode={mode}
                 chartWidth={chartWidth}
