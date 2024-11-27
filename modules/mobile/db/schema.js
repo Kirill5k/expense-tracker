@@ -30,7 +30,7 @@ const Transaction = tableSchema({
 })
 
 const PeriodicTransaction = tableSchema({
-  name: 'periodic-transactions',
+  name: 'periodic_transactions',
   columns: [
     {name: 'category_id', type: 'string', isIndexed: true},
     {name: 'amount_value', type: 'number'},

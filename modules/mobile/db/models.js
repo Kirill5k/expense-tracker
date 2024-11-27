@@ -84,7 +84,7 @@ export class Transaction extends Model {
 }
 
 export class PeriodicTransaction extends Model {
-  static table = 'periodic-transactions'
+  static table = 'periodic_transactions'
 
   @field('category_id') categoryId
   @field('amount_value') amountValue

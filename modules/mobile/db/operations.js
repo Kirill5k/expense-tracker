@@ -1,17 +1,27 @@
 import {defaultDisplayDate} from '@/utils/dates'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
-import {ObjectId} from 'bson'
-import crypto from 'crypto'
+import * as Crypto from 'expo-crypto'
 
-export const generatePeriodTransactionRecurrenceInstanceId = (ptxId, date) => {
+export const generatePeriodicTransactionRecurrenceInstanceId = async (ptxId, date) => {
   const timestamp = Math.floor(new Date(date).getTime() / 1000)
-  const buffer = Buffer.alloc(12)
-  buffer.writeUInt32BE(timestamp, 0)
-  const hashInput = `${ptxId.toString()}_${date}`
-  const hash = crypto.createHash('sha256').update(hashInput).digest()
-  hash.copy(buffer, 4, 0, 8)
-  return new ObjectId(buffer).toHexString()
+  const array = new Uint8Array(12)
+  array[0] = (timestamp >> 24) & 0xff
+  array[1] = (timestamp >> 16) & 0xff
+  array[2] = (timestamp >> 8) & 0xff
+  array[3] = timestamp & 0xff
+  const hashInput = `${ptxId.toString()}_${date}`;
+  const hashHex = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      hashInput,
+      { encoding: Crypto.CryptoEncoding.HEX }
+  )
+  for (let i = 0; i < 8; i++) {
+    array[4 + i] = parseInt(hashHex.slice(i * 2, i * 2 + 2), 16)
+  }
+  return Array.from(array)
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('')
 }
 
 const resetStateRec = (rec) => {

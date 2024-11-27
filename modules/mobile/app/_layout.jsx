@@ -63,13 +63,7 @@ function RootLayoutNav() {
   const startSync = () => {
     const syncDb = () => {
       console.log('Initiating db sync')
-      fetch().then(state => {
-        if (state.isInternetReachable) {
-          initSync(database, accessToken)
-        } else {
-          console.log('Not connected to the internet. skipping db sync')
-        }
-      })
+      initSync(database, accessToken)
     }
 
     if (accessToken) {

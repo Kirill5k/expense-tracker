@@ -55,7 +55,6 @@
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
     "bson": "^6.8.0",
-    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "expo": "~51.0.39",
@@ -89,7 +88,8 @@
     "reanimated-color-picker": "^3.0.4",
     "tailwindcss": "^3.4.10",
     "zod": "^3.23.8",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "expo-crypto": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
