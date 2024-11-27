@@ -1,7 +1,6 @@
 import React, {useState} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
-import {Divider} from '@/components/ui/divider'
 import {Heading} from '@/components/ui/heading'
 import {ProgressBar} from '@/components/common/progress'
 import FloatingButton from '@/components/common/floating-button'
@@ -47,7 +46,6 @@ const Categories = ({categories}) => {
         <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Categories
         </Heading>
-        {isScrolling && <Divider/>}
         {loading && <ProgressBar mode={mode}/>}
         <CategoryList
             items={displayedCategories}

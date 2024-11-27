@@ -3,7 +3,6 @@ import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
-import {Divider} from '@/components/ui/divider'
 import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
 import Profile from '@/components/settings/profile'
@@ -108,7 +107,6 @@ const Settings = ({user, state, totalTransactionCount}) => {
         <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
-        {isScrolling && <Divider/>}
         {loading && <ProgressBar mode={mode}/>}
         <ScrollView
             bounces={false}

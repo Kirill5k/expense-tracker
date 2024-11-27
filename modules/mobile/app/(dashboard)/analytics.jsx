@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react'
 import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
-import {Divider} from '@/components/ui/divider'
 import {Heading} from '@/components/ui/heading'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {ProgressBar} from '@/components/common/progress'
@@ -50,7 +49,6 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
             items={kinds}
             onChange={setKind}
         />
-        {isScrolling && <Divider/>}
         <ScrollView
             bounces={false}
             showsVerticalScrollIndicator={false}

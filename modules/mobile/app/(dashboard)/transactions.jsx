@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
-import {Divider} from '@/components/ui/divider'
 import FloatingButton from '@/components/common/floating-button'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionList from '@/components/transaction/list'
@@ -59,7 +58,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
             value={state.displayDate}
             onSelect={dd => updateStateDisplayDate(database, dd)}
         />
-        {isScrolling && <Divider/>}
         <TransactionList
             disabled={loading}
             items={transactions}
