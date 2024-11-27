@@ -50,7 +50,6 @@
     "@legendapp/motion": "^2.4.0",
     "@morrowdigital/watermelondb-expo-plugin": "^2.3.3",
     "@nozbe/watermelondb": "^0.27.1",
-    "@react-native-community/netinfo": "11.3.1",
     "@react-navigation/native": "^6.0.2",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
