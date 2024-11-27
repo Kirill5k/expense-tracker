@@ -110,7 +110,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |      "deleted" : [
        |      ]
        |    },
-       |    "periodicTransactions": {
+       |    "periodic_transactions": {
        |      "created" : [
        |        {
        |          "id" : "${PeriodicTransactions.txid}",
