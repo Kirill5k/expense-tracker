@@ -67,7 +67,7 @@ function RootLayoutNav() {
 
     if (accessToken) {
       syncDb()
-      const intervalId = setInterval(syncDb, 180000) // 3 minutes
+      const intervalId = setInterval(syncDb, 240000) // 4 minutes
       setIntervalId(intervalId)
     }
   }
