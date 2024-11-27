@@ -3,7 +3,7 @@ import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
-import Tag from '@/components/common/tag'
+import {TagList} from '@/components/common/tag'
 import {ListItemPressable, ListItemIcon} from '@/components/common/list'
 import {groupBy} from '@/utils/arrays'
 import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/utils/transactions'
@@ -32,9 +32,7 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                     {tx.category.name}
                   </Text>
                   {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
-                  {tx.tags.length > 0 && <HStack space="xs" className="mt-1 w-64 flex flex-wrap">
-                    {tx.tags.map(((t, i) => (<Tag key={`${t}-${i}`} text={t}/>)))}
-                  </HStack>}
+                  <TagList items={tx.tags} className="w-64"/>
                 </VStack>
                 <Text
                     className={mergeClasses(
