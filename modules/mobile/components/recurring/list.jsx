@@ -11,6 +11,8 @@ import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/uti
 
 
 const RecurringTransactionListItem = ({item, onItemDelete, onItemPress, disabled}) => {
+  const handleItemPress = () => onItemPress(item)
+  const handleItemDelete = () => onItemDelete(item)
   return (
       <Box className={mergeClasses(
           'bg-background-50 px-1',
@@ -19,8 +21,8 @@ const RecurringTransactionListItem = ({item, onItemDelete, onItemPress, disabled
       )}>
         <ListItemPressable
             disabled={disabled}
-            onPress={() => onItemPress(item)}
-            onDelete={() => onItemDelete(item)}
+            onPress={handleItemPress}
+            onDelete={handleItemDelete}
         >
           <HStack className={Classes.listItemLayout}>
             <ListItemIcon

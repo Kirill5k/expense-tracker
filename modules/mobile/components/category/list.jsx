@@ -9,6 +9,8 @@ import {mergeClasses} from '@/utils/css'
 
 
 const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}) => {
+  const handleItemPress = () => onItemPress(item)
+  const handleItemDelete = () => onItemDelete(item)
   return (
       <Box className={mergeClasses(
           'bg-background-50 px-1',
@@ -17,8 +19,8 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
       )}>
         <ListItemPressable
             disabled={disabled}
-            onPress={() => onItemPress(item)}
-            onDelete={() => onItemDelete(item)}
+            onPress={handleItemPress}
+            onDelete={handleItemDelete}
         >
           <HStack className={Classes.listItemLayout}>
             <ListItemIcon
