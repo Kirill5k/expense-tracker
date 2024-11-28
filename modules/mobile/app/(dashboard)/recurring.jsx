@@ -1,9 +1,10 @@
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import Classes from '@/constants/classes'
+import {enhanceWithCategories} from '@/db/observers'
 
 
-const Recurring = ({}) => {
+const Recurring = ({categories}) => {
   return (
       <VStack className={Classes.dashboardLayout}>
         <Heading size="2xl" className="pb-2">
@@ -13,4 +14,4 @@ const Recurring = ({}) => {
   )
 }
 
-export default Recurring
+export default enhanceWithCategories(Recurring)
