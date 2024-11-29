@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import Classes from '@/constants/classes'
+import FloatingButton from '@/components/common/floating-button'
 import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -13,6 +14,10 @@ const Recurring = ({categories}) => {
   const mode = useColorScheme()
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const handleFabPress = () => {
+
+  }
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -30,6 +35,11 @@ const Recurring = ({categories}) => {
                 setIsScrolling(true)
               }
             }}
+        />
+        <FloatingButton
+            onPress={handleFabPress}
+            mode={mode}
+            iconCode={"plus"}
         />
       </VStack>
   )
