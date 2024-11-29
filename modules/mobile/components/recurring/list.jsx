@@ -24,17 +24,28 @@ const RecurrenceLabel = ({item}) => {
   const interval = item.recurrence.interval
   const nextDate = item.recurrence.nextDate
 
-  let text = recurrenceFreqMappings[freq]
-  if (interval > 1) {
-    text = `${interval} ${text}s`
+  let label = '';
+
+  switch (freq) {
+    case 'daily':
+      label = interval === 1 ? 'Daily' : `Every ${interval} days`;
+      break;
+    case 'weekly':
+      label = interval === 1 ? 'Weekly' : `Every ${interval} weeks`;
+      break;
+    case 'monthly':
+      label = interval === 1 ? 'Monthly' : `Every ${interval} months`;
+      break;
+    default:
+      label = 'Unknown frequency';
   }
 
   return (
       <HStack space="xs" className="items-center pb-1">
-        <Icon as={CalendarDaysIcon} className="text-typography-500 w-3 h-3" />
-        <Text className="text-xs">Every {text}</Text>
+        <Icon as={CalendarDaysIcon} className="text-typography-500 w-3 h-4" />
+        <Text className="text-xs">{label}</Text>
         <Divider orientation="vertical" className="mx-1" />
-        <Icon as={ClockIcon} className="text-typography-500 w-3 h-3" />
+        <Icon as={ClockIcon} className="text-typography-500 w-3 h-4" />
         <Text className="text-xs">Next {format(parseISO(nextDate), 'dd/MM/yyyy')}</Text>
       </HStack>
   )
@@ -69,7 +80,7 @@ const RecurringTransactionListItem = ({item, onItemDelete, onItemPress, disabled
             </VStack>
             <Text
                 className={mergeClasses(
-                    'rounded-xl border text-md font-medium p-1 px-2 ml-auto',
+                    Classes.listItemAmount,
                     isExpense(item) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
                 )}>
               {formatAmount(item)}

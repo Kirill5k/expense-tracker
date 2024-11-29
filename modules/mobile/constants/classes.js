@@ -3,6 +3,7 @@ export default {
   scrollList: 'max-w-[600px] w-full',
   listItemLayout: 'items-center p-3',
   listItemMainText: 'font-semibold text-primary-900 line-clamp-1 p-0 m-0 text-lg',
+  listItemAmount: ' text-lg font-medium ml-auto', // OLD: 'rounded-xl border text-md font-medium p-1 px-2 ml-auto'
   dark: {
     inputFieldBorder: 'border-secondary-400',
     invalidInputFieldBorder: 'border-red-300'

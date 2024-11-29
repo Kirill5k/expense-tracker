@@ -37,7 +37,7 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                 </VStack>
                 <Text
                     className={mergeClasses(
-                        'rounded-xl border text-md font-medium p-1 px-2 ml-auto',
+                        Classes.listItemAmount,
                         isExpense(tx) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
                     )}>
                   {formatAmount(tx)}
