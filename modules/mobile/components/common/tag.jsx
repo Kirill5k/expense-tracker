@@ -19,7 +19,7 @@ export const TagList = ({items, className, tagClassName}) => {
 
 const Tag = ({text, className}) => {
   return (
-      <Box className={mergeClasses('rounded-lg bg-background-100', className)}>
+      <Box className={mergeClasses('rounded-lg bg-background-200', className)}>
         <Text className="rounded-lg text-typography-900 text-sm font-medium p-1.5 py-0.5">
           {text}
         </Text>
