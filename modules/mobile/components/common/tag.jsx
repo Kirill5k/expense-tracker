@@ -11,7 +11,7 @@ export const TagList = ({items, className, tagClassName}) => {
   }
 
   return (
-      <HStack space="xs" className={mergeClasses('mt-1 flex flex-wrap', className)}>
+      <HStack space="xs" className={mergeClasses('flex flex-wrap', className)}>
         {items.map(((t, i) => (<Tag key={`${t}-${i}`} text={t} className={tagClassName}/>)))}
       </HStack>
   )

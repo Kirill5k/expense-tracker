@@ -80,10 +80,10 @@ const CategoryGroupedTransactionList = ({items}) => {
                 <VStack space="sm">
                   {item.transactions.map(tx => (
                       <HStack key={tx.id} className="w-full justify-between bg-background-100 rounded-xl py-3 px-3">
-                        <VStack className="items-start">
+                        <VStack className="items-start gap-1">
                           <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
                           {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
-                          <TagList items={tx.tags} tagClassName="bg-background-200"/>
+                          <TagList items={tx.tags}/>
                         </VStack>
                         <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
                       </HStack>

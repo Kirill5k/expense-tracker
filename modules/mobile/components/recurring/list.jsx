@@ -30,11 +30,11 @@ const RecurrenceLabel = ({item}) => {
   }
 
   return (
-      <HStack space="xs" className="items-center">
-        <Icon as={CalendarDaysIcon} className="text-typography-500 w-4 h-4" />
+      <HStack space="xs" className="items-center pb-1">
+        <Icon as={CalendarDaysIcon} className="text-typography-500 w-3 h-3" />
         <Text className="text-xs">Every {text}</Text>
         <Divider orientation="vertical" className="mx-1" />
-        <Icon as={ClockIcon} className="text-typography-500 w-4 h-4" />
+        <Icon as={ClockIcon} className="text-typography-500 w-3 h-3" />
         <Text className="text-xs">Next {format(parseISO(nextDate), 'dd/MM/yyyy')}</Text>
       </HStack>
   )
@@ -61,21 +61,19 @@ const RecurringTransactionListItem = ({item, onItemDelete, onItemPress, disabled
                 color={item.category.color}
             />
             <VStack className="justify-center gap-1">
-              <HStack className="justify-between">
-                <Text className={Classes.listItemMainText}>
-                  {item.note || item.category.name}
-                </Text>
-                <Text
-                    className={mergeClasses(
-                        'rounded-xl border text-md font-medium p-1 px-2',
-                        isExpense(item) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
-                    )}>
-                  {formatAmount(item)}
-                </Text>
-              </HStack>
+              <Text className={Classes.listItemMainText}>
+                {item.note || item.category.name}
+              </Text>
               <RecurrenceLabel item={item}/>
               <TagList items={item.tags} className="w-64"/>
             </VStack>
+            <Text
+                className={mergeClasses(
+                    'rounded-xl border text-md font-medium p-1 px-2 ml-auto',
+                    isExpense(item) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
+                )}>
+              {formatAmount(item)}
+            </Text>
           </HStack>
         </ListItemPressable>
       </Box>

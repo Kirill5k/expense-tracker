@@ -27,7 +27,7 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                     icon={tx.category.icon}
                     color={tx.category.color}
                 />
-                <VStack className="justify-center">
+                <VStack className="justify-center gap-1">
                   <HStack>
                     <Text className={Classes.listItemMainText}>
                       {tx.note || tx.category.name}
