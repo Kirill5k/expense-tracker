@@ -218,32 +218,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
-        <FormControl isInvalid={!!formState.errors.tags}>
-          <FormControlLabel>
-            <FormControlLabelText>Tags</FormControlLabelText>
-          </FormControlLabel>
-          <Controller
-              name="tags"
-              control={control}
-              render={({field: {onChange, onBlur, value}}) => (
-                  <TagsInput
-                    placeholder=""
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                  />
-              )}
-          />
-          <FormControlHelper>
-            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each tag</FormControlHelperText>
-          </FormControlHelper>
-          <FormControlError>
-            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
-            <FormControlErrorText className="text-xs">
-              {formState.errors?.tags?.message}
-            </FormControlErrorText>
-          </FormControlError>
-        </FormControl>
+
         <FormControl isInvalid={!!formState.errors.note}>
           <FormControlLabel>
             <FormControlLabelText>Note</FormControlLabelText>
@@ -272,6 +247,34 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
+
+        <FormControl isInvalid={!!formState.errors.tags}>
+          <FormControlLabel>
+            <FormControlLabelText>Tags</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+              name="tags"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <TagsInput
+                    placeholder=""
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+              )}
+          />
+          <FormControlHelper>
+            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each tag</FormControlHelperText>
+          </FormControlHelper>
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.tags?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
         <HStack space="md" className="justify-end">
           <Button
               size="md"

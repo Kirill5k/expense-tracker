@@ -28,10 +28,11 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                     color={tx.category.color}
                 />
                 <VStack className="justify-center">
-                  <Text className={Classes.listItemMainText}>
-                    {tx.category.name}
-                  </Text>
-                  {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
+                  <HStack>
+                    <Text className={Classes.listItemMainText}>
+                      {tx.note || tx.category.name}
+                    </Text>
+                  </HStack>
                   <TagList items={tx.tags} className="w-64"/>
                 </VStack>
                 <Text
