@@ -7,6 +7,7 @@ import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {TagList} from '@/components/common/tag'
 import {ListItemPressable, ListItemIcon} from '@/components/common/list'
+import RecurringTransactionHeader from '@/components/recurring/header'
 import Classes from '@/constants/classes'
 import {mergeClasses} from '@/utils/css'
 import {formatAmount, isExpense} from '@/utils/transactions'
@@ -104,6 +105,8 @@ const RecurringTransactionList = ({items, onScroll, onItemPress, onItemDelete, d
                   item={item}
               />
           )}
+          ListHeaderComponent={<RecurringTransactionHeader items={items}/>}
+          ListEmptyComponent={<Text className="py-10 text-center">No recurring transactions found</Text>}
       />
   )
 }

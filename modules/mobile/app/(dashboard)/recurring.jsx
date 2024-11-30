@@ -5,7 +5,6 @@ import Classes from '@/constants/classes'
 import FloatingButton from '@/components/common/floating-button'
 import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
-import RecurringTransactionHeader from '@/components/recurring/header'
 import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithCategories} from '@/db/observers'
 
@@ -25,9 +24,6 @@ const Recurring = ({categories}) => {
           Recurring
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
-        <RecurringTransactionHeader
-            items={txs}
-        />
         <RecurringTransactionList
             items={txs}
             disabled={loading}
