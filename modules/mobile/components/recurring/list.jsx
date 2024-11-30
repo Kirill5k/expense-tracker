@@ -13,12 +13,6 @@ import {formatAmount, isExpense} from '@/utils/transactions'
 import { parseISO, format } from 'date-fns'
 
 
-const recurrenceFreqMappings = {
-  'monthly': 'month',
-  'daily': 'day',
-  'weekly': 'week'
-}
-
 const RecurrenceLabel = ({item}) => {
   const freq = item.recurrence.frequency
   const interval = item.recurrence.interval

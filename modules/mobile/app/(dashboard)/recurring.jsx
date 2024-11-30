@@ -5,9 +5,9 @@ import Classes from '@/constants/classes'
 import FloatingButton from '@/components/common/floating-button'
 import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
+import RecurringTransactionHeader from '@/components/recurring/header'
 import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithCategories} from '@/db/observers'
-
 
 
 const Recurring = ({categories}) => {
@@ -25,6 +25,9 @@ const Recurring = ({categories}) => {
           Recurring
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
+        <RecurringTransactionHeader
+            items={txs}
+        />
         <RecurringTransactionList
             items={txs}
             disabled={loading}
@@ -54,7 +57,7 @@ const txs = [
     categoryId: "61041a74937c172e4baaa550",
     recurrence: {
       startDate: "2024-09-06",
-      nextDate: "2024-11-30",
+      nextDate: "2024-12-05",
       endDate: null,
       interval: 1,
       frequency: "daily"
@@ -83,7 +86,7 @@ const txs = [
     categoryId: "61041a74937c172e4baaa555",
     recurrence: {
       startDate: "2024-09-06",
-      nextDate: "2024-11-30",
+      nextDate: "2024-12-10",
       endDate: null,
       interval: 1,
       frequency: "daily"
@@ -111,7 +114,7 @@ const txs = [
     categoryId: "671f91e4fa5d5e39ff022935",
     recurrence: {
       startDate: "2024-09-06",
-      nextDate: "2024-11-30",
+      nextDate: "2024-12-10",
       endDate: null,
       interval: 2,
       frequency: "daily"
