@@ -56,7 +56,7 @@ const RecurringTransactionHeader = ({items}) => {
   return (
       <HStack className="mb-2 p-3 rounded-xl bg-background-50 justify-between">
         <VStack className="w-2/4">
-          <Text>Monthly Recurring</Text>
+          <Text>Monthly Total</Text>
           <Heading size="xl">{printAmount(monthTotal, nextWeekTxs[0].amount.currency)}</Heading>
         </VStack>
         <Divider orientation="vertical"/>
