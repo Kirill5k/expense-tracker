@@ -1,3 +1,4 @@
+import {useState} from 'react'
 import DateTimePicker from 'react-native-ui-datepicker'
 import {
   Accordion,
@@ -8,6 +9,7 @@ import {
   AccordionContent,
   AccordionIcon,
 } from '@/components/ui/accordion'
+import {Switch} from '../ui/switch'
 import {Fab, FabLabel} from '../ui/fab'
 import {Box} from '../ui/box'
 import {MaterialIcon} from '../ui/icon';
@@ -18,7 +20,9 @@ import {format} from 'date-fns'
 import dayjs from 'dayjs'
 
 
-const AccordionDateSelect = ({value, onSelect, mode}) => {
+const AccordionDateSelect = ({value, onSelect, mode, nullable = false}) => {
+  const [enabled, setEnabled] = useState(!nullable)
+  const [selectedValues, setSelectedValues] = useState([])
 
   const formatDate = (date) => {
     if (date) {
@@ -27,30 +31,51 @@ const AccordionDateSelect = ({value, onSelect, mode}) => {
     return ''
   }
 
+  const handleEnabledToggle = () => {
+    if (enabled) {
+      setSelectedValues([])
+      onSelect(null)
+    }
+    setEnabled(!enabled)
+  }
+
   return (
       <Accordion
+          value={selectedValues}
+          onValueChange={(item) => setSelectedValues(item)}
           size="md"
           variant="unfilled"
           type="single"
           isCollapsible={true}
-          isDisabled={false}
+          isDisabled={!enabled}
           className={mergeClasses('border rounded-md', Classes[mode].inputFieldBorder)}
       >
         <AccordionItem value="a">
           <AccordionHeader>
-            <AccordionTrigger className="px-5 py-2">
+            <AccordionTrigger className={mergeClasses('px-3 py-0', !nullable && 'pr-5')}>
               {({ isExpanded }) => {
                 return (
                     <>
-                      <AccordionTitleText className="font-semibold">
+                      <AccordionTitleText className="pl-2 font-semibold py-2">
                         {formatDate(value)}
                       </AccordionTitleText>
-                      <AccordionIcon
-                          className="flex-grow-0"
-                          as={MaterialIcon}
-                          code={isExpanded ? 'chevron-up' : 'chevron-down'}
-                          dcolor={value ? Colors[mode].tabIconSelected : Colors[mode].text}
-                      />
+                      {!nullable && (
+                          <AccordionIcon
+                              className="flex-grow-0"
+                              as={MaterialIcon}
+                              code={isExpanded ? 'chevron-up' : 'chevron-down'}
+                              dcolor={value ? Colors[mode].tabIconSelected : Colors[mode].text}
+                          />
+                      )}
+                      {nullable && (
+                          <Switch
+                              value={enabled}
+                              onToggle={handleEnabledToggle}
+                              className="p-0 m-0"
+                              size="sm"
+                              trackColor={{ false: Colors[mode].text, true: Colors[mode].tabIconSelected }}
+                          />
+                      )}
                     </>
                 )
               }}
