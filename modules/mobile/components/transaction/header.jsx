@@ -16,7 +16,7 @@ const TransactionHeader = ({items}) => {
       <HStack className={Classes.listItemHeader}>
         <VStack className="w-2/4">
           <Text>Balance</Text>
-          <Heading size="xl">{printAmount(calcTotal(items), items[0].amount.currency)}</Heading>
+          <Heading size="xl">{printAmount(calcTotal(items), items[0]?.amount?.currency)}</Heading>
         </VStack>
         <Divider orientation="vertical"/>
         <VStack className="pl-3 w-2/4">

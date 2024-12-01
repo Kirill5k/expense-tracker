@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import Classes from '@/constants/classes'
+import ToggleButton from '@/components/common/toggle-button'
 import FloatingButton from '@/components/common/floating-button'
 import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
@@ -9,8 +10,15 @@ import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithCategories} from '@/db/observers'
 
 
+const kinds = [
+  {label: 'All', value: 'all'},
+  {label: 'Spending', value: 'expense'},
+  {label: 'Income', value: 'income'}
+]
+
 const Recurring = ({categories}) => {
   const mode = useColorScheme()
+  const [kind, setKind] = useState(kinds[0])
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -18,14 +26,23 @@ const Recurring = ({categories}) => {
 
   }
 
+  const displayedTxs = kind.value === 'all' ? txs : txs.filter(tx => tx.category.kind === kind.value)
+
   return (
       <VStack className={Classes.dashboardLayout}>
         <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Recurring
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
+        <ToggleButton
+            className="mb-2"
+            size="lg"
+            value={kind}
+            items={kinds}
+            onChange={setKind}
+        />
         <RecurringTransactionList
-            items={txs}
+            items={displayedTxs}
             disabled={loading}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 20 && isScrolling) {

@@ -58,7 +58,7 @@ const RecurringTransactionHeader = ({items}) => {
       <HStack className={Classes.listItemHeader}>
         <VStack className="w-2/4">
           <Text>Monthly Total</Text>
-          <Heading size="xl">{printAmount(monthTotal, nextWeekTxs[0].amount.currency)}</Heading>
+          <Heading size="xl">{printAmount(monthTotal, items[0]?.amount?.currency)}</Heading>
         </VStack>
         <Divider orientation="vertical"/>
         <VStack className="pl-3 w-2/4">
