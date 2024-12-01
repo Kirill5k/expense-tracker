@@ -8,6 +8,10 @@ import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithCategories} from '@/db/observers'
+import {hideRecurringTransaction} from '@/db/operations'
+import useStore from '@/store'
+import {router} from 'expo-router'
+import {useDatabase} from '@nozbe/watermelondb/react'
 
 
 const kinds = [
@@ -17,13 +21,29 @@ const kinds = [
 ]
 
 const Recurring = ({categories}) => {
+  const database = useDatabase()
   const mode = useColorScheme()
+
+  const {setUndoAlert, setRtxToUpdate} = useStore()
   const [kind, setKind] = useState(kinds[0])
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const handleFabPress = () => {
+  const handleItemDelete = (rtx) => {
+    setLoading(true)
+    hideRecurringTransaction(database, rtx.id, true)
+        .then(() => setUndoAlert('Recurring transaction has been deleted', () => hideRecurringTransaction(database, rtx.id, false)))
+        .then(() => setLoading(false))
+  }
 
+  const handleItemPress = (rtx) => {
+    setRtxToUpdate(rtx)
+    router.push('recurring')
+  }
+
+  const handleFabPress = () => {
+    setRtxToUpdate(null)
+    router.push('recurring')
   }
 
   const displayedTxs = kind.value === 'all' ? txs : txs.filter(tx => tx.category.kind === kind.value)
@@ -44,6 +64,8 @@ const Recurring = ({categories}) => {
         <RecurringTransactionList
             items={displayedTxs}
             disabled={loading}
+            onItemPress={handleItemPress}
+            onItemDelete={handleItemDelete}
             onScroll={({nativeEvent}) => {
               if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
                 setIsScrolling(false)

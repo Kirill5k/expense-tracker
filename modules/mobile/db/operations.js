@@ -68,6 +68,15 @@ const updateUserRec = (rec, user) => {
   rec.registrationDate = user.registrationDate
 }
 
+export const hideRecurringTransaction = async (database, rtxid, hidden) => {
+  await database.write(async () => {
+    const rtx = await database.get('periodic_transactions').find(rtxid)
+    await rtx.update(rec => {
+      rec.hidden = hidden
+    })
+  })
+}
+
 export const hideCategory = async (database, catid, hidden) => {
   await database.write(async () => {
     const cat = await database.get('categories').find(catid)
