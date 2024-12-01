@@ -3,8 +3,9 @@ import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
-import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/utils/transactions'
-import { getDaysInMonth } from 'date-fns'
+import {printAmount, isExpense} from '@/utils/transactions'
+import {getDaysInMonth} from 'date-fns'
+import Classes from '@/constants/classes'
 
 const calculateMonthlyTotal = (txs, daysInMonth = 30) => {
   let totalAmount = 0
@@ -54,7 +55,7 @@ const RecurringTransactionHeader = ({items}) => {
   }
 
   return (
-      <HStack className="mb-2 p-3 rounded-xl bg-background-50 justify-between">
+      <HStack className={Classes.listItemHeader}>
         <VStack className="w-2/4">
           <Text>Monthly Total</Text>
           <Heading size="xl">{printAmount(monthTotal, nextWeekTxs[0].amount.currency)}</Heading>

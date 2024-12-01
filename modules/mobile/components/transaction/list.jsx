@@ -9,6 +9,7 @@ import {groupBy} from '@/utils/arrays'
 import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
 import {FlatList} from '@/components/ui/flat-list'
+import TransactionHeader from './header'
 import {mergeClasses} from '@/utils/css'
 
 
@@ -100,6 +101,7 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
                   onItemDelete={onItemDelete}
               />
           )}
+          ListHeaderComponent={<TransactionHeader items={items}/>}
           ListEmptyComponent={<Text className="py-10 text-center">No transactions for this period</Text>}
       />
   )
