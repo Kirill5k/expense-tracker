@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form-control'
 import {Input, InputField, InputSlot} from '@/components/ui/input'
 import {z} from 'zod'
-import {format} from 'date-fns'
+import {format, subHours} from 'date-fns'
 import {Controller, useForm} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {Keyboard} from 'react-native'
@@ -38,7 +38,8 @@ const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
   category: z.preprocess(c => c || {id: '', name: '', kind: 'expense', color: '#000', icon: ''},
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
-  date: z.date().refine((val) => val, {message: 'Invalid date format'}),
+  startDate: z.date().refine((val) => val, {message: 'Invalid date format'}),
+  endDate: z.date().optional().refine((val) => val === undefined || val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
   tags: z.array(z.string())
       .max(4, "You can add a maximum of 4 tags")
@@ -47,9 +48,12 @@ const transactionSchema = z.object({
       })
       .optional(),
   note: z.string().max(30, "Note is too long").optional(),
-});
+}).refine(data => !data.endDate || subHours(data.endDate, 1) > data.startDate, {
+  message: 'End date must be after start date',
+  path: ['endDate'],
+})
 
-const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
+const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
   const {
     control,
     handleSubmit,
@@ -59,9 +63,10 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
     watch
   } = useForm({
     defaultValues: {
-      date: transaction?.date ? new Date(transaction.date) : new Date(),
+      startDate: transaction?.recurrence ? new Date(transaction.recurrence.startDate) : new Date(),
+      endDate: transaction?.recurrence ? new Date(transaction.recurrence.endDate) : null,
       kind: transaction?.category?.kind || 'expense',
-      category: transaction?.category || null,
+      category: transaction?.category || undefined,
       amount: transaction?.amount?.value?.toFixed(2),
       tags: transaction?.tags || [],
       note: transaction?.note || ''
@@ -197,12 +202,12 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           </FormControlError>
         </FormControl>
 
-        <FormControl isInvalid={!!formState.errors.date}>
+        <FormControl isInvalid={!!formState.errors.startDate}>
           <FormControlLabel>
-            <FormControlLabelText>Date</FormControlLabelText>
+            <FormControlLabelText>Start date</FormControlLabelText>
           </FormControlLabel>
           <Controller
-              name="date"
+              name="startDate"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
@@ -215,7 +220,32 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
-              {formState.errors?.date?.message}
+              {formState.errors?.startDate?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl isInvalid={!!formState.errors.endDate}>
+          <FormControlLabel>
+            <FormControlLabelText>End date</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+              name="endDate"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <DateSelect
+                      isInvalid={!!formState.errors.endDate}
+                      nullable
+                      mode={mode}
+                      value={value}
+                      onSelect={onChange}
+                  />
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.endDate?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
@@ -296,4 +326,4 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
   )
 }
 
-export default TransactionForm
+export default RecurringTransactionForm

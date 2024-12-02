@@ -1,18 +1,21 @@
 import {useEffect} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
-import CategoryForm from '@/components/category/form'
+import RecurringTransactionForm from '@/components/recurring/form'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {createCategory, updateCategory} from '@/db/operations'
-import {enhanceWithUser} from '@/db/observers'
+import {enhanceWithCategories} from '@/db/observers'
 import {useColorScheme} from '@/components/useColorScheme'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 
-const Recurring = ({user}) => {
+const Recurring = ({user, categories}) => {
   const {rtxToUpdate, setRtxToUpdate} = useStore()
   const database = useDatabase()
   const mode = useColorScheme()
+
+  const incomeCategories = categories.filter(c => c.kind === 'income').map(c => c.toDomain)
+  const expenseCategories = categories.filter(c => c.kind === 'expense').map(c => c.toDomain)
 
   const withUserId = obj => ({...obj, userId: user.id})
 
@@ -30,9 +33,18 @@ const Recurring = ({user}) => {
           <ScreenHeader
               heading={rtxToUpdate?.id ? 'Edit Recurring Transaction' : 'New Recurring Transaction'}
           />
+          <RecurringTransactionForm
+              mode={mode}
+              transaction={rtxToUpdate}
+              currency={user?.currency}
+              expenseCategories={expenseCategories}
+              incomeCategories={incomeCategories}
+              onCancel={() => router.back()}
+              onSubmit={handleFormSubmit}
+          />
         </VStack>
       </ScreenLayout>
   )
 }
 
-export default enhanceWithUser(Recurring)
+export default enhanceWithCategories(Recurring)

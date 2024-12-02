@@ -20,7 +20,7 @@ import {format} from 'date-fns'
 import dayjs from 'dayjs'
 
 
-const AccordionDateSelect = ({value, onSelect, mode, nullable = false}) => {
+const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false}) => {
   const [enabled, setEnabled] = useState(!nullable)
   const [selectedValues, setSelectedValues] = useState([])
 
@@ -34,7 +34,10 @@ const AccordionDateSelect = ({value, onSelect, mode, nullable = false}) => {
   const handleEnabledToggle = () => {
     if (enabled) {
       setSelectedValues([])
-      onSelect(null)
+      onSelect(undefined)
+    } else {
+      setSelectedValues(['a'])
+      onSelect(new Date())
     }
     setEnabled(!enabled)
   }
@@ -49,6 +52,9 @@ const AccordionDateSelect = ({value, onSelect, mode, nullable = false}) => {
           isCollapsible={true}
           isDisabled={!enabled}
           className={mergeClasses('border rounded-md', Classes[mode].inputFieldBorder)}
+          style={{
+            borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
+          }}
       >
         <AccordionItem value="a">
           <AccordionHeader>
@@ -111,7 +117,7 @@ const DateSelect = ({value, onSelect, mode}) => {
             height={240}
             displayFullDays={false}
             mode="single"
-            date={dayjs(value)}
+            date={value ? dayjs(value) : dayjs()}
             onChange={handleDateChange}
             headerButtonsPosition="right"
             headerButtonColor={Colors[mode].tint}
