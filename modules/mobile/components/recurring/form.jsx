@@ -39,7 +39,9 @@ const transactionSchema = z.object({
   category: z.preprocess(c => c || {id: '', name: '', kind: 'expense', color: '#000', icon: ''},
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   startDate: z.date().refine((val) => val, {message: 'Invalid date format'}),
-  endDate: z.date().optional().refine((val) => val === undefined || val, {message: 'Invalid date format'}),
+  frequency: z.enum(['monthly', 'weekly', 'daily']),
+  interval: z.string().refine((val) => !isNaN(val) && Number(val) > 0 && Number(val) < 13, {message: 'Interval must be between 1 and 12'}),
+  endDate: z.date().nullable().optional().refine((val) => val === null || val, {message: 'Invalid date format'}),
   amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
   tags: z.array(z.string())
       .max(4, "You can add a maximum of 4 tags")
@@ -64,7 +66,9 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
   } = useForm({
     defaultValues: {
       startDate: transaction?.recurrence ? new Date(transaction.recurrence.startDate) : new Date(),
-      endDate: transaction?.recurrence ? new Date(transaction.recurrence.endDate) : null,
+      frequency: transaction?.recurrence ? transaction.recurrence.frequency : 'monthly',
+      interval: transaction?.recurrence ? transaction.recurrence.interval.toString() : '1',
+      endDate: transaction?.recurrence?.endDate ? new Date(transaction.recurrence.endDate) : null,
       kind: transaction?.category?.kind || 'expense',
       category: transaction?.category || undefined,
       amount: transaction?.amount?.value?.toFixed(2),
@@ -221,6 +225,81 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
               {formState.errors?.startDate?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl isInvalid={!!formState.errors.frequency}>
+          <FormControlLabel>
+            <FormControlLabelText>Frequency</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+              name="frequency"
+              defaultValue="monthly"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <RadioGroup value={value} onChange={onChange}>
+                    <HStack space="md">
+                      <Radio value="daily" size="md">
+                        <RadioLabel className="p-1">Daily</RadioLabel>
+                        <RadioIndicator>
+                          <RadioIcon as={CircleIcon}/>
+                        </RadioIndicator>
+                      </Radio>
+                      <Radio value="weekly" size="md">
+                        <RadioLabel className="p-1">Weekly</RadioLabel>
+                        <RadioIndicator>
+                          <RadioIcon as={CircleIcon}/>
+                        </RadioIndicator>
+                      </Radio>
+                      <Radio value="monthly" size="md">
+                        <RadioLabel className="p-1">Monthly</RadioLabel>
+                        <RadioIndicator>
+                          <RadioIcon as={CircleIcon}/>
+                        </RadioIndicator>
+                      </Radio>
+                    </HStack>
+                  </RadioGroup>
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.frequency?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl isInvalid={!!formState.errors.interval}>
+          <FormControlLabel>
+            <FormControlLabelText>Interval</FormControlLabelText>
+          </FormControlLabel>
+          <Controller
+              name="interval"
+              defaultValue="1"
+              control={control}
+              render={({field: {onChange, onBlur, value}}) => (
+                  <Input variant="outline">
+                    <InputField
+                        className="pl-5"
+                        autoComplete="off"
+                        inputMode="numeric"
+                        keyboardType="numeric"
+                        placeholder=""
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        onSubmitEditing={handleKeyPress}
+                        returnKeyType="done"
+                        importantForAutofill="no"
+                    />
+                  </Input>
+              )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle}/>
+            <FormControlErrorText className="text-xs">
+              {formState.errors?.interval?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>

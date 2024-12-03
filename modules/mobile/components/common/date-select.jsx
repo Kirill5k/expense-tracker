@@ -21,7 +21,7 @@ import dayjs from 'dayjs'
 
 
 const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false}) => {
-  const [enabled, setEnabled] = useState(!nullable)
+  const [enabled, setEnabled] = useState(!!value)
   const [selectedValues, setSelectedValues] = useState([])
 
   const formatDate = (date) => {
@@ -34,7 +34,7 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
   const handleEnabledToggle = () => {
     if (enabled) {
       setSelectedValues([])
-      onSelect(undefined)
+      onSelect(null)
     } else {
       setSelectedValues(['a'])
       onSelect(new Date())
@@ -77,7 +77,7 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
                           <Switch
                               value={enabled}
                               onToggle={handleEnabledToggle}
-                              className="p-0 m-0"
+                              className="mx-0 my-0.5 p-0"
                               size="sm"
                               trackColor={{ false: Colors[mode].text, true: Colors[mode].tabIconSelected }}
                           />

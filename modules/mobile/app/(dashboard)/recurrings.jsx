@@ -93,7 +93,7 @@ const txs = [
     recurrence: {
       startDate: "2024-09-06",
       nextDate: "2024-12-05",
-      endDate: null,
+      endDate: "2024-12-30",
       interval: 1,
       frequency: "daily"
     },
