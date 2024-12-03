@@ -25,6 +25,7 @@ import {AlertTriangle} from 'lucide-react-native'
 import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
+import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -39,10 +40,10 @@ const transactionSchema = z.object({
   category: z.preprocess(c => c || {id: '', name: '', kind: 'expense', color: '#000', icon: ''},
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   date: z.date().refine((val) => val, {message: 'Invalid date format'}),
-  amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
+  amount: z.string().refine((v) => isPositiveNumber(v), {message: 'Please specify the correct amount'}),
   tags: z.array(z.string())
       .max(4, "You can add a maximum of 4 tags")
-      .refine((tags) => new Set(tags).size === tags.length, {
+      .refine((tags) => containsUniqueElements(tags), {
         message: "Tags must be unique",
       })
       .optional(),

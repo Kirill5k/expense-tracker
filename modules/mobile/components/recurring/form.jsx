@@ -25,6 +25,7 @@ import {AlertTriangle} from 'lucide-react-native'
 import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
+import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -40,14 +41,18 @@ const transactionSchema = z.object({
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   startDate: z.date().refine((val) => val, {message: 'Invalid date format'}),
   frequency: z.enum(['monthly', 'weekly', 'daily']),
-  interval: z.string().refine((val) => !isNaN(val) && Number(val) > 0 && Number(val) < 13, {message: 'Interval must be between 1 and 12'}),
-  endDate: z.date().nullable().optional().refine((val) => val === null || val, {message: 'Invalid date format'}),
-  amount: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {message: 'Please specify the correct amount'}),
+  interval: z.string()
+      .refine((v) => isPositiveNumber(v) && Number(v) < 13, {message: 'Interval must be between 1 and 12'}),
+  endDate: z
+      .date()
+      .nullable()
+      .optional()
+      .refine((val) => val === null || val, {message: 'Invalid date format'}),
+  amount: z.string()
+      .refine((v) => isPositiveNumber(v), {message: 'Please specify the correct amount'}),
   tags: z.array(z.string())
       .max(4, "You can add a maximum of 4 tags")
-      .refine((tags) => new Set(tags).size === tags.length, {
-        message: "Tags must be unique",
-      })
+      .refine((t) => containsUniqueElements(t), {message: "Tags must be unique"})
       .optional(),
   note: z.string().max(30, "Note is too long").optional(),
 }).refine(data => !data.endDate || subHours(data.endDate, 1) > data.startDate, {
@@ -100,7 +105,12 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
       ...transaction,
       ...data,
       categoryId: data.category.id,
-      date: format(data.date, 'yyyy-MM-dd'),
+      recurrence: {
+        frequency: data.frequency,
+        interval: parseInt(data.interval),
+        startDate: format(data.startDate, 'yyyy-MM-dd'),
+        endDate: data.endDate && format(data.endDate, 'yyyy-MM-dd')
+      },
       amount: {
         currency,
         value: parseFloat(data.amount)
