@@ -46,7 +46,7 @@ const Recurring = ({categories}) => {
     router.push('recurring')
   }
 
-  const displayedTxs = kind.value === 'all' ? txs : txs.filter(tx => tx.category.kind === kind.value)
+  const displayedTxs = kind.value === 'all' ? [] : [].filter(tx => tx.category.kind === kind.value)
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -84,92 +84,3 @@ const Recurring = ({categories}) => {
 }
 
 export default enhanceWithCategories(Recurring)
-
-
-const txs = [
-  {
-    id: "67408afdbd1e1a12e9da68ba",
-    categoryId: "61041a74937c172e4baaa550",
-    recurrence: {
-      startDate: "2024-09-06",
-      nextDate: "2024-12-05",
-      endDate: "2024-12-30",
-      interval: 1,
-      frequency: "daily"
-    },
-    amount: {
-      value: 15,
-      currency: {
-        code: "GBP",
-        symbol: "£"
-      }
-    },
-    note: "test tx",
-    tags: [
-      "foo"
-    ],
-    category: {
-      id: "61041a74937c172e4baaa550",
-      name: "Holidays",
-      icon: "mdi-bag-carry-on",
-      kind: "expense",
-      color: "#00BFA5"
-    }
-  },
-  {
-    id: "67408c5ebd1e1a12e9da68bb",
-    categoryId: "61041a74937c172e4baaa555",
-    recurrence: {
-      startDate: "2024-09-06",
-      nextDate: "2024-12-10",
-      endDate: null,
-      interval: 1,
-      frequency: "daily"
-    },
-    amount: {
-      value: 15,
-      currency: {
-        code: "GBP",
-        symbol: "£"
-      }
-    },
-    note: "Test tx",
-    tags: [
-    ],
-    category: {
-      id: "61041a74937c172e4baaa555",
-      name: "Entertainment",
-      icon: "mdi-drama-masks",
-      kind: "expense",
-      color: "#D500F9"
-    }
-  },
-  {
-    id: "67408f8d1747ae334b41f964",
-    categoryId: "671f91e4fa5d5e39ff022935",
-    recurrence: {
-      startDate: "2024-09-06",
-      nextDate: "2024-12-10",
-      endDate: null,
-      interval: 2,
-      frequency: "daily"
-    },
-    amount: {
-      value: 15,
-      currency: {
-        code: "GBP",
-        symbol: "£"
-      }
-    },
-    tags: [
-      "foo"
-    ],
-    category: {
-      id: "671f91e4fa5d5e39ff022935",
-      name: "Investments",
-      icon: "mdi-chart-areaspline",
-      kind: "income",
-      color: "#2962FF"
-    }
-  }
-]
