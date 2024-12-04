@@ -7,8 +7,9 @@ import FloatingButton from '@/components/common/floating-button'
 import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
-import {enhanceWithCategories} from '@/db/observers'
+import {enhanceWithRecurringTransactions} from '@/db/observers'
 import {hideRecurringTransaction} from '@/db/operations'
+import {mapTransactions} from '@/db/mappers'
 import useStore from '@/store'
 import {router} from 'expo-router'
 import {useDatabase} from '@nozbe/watermelondb/react'
@@ -20,7 +21,7 @@ const kinds = [
   {label: 'Income', value: 'income'}
 ]
 
-const Recurring = ({categories}) => {
+const Recurring = ({state, user, categories, recurringTransactions}) => {
   const database = useDatabase()
   const mode = useColorScheme()
 
@@ -46,7 +47,8 @@ const Recurring = ({categories}) => {
     router.push('recurring')
   }
 
-  const displayedTxs = kind.value === 'all' ? [] : [].filter(tx => tx.category.kind === kind.value)
+  const transactions = mapTransactions(recurringTransactions, categories, user)
+  const displayedTxs = kind.value === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind.value)
 
   return (
       <VStack className={Classes.dashboardLayout}>
@@ -83,4 +85,4 @@ const Recurring = ({categories}) => {
   )
 }
 
-export default enhanceWithCategories(Recurring)
+export default enhanceWithRecurringTransactions(Recurring)

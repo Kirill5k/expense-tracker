@@ -22,6 +22,20 @@ const categoriesObservable =
       ).observe()
     }))
 
+const recurringTransactionsObservable =
+    withObservables([], ({state}) => ({
+      categories: state.collections.get('categories').query(
+          Q.where('user_id', Q.eq(state.userId)),
+          Q.where('hidden', Q.notEq(true)),
+          Q.sortBy('name', Q.asc),
+      ).observe(),
+      recurringTransactions: state.collections.get('periodic_transactions').query(
+          Q.where('user_id', Q.eq(state.userId)),
+          Q.where('hidden', Q.notEq(true)),
+          Q.sortBy('recurrence_next_date', Q.asc),
+      ).observe()
+    }))
+
 const transactionsObservable =
     withObservables(['state', 'user'], ({state}) => ({
       displayedTransactions: combineLatest([state.observe()]).pipe(
@@ -78,4 +92,11 @@ export const enhanceWithUserAndTxCount = compose(
     stateObservable,
     userObservable,
     transactionCountObservable
+)
+
+export const enhanceWithRecurringTransactions = compose(
+    withDatabase,
+    stateObservable,
+    userObservable,
+    recurringTransactionsObservable
 )
