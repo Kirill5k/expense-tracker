@@ -77,7 +77,7 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
                           <Switch
                               value={enabled}
                               onToggle={handleEnabledToggle}
-                              className="mx-0 my-0.5 p-0"
+                              className="mx-0 my-1 p-0"
                               size="sm"
                               trackColor={{ false: Colors[mode].text, true: Colors[mode].tabIconSelected }}
                           />
