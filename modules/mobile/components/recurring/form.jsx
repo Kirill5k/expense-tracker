@@ -41,7 +41,8 @@ const transactionSchema = z.object({
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
   startDate: z.date().refine((val) => val, {message: 'Invalid date format'}),
   frequency: z.enum(['monthly', 'weekly', 'daily']),
-  interval: z.string()
+  interval: z
+      .string()
       .refine((v) => isPositiveNumber(v) && Number(v) < 13, {message: 'Interval must be between 1 and 12'}),
   endDate: z
       .date()
@@ -60,6 +61,17 @@ const transactionSchema = z.object({
   path: ['endDate'],
 })
 
+const intervalHelpText = (frequency, interval) => {
+  switch (frequency) {
+    case 'monthly':
+      return interval === '1' ? 'month' : `${interval} months`
+    case 'weekly':
+      return interval === '1' ? 'week' : `${interval} weeks`
+    default:
+      return interval === '1' ? 'day' : `${interval} days`
+  }
+}
+
 const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
   const {
     control,
@@ -67,7 +79,8 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
     reset,
     formState,
     setValue,
-    watch
+    watch,
+      getValues
   } = useForm({
     defaultValues: {
       startDate: transaction?.recurrence ? new Date(transaction.recurrence.startDate) : new Date(),
@@ -306,6 +319,11 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
                   </Input>
               )}
           />
+          <FormControlHelper>
+            <FormControlHelperText className="text-xs test-secondary-500">
+              1 transaction every {intervalHelpText(getValues('frequency'), getValues('interval'))}
+            </FormControlHelperText>
+          </FormControlHelper>
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
