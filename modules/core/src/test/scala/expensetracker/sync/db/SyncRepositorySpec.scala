@@ -18,7 +18,7 @@ import scala.concurrent.Future
 
 class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
-  override protected val mongoPort: Int = 12351
+  override protected val mongoPort: Int = 12352
 
   "A SyncRepository" when {
     "pullChanges" should {

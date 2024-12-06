@@ -58,7 +58,7 @@ final private class LiveTransactionRepository[F[_]](
         .set("parentTransactionId", tx.parentTransactionId.map(_.toObjectId))
         .set("isRecurring", tx.isRecurring)
 
-      upd = tx.createdAt.fold(upd)(ts => upd.set(Field.CreatedAt, ts))
+      upd = tx.createdAt.fold(upd.setOnInsert(Field.CreatedAt, Instant.now))(ts => upd.set(Field.CreatedAt, ts))
       upd = tx.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
       upd
     }
