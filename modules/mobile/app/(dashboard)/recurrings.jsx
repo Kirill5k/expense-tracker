@@ -21,7 +21,7 @@ const kinds = [
   {label: 'Income', value: 'income'}
 ]
 
-const Recurring = ({state, user, categories, recurringTransactions}) => {
+const Recurring = ({user, categories, recurringTransactions}) => {
   const database = useDatabase()
   const mode = useColorScheme()
 

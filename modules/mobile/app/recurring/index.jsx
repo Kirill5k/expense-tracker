@@ -3,7 +3,7 @@ import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import RecurringTransactionForm from '@/components/recurring/form'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
-import {createCategory, updateCategory} from '@/db/operations'
+import {createRecurringTransaction, updateRecurringTransaction} from '@/db/operations'
 import {enhanceWithCategories} from '@/db/observers'
 import {useColorScheme} from '@/components/useColorScheme'
 import {useDatabase} from '@nozbe/watermelondb/react'
@@ -19,8 +19,11 @@ const Recurring = ({user, categories}) => {
 
   const withUserId = obj => ({...obj, userId: user.id})
 
-  const handleFormSubmit = (cat) => {
-    router.back()
+  const handleFormSubmit = (rtx) => {
+    const res = rtx.id
+        ? updateRecurringTransaction(database, withUserId(rtx))
+        : createRecurringTransaction(database, withUserId(rtx))
+    return res.then(() => router.back())
   }
 
   useEffect(() => {

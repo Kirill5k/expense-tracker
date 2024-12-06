@@ -24,6 +24,7 @@ const categoriesObservable =
 
 const recurringTransactionsObservable =
     withObservables([], ({state}) => ({
+      user: state.user.observe(),
       categories: state.collections.get('categories').query(
           Q.where('user_id', Q.eq(state.userId)),
           Q.where('hidden', Q.notEq(true)),
@@ -97,6 +98,5 @@ export const enhanceWithUserAndTxCount = compose(
 export const enhanceWithRecurringTransactions = compose(
     withDatabase,
     stateObservable,
-    userObservable,
     recurringTransactionsObservable
 )

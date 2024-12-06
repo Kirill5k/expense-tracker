@@ -86,6 +86,14 @@ export const hideCategory = async (database, catid, hidden) => {
   })
 }
 
+export const createRecurringTransaction = async (database, rtx) => {
+  console.log('create', rtx)
+}
+
+export const updateRecurringTransaction = async (database, rtx) => {
+  console.log('update', rtx)
+}
+
 export const createCategory = async (database, cat) => {
   await database.write(async () => {
     await database.get('categories').create(rec => updateCatRec(rec, cat))
