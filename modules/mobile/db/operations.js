@@ -47,6 +47,22 @@ const updateCatRec = (rec, c) => {
   rec.hidden = c.hidden || false
 }
 
+const updateRtxRec = (rec, rtx) => {
+  rec.categoryId = rtx.category.id
+  rec.recurrenceStartDate = rtx.recurrence.startDate
+  rec.recurrenceNextDate = rtx.recurrence.nextDate
+  rec.recurrenceEndDate = rtx.recurrence.endDate
+  rec.recurrenceFrequency = rtx.recurrence.frequency
+  rec.recurrenceInterval = rtx.recurrence.interval
+  rec.userId = rtx.userId
+  rec.amountValue = rtx.amount.value
+  rec.amountCurrencyCode = rtx.amount.currency.code
+  rec.amountCurrencySymbol = rtx.amount.currency.symbol
+  rec.note = rtx.note
+  rec.tags = nonEmpty(rtx.tags) ? rtx.tags.join(',') : null
+  rec.hidden = rtx.hidden || false
+}
+
 const updateTxRec = (rec, tx) => {
   rec.categoryId = tx.category.id
   rec.date = tx.date
@@ -89,8 +105,27 @@ export const hideCategory = async (database, catid, hidden) => {
 }
 
 export const createRecurringTransaction = async (database, rtx) => {
-  const {transactions, recurringTransaction} = generateRecurrences({...rtx, id: new ObjectId().toHexString()})
-  console.log('create', transactions, recurringTransaction)
+  const rtxId = new ObjectId().toHexString();
+  const {transactions, recurringTransaction} = generateRecurrences({...rtx, id: rtxId})
+
+  const actions = []
+  for (const tx of transactions) {
+    const txId = await generatePeriodicTransactionRecurrenceInstanceId(rtxId, tx.date)
+    const createTxAction = database.get('transactions').prepareCreate(rec => {
+      updateTxRec(rec, tx)
+      rec._raw.id = txId
+      rec.userId = rtx.userId
+    })
+    actions.push(createTxAction)
+  }
+  const createRtxAction = database.get('periodic_transactions').prepareCreate(rec => {
+    updateRtxRec(rec, recurringTransaction)
+    rec._raw.id = rtxId
+    rec.userId = rtx.userId
+  })
+  actions.push(createRtxAction)
+
+  await database.batch(actions)
 }
 
 export const updateRecurringTransaction = async (database, rtx) => {
