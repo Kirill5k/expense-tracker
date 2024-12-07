@@ -42,37 +42,49 @@ export const isExpense = tx => tx.category.kind === 'expense'
 
 export const withUpdatedCategory = (tx, catUpdates) => ({...tx, category: {...tx.category, ...catUpdates}})
 
-// Performs binary search while assuming that txs array is sorted by date field
-export const withinDates = (txs, {start, end}) => {
-  const asc = txs.length < 2 || txs[0].date <= txs[txs.length - 1].date
-  const startDate = format(start, 'yyyy-MM-dd')
-  const endDate = format(end, 'yyyy-MM-dd')
-  const startIdx = binarySearchDateIndex(txs, startDate, (mid, target) => asc ? mid < target : mid >= target);
-  const endIdx = binarySearchDateIndex(txs, endDate, (mid, target) => asc ? mid <= target : mid > target);
+export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, note, userId}, now = new Date()) => {
+  const startDate = recurrence.nextDate ? new Date(recurrence.nextDate) :new Date(recurrence.startDate)
+  const endDate = recurrence.endDate ? new Date(recurrence.endDate) : new Date()
 
-  return asc ? txs.slice(startIdx, endIdx) : txs.slice(endIdx, startIdx)
-}
+  let currentDate = new Date(startDate)
+  const transactions = []
+  while (currentDate < endDate && currentDate <= now) {
+    transactions.push({
+      parentTransactionId: id,
+      isRecurring: true,
+      amount,
+      categoryId,
+      tags,
+      note,
+      userId,
+      date: currentDate.toISOString().split('T')[0]
+    })
 
-const binarySearchDateIndex = (array, targetDate, comparator) => {
-  let low = 0
-  let high = array.length - 1
-  let result = array.length
-
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2)
-    const midDate = array[mid].date
-
-    if (comparator(midDate, targetDate)) {
-      low = mid + 1
-    } else {
-      result = mid
-      high = mid - 1
+    switch (recurrence.frequency) {
+      case "daily":
+        currentDate.setDate(currentDate.getDate() + recurrence.interval)
+        break;
+      case "weekly":
+        currentDate.setDate(currentDate.getDate() + (recurrence.interval * 7))
+        break;
+      case "monthly":
+        currentDate.setMonth(currentDate.getMonth() + recurrence.interval)
+        break;
+      default:
+        throw new Error("Unsupported frequency")
     }
   }
-  return result
-}
 
-export const sorts = {
-  byDate: (desc) => (a, b) => desc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date),
-  byAmount: (desc) => (a, b) => desc ? a.amount.value - b.amount.value : b.amount.value - a.amount.value
+  return {
+    transactions,
+    recurringTransaction: {
+      amount,
+      categoryId,
+      id,
+      tags,
+      note,
+      userId,
+      recurrence: {...recurrence, nextDate: currentDate.toISOString().split('T')[0]}
+    }
+  }
 }

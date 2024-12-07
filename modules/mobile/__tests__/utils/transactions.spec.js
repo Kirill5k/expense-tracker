@@ -1,133 +1,100 @@
-import {withinDates} from '@/utils/transactions'
+import {subMonths, addMonths, format} from 'date-fns'
+import {generateRecurrences} from '@/utils/transactions'
 
-const txs = [
-  { date: '2024-10-01', id: '10' },
-  { date: '2024-10-05', id: '15' },
-  { date: '2024-10-10', id: '20' },
-  { date: '2024-10-15', id: '25' },
-  { date: '2024-10-20', id: '30' },
-]
+describe('generateTxInstances', () => {
+  const now = new Date()
 
-const reversedTxs = [
-  { date: '2024-10-20', id: '30' },
-  { date: '2024-10-15', id: '25' },
-  { date: '2024-10-10', id: '20' },
-  { date: '2024-10-05', id: '15' },
-  { date: '2024-10-01', id: '10' },
-]
+  describe('nextDate is null', () => {
+    test('startDate is before today and endDate is not defined', () => {
+      const rtx = {
+        id: "67408afdbd1e1a12e9da68ba",
+        categoryId: "61041a74937c172e4baaa550",
+        recurrence: {
+          startDate: format(subMonths(now, 5), 'yyyy-MM-dd'),
+          nextDate: null,
+          endDate: null,
+          interval: 1,
+          frequency: "monthly"
+        },
+        amount: {value: 15, currency: {code: "GBP", symbol: "£"}},
+        note: "test tx",
+        tags: ["foo"]
+      }
 
-describe('withinDate', () => {
-  test('when start and end dates are in the middle', () => {
-    const start = new Date('2024-10-05T00:00:00Z')
-    const end = new Date('2024-10-15T00:00:00Z')
+      const {transactions, recurringTransaction} = generateRecurrences(rtx)
 
-    const result = withinDates(txs, {start, end})
-    expect(result).toHaveLength(3)
-    expect(result.map(t => t.id)).toEqual(['15', '20', '25'])
+      expect(transactions).toHaveLength(6)
+      expect(recurringTransaction.recurrence.nextDate).toBe(format(addMonths(now, 1), 'yyyy-MM-dd'))
+    })
+
+    test('startDate is before today and endDate is before today', () => {
+      const endDate = subMonths(now, 1)
+      const rtx = {
+        id: "67408afdbd1e1a12e9da68ba",
+        categoryId: "61041a74937c172e4baaa550",
+        recurrence: {
+          startDate: format(subMonths(now, 5), 'yyyy-MM-dd'),
+          nextDate: null,
+          endDate: format(endDate, 'yyyy-MM-dd'),
+          interval: 1,
+          frequency: "monthly"
+        },
+        amount: {value: 15, currency: {code: "GBP", symbol: "£"}},
+        note: "test tx",
+        tags: ["foo"]
+      }
+
+      const {transactions, recurringTransaction} = generateRecurrences(rtx)
+
+      expect(transactions).toHaveLength(4)
+      expect(recurringTransaction.recurrence.nextDate).toBe(format(endDate, 'yyyy-MM-dd'))
+    })
+
+    test('startDate is in the future', () => {
+      const startDate = addMonths(now, 1)
+      const rtx = {
+        id: "67408afdbd1e1a12e9da68ba",
+        categoryId: "61041a74937c172e4baaa550",
+        recurrence: {
+          startDate: format(addMonths(now, 1), 'yyyy-MM-dd'),
+          nextDate: null,
+          endDate: null,
+          interval: 1,
+          frequency: "monthly"
+        },
+        amount: {value: 15, currency: {code: "GBP", symbol: "£"}},
+        note: "test tx",
+        tags: ["foo"]
+      }
+
+      const {transactions, recurringTransaction} = generateRecurrences(rtx)
+
+      expect(transactions).toHaveLength(0)
+      expect(recurringTransaction.recurrence.nextDate).toBe(format(startDate, 'yyyy-MM-dd'))
+    })
   })
 
-  test('when start date is outside and end date is inside', () => {
-    const start = new Date('2023-10-05T00:00:00Z')
-    const end = new Date('2024-10-15T00:00:00Z')
+  describe('nextDate is defined', () => {
+    test('nextDate is today and endDate is not defined', () => {
+      const rtx = {
+        id: "67408afdbd1e1a12e9da68ba",
+        categoryId: "61041a74937c172e4baaa550",
+        recurrence: {
+          startDate: format(subMonths(now, 5), 'yyyy-MM-dd'),
+          nextDate: format(now, 'yyyy-MM-dd'),
+          endDate: null,
+          interval: 1,
+          frequency: "monthly"
+        },
+        amount: {value: 15, currency: {code: "GBP", symbol: "£"}},
+        note: "test tx",
+        tags: ["foo"]
+      }
 
-    const result = withinDates(txs, {start, end})
-    expect(result).toHaveLength(4)
-    expect(result.map(t => t.id)).toEqual(['10', '15', '20', '25'])
-  })
+      const {transactions, recurringTransaction} = generateRecurrences(rtx)
 
-  test('when end date is outside', () => {
-    const start = new Date('2024-10-05T00:00:00Z')
-    const end = new Date('2025-10-15T00:00:00Z')
-
-    const result = withinDates(txs, {start, end})
-    expect(result).toHaveLength(4)
-    expect(result.map(t => t.id)).toEqual(['15', '20', '25', '30'])
-  })
-
-  test('when both dates are outside', () => {
-    const start = new Date('2025-10-05T00:00:00Z')
-    const end = new Date('2025-10-15T00:00:00Z')
-
-    const result = withinDates(txs, {start, end})
-    expect(result).toHaveLength(0)
-  })
-
-  test('array is reversed and start and end dates are in the inside', () => {
-    const start = new Date('2024-10-05T00:00:00Z')
-    const end = new Date('2024-10-15T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(3)
-    expect(result.map(t => t.id)).toEqual(['25', '20', '15'])
-  })
-
-  test('array is reversed and start date is outside and end date is inside', () => {
-    const start = new Date('2023-10-05T00:00:00Z')
-    const end = new Date('2024-10-15T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(4)
-    expect(result.map(t => t.id)).toEqual(['25', '20', '15', '10'])
-  })
-
-  test('array is reversed and start is outside and end is on the edge', () => {
-    const start = new Date('2023-10-05T00:00:00Z')
-    const end = new Date('2024-10-01T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(1)
-    expect(result.map(t => t.id)).toEqual(['10'])
-  })
-
-  test('array is reversed and start is on the edge and end is in the middle', () => {
-    const start = new Date('2024-10-01T00:00:00Z')
-    const end = new Date('2024-10-15T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(4)
-    expect(result.map(t => t.id)).toEqual(['25', '20', '15', '10'])
-  })
-
-  test('array is reversed and start is on the edge and end is outside', () => {
-    const start = new Date('2024-10-20T00:00:00Z')
-    const end = new Date('2025-10-20T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(1)
-    expect(result.map(t => t.id)).toEqual(['30'])
-  })
-
-  test('array is reversed and start is inside and end is outside', () => {
-    const start = new Date('2024-10-05T00:00:00Z')
-    const end = new Date('2025-10-15T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(4)
-    expect(result.map(t => t.id)).toEqual(['30', '25', '20', '15'])
-  })
-
-  test('array is reversed and start is inside and end is on the edge', () => {
-    const start = new Date('2024-10-05T00:00:00Z')
-    const end = new Date('2024-10-20T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(4)
-    expect(result.map(t => t.id)).toEqual(['30', '25', '20', '15'])
-  })
-
-  test('array is reversed and both dates are outside', () => {
-    const start = new Date('2025-10-05T00:00:00Z')
-    const end = new Date('2025-10-15T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(0)
-  })
-
-  test('array is reversed and both dates are outside #3', () => {
-    const start = new Date('2023-10-05T00:00:00Z')
-    const end = new Date('2023-10-15T00:00:00Z')
-
-    const result = withinDates(reversedTxs, {start, end})
-    expect(result).toHaveLength(0)
+      expect(transactions).toHaveLength(1)
+      expect(recurringTransaction.recurrence.nextDate).toBe(format(addMonths(now, 1), 'yyyy-MM-dd'))
+    })
   })
 })

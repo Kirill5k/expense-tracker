@@ -1,3 +1,4 @@
+import 'react-native-get-random-values'
 import {useEffect, useState} from 'react'
 import {router} from 'expo-router'
 import {Button, ButtonText} from '@/components/ui/button'

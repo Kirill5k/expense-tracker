@@ -1,6 +1,8 @@
 import {defaultDisplayDate} from '@/utils/dates'
+import {generateRecurrences} from '@/utils/transactions'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
+import {ObjectId} from 'bson'
 import * as Crypto from 'expo-crypto'
 
 export const generatePeriodicTransactionRecurrenceInstanceId = async (ptxId, date) => {
@@ -87,7 +89,8 @@ export const hideCategory = async (database, catid, hidden) => {
 }
 
 export const createRecurringTransaction = async (database, rtx) => {
-  console.log('create', rtx)
+  const {transactions, recurringTransaction} = generateRecurrences({...rtx, id: new ObjectId().toHexString()})
+  console.log('create', transactions, recurringTransaction)
 }
 
 export const updateRecurringTransaction = async (database, rtx) => {
