@@ -17,7 +17,6 @@ import { parseISO, format } from 'date-fns'
 const RecurrenceLabel = ({item}) => {
   const freq = item.recurrence.frequency
   const interval = item.recurrence.interval
-  const nextDate = item.recurrence.nextDate
 
   let label = '';
 
@@ -35,6 +34,8 @@ const RecurrenceLabel = ({item}) => {
       label = 'Unknown frequency';
   }
 
+  const nextDate = item.recurrence.nextDate
+  const hasNext = nextDate ? false : nextDate < item.recurrence.endDate
   return (
       <HStack space="xs" className="items-center pb-1">
         <Icon as={CalendarDaysIcon} className="text-typography-500 w-3 h-4" />

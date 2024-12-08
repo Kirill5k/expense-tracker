@@ -1,5 +1,5 @@
 import {defaultDisplayDate} from '@/utils/dates'
-import {generateRecurrences} from '@/utils/transactions'
+import {generateRecurrences, calculateRecurrenceNextDate} from '@/utils/transactions'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
 import {ObjectId} from 'bson'
@@ -129,8 +129,11 @@ export const createRecurringTransaction = async (database, rtx) => {
 }
 
 export const updateRecurringTransaction = async (database, rtx) => {
-  // update next date
-  console.log('update', rtx)
+  const newNextDate = calculateRecurrenceNextDate(rtx)
+  await database.write(async () => {
+    const found = await database.get('periodic_transactions').find(rtx.id)
+    await found.update(rec => updateRtxRec(rec, {...rtx, recurrence: {...rtx.recurrence, nextDate: newNextDate}}))
+  })
 }
 
 export const createCategory = async (database, cat) => {
