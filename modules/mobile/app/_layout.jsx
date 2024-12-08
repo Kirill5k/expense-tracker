@@ -2,6 +2,7 @@ import '@/global.css'
 import 'react-native-reanimated'
 import 'react-native-get-random-values'
 import React, {useEffect, useState} from 'react'
+import {AppState} from 'react-native'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
@@ -56,6 +57,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const [appState, setAppState] = useState(AppState.currentState)
   const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken} = useStore()
 
@@ -85,6 +87,24 @@ function RootLayoutNav() {
     startSync(accessToken)
     return () => stopSync(intervalId)
   }, [accessToken])
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState) => {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App has come to the foreground')
+      }
+
+      if (nextAppState === 'background') {
+        console.log('App has gone to the background')
+      }
+
+      setAppState(nextAppState)
+    }
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange)
+
+    return () => subscription.remove()
+  }, [appState])
 
   return (
       <SafeAreaProvider>
