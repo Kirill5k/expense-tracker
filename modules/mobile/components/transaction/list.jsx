@@ -1,4 +1,6 @@
 import React, {useRef, useEffect} from 'react'
+import {Badge, BadgeIcon} from "@/components/ui/badge"
+import {MaterialIcon} from '@/components/ui/icon'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -8,12 +10,12 @@ import {ListItemPressable, ListItemIcon} from '@/components/common/list'
 import {groupBy} from '@/utils/arrays'
 import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
+import Colors from '@/constants/colors'
 import {FlatList} from '@/components/ui/flat-list'
 import TransactionHeader from './header'
 import {mergeClasses} from '@/utils/css'
 
-
-const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
+const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItemCopy, onItemDelete}) => {
   return (
       <VStack className="rounded-xl bg-background-50 p-1" space="sm">
         {items.map(tx => (
@@ -37,13 +39,29 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
                   </HStack>
                   <TagList items={tx.tags} className="w-64"/>
                 </VStack>
-                <Text
-                    className={mergeClasses(
-                        Classes.listItemAmount,
-                        isExpense(tx) ? 'text-red-500 border-red-400' : 'text-green-500 border-green-400'
-                    )}>
-                  {formatAmount(tx)}
-                </Text>
+                <VStack className="ml-auto relative">
+                  {tx.isRecurring && (
+                      <Badge
+                          className="absolute z-10 bg-transparent -top-2 -right-4"
+                          variant="solid"
+                      >
+                        <BadgeIcon
+                            className="text-white"
+                            as={MaterialIcon}
+                            code="sync"
+                            dsize={16}
+                            dcolor={Colors[mode].text}
+                        />
+                      </Badge>
+                  )}
+                  <Text
+                      className={mergeClasses(
+                          Classes.listItemAmount,
+                          isExpense(tx) ? 'text-red-500' : 'text-green-500'
+                      )}>
+                    {formatAmount(tx)}
+                  </Text>
+                </VStack>
               </HStack>
             </ListItemPressable>
         ))}
@@ -51,7 +69,7 @@ const TransactionGroup = React.memo(({disabled, items, onItemPress, onItemCopy, 
   )
 })
 
-const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy, onItemDelete}) => {
+const TransactionListItem = React.memo(({mode, disabled, item, onItemPress, onItemCopy, onItemDelete}) => {
   return (
       <VStack className="mb-5">
         <HStack className="items-center justify-between">
@@ -59,6 +77,7 @@ const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy
           <Text className="text-md">{printAmount(calcTotal(item.txGroup), item.txGroup[0].amount.currency)}</Text>
         </HStack>
         <TransactionGroup
+            mode={mode}
             disabled={disabled}
             items={item.txGroup}
             onItemPress={onItemPress}
@@ -69,7 +88,7 @@ const TransactionListItem = React.memo(({disabled, item, onItemPress, onItemCopy
   )
 })
 
-const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
+const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
   const groupedItems = Object.entries(groupBy(items, i => i.date))
   const data = groupedItems.map(([date, txGroup]) => ({date, txGroup}))
 
@@ -94,6 +113,7 @@ const TransactionList = ({disabled, items, onItemPress, onItemCopy, onItemDelete
           keyExtractor={(item) => item.date}
           renderItem={({item}) => (
               <TransactionListItem
+                  mode={mode}
                   item={item}
                   disabled={disabled}
                   onItemPress={onItemPress}

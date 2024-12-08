@@ -59,6 +59,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
             onSelect={dd => updateStateDisplayDate(database, dd)}
         />
         <TransactionList
+            mode={mode}
             disabled={loading}
             items={transactions}
             onItemPress={handleItemPress}
