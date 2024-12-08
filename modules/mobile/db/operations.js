@@ -129,6 +129,7 @@ export const createRecurringTransaction = async (database, rtx) => {
 }
 
 export const updateRecurringTransaction = async (database, rtx) => {
+  // update next date
   console.log('update', rtx)
 }
 

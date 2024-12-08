@@ -1,5 +1,77 @@
 import {subMonths, addMonths, format} from 'date-fns'
-import {generateRecurrences} from '@/utils/transactions'
+import {generateRecurrences, calculateRecurrenceNextDate} from '@/utils/transactions'
+
+describe('calculateRecurrenceNextDate', () => {
+  test('startDate is before today and endDate is not defined', () => {
+    const rtx = {
+      recurrence: {
+        startDate: '2024-10-01',
+        nextDate: null,
+        endDate: null,
+        interval: 1,
+        frequency: "monthly"
+      }
+    }
+
+    expect(calculateRecurrenceNextDate(rtx, '2024-11-01')).toBe('2024-12-01')
+  })
+
+  test('startDate is before today and endDate is in the future', () => {
+    const rtx = {
+      recurrence: {
+        startDate: '2024-10-01',
+        nextDate: null,
+        endDate: '2025-10-01',
+        interval: 1,
+        frequency: "monthly"
+      }
+    }
+
+    expect(calculateRecurrenceNextDate(rtx, '2024-11-01')).toBe('2024-12-01')
+  })
+
+  test('startDate is before today and endDate is before today', () => {
+    const rtx = {
+      recurrence: {
+        startDate: '2024-10-01',
+        nextDate: null,
+        endDate: '2024-10-30',
+        interval: 1,
+        frequency: "monthly"
+      }
+    }
+
+    expect(calculateRecurrenceNextDate(rtx, '2024-11-01')).toBe(null)
+  })
+
+  test('startDate is before today and endDate is today', () => {
+    const rtx = {
+      recurrence: {
+        startDate: '2024-10-01',
+        nextDate: null,
+        endDate: '2024-11-01',
+        interval: 1,
+        frequency: "monthly"
+      }
+    }
+
+    expect(calculateRecurrenceNextDate(rtx, '2024-11-01')).toBe(null)
+  })
+
+  test('startDate is in the future and endDate is not defined', () => {
+    const rtx = {
+      recurrence: {
+        startDate: '2025-01-01',
+        nextDate: null,
+        endDate: null,
+        interval: 1,
+        frequency: "monthly"
+      }
+    }
+
+    expect(calculateRecurrenceNextDate(rtx, '2024-11-01')).toBe('2025-01-01')
+  })
+})
 
 describe('generateTxInstances', () => {
   const now = new Date()

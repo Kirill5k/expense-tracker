@@ -1,4 +1,4 @@
-import {format, isToday, isYesterday, parseISO} from 'date-fns'
+import {format, isToday, isYesterday, parseISO, addDays, addWeeks, addMonths} from 'date-fns'
 
 export const calcTotal = (transactions) => {
   if (!transactions?.length) {
@@ -43,12 +43,12 @@ export const isExpense = tx => tx.category.kind === 'expense'
 export const withUpdatedCategory = (tx, catUpdates) => ({...tx, category: {...tx.category, ...catUpdates}})
 
 export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, note, userId}, now = new Date()) => {
-  const startDate = recurrence.nextDate ? new Date(recurrence.nextDate) :new Date(recurrence.startDate)
-  const endDate = recurrence.endDate ? new Date(recurrence.endDate) : new Date()
+  const startDate = recurrence.nextDate ? parseISO(recurrence.nextDate) : parseISO(recurrence.startDate)
+  const endDate = recurrence.endDate ? parseISO(recurrence.endDate) : null
 
-  let currentDate = new Date(startDate)
+  let currentDate = startDate
   const transactions = []
-  while (currentDate < endDate && currentDate <= now) {
+  while ((endDate ? currentDate < endDate : true) && currentDate <= now) {
     transactions.push({
       parentTransactionId: id,
       isRecurring: true,
@@ -60,19 +60,7 @@ export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, n
       date: currentDate.toISOString().split('T')[0]
     })
 
-    switch (recurrence.frequency) {
-      case "daily":
-        currentDate.setDate(currentDate.getDate() + recurrence.interval)
-        break;
-      case "weekly":
-        currentDate.setDate(currentDate.getDate() + (recurrence.interval * 7))
-        break;
-      case "monthly":
-        currentDate.setMonth(currentDate.getMonth() + recurrence.interval)
-        break;
-      default:
-        throw new Error("Unsupported frequency")
-    }
+    currentDate = addInterval(currentDate, recurrence)
   }
 
   return {
@@ -87,4 +75,33 @@ export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, n
       recurrence: {...recurrence, nextDate: currentDate.toISOString().split('T')[0]}
     }
   }
+}
+
+const addInterval = (date, {frequency, interval}) => {
+  switch (frequency) {
+    case 'daily':
+      return addDays(date, interval);
+    case 'weekly':
+      return addWeeks(date, interval);
+    case 'monthly':
+      return addMonths(date, interval);
+    default:
+      throw new Error('Unsupported frequency');
+  }
+}
+
+export const calculateRecurrenceNextDate = ({recurrence}, dateAfter) => {
+  const referenceDate = dateAfter ? parseISO(dateAfter) : new Date()
+  const endDate = recurrence.endDate ? parseISO(recurrence.endDate) : null
+
+  let currentNextDate = parseISO(recurrence.startDate)
+  while ((endDate ? currentNextDate < endDate : true) && currentNextDate <= referenceDate) {
+    currentNextDate = addInterval(currentNextDate, recurrence)
+  }
+
+  if (endDate && endDate <= currentNextDate) {
+    return null
+  }
+
+  return currentNextDate.toISOString().split('T')[0]
 }
