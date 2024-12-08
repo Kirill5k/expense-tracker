@@ -63,6 +63,10 @@ export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, n
     currentDate = addInterval(currentDate, recurrence)
   }
 
+  if (endDate && endDate <= currentDate) {
+    currentDate = null
+  }
+
   return {
     transactions,
     recurringTransaction: {
@@ -72,7 +76,7 @@ export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, n
       tags,
       note,
       userId,
-      recurrence: {...recurrence, nextDate: currentDate.toISOString().split('T')[0]}
+      recurrence: {...recurrence, nextDate: currentDate && currentDate.toISOString().split('T')[0]}
     }
   }
 }

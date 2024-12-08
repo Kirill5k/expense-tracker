@@ -119,7 +119,7 @@ describe('generateTxInstances', () => {
       const {transactions, recurringTransaction} = generateRecurrences(rtx)
 
       expect(transactions).toHaveLength(4)
-      expect(recurringTransaction.recurrence.nextDate).toBe(format(endDate, 'yyyy-MM-dd'))
+      expect(recurringTransaction.recurrence.nextDate).toBe(null)
     })
 
     test('startDate is in the future', () => {
