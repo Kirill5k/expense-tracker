@@ -62,13 +62,16 @@ const transactionSchema = z.object({
 })
 
 const intervalHelpText = (frequency, interval) => {
+  if (!interval) {
+    return ''
+  }
   switch (frequency) {
     case 'monthly':
-      return interval === '1' ? 'month' : `${interval} months`
+      return '1 transaction every ' + (interval === '1' ? 'month' : `${interval} months`)
     case 'weekly':
-      return interval === '1' ? 'week' : `${interval} weeks`
+      return '1 transaction every ' + (interval === '1' ? 'week' : `${interval} weeks`)
     default:
-      return interval === '1' ? 'day' : `${interval} days`
+      return '1 transaction every ' + (interval === '1' ? 'day' : `${interval} days`)
   }
 }
 
@@ -135,6 +138,9 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
   const handleKeyPress = () => {
     Keyboard.dismiss();
   }
+
+  const frequecny = watch('frequency')
+  const interval = watch('interval')
 
   return (
       <VStack space="lg" className="w-full">
@@ -321,7 +327,7 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
           />
           <FormControlHelper>
             <FormControlHelperText className="text-xs test-secondary-500">
-              1 transaction every {intervalHelpText(getValues('frequency'), getValues('interval'))}
+              {intervalHelpText(frequecny, interval)}
             </FormControlHelperText>
           </FormControlHelper>
           <FormControlError>

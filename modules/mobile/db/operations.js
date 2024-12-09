@@ -68,6 +68,8 @@ const updateTxRec = (rec, tx) => {
   rec.categoryId = tx.category.id
   rec.date = tx.date
   rec.userId = tx.userId
+  rec.parentTransactionId = tx.parentTransactionId
+  rec.isRecurring = tx.isRecurring
   rec.amountValue = tx.amount.value
   rec.amountCurrencyCode = tx.amount.currency.code
   rec.amountCurrencySymbol = tx.amount.currency.symbol
@@ -108,25 +110,26 @@ export const hideCategory = async (database, catid, hidden) => {
 export const createRecurringTransaction = async (database, rtx) => {
   const rtxId = new ObjectId().toHexString();
   const {transactions, recurringTransaction} = generateRecurrences({...rtx, id: rtxId})
-
-  const actions = []
-  for (const tx of transactions) {
-    const txId = await generatePeriodicTransactionRecurrenceInstanceId(rtxId, tx.date)
-    const createTxAction = database.get('transactions').prepareCreate(rec => {
-      updateTxRec(rec, tx)
-      rec._raw.id = txId
+  await database.write(async () => {
+    const actions = []
+    for (const tx of transactions) {
+      const txId = await generatePeriodicTransactionRecurrenceInstanceId(rtxId, tx.date)
+      const createTxAction = database.get('transactions').prepareCreate(rec => {
+        updateTxRec(rec, tx)
+        rec._raw.id = txId
+        rec.userId = rtx.userId
+      })
+      actions.push(createTxAction)
+    }
+    const createRtxAction = database.get('periodic_transactions').prepareCreate(rec => {
+      updateRtxRec(rec, recurringTransaction)
+      rec._raw.id = rtxId
       rec.userId = rtx.userId
     })
-    actions.push(createTxAction)
-  }
-  const createRtxAction = database.get('periodic_transactions').prepareCreate(rec => {
-    updateRtxRec(rec, recurringTransaction)
-    rec._raw.id = rtxId
-    rec.userId = rtx.userId
-  })
-  actions.push(createRtxAction)
+    actions.push(createRtxAction)
 
-  await database.batch(actions)
+    await database.batch(actions)
+  })
 }
 
 export const updateRecurringTransaction = async (database, rtx) => {

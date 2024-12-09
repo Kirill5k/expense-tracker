@@ -35,14 +35,17 @@ const RecurrenceLabel = ({item}) => {
   }
 
   const nextDate = item.recurrence.nextDate
-  const hasNext = nextDate ? false : nextDate < item.recurrence.endDate
+  const hasNext = !nextDate ? false : nextDate < item.recurrence.endDate
+  const nextDateLabel = hasNext
+      ? `Next ${format(parseISO(nextDate), 'dd/MM/yyyy')}`
+      : 'No More Scheduled'
   return (
       <HStack space="xs" className="items-center pb-1">
         <Icon as={CalendarDaysIcon} className="text-typography-500 w-3 h-4" />
         <Text className="text-xs">{label}</Text>
         <Divider orientation="vertical" className="mx-1" />
         <Icon as={ClockIcon} className="text-typography-500 w-3 h-4" />
-        <Text className="text-xs">Next {format(parseISO(nextDate), 'dd/MM/yyyy')}</Text>
+        <Text className="text-xs">{nextDateLabel}</Text>
       </HStack>
   )
 }
@@ -88,7 +91,9 @@ const RecurringTransactionListItem = ({item, onItemDelete, onItemPress, disabled
 }
 
 const RecurringTransactionList = ({items, onScroll, onItemPress, onItemDelete, disabled}) => {
-  const data = items.map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
+  const nonNullDates = items.filter(i => i.recurrence.nextDate !== null)
+  const nullDates = items.filter(i => i.recurrence.nextDate === null)
+  const data = nonNullDates.concat(nullDates).map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
   return (
       <FlatList
           bounces={false}

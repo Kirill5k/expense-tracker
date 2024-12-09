@@ -42,7 +42,8 @@ export const isExpense = tx => tx.category.kind === 'expense'
 
 export const withUpdatedCategory = (tx, catUpdates) => ({...tx, category: {...tx.category, ...catUpdates}})
 
-export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, note, userId}, now = new Date()) => {
+export const generateRecurrences = (rtx, now = new Date()) => {
+  const recurrence = rtx.recurrence
   const startDate = recurrence.nextDate ? parseISO(recurrence.nextDate) : parseISO(recurrence.startDate)
   const endDate = recurrence.endDate ? parseISO(recurrence.endDate) : null
 
@@ -50,13 +51,9 @@ export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, n
   const transactions = []
   while ((endDate ? currentDate < endDate : true) && currentDate <= now) {
     transactions.push({
-      parentTransactionId: id,
+      ...rtx,
+      parentTransactionId: rtx.id,
       isRecurring: true,
-      amount,
-      categoryId,
-      tags,
-      note,
-      userId,
       date: currentDate.toISOString().split('T')[0]
     })
 
@@ -70,12 +67,7 @@ export const generateRecurrences = ({recurrence, amount, categoryId, id, tags, n
   return {
     transactions,
     recurringTransaction: {
-      amount,
-      categoryId,
-      id,
-      tags,
-      note,
-      userId,
+      ...rtx,
       recurrence: {...recurrence, nextDate: currentDate && currentDate.toISOString().split('T')[0]}
     }
   }
