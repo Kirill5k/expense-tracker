@@ -76,6 +76,7 @@ export const generateRecurrences = (rtx, now = new Date()) => {
 const addInterval = (date, {frequency, interval}) => {
   switch (frequency) {
     case 'daily':
+      console.log('adding days', interval, date)
       return addDays(date, interval);
     case 'weekly':
       return addWeeks(date, interval);
@@ -100,4 +101,26 @@ export const calculateRecurrenceNextDate = ({recurrence}, dateAfter) => {
   }
 
   return currentNextDate.toISOString().split('T')[0]
+}
+
+export const calculateLastOccurrenceDate = ({recurrence}) => {
+  const { startDate, endDate, frequency, interval } = recurrence
+
+  if (!endDate || startDate > endDate) {
+    return null
+  }
+
+  const start = parseISO(startDate)
+  const end = parseISO(endDate)
+
+  let lastOccurrence = start
+  while (true) {
+    const nextOccurrence = addInterval(lastOccurrence, {frequency, interval})
+    if (nextOccurrence >= end) {
+      break
+    }
+    lastOccurrence = nextOccurrence
+  }
+
+  return lastOccurrence.toISOString().split('T')[0]
 }

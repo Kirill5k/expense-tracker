@@ -26,6 +26,7 @@ import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
+import {calculateLastOccurrenceDate} from '@/utils/transactions'
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -75,15 +76,36 @@ const intervalHelpText = (frequency, interval) => {
   }
 }
 
-const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
+const endDateHelpText = ({frequency, interval, endDate, startDate}) => {
+  const lastTxDate = calculateLastOccurrenceDate({
+    recurrence: {
+      frequency,
+      interval: parseInt(interval),
+      endDate: endDate ? format(endDate, 'yyyy-MM-dd') : null,
+      startDate: format(startDate, 'yyyy-MM-dd')
+    }
+  })
+  if (lastTxDate) {
+    return `Last recurrence on ${format(lastTxDate, 'dd MMM yyyy')}`
+  }
+}
+
+const RecurringTransactionForm = ({
+  transaction,
+  onSubmit,
+  onCancel,
+  incomeCategories,
+  expenseCategories,
+  currency,
+  mode
+}) => {
   const {
     control,
     handleSubmit,
     reset,
     formState,
     setValue,
-    watch,
-      getValues
+    watch
   } = useForm({
     defaultValues: {
       startDate: transaction?.recurrence ? new Date(transaction.recurrence.startDate) : new Date(),
@@ -139,8 +161,10 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
     Keyboard.dismiss();
   }
 
-  const frequecny = watch('frequency')
+  const frequency = watch('frequency')
   const interval = watch('interval')
+  const startDate = watch('startDate')
+  const endDate = watch('endDate')
 
   return (
       <VStack space="lg" className="w-full">
@@ -327,7 +351,7 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
           />
           <FormControlHelper>
             <FormControlHelperText className="text-xs test-secondary-500">
-              {intervalHelpText(frequecny, interval)}
+              {intervalHelpText(frequency, interval)}
             </FormControlHelperText>
           </FormControlHelper>
           <FormControlError>
@@ -340,7 +364,7 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
 
         <FormControl isInvalid={!!formState.errors.endDate}>
           <FormControlLabel>
-            <FormControlLabelText>End date</FormControlLabelText>
+            <FormControlLabelText>End date (exclusive)</FormControlLabelText>
           </FormControlLabel>
           <Controller
               name="endDate"
@@ -355,6 +379,11 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
                   />
               )}
           />
+          <FormControlHelper>
+            <FormControlHelperText className="text-xs test-secondary-500">
+              {endDateHelpText({frequency, interval, endDate, startDate})}
+            </FormControlHelperText>
+          </FormControlHelper>
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
@@ -401,15 +430,16 @@ const RecurringTransactionForm = ({transaction, onSubmit, onCancel, incomeCatego
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
-                    placeholder=""
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
+                      placeholder=""
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
                   />
               )}
           />
           <FormControlHelper>
-            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each tag</FormControlHelperText>
+            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each
+              tag</FormControlHelperText>
           </FormControlHelper>
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>

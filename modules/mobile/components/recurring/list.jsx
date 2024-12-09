@@ -11,7 +11,7 @@ import RecurringTransactionHeader from '@/components/recurring/header'
 import Classes from '@/constants/classes'
 import {mergeClasses} from '@/utils/css'
 import {formatAmount, isExpense} from '@/utils/transactions'
-import { parseISO, format } from 'date-fns'
+import {parseISO, format} from 'date-fns'
 
 
 const RecurrenceLabel = ({item}) => {

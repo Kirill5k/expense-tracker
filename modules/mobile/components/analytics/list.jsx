@@ -90,14 +90,14 @@ const CategoryGroupedTransactionList = ({items, mode}) => {
                         <VStack>
                           {tx.isRecurring && (
                               <Badge
-                                  className="absolute z-10 bg-transparent -top-3 -right-5"
+                                  className="absolute z-10 bg-transparent -top-3 -right-4"
                                   variant="solid"
                               >
                                 <BadgeIcon
                                     className="text-white"
                                     as={MaterialIcon}
                                     code="repeat-variant"
-                                    dsize={14}
+                                    dsize={12}
                                     dcolor={Colors[mode].tabIconDefault}
                                 />
                               </Badge>
