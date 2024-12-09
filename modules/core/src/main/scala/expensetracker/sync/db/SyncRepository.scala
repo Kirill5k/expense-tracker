@@ -79,7 +79,7 @@ final private class LiveSyncRepository[F[_]](
         .aggregate[EntityChanges](
           Aggregate
             .matchBy(idEq(uid.toObjectId))
-            .lookup("periodicTransactions", "_id", "userId", "periodicTransactionsColl")
+            .lookup("periodic-transactions", "_id", "userId", "periodicTransactionsColl")
             .lookup("transactions", "_id", "userId", "transactionsColl")
             .lookup("categories", "_id", "userId", "categoriesColl")
             .lookup("users", "_id", "_id", "usersColl")
