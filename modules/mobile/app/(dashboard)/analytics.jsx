@@ -77,6 +77,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               onSelect={(dd) => updateStateDisplayDate(database, dd)}
           />
           <CategoryGroupedTransactionList
+              mode={mode}
               items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
           />
           <Box

@@ -1,13 +1,15 @@
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
+import {Badge, BadgeIcon} from "@/components/ui/badge"
+import {MaterialIcon} from '@/components/ui/icon'
 import {Text} from '@/components/ui/text'
 import {ListItemIcon} from '@/components/common/list'
 import {TagList} from '@/components/common/tag'
 import Classes from '@/constants/classes'
+import Colors from '@/constants/colors'
 import {sortedBy} from '@/utils/arrays'
 import {printAmount, formatDate, formatAmount, isExpense} from '@/utils/transactions'
 import {Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionContent} from '@/components/ui/accordion'
-import React from "react";
 
 const prepareData = (txs) => {
   let total = 0
@@ -29,7 +31,7 @@ const prepareData = (txs) => {
   }
 }
 
-const CategoryGroupedTransactionList = ({items}) => {
+const CategoryGroupedTransactionList = ({items, mode}) => {
   const {data, total} = prepareData(items)
 
   if (items.length === 0) {
@@ -85,7 +87,23 @@ const CategoryGroupedTransactionList = ({items}) => {
                           {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
                           <TagList items={tx.tags}/>
                         </VStack>
-                        <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
+                        <VStack>
+                          {tx.isRecurring && (
+                              <Badge
+                                  className="absolute z-10 bg-transparent -top-3 -right-5"
+                                  variant="solid"
+                              >
+                                <BadgeIcon
+                                    className="text-white"
+                                    as={MaterialIcon}
+                                    code="repeat-variant"
+                                    dsize={14}
+                                    dcolor={Colors[mode].tabIconDefault}
+                                />
+                              </Badge>
+                          )}
+                          <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
+                        </VStack>
                       </HStack>
                   ))}
                 </VStack>
