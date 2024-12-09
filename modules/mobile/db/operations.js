@@ -1,3 +1,4 @@
+import 'react-native-get-random-values'
 import {defaultDisplayDate} from '@/utils/dates'
 import {generateRecurrences, calculateRecurrenceNextDate} from '@/utils/transactions'
 import {nonEmpty} from '@/utils/arrays'
