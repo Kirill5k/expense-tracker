@@ -35,7 +35,7 @@ const RecurrenceLabel = ({item}) => {
   }
 
   const nextDate = item.recurrence.nextDate
-  const hasNext = !nextDate ? false : nextDate < item.recurrence.endDate
+  const hasNext = !nextDate ? false : (item.recurrence.endDate == null || nextDate < item.recurrence.endDate)
   const nextDateLabel = hasNext
       ? `Next ${format(parseISO(nextDate), 'dd/MM/yyyy')}`
       : 'No More Scheduled'
