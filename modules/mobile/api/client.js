@@ -79,14 +79,15 @@ class BackendClient {
         params: {lastPulledAt}
       })
 
-  pushChanges = (token, lastPulledAt, data) =>
-      dispatch({
-        method: 'post',
-        data,
-        url: '/api/sync/watermelon',
-        headers: {Authorization: `Bearer ${token}`},
-        params: {lastPulledAt}
-      })
+  pushChanges = (token, lastPulledAt, data) => {
+    return dispatch({
+      method: 'post',
+      data,
+      url: '/api/sync/watermelon',
+      headers: {Authorization: `Bearer ${token}`},
+      params: {lastPulledAt}
+    })
+  }
 }
 
 export default new BackendClient()

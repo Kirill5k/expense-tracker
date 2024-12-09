@@ -63,7 +63,7 @@ function RootLayoutNav() {
 
   const startSync = (accessToken) => {
     const syncDb = () => {
-      console.log('Initiating db sync')
+      console.log('Initiating db sync', intervalId)
       initSync(database)
     }
 

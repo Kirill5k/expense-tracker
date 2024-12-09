@@ -5,8 +5,9 @@ import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
 import {ObjectId} from 'bson'
 import * as Crypto from 'expo-crypto'
+import {Q} from '@nozbe/watermelondb'
 
-export const generatePeriodicTransactionRecurrenceInstanceId = async (ptxId, date) => {
+export const generateRecurrenceInstanceId = async (ptxId, date) => {
   const timestamp = Math.floor(new Date(date).getTime() / 1000)
   const array = new Uint8Array(12)
   array[0] = (timestamp >> 24) & 0xff
@@ -49,7 +50,7 @@ const updateCatRec = (rec, c) => {
 }
 
 const updateRtxRec = (rec, rtx) => {
-  rec.categoryId = rtx.category.id
+  rec.categoryId = rtx.category ? rtx.category.id : rtx.categoryId
   rec.recurrenceStartDate = rtx.recurrence.startDate
   rec.recurrenceNextDate = rtx.recurrence.nextDate
   rec.recurrenceEndDate = rtx.recurrence.endDate
@@ -65,7 +66,7 @@ const updateRtxRec = (rec, rtx) => {
 }
 
 const updateTxRec = (rec, tx) => {
-  rec.categoryId = tx.category.id
+  rec.categoryId = tx.category ? tx.category.id : tx.categoryId
   rec.date = tx.date
   rec.userId = tx.userId
   rec.parentTransactionId = tx.parentTransactionId
@@ -113,7 +114,7 @@ export const createRecurringTransaction = async (database, rtx) => {
   await database.write(async () => {
     const actions = []
     for (const tx of transactions) {
-      const txId = await generatePeriodicTransactionRecurrenceInstanceId(rtxId, tx.date)
+      const txId = await generateRecurrenceInstanceId(rtxId, tx.date)
       const createTxAction = database.get('transactions').prepareCreate(rec => {
         updateTxRec(rec, tx)
         rec._raw.id = txId
@@ -138,6 +139,41 @@ export const updateRecurringTransaction = async (database, rtx) => {
     const found = await database.get('periodic_transactions').find(rtx.id)
     await found.update(rec => updateRtxRec(rec, {...rtx, recurrence: {...rtx.recurrence, nextDate: newNextDate}}))
   })
+}
+
+export const createRecurringTransactionInstancesWithTodayDate = async (database) => {
+  const now = new Date().toISOString().slice(0, 10)
+  const rtxs = await database.get('periodic_transactions').query(
+      Q.where('recurrence_next_date', Q.eq(now)),
+      Q.or(
+          Q.where('recurrence_end_date', Q.eq(null)),
+          Q.where('recurrence_end_date', Q.gt(now))
+      ),
+      Q.where('hidden', Q.notEq(true)),
+  ).fetch()
+  console.log(`Found ${rtxs.length} recurring transactions with today's date`)
+  if (rtxs.length > 0) {
+    await database.write(async () => {
+      const actions = []
+      for (const rtx of rtxs) {
+        const {transactions, recurringTransaction} = generateRecurrences(rtx.toDomain())
+        for (const tx of transactions) {
+          const txId = await generateRecurrenceInstanceId(rtx.id, tx.date)
+          const createTxAction = database.get('transactions').prepareCreate(rec => {
+            updateTxRec(rec, tx)
+            rec._raw.id = txId
+            rec.userId = rtx.userId
+          })
+          actions.push(createTxAction)
+        }
+        const updateRtxAction = rtx.prepareUpdate(rec => {
+          rec.recurrenceNextDate = recurringTransaction.recurrence.nextDate
+        })
+        actions.push(updateRtxAction)
+      }
+      await database.batch(actions)
+    })
+  }
 }
 
 export const createCategory = async (database, cat) => {
