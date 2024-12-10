@@ -46,8 +46,8 @@ const Index = ({state, user}) => {
             <VStack className="h-full w-full justify-between p-9" space="xl">
               <VStack></VStack>
               <VStack className="items-center">
-                <LogoChart mode={mode}/>
-                <Heading size="3xl">
+                <LogoChart imageBased mode={mode}/>
+                <Heading size="3xl" className="">
                   {Text.appName}
                 </Heading>
               </VStack>
