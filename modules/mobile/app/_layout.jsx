@@ -15,6 +15,7 @@ import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider'
 import {withToast} from '@/components/ui/toast'
 import useStore from '@/store'
 import database from '@/db'
+import {createRecurringTransactionInstancesWithTodayDate} from '@/db/operations'
 import {initSync} from '@/db/sync'
 
 export {
@@ -92,6 +93,7 @@ function RootLayoutNav() {
     const handleAppStateChange = (nextAppState) => {
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground')
+        createRecurringTransactionInstancesWithTodayDate(database)
       }
 
       if (nextAppState === 'background') {

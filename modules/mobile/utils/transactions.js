@@ -76,7 +76,6 @@ export const generateRecurrences = (rtx, now = new Date()) => {
 const addInterval = (date, {frequency, interval}) => {
   switch (frequency) {
     case 'daily':
-      console.log('adding days', interval, date)
       return addDays(date, interval);
     case 'weekly':
       return addWeeks(date, interval);
