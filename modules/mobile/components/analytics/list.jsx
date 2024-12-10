@@ -90,7 +90,7 @@ const CategoryGroupedTransactionList = ({items, mode}) => {
                         <VStack>
                           {tx.isRecurring && (
                               <Badge
-                                  className="absolute z-10 bg-transparent -top-3 -right-4"
+                                  className="absolute -z-10 bg-transparent -top-2.5 -right-4"
                                   variant="solid"
                               >
                                 <BadgeIcon

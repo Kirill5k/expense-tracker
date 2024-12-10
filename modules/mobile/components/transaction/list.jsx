@@ -42,7 +42,7 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
                 <VStack className="ml-auto relative">
                   {tx.isRecurring && (
                       <Badge
-                          className="absolute z-10 bg-transparent -top-2 -right-4"
+                          className="absolute -z-10 bg-transparent -top-2 -right-4"
                           variant="solid"
                       >
                         <BadgeIcon
