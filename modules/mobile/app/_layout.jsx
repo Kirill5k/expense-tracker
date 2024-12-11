@@ -62,15 +62,15 @@ function RootLayoutNav() {
   const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken} = useStore()
 
-  const startSync = (accessToken) => {
-    const syncDb = () => {
-      console.log('Initiating db sync', intervalId)
-      initSync(database)
-    }
+  const syncDb = () => {
+    console.log('Initiating db sync', intervalId)
+    initSync(database)
+  }
 
+  const startSync = (accessToken) => {
     if (accessToken) {
       syncDb()
-      const intervalId = setInterval(syncDb, 240000) // 4 minutes
+      const intervalId = setInterval(syncDb, 600000) // 10 minutes
       setIntervalId(intervalId)
     }
   }
@@ -93,6 +93,7 @@ function RootLayoutNav() {
     const handleAppStateChange = (nextAppState) => {
       if (appState.match(/inactive|background/) && nextAppState === 'active') {
         console.log('App has come to the foreground')
+        syncDb()
         createRecurringTransactionInstancesWithTodayDate(database)
       }
 
