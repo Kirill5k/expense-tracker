@@ -13,6 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "newArchEnabled": true,
       "supportsTablet": false,
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
@@ -26,6 +27,7 @@
       }
     },
     "android": {
+      "newArchEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
