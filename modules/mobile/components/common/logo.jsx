@@ -19,8 +19,8 @@ export const LogoChart = ({mode, imageBased}) => {
       <VStack className="w-full flex items-center justify-center my-1">
         {imageBased && (
             <Image
-                style={{width: 100, height: 100}}
-                source={require("@/assets/images/logo.png")}
+                style={{width: 180, height: 180}}
+                source={require("@/assets/images/adaptive-icon.png")}
             />
         )}
         {!imageBased && (

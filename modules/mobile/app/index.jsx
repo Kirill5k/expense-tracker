@@ -45,9 +45,9 @@ const Index = ({state, user}) => {
         {!isLoading && (
             <VStack className="h-full w-full justify-between p-9" space="xl">
               <VStack></VStack>
-              <VStack className="items-center">
+              <VStack className="items-center relative">
                 <LogoChart imageBased mode={mode}/>
-                <Heading size="3xl" className="">
+                <Heading size="3xl" className="absolute -bottom-4">
                   {Text.appName}
                 </Heading>
               </VStack>
