@@ -83,8 +83,7 @@ object SyncController extends TapirSchema with TapirJson {
   private val watermelonPath = basePath / "watermelon"
 
   final case class WatermelonState(
-      id: String,
-      user_id: UserId
+      id: String
   ) derives Codec.AsObject
 
   final case class WatermelonUser(
