@@ -271,6 +271,19 @@ export const resetState = async (database) => {
   })
 }
 
+export const deleteData = async (database) => {
+  const deleteFromCollection = async (collectionName) => {
+    const allRecords = await database.get(collectionName).query().fetch()
+    await database.batch(allRecords.map(record => record.markAsDeleted()))
+  }
+
+  await database.write(async () => {
+    await deleteFromCollection('periodic_transactions')
+    await deleteFromCollection('transactions')
+    await deleteFromCollection('categories')
+  })
+}
+
 export const initState = async (database) => {
   await database.write(async () => {
     try {

@@ -67,7 +67,7 @@ final private class AuthController[F[_]](
       }
 
   private def deleteCurrentUserData(using authenticator: Authenticator[F]) =
-    deleteCurrentUserEndpoint.withAuthenticatedSession
+    deleteCurrentUserDataEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
         userService.deleteData(session.userId).voidResponse
       }

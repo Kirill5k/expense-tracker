@@ -25,7 +25,8 @@ import {
   updateUserDarkMode,
   updateUserCurrency,
   resetState,
-  updateStateAuthStatus
+  updateStateAuthStatus,
+  deleteData
 } from '@/db/operations'
 
 const themeDisplayLabel = (darkMode) => {
@@ -51,7 +52,7 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 const Settings = ({user, state, totalTransactionCount}) => {
   const mode = useColorScheme()
   const database = useDatabase()
-  const {setMode, clearAccessToken} = useStore()
+  const {setMode, clearAccessToken, setErrorAlert} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -59,7 +60,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
   const handleLogout = () => {
     setLoading(true)
     clearAccessToken()
-    resetState(database)
+    return resetState(database)
         .then(() => {
           setLoading(false)
           router.push('/')
@@ -87,6 +88,25 @@ const Settings = ({user, state, totalTransactionCount}) => {
         .changeUserPassword(state.accessToken, state.userId, {currentPassword, newPassword: password})
         .then(() => Client.login({email: user.email, password}))
         .then(({access_token}) => updateStateAuthStatus(database, access_token))
+        .catch(e => setErrorAlert(`Failed to reset the password: ${e}`))
+        .finally(() => setLoading(false))
+  }
+
+  const handleUserDelete = () => {
+    setLoading(true)
+    return Client
+        .deleteUser(state.accessToken)
+        .then(handleLogout)
+        .catch(e => setErrorAlert(`Failed to delete the account: ${e}`))
+        .finally(() => setLoading(false))
+  }
+
+  const handleUserDataDelete = () => {
+    setLoading(true)
+    return Client
+        .deleteUserData(state.accessToken)
+        .then(() => deleteData(database))
+        .catch(e => setErrorAlert(`Failed to delete the data: ${e}`))
         .finally(() => setLoading(false))
   }
 
@@ -207,7 +227,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                     alertText="This will permanently delete all your saved transactions and categories from the app. This action is irreversible and cannot be undone. However, your account will remain active."
                     buttonText="Clear All Data"
                     confirmationText="DELETE"
-                    onPress={() => console.log('clear all data')}
+                    onPress={handleUserDataDelete}
                 />
               </SettingsAccordionContent>
             </SettingsAccordionItem>
@@ -223,7 +243,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                     alertText="Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account."
                     buttonText="Close Account"
                     confirmationText="DELETE"
-                    onPress={() => console.log('close account')}
+                    onPress={handleUserDelete}
                 />
               </SettingsAccordionContent>
             </SettingsAccordionItem>

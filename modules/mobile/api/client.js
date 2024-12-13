@@ -57,6 +57,20 @@ class BackendClient {
         headers: {Authorization: `Bearer ${token}`}
       })
 
+  deleteUser = (token) =>
+      dispatch({
+        method: 'delete',
+        url: '/api/auth/user',
+        headers: {Authorization: `Bearer ${token}`}
+      })
+
+  deleteUserData = (token) =>
+      dispatch({
+        method: 'delete',
+        url: '/api/auth/user/data',
+        headers: {Authorization: `Bearer ${token}`}
+      })
+
   logout = (token) =>
       dispatch({
         method: 'post',
