@@ -11,6 +11,11 @@ const Alerts = {
     title: 'Success!',
     message: 'Account has been successfully created! Signing you in'
   },
+  DATA_DELETION_SUCCESS: {
+    type: 'success',
+    title: 'Success!',
+    message: 'Your data has been deleted'
+  },
   PASSWORD_CHANGE_SUCCESS: {
     type: 'success',
     title: 'Success!',
@@ -41,6 +46,8 @@ const useStore = create((set, get) => ({
   clearAlert: () => set({alert: null}),
   setLoginSuccessAlert: () => set({alert: Alerts.LOGIN_SUCCESS}),
   setRegistrationSuccessAlert: () => set({alert: Alerts.REGISTRATION_SUCCESS}),
+  setPasswordChangeSuccessAlert: () => set({alert: Alerts.PASSWORD_CHANGE_SUCCESS}),
+  setDataDeletionSuccessAlert: () => set({alert: Alerts.DATA_DELETION_SUCCESS}),
 }));
 
 export default useStore;

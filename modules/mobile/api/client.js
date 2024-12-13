@@ -94,6 +94,7 @@ class BackendClient {
       })
 
   pushChanges = (token, lastPulledAt, data) => {
+    console.log(`pushing sync changes: ${JSON.stringify(data)}`)
     return dispatch({
       method: 'post',
       data,

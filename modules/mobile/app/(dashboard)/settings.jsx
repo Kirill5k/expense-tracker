@@ -52,7 +52,7 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 const Settings = ({user, state, totalTransactionCount}) => {
   const mode = useColorScheme()
   const database = useDatabase()
-  const {setMode, clearAccessToken, setErrorAlert} = useStore()
+  const {setMode, clearAccessToken, setErrorAlert, setPasswordChangeSuccessAlert, setDataDeletionSuccessAlert} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -88,6 +88,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
         .changeUserPassword(state.accessToken, state.userId, {currentPassword, newPassword: password})
         .then(() => Client.login({email: user.email, password}))
         .then(({access_token}) => updateStateAuthStatus(database, access_token))
+        .then(() => setPasswordChangeSuccessAlert())
         .catch(e => setErrorAlert(`Failed to reset the password: ${e}`))
         .finally(() => setLoading(false))
   }
@@ -106,6 +107,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
     return Client
         .deleteUserData(state.accessToken)
         .then(() => deleteData(database))
+        .then(() => setDataDeletionSuccessAlert())
         .catch(e => setErrorAlert(`Failed to delete the data: ${e}`))
         .finally(() => setLoading(false))
   }

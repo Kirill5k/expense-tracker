@@ -30,7 +30,7 @@ const Index = ({state, user}) => {
 
   useEffect(() => {
     if (state) {
-      if (state.isAuthenticated === false) {
+      if (state.isAuthenticated === false || !state.userId) {
         setIsLoading(false)
       }
 

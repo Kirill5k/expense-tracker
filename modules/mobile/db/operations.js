@@ -274,7 +274,10 @@ export const resetState = async (database) => {
 export const deleteData = async (database) => {
   const deleteFromCollection = async (collectionName) => {
     const allRecords = await database.get(collectionName).query().fetch()
-    await database.batch(allRecords.map(record => record.markAsDeleted()))
+    const actions = allRecords.map(r => r.prepareUpdate(rec => {
+      rec.hidden = true
+    }))
+    await database.batch(actions)
   }
 
   await database.write(async () => {
