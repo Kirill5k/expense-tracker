@@ -11,9 +11,9 @@ const Profile = ({user}) => {
     <HStack className="p-4 w-full items-center" space="xl">
       <Avatar size="xl" className="bg-info-500">
         <AvatarFallbackText className="text-white">{fullName}</AvatarFallbackText>
-        <AvatarBadge className="justify-center items-center bg-white border border-outline-200">
-          <Icon as={MaterialIcon} code="pencil" dcolor="text-primary-100" dsize={16} />
-        </AvatarBadge>
+        {/*<AvatarBadge className="justify-center items-center bg-white border border-outline-200">*/}
+        {/*  <Icon as={MaterialIcon} code="pencil" dcolor="text-primary-100" dsize={16} />*/}
+        {/*</AvatarBadge>*/}
       </Avatar>
       <VStack className="w-full items-left" space="xs">
         <Text size="2xl" className="font-bold text-primary-900">
