@@ -83,7 +83,8 @@ object SyncController extends TapirSchema with TapirJson {
   private val watermelonPath = basePath / "watermelon"
 
   final case class WatermelonState(
-      id: String
+      id: String,
+      user_id: Option[UserId]
   ) derives Codec.AsObject
 
   final case class WatermelonUser(
@@ -308,7 +309,7 @@ object SyncController extends TapirSchema with TapirJson {
       WatermelonDataChanges(
         state = WatermelonDataChange(
           created = Nil,
-          updated = Option.when(dc.users.created.nonEmpty)(WatermelonState("expense-tracker", dc.users.created.head.id)).toList,
+          updated = Option.when(dc.users.created.nonEmpty)(WatermelonState("expense-tracker", dc.users.created.headOption.map(_.id))).toList,
           deleted = Nil
         ),
         transactions = WatermelonDataChange(
