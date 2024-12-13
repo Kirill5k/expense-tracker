@@ -21,6 +21,7 @@ trait PeriodicTransactionService[F[_]]:
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
   def generateRecurrencesForToday: F[Unit]
+  def deleteAll(uid: UserId): F[Unit]
 
 final private class LivePeriodicTransactionService[F[_]](
     private val repository: PeriodicTransactionRepository[F],
@@ -69,6 +70,9 @@ final private class LivePeriodicTransactionService[F[_]](
       _ <- F.whenA(updTxs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(updTxs)))
       _ <- save(updPTxs)
     yield ()
+
+  override def deleteAll(uid: UserId): F[Unit] =
+    repository.deleteAll(uid)
 }
 
 object PeriodicTransactionService:

@@ -15,6 +15,7 @@ trait CategoryService[F[_]] {
   def assignDefault(uid: UserId): F[Unit]
   def hide(uid: UserId, cid: CategoryId, hidden: Boolean): F[Unit]
   def save(cats: List[Category]): F[Unit]
+  def deleteAll(uid: UserId): F[Unit]
 }
 
 final private class LiveCategoryService[F[_]](
@@ -48,6 +49,9 @@ final private class LiveCategoryService[F[_]](
 
   override def save(cats: List[Category]): F[Unit] =
     F.whenA(cats.nonEmpty)(repository.save(cats))
+
+  override def deleteAll(uid: UserId): F[Unit] =
+    repository.deleteAll(uid)
 }
 
 object CategoryService:

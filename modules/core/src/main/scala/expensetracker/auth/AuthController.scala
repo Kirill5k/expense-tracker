@@ -60,6 +60,18 @@ final private class AuthController[F[_]](
         userService.find(session.userId).mapResponse(UserView.from)
       }
 
+  private def deleteCurrentUser(using authenticator: Authenticator[F]) =
+    deleteCurrentUserEndpoint.withAuthenticatedSession
+      .serverLogic { session => _ =>
+          userService.delete(session.userId).voidResponse
+      }
+
+  private def deleteCurrentUserData(using authenticator: Authenticator[F]) =
+    deleteCurrentUserEndpoint.withAuthenticatedSession
+      .serverLogic { session => _ =>
+        userService.deleteData(session.userId).voidResponse
+      }
+
   private def createUser =
     createUserEndpoint
       .serverLogic { req =>
@@ -88,7 +100,9 @@ final private class AuthController[F[_]](
           getCurrentUser,
           updateSettings,
           changePassword,
-          logout
+          logout,
+          deleteCurrentUser,
+          deleteCurrentUserData
         )
       )
 }
@@ -192,6 +206,16 @@ object AuthController extends TapirSchema with TapirJson {
     .out(jsonBody[UserView])
     .description("Get currently logged in user")
 
+  val deleteCurrentUserEndpoint = Controller.securedEndpoint.delete
+    .in(userPath)
+    .out(statusCode(StatusCode.NoContent))
+    .description("Permanently delete currently logged in user")
+
+  val deleteCurrentUserDataEndpoint = Controller.securedEndpoint.delete
+    .in(userPath / "data")
+    .out(statusCode(StatusCode.NoContent))
+    .description("Permanently delete currently logged in user's data")
+  
   val updateUserSettingsEndpoint = Controller.securedEndpoint.put
     .in(userIdPath / "settings")
     .in(jsonBody[UpdateUserSettingsRequest])

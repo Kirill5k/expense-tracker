@@ -5,6 +5,9 @@ import expensetracker.category.{Category, CategoryId}
 import expensetracker.transaction.{PeriodicTransaction, Transaction}
 
 enum Action:
+  case DeleteAllCategories(uid: UserId)
+  case DeleteAllTransactions(uid: UserId)
+  case DeleteAllPeriodicTransactions(uid: UserId)
   case SaveCategories(categories: List[Category])
   case SaveTransactions(transactions: List[Transaction])
   case SavePeriodicTransactions(periodicTransactions: List[PeriodicTransaction])

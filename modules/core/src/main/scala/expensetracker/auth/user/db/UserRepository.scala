@@ -19,6 +19,7 @@ import mongo4cats.operations.{Aggregate, Filter, Projection, Update}
 
 trait UserRepository[F[_]] extends Repository[F]:
   def find(uid: UserId): F[User]
+  def delete(uid: UserId): F[Unit]
   def findBy(email: UserEmail): F[Option[User]]
   def create(details: UserDetails, password: PasswordHash): F[UserId]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
@@ -108,6 +109,11 @@ final private class LiveUserRepository[F[_]](
     collection
       .updateOne(idEq(uid.toObjectId), Update.set(Field.Password, password.value))
       .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
+
+  override def delete(uid: UserId): F[Unit] =
+    collection
+      .deleteOne(idEq(uid.toObjectId))
+      .flatMap(r => F.raiseWhen(r.getDeletedCount == 0)(AccountDoesNotExist(uid)))
 }
 
 object UserRepository extends MongoJsonCodecs:

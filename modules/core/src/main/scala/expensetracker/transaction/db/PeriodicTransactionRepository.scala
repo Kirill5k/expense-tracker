@@ -29,6 +29,7 @@ trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
   def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]]
+  def deleteAll(uid: UserId): F[Unit]
 
 final private class LivePeriodicTransactionRepository[F[_]](
     private val collection: MongoCollection[F, PeriodicTransactionEntity],
@@ -108,6 +109,9 @@ final private class LivePeriodicTransactionRepository[F[_]](
       )
       .all
       .mapList(_.toDomain)
+
+  override def deleteAll(uid: UserId): F[Unit] =
+    collection.deleteMany(userIdEq(uid)).void
 }
 
 object PeriodicTransactionRepository extends MongoJsonCodecs with JsonCodecs:

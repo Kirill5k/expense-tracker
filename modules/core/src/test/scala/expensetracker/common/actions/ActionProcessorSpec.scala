@@ -148,6 +148,60 @@ class ActionProcessorSpec extends IOWordSpec {
         r mustBe ()
       }
     }
+
+    "delete ptxs" in {
+      val (usrSvc, catSvc, txSvc, ptxSvc) = mocks
+      when(ptxSvc.deleteAll(any[UserId])).thenReturn(IO.unit)
+
+      val result = for
+        dispatcher <- ActionDispatcher.make[IO]
+        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _ <- dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
+        res <- processor.run.interruptAfter(1.second).compile.drain
+      yield res
+
+      result.asserting { r =>
+        verify(ptxSvc).deleteAll(Users.uid1)
+        verifyNoInteractions(catSvc, usrSvc, txSvc)
+        r mustBe()
+      }
+    }
+
+    "delete txs" in {
+      val (usrSvc, catSvc, txSvc, ptxSvc) = mocks
+      when(txSvc.deleteAll(any[UserId])).thenReturn(IO.unit)
+
+      val result = for
+        dispatcher <- ActionDispatcher.make[IO]
+        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _ <- dispatcher.dispatch(Action.DeleteAllTransactions(Users.uid1))
+        res <- processor.run.interruptAfter(1.second).compile.drain
+      yield res
+
+      result.asserting { r =>
+        verify(txSvc).deleteAll(Users.uid1)
+        verifyNoInteractions(catSvc, usrSvc, ptxSvc)
+        r mustBe()
+      }
+    }
+
+    "delete cats" in {
+      val (usrSvc, catSvc, txSvc, ptxSvc) = mocks
+      when(catSvc.deleteAll(any[UserId])).thenReturn(IO.unit)
+
+      val result = for
+        dispatcher <- ActionDispatcher.make[IO]
+        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _ <- dispatcher.dispatch(Action.DeleteAllCategories(Users.uid1))
+        res <- processor.run.interruptAfter(1.second).compile.drain
+      yield res
+
+      result.asserting { r =>
+        verify(catSvc).deleteAll(Users.uid1)
+        verifyNoInteractions(txSvc, usrSvc, ptxSvc)
+        r mustBe()
+      }
+    }
   }
 
   def mocks: (UserService[IO], CategoryService[IO], TransactionService[IO], PeriodicTransactionService[IO]) =

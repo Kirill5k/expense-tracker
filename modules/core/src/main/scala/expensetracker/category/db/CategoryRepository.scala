@@ -26,6 +26,7 @@ trait CategoryRepository[F[_]] extends Repository[F]:
   def hide(uid: UserId, cid: CategoryId, hidden: Boolean = true): F[Unit]
   def isHidden(uid: UserId, cid: CategoryId): F[Boolean]
   def save(cats: List[Category]): F[Unit]
+  def deleteAll(uid: UserId): F[Unit]
 
 final private class LiveCategoryRepository[F[_]](
     private val collection: MongoCollection[F, CategoryEntity]
@@ -107,6 +108,9 @@ final private class LiveCategoryRepository[F[_]](
     collection
       .count(userIdEq(uid) && idEq(cid.toObjectId) && isHidden)
       .map(_ > 0)
+
+  override def deleteAll(uid: UserId): F[Unit] =
+    collection.deleteMany(userIdEq(uid)).void
 }
 
 object CategoryRepository extends MongoJsonCodecs:

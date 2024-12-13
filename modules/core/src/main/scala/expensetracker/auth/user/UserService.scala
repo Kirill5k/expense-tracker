@@ -10,9 +10,11 @@ trait UserService[F[_]]:
   def create(details: UserDetails, password: Password): F[UserId]
   def login(login: Login): F[User]
   def find(uid: UserId): F[User]
+  def delete(userId: UserId): F[Unit]
   def updateSettings(uid: UserId, settings: UserSettings): F[Unit]
   def changePassword(cp: ChangePassword): F[Unit]
   def save(users: List[User]): F[Unit]
+  def deleteData(userId: UserId): F[Unit]
 
 final private class LiveUserService[F[_]](
     private val repository: UserRepository[F],
@@ -62,6 +64,14 @@ final private class LiveUserService[F[_]](
 
   override def save(users: List[User]): F[Unit] =
     repository.save(users)
+
+  override def delete(userId: UserId): F[Unit] =
+    repository.delete(userId) >> deleteData(userId)
+
+  override def deleteData(userId: UserId): F[Unit] =
+    dispatcher.dispatch(Action.DeleteAllCategories(userId)) >>
+      dispatcher.dispatch(Action.DeleteAllTransactions(userId)) >>
+      dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(userId))
 }
 
 object UserService:

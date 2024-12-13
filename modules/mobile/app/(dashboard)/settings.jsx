@@ -48,8 +48,6 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
   return `${futureTransactionVisibilityDays} Days`
 }
 
-const showSecuritySettings = false
-
 const Settings = ({user, state, totalTransactionCount}) => {
   const mode = useColorScheme()
   const database = useDatabase()
@@ -181,59 +179,55 @@ const Settings = ({user, state, totalTransactionCount}) => {
             </SettingsAccordionItem>
           </SettingsAccordion>
 
-          {showSecuritySettings && (
-              <>
-                <Heading className="py-2" size="xl">
-                  Security
-                </Heading>
-                <SettingsAccordion
+          <Heading className="py-2" size="xl">
+            Security
+          </Heading>
+          <SettingsAccordion
+              isDisabled={loading}
+          >
+            <SettingsAccordionItem
+                value="4"
+                headerTitle="Change Password"
+            >
+              <SettingsAccordionContent>
+                <PasswordChange
+                    onSubmit={handlePasswordChange}
+                />
+              </SettingsAccordionContent>
+            </SettingsAccordionItem>
+            <SettingsAccordionItem
+                value="5"
+                headerTitle="Clear All Data"
+            >
+              <SettingsAccordionContent>
+                <DeleteButton
+                    outline
                     isDisabled={loading}
-                >
-                  <SettingsAccordionItem
-                      value="4"
-                      headerTitle="Change Password"
-                  >
-                    <SettingsAccordionContent>
-                      <PasswordChange
-                          onSubmit={handlePasswordChange}
-                      />
-                    </SettingsAccordionContent>
-                  </SettingsAccordionItem>
-                  <SettingsAccordionItem
-                      value="5"
-                      headerTitle="Clear All Data"
-                  >
-                    <SettingsAccordionContent>
-                      <DeleteButton
-                          outline
-                          isDisabled={loading}
-                          mode={mode}
-                          alertText="This will permanently delete all your saved transactions, categories, and personal settings from the app. This action is irreversible and cannot be undone. However, your account will remain active."
-                          buttonText="Clear All Data"
-                          confirmationText="DELETE"
-                          onPress={() => console.log('clear all data')}
-                      />
-                    </SettingsAccordionContent>
-                  </SettingsAccordionItem>
-                  <SettingsAccordionItem
-                      isLast
-                      value="6"
-                      headerTitle="Close Account"
-                  >
-                    <SettingsAccordionContent>
-                      <DeleteButton
-                          isDisabled={loading}
-                          mode={mode}
-                          alertText="Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account."
-                          buttonText="Close Account"
-                          confirmationText="DELETE"
-                          onPress={() => console.log('close account')}
-                      />
-                    </SettingsAccordionContent>
-                  </SettingsAccordionItem>
-                </SettingsAccordion>
-              </>
-          )}
+                    mode={mode}
+                    alertText="This will permanently delete all your saved transactions and categories from the app. This action is irreversible and cannot be undone. However, your account will remain active."
+                    buttonText="Clear All Data"
+                    confirmationText="DELETE"
+                    onPress={() => console.log('clear all data')}
+                />
+              </SettingsAccordionContent>
+            </SettingsAccordionItem>
+            <SettingsAccordionItem
+                isLast
+                value="6"
+                headerTitle="Close Account"
+            >
+              <SettingsAccordionContent>
+                <DeleteButton
+                    isDisabled={loading}
+                    mode={mode}
+                    alertText="Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account."
+                    buttonText="Close Account"
+                    confirmationText="DELETE"
+                    onPress={() => console.log('close account')}
+                />
+              </SettingsAccordionContent>
+            </SettingsAccordionItem>
+          </SettingsAccordion>
 
           <Box className="px-5">
             <Button

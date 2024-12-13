@@ -33,6 +33,7 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def hide(cid: CategoryId, hidden: Boolean): F[Unit]
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
   def save(txs: List[Transaction]): F[Unit]
+  def deleteAll(uid: UserId): F[Unit]
 
 final private class LiveTransactionRepository[F[_]](
     private val collection: MongoCollection[F, TransactionEntity],
@@ -127,6 +128,9 @@ final private class LiveTransactionRepository[F[_]](
     val options = UpdateOptions(upsert = true)
     val cmds    = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, options))
     collection.bulkWrite(cmds).void
+
+  override def deleteAll(uid: UserId): F[Unit] =
+    collection.deleteMany(userIdEq(uid)).void
 }
 
 object TransactionRepository extends MongoJsonCodecs with JsonCodecs:
