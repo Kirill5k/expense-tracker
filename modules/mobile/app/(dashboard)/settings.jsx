@@ -124,7 +124,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
