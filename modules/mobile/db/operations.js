@@ -274,9 +274,7 @@ export const resetState = async (database) => {
 export const deleteData = async (database) => {
   const deleteFromCollection = async (collectionName) => {
     const allRecords = await database.get(collectionName).query().fetch()
-    const actions = allRecords.map(r => r.prepareUpdate(rec => {
-      rec.hidden = true
-    }))
+    const actions = allRecords.map(r => r.prepareDestroyPermanently())
     await database.batch(actions)
   }
 

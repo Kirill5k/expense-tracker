@@ -261,7 +261,7 @@ const RecurringTransactionForm = ({
 
         <FormControl isInvalid={!!formState.errors.startDate}>
           <FormControlLabel>
-            <FormControlLabelText>Start date</FormControlLabelText>
+            <FormControlLabelText>Start Date</FormControlLabelText>
           </FormControlLabel>
           <Controller
               name="startDate"
@@ -364,7 +364,7 @@ const RecurringTransactionForm = ({
 
         <FormControl isInvalid={!!formState.errors.endDate}>
           <FormControlLabel>
-            <FormControlLabelText>End date (exclusive)</FormControlLabelText>
+            <FormControlLabelText>End Date (Exclusive)</FormControlLabelText>
           </FormControlLabel>
           <Controller
               name="endDate"
