@@ -96,7 +96,9 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
       amount: {
         currency,
         value: parseFloat(data.amount)
-      }
+      },
+      isRecurring: false,
+      parentTransactionId: null
     }
     onSubmit(tx)
   }
