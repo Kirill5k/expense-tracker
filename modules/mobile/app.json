@@ -43,6 +43,7 @@
     "plugins": [
       "@morrowdigital/watermelondb-expo-plugin",
       "expo-router",
+      "expo-localization",
       [
         "expo-build-properties",
         {
@@ -57,7 +58,8 @@
             "deploymentTarget": "13.4"
           }
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "extra": {
       "router": {

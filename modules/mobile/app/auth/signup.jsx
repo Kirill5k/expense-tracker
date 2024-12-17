@@ -20,7 +20,7 @@ import Features from '@/config/features'
 const SignUp = ({user}) => {
   const database = useDatabase()
   const mode = useColorScheme()
-  const {setRegistrationSuccessAlert, accessToken, setAccessToken} = useStore()
+  const {setRegistrationSuccessAlert, accessToken, setAccessToken, locale} = useStore()
 
   const handleCreateAccount = async (account) => {
     await Client.createUser(account)
@@ -45,6 +45,7 @@ const SignUp = ({user}) => {
                   subHeading={Wordings.signupSubHeading}
               />
               <RegistrationForm
+                  locale={locale}
                   mode={mode}
                   onSubmit={handleCreateAccount}
               />

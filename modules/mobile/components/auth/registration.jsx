@@ -14,7 +14,7 @@ import {Input, InputField, InputIcon, InputSlot} from '@/components/ui/input'
 import {Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel} from '@/components/ui/checkbox'
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
 import {Button, ButtonText, ButtonSpinner} from '@/components/ui/button'
-import {CurrencySelect, currencies} from '@/components/settings/currency-select'
+import {CurrencySelect, currencies, getCurrencyByCode} from '@/components/settings/currency-select'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
@@ -54,7 +54,7 @@ const signUpSchema = z.object({
   acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const RegistrationForm = ({onSubmit, mode}) => {
+export const RegistrationForm = ({onSubmit, mode, locale}) => {
   const {
     control,
     handleSubmit,
@@ -173,7 +173,7 @@ export const RegistrationForm = ({onSubmit, mode}) => {
           </FormControlLabel>
           <Controller
               name="currency"
-              defaultValue={currencies[0]}
+              defaultValue={getCurrencyByCode(locale.currencyCode, 'USD')}
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <CurrencySelect

@@ -31,6 +31,7 @@ const Alerts = {
 const useStore = create((set, get) => ({
   alert: null,
   mode: 'system',
+  locale: null,
   accessToken: null,
   rtxToUpdate: null,
   txToUpdate: null,
@@ -39,6 +40,7 @@ const useStore = create((set, get) => ({
   setRtxToUpdate: (rtxToUpdate) => set({rtxToUpdate}),
   setCatToUpdate: (catToUpdate) => set({catToUpdate}),
   setAccessToken: (accessToken) => set({accessToken}),
+  setLocale: (locale) => set({locale}),
   clearAccessToken: () => set({accessToken: null}),
   setMode: (mode) => set({mode}),
   setErrorAlert: (message) => set({alert: {type: 'error', title: 'Error!', message}}),

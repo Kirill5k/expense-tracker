@@ -3,6 +3,7 @@ import 'react-native-reanimated'
 import 'react-native-get-random-values'
 import React, {useEffect, useState} from 'react'
 import {AppState} from 'react-native'
+import {useLocales} from 'expo-localization'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 import {SafeAreaProvider} from 'react-native-safe-area-context'
@@ -60,7 +61,8 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const [appState, setAppState] = useState(AppState.currentState)
   const [intervalId, setIntervalId] = useState(null)
-  const {mode, alert, clearAlert, accessToken} = useStore()
+  const {mode, alert, clearAlert, accessToken, setLocale} = useStore()
+  const locales = useLocales()
 
   const syncDb = () => {
     console.log('Initiating db sync', intervalId)
@@ -108,6 +110,12 @@ function RootLayoutNav() {
 
     return () => subscription.remove()
   }, [appState])
+
+  useEffect(() => {
+    if (locales?.length) {
+      setLocale(locales[0])
+    }
+  }, [locales]);
 
   return (
       <SafeAreaProvider>
