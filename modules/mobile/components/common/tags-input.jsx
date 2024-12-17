@@ -4,7 +4,7 @@ import {Text} from '@/components/ui/text'
 import {Input, InputSlot, InputField} from '@/components/ui/input'
 import {HStack} from "../ui/hstack";
 
-const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
+const TagsInput = ({placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md'}) => {
   const [currentTags, setCurrentTags] = useState(value || [])
   const [latestTag, setLatestTag] = useState('')
 
@@ -39,6 +39,9 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, size = 'md'}) => {
     if (latestTag !== '') {
       updateTags([...currentTags, latestTag])
       setLatestTag('')
+    }
+    if (onSubmitEditing) {
+      onSubmitEditing()
     }
   }
 
