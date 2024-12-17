@@ -138,7 +138,6 @@ const RecurringTransactionForm = ({
   }, [txKind])
 
   const handleFormSubmit = (data) => {
-    reset()
     const tx = {
       ...transaction,
       ...data,

@@ -48,7 +48,6 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
   const color = watch('color')
 
   const handleFormSubmit = (data) => {
-    reset()
     const cat = {...category, ...data}
     onSubmit(cat)
   }

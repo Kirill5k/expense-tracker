@@ -87,7 +87,6 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
   }, [txKind])
 
   const handleFormSubmit = (data) => {
-    reset()
     const tx = {
       ...transaction,
       ...data,
