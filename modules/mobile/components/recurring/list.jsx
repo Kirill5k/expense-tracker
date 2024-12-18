@@ -113,6 +113,7 @@ const RecurringTransactionList = ({items, onScroll, onItemPress, onItemDelete, d
           )}
           ListHeaderComponent={<RecurringTransactionHeader items={items}/>}
           ListEmptyComponent={<Text className="py-10 text-center">No recurring transactions found</Text>}
+          ListFooterComponent={<Box className="py-3"></Box>}
       />
   )
 }

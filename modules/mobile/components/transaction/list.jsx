@@ -1,6 +1,7 @@
 import React, {useRef, useEffect} from 'react'
 import {Badge, BadgeIcon} from "@/components/ui/badge"
 import {MaterialIcon} from '@/components/ui/icon'
+import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -123,6 +124,7 @@ const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItem
           )}
           ListHeaderComponent={<TransactionHeader items={items}/>}
           ListEmptyComponent={<Text className="py-10 text-center">No transactions for this period</Text>}
+          ListFooterComponent={<Box className="py-3"></Box>}
       />
   )
 }

@@ -59,6 +59,7 @@ const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) =>
               />
           )}
           ListEmptyComponent={<Text className="py-10 text-center">No categories found</Text>}
+          ListFooterComponent={<Box className="py-3"></Box>}
       />
   )
 }
