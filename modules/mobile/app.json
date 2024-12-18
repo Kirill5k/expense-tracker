@@ -18,8 +18,8 @@
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
       "associatedDomains": [
-        "applinks:watery-mommy-kirill5k-185d3bc4.koyeb.app",
-        "webcredentials:watery-mommy-kirill5k-185d3bc4.koyeb.app"
+        "applinks:spendsync.co.uk",
+        "webcredentials:spendsync.co.uk"
       ],
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",
