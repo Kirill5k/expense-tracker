@@ -32,7 +32,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   }
 
   const handleItemCopy = (tx) => {
-    setTxToUpdate({...tx, id: null})
+    setTxToUpdate({...tx, id: null, isRecurring: false, parentTransactionId: null})
     router.push('transaction')
   }
 
