@@ -74,8 +74,8 @@ const TransactionListItem = React.memo(({mode, disabled, item, onItemPress, onIt
   return (
       <VStack className="mb-5">
         <HStack className="items-center justify-between">
-          <Heading size="md" className="mb-1">{formatDate(item)}</Heading>
-          <Text className="text-md">{printAmount(calcTotal(item.txGroup), item.txGroup[0].amount.currency)}</Text>
+          <Heading size="md">{formatDate(item)}</Heading>
+          <Text className="text-lg">{printAmount(calcTotal(item.txGroup), item.txGroup[0].amount.currency)}</Text>
         </HStack>
         <TransactionGroup
             mode={mode}
