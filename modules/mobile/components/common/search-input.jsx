@@ -7,8 +7,9 @@ import {MaterialIcon} from '@/components/ui/icon'
 import {Button, ButtonIcon} from '@/components/ui/button'
 import Colors from '@/constants/colors'
 
-const ExpandableSearchInput = ({onClose, onExpand, className, mode}) => {
+const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [value, setValue] = useState('')
   const animation = useRef(new Animated.Value(0)).current
   const inputRef = useRef(null)
   const screenWidth = Dimensions.get('window').width
@@ -22,6 +23,7 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode}) => {
     }).start()
     if (isExpanded) {
       inputRef.current.blur()
+      handleValueChange('')
       if (onClose) {
         onClose()
       }
@@ -33,9 +35,16 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode}) => {
     }
   }
 
+  const handleValueChange = (v) => {
+    setValue(v)
+    if (onChange) {
+      onChange(v)
+    }
+  }
+
   const inputWidth = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [34, screenWidth - 26], // Adjust the final width as needed
+    outputRange: [34, screenWidth - 26],
   })
 
   return (
@@ -45,11 +54,16 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode}) => {
             <Input
                 variant="rounded"
                 size="sm"
+                className="bg-background-100 border-0"
             >
               <InputField
+                  value={value}
+                  onChangeText={handleValueChange}
                   ref={inputRef}
                   autoFocus={isExpanded}
-                  placeholder={isExpanded ? 'Enter Text here...' : ''}
+                  placeholder={isExpanded ? 'Type to search...' : ''}
+                  importantForAutofill="no"
+                  inputMode="text"
               />
             </Input>
           </Animated.View>
