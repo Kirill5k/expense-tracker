@@ -6,6 +6,7 @@ import {Heading} from '@/components/ui/heading'
 import FloatingButton from '@/components/common/floating-button'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionList from '@/components/transaction/list'
+import TransactionFilter from '@/components/transaction/filter'
 import {ProgressBar} from '@/components/common/progress'
 import SearchInput from '@/components/common/search-input'
 import Classes from '@/constants/classes'
@@ -26,7 +27,8 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const transactions = filterBySearchQuery(mapTransactions(displayedTransactions, categories, user), searchQuery)
+  const mappedTransactions = mapTransactions(displayedTransactions, categories, user)
+  const transactions = filterBySearchQuery(mappedTransactions, searchQuery)
 
   const handleItemDelete = (tx) => {
     setLoading(true)
@@ -60,6 +62,11 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
               mode={mode}
               className="ml-auto z-10 bg-background-0"
               onChange={setSearchQuery}
+          />
+          <TransactionFilter
+              className="mx-1"
+              mode={mode}
+              categories={categories}
           />
         </HStack>
         {loading && <ProgressBar mode={mode}/>}

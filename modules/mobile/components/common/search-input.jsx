@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { Animated, Dimensions } from 'react-native'
+import React, {useRef, useState} from 'react'
+import {Animated, Dimensions} from 'react-native'
 import {HStack} from '@/components/ui/hstack'
 import {Box} from '@/components/ui/box'
 import {Input, InputField} from '@/components/ui/input'
@@ -44,13 +44,13 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
 
   const inputWidth = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [38, screenWidth - 26],
+    outputRange: [38, screenWidth - 70],
   })
 
   return (
-      <Box className={"flex justify-end flex-row items-center " + className }>
+      <Box className={"bg-background-0 flex justify-end flex-row items-center " + className}>
         <HStack className="relative justify-end items-center">
-          <Animated.View style={{overflow: 'hidden', width: inputWidth }}>
+          <Animated.View style={{overflow: 'hidden', width: inputWidth}}>
             <Input
                 variant="rounded"
                 size="md"
@@ -76,7 +76,7 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
               onPress={toggleExpand}
               className="px-2 absolute"
           >
-            <ButtonIcon as={MaterialIcon} code="magnify" dsize={24} dcolor={Colors[mode].text} />
+            <ButtonIcon as={MaterialIcon} code="magnify" dsize={24} dcolor={Colors[mode].text}/>
           </Button>
         </HStack>
       </Box>
