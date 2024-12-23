@@ -56,11 +56,11 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
           </Heading>
           <SearchInput
               mode={mode}
-              className="ml-auto z-10 bg-background-0"
+              className="absolute ml-auto z-10 bg-background-0 right-14 -top-1"
               onChange={setSearchQuery}
           />
           <TransactionFilter
-              className="mx-1"
+              className="absolute mx-1 right-0 -top-1"
               mode={mode}
               categories={categories}
               value={filteredCats}
