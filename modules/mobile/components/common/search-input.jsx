@@ -44,7 +44,7 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
 
   const inputWidth = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [34, screenWidth - 26],
+    outputRange: [38, screenWidth - 26],
   })
 
   return (
@@ -53,7 +53,7 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
           <Animated.View style={{overflow: 'hidden', width: inputWidth }}>
             <Input
                 variant="rounded"
-                size="sm"
+                size="md"
                 className="bg-background-100 border-0"
             >
               <InputField
@@ -63,7 +63,10 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
                   autoFocus={isExpanded}
                   placeholder={isExpanded ? 'Type to search...' : ''}
                   importantForAutofill="no"
-                  inputMode="text"
+                  inputMode="search"
+                  autoComplete="off"
+                  returnKeyType="search"
+                  autoCorrect={false}
               />
             </Input>
           </Animated.View>
@@ -73,7 +76,7 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
               onPress={toggleExpand}
               className="px-2 absolute"
           >
-            <ButtonIcon as={MaterialIcon} code="magnify" dsize={20} dcolor={Colors[mode].text} />
+            <ButtonIcon as={MaterialIcon} code="magnify" dsize={24} dcolor={Colors[mode].text} />
           </Button>
         </HStack>
       </Box>

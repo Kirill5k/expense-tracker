@@ -23,7 +23,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const {setUndoAlert, setTxToUpdate} = useStore()
   const mode = useColorScheme()
 
-  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -53,8 +52,8 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <HStack className="">
-          <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-1'}>
+        <HStack className="relative">
+          <Heading size="2xl" className={loading ? 'pb-0' : 'pb-1'}>
             Transactions
           </Heading>
           <SearchInput
@@ -77,13 +76,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
             onItemPress={handleItemPress}
             onItemCopy={handleItemCopy}
             onItemDelete={handleItemDelete}
-            onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
-                setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
-                setIsScrolling(true)
-              }
-            }}
         />
         <FloatingButton
             onPress={() => {
