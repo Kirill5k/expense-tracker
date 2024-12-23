@@ -123,3 +123,22 @@ export const calculateLastOccurrenceDate = ({recurrence}) => {
 
   return lastOccurrence.toISOString().split('T')[0]
 }
+
+export const filterBySearchQuery = (transactions, searchQuery) => {
+  if (!searchQuery) {
+    return transactions
+  }
+
+  const keywords = searchQuery.split(/[\s,]+/).filter(Boolean)
+
+  return transactions.filter(({ tags, category, note }) => {
+    return keywords.every(keyword => {
+      const lowerKeyword = keyword.toLowerCase();
+      const inCategory = category.name.toLowerCase().includes(lowerKeyword);
+      const inNote = note.toLowerCase().includes(lowerKeyword);
+      const inTags = tags.some(tag => tag.toLowerCase().includes(lowerKeyword));
+
+      return inCategory || inNote || inTags;
+    });
+  });
+}
