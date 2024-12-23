@@ -134,8 +134,8 @@ export const filterBySearchQuery = (transactions, searchQuery) => {
     return keywords.every(keyword => {
       const lowerKeyword = keyword.toLowerCase()
       const inCategory = category.name.toLowerCase().includes(lowerKeyword)
-      const inNote = note.toLowerCase().includes(lowerKeyword)
-      const inTags = tags.some(tag => tag.toLowerCase().includes(lowerKeyword))
+      const inNote = note ? note.toLowerCase().includes(lowerKeyword) : false
+      const inTags = (tags || []).some(tag => tag.toLowerCase().includes(lowerKeyword))
       return inCategory || inNote || inTags
     })
   })
