@@ -7,10 +7,12 @@ export default {
   listItemAmount: ' text-lg font-medium ml-auto', // OLD: 'rounded-xl border text-md font-medium p-1 px-2 ml-auto'
   dark: {
     inputFieldBorder: 'border-secondary-400',
-    invalidInputFieldBorder: 'border-red-300'
+    invalidInputFieldBorder: 'border-red-300',
+    selectedBorder: 'border-primary-400'
   },
   light: {
     inputFieldBorder: 'border-secondary-200',
-    invalidInputFieldBorder: 'border-red-600'
+    invalidInputFieldBorder: 'border-red-600',
+    selectedBorder: 'border-primary-200'
   }
 }

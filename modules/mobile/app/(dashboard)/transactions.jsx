@@ -16,7 +16,7 @@ import {updateStateDisplayDate, hideTransaction} from '@/db/operations'
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
-import {filterBySearchQuery} from '@/utils/transactions'
+import {filterBySearchQuery, filterByCategory} from '@/utils/transactions'
 
 
 const Transactions = ({state, user, displayedTransactions, categories}) => {
@@ -26,9 +26,10 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
 
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [filteredCats, setFilteredCats] = useState([])
 
   const mappedTransactions = mapTransactions(displayedTransactions, categories, user)
-  const transactions = filterBySearchQuery(mappedTransactions, searchQuery)
+  const transactions = filterByCategory(filterBySearchQuery(mappedTransactions, searchQuery), filteredCats)
 
   const handleItemDelete = (tx) => {
     setLoading(true)
@@ -47,11 +48,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
     router.push('transaction')
   }
 
-  /*
-  TODO:
-   - Filter and search transactions
-   */
-
   return (
       <VStack className={Classes.dashboardLayout}>
         <HStack className="relative">
@@ -67,6 +63,8 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
               className="mx-1"
               mode={mode}
               categories={categories}
+              value={filteredCats}
+              onChange={setFilteredCats}
           />
         </HStack>
         {loading && <ProgressBar mode={mode}/>}

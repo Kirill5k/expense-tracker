@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {MaterialIcon, CheckIcon} from '@/components/ui/icon'
 import {Button, ButtonIcon} from '@/components/ui/button'
 import Colors from '@/constants/colors'
+import Classes from '@/constants/classes'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {
   Actionsheet,
@@ -9,9 +10,6 @@ import {
   ActionsheetContent,
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-  ActionsheetIcon,
 } from "@/components/ui/actionsheet"
 import {
   CheckboxGroup,
@@ -20,8 +18,10 @@ import {
   CheckboxIcon,
   CheckboxLabel
 } from "@/components/ui/checkbox"
+import {mergeClasses} from '@/utils/css'
 
-const TransactionFilter = ({mode, className, categories}) => {
+
+const TransactionFilter = ({mode, className, categories, value, onChange}) => {
   const [show, setShow] = useState(false)
   const handleClose = () => setShow(false)
 
@@ -30,7 +30,12 @@ const TransactionFilter = ({mode, className, categories}) => {
         <Button
             variant="link"
             size="md"
-            className={'px-2 bg-background-100 rounded-full ' + className}
+            className={mergeClasses(
+                'px-2 bg-background-100 rounded-full',
+                value.length ? 'border-2' : 'border border-transparent',
+                value.length && Classes[mode].selectedBorder,
+                className,
+            )}
             onPress={() => setShow(true)}
         >
           <ButtonIcon as={MaterialIcon} code="filter-outline" dsize={24} dcolor={Colors[mode].text}/>
@@ -42,7 +47,11 @@ const TransactionFilter = ({mode, className, categories}) => {
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
             <ScrollView className="w-full h-52">
-              <CheckboxGroup className="w-full flex justify-end">
+              <CheckboxGroup
+                  value={value}
+                  onChange={onChange}
+                  className="w-full flex justify-end"
+              >
                 {categories.map(cat => (
                     <Checkbox
                         key={cat.id}
