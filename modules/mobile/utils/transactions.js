@@ -1,5 +1,4 @@
 import {format, isToday, isYesterday, parseISO, addDays, addWeeks, addMonths} from 'date-fns'
-import transactions from "../app/(dashboard)/transactions";
 
 export const calcTotal = (transactions) => {
   if (!transactions?.length) {

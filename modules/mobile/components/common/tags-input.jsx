@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {Pressable} from '@/components/ui/pressable'
 import {Text} from '@/components/ui/text'
 import {Input, InputSlot, InputField} from '@/components/ui/input'
-import {HStack} from "../ui/hstack";
+import {HStack} from '@/components/ui/hstack'
 
 const TagsInput = ({placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md'}) => {
   const [currentTags, setCurrentTags] = useState(value || [])
