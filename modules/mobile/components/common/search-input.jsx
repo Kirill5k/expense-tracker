@@ -38,7 +38,7 @@ const ExpandableSearchInput = ({className, mode, onChange}) => {
 
   const inputWidth = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [38, screenWidth - 74],
+    outputRange: [38, screenWidth - 77],
   })
 
   return (
