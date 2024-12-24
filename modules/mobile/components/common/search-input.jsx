@@ -7,7 +7,7 @@ import {MaterialIcon} from '@/components/ui/icon'
 import {Button, ButtonIcon} from '@/components/ui/button'
 import Colors from '@/constants/colors'
 
-const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) => {
+const ExpandableSearchInput = ({className, mode, onChange}) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [value, setValue] = useState('')
   const animation = useRef(new Animated.Value(0)).current
@@ -24,14 +24,8 @@ const ExpandableSearchInput = ({onClose, onExpand, className, mode, onChange}) =
     if (isExpanded) {
       inputRef.current.blur()
       handleValueChange('')
-      if (onClose) {
-        onClose()
-      }
     } else {
       inputRef.current.focus()
-      if (onExpand) {
-        onExpand()
-      }
     }
   }
 
