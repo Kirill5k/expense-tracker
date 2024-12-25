@@ -7,7 +7,6 @@ import {MaterialIcon} from '@/components/ui/icon'
 import Colors from '@/constants/colors'
 
 const ExpandableSearchInput = ({className, mode, onChange}) => {
-  const [isEditable, setIsEditable] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [value, setValue] = useState('')
   const animation = useRef(new Animated.Value(0)).current
@@ -35,7 +34,6 @@ const ExpandableSearchInput = ({className, mode, onChange}) => {
   })
 
   const handleExpand = () => {
-    setIsEditable(true)
     setIsExpanded(true)
     Animated.timing(animation, {
       toValue: 1,
@@ -46,7 +44,6 @@ const ExpandableSearchInput = ({className, mode, onChange}) => {
   }
 
   const handleClose = () => {
-    setIsEditable(false)
     setIsExpanded(false)
     Animated.timing(animation, {
       toValue: 0,
