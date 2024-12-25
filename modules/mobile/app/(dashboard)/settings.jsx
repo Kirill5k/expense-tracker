@@ -251,7 +251,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
             </SettingsAccordionItem>
           </SettingsAccordion>
 
-          <Box className="px-5">
+          <Box className="px-5 mb-6">
             <Button
                 isDisabled={loading}
                 className="my-4 w-full"

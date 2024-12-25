@@ -80,7 +80,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               mode={mode}
               items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
           />
-          <Box className="py-3"/>
+          <Box className="py-5 my-0.5"></Box>
         </ScrollView>
       </VStack>
   )
