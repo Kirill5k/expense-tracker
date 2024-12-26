@@ -18,8 +18,8 @@
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
       "associatedDomains": [
-        "applinks:spendsync.co.uk",
-        "webcredentials:spendsync.co.uk"
+        "applinks:api.spendsync.co.uk",
+        "webcredentials:api.spendsync.co.uk"
       ],
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",
