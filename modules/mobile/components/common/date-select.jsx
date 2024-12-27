@@ -62,6 +62,14 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
               {({ isExpanded }) => {
                 return (
                     <>
+                      {enabled && <Box className="pl-1.5">
+                        <AccordionIcon
+                            as={MaterialIcon}
+                            code="calendar"
+                            dsize={20}
+                            dcolor={Colors[mode].text}
+                        />
+                      </Box>}
                       <AccordionTitleText className="pl-2 font-semibold py-2">
                         {formatDate(value)}
                       </AccordionTitleText>

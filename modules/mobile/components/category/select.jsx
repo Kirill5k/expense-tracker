@@ -28,7 +28,7 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
                   variant="outline"
                   action="primary"
                   className={mergeClasses(
-                      'justify-between items-center',
+                      'justify-between items-center pl-4',
                       isOpen && 'border-primary-600'
                   )}
                   style={{
@@ -43,7 +43,7 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
                     dsize={20}
                     className="flex-grow-0"
                 />}
-                <ButtonText className={mergeClasses('flex-grow', value?.icon && 'px-2')}>
+                <ButtonText className={mergeClasses('flex-grow pl-1', value?.icon && 'px-2')}>
                   {value?.name ? value.name : 'Select category'}
                 </ButtonText>
                 <ButtonIcon

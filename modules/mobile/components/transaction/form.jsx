@@ -228,7 +228,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="pl-2">
+                  <Input variant="outline" className="pl-2.5">
                     <InputField
                         autoComplete="off"
                         placeholder=""

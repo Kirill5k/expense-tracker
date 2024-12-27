@@ -49,7 +49,7 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, onSubmitEditing, s
       <Input
           variant="outline"
           size={size}
-          className="pl-2"
+          className="pl-3"
       >
         {currentTags?.length > 0 && (
             <InputSlot>
