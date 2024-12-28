@@ -2,18 +2,19 @@ import sbt.*
 
 object Dependencies {
   object Versions {
-    val mongo4cats  = "0.7.11"
-    val commonScala = "0.1.21"
-    val pureConfig  = "0.17.7"
-    val circe       = "0.14.9"
-    val squants     = "1.8.3"
-    val bcrypt      = "4.3.0"
-    val refined     = "0.11.2"
-    val logback     = "1.5.12"
-    val log4cats    = "2.7.0"
-    val tapir       = "1.11.9"
-    val jwt         = "10.0.1"
-    val apispec     = "0.11.3"
+    val mongo4cats   = "0.7.11"
+    val commonScala  = "0.1.21"
+    val pureConfig   = "0.17.8"
+    val circe        = "0.14.10"
+    val circeRefined = "0.15.1"
+    val squants      = "1.8.3"
+    val bcrypt       = "4.3.0"
+    val refined      = "0.11.3"
+    val logback      = "1.5.15"
+    val log4cats     = "2.7.0"
+    val tapir        = "1.11.11"
+    val jwt          = "10.0.1"
+    val apispec      = "0.11.3"
   }
 
   object Libraries {
@@ -47,7 +48,7 @@ object Dependencies {
     object circe {
       val core    = "io.circe" %% "circe-core"    % Versions.circe
       val generic = "io.circe" %% "circe-generic" % Versions.circe
-      val refined = "io.circe" %% "circe-refined" % Versions.circe
+      val refined = "io.circe" %% "circe-refined" % Versions.circeRefined
       val parser  = "io.circe" %% "circe-parser"  % Versions.circe
       val all     = Seq(core, generic, refined, parser)
     }
