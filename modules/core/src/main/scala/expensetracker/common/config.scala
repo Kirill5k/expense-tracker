@@ -3,7 +3,6 @@ package expensetracker.common
 import cats.effect.kernel.Sync
 import kirill5k.common.http4s.Server
 import pureconfig.*
-import pureconfig.generic.derivation.default.*
 
 object config {
 

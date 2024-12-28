@@ -2,7 +2,6 @@ package expensetracker.openapi
 
 import cats.effect.kernel.Sync
 import pureconfig.*
-import pureconfig.generic.derivation.default.*
 
 object config {
 
