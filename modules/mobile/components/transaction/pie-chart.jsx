@@ -77,17 +77,17 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
   }
 
   return (
-      <Box className="w-full flex items-center justify-center my-1">
+      <Box className="w-full flex items-center justify-center my-1 pt-3">
         <PieChart
             sectionAutoFocus
             onPress={handlePress}
             data={data}
             donut
-            radius={105}
-            innerRadius={75}
-            innerCircleColor={Colors[mode].background}
-            strokeColor={Colors[mode].background}
-            strokeWidth={1}
+            radius={120}
+            innerRadius={90}
+            innerCircleColor={Colors[mode].splashScreenBackground}
+            strokeColor={Colors[mode].splashScreenBackground}
+            strokeWidth={4}
             centerLabelComponent={() => (
                 <VStack className="items-center justify-center">
                   <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>

@@ -147,12 +147,12 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
         <Heading size="3xl">{printAmount(total, currency, false)}</Heading>
-        <Text size="sm" className="py-0 mb-1">{pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)}</Text>
+        <Text size="sm" className="pb-2 pt-0 mb-1">{pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)}</Text>
         <BarChart
             spacing={calcSpacing(chartWidth, displayDate.range)}
             barWidth={calcBarWidth(chartWidth, displayDate.range) / 2}
             frontColor={Colors[mode][kind].barChartMain}
-            height={132}
+            height={152}
             width={chartWidth}
             initialSpacing={10}
             roundToDigits={0}
@@ -175,7 +175,7 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
               dashWidth: 5,
               dashGap: 7,
               zIndex: -1,
-              labelText: chartData.average === 0 ? '' : `${chartData.average}`,
+              labelText: chartData.average === 0 ? '' : `${chartData.average}\navg`,
               labelTextStyle: {
                 color: pressedItem ? Colors[mode][kind].barChartSecondary : Colors[mode][kind].barChartMain,
                 textAlign: 'right',
