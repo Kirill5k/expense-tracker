@@ -60,22 +60,21 @@ const ExpandableSearchInput = ({className, mode, onChange}) => {
           <Input
               variant="rounded"
               size="md"
-              className="bg-background-100 border-0"
+              className="bg-background-100 border-0 relative"
           >
-            <InputSlot
-                className="ml-2"
-            >
-              <Pressable
-                  onPress={toggleExpand}
-              >
+            <InputSlot className="ml-2">
+              <Pressable onPress={toggleExpand}>
                 <InputIcon
-                    as={MaterialIcon} code="magnify" dsize={24} dcolor={Colors[mode].text}
+                    as={MaterialIcon}
+                    code="magnify"
+                    dsize={24}
+                    dcolor={Colors[mode].text}
                 />
               </Pressable>
             </InputSlot>
             <InputField
                 editable={isExpanded}
-                clearButtonMode={isExpanded ? 'always' : 'never'}
+                clearButtonMode="never"
                 value={value}
                 onChangeText={handleValueChange}
                 ref={inputRef}
@@ -87,6 +86,17 @@ const ExpandableSearchInput = ({className, mode, onChange}) => {
                 returnKeyType="search"
                 autoCorrect={false}
             />
+            <Pressable
+                className="right-2"
+                onPress={toggleExpand}
+            >
+              <InputIcon
+                  as={MaterialIcon}
+                  code="close"
+                  dsize={24}
+                  dcolor={Colors[mode].text}
+              />
+            </Pressable>
           </Input>
         </Animated.View>
       </Box>
