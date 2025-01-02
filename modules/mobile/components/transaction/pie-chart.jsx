@@ -1,3 +1,4 @@
+import {Pressable} from '@/components/ui/pressable'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
@@ -67,7 +68,7 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
       : prevData.total
 
   const handlePress = (item, i) => {
-    if (pressedItem === i || !item.category) {
+    if (pressedItem?.index === i || !item?.category) {
       setPressedItem(null)
       onChartPress([]);
     } else {
@@ -87,15 +88,17 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
             innerRadius={90}
             innerCircleColor={Colors[mode].splashScreenBackground}
             strokeColor={Colors[mode].splashScreenBackground}
-            strokeWidth={4}
+            strokeWidth={2}
             centerLabelComponent={() => (
-                <VStack className="items-center justify-center">
-                  <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
-                  <Heading size="2xl">
-                    {printAmount(total, currency, false)}
-                  </Heading>
-                  <Text size="md">{percentageChange(total, prevTotal)}</Text>
-                </VStack>
+                <Pressable onPress={() => handlePress(null)}>
+                  <VStack className="w-full h-full items-center justify-center">
+                    <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
+                    <Heading size="2xl">
+                      {printAmount(total, currency, false)}
+                    </Heading>
+                    <Text size="md">{percentageChange(total, prevTotal)}</Text>
+                  </VStack>
+                </Pressable>
             )}
         />
       </Box>
