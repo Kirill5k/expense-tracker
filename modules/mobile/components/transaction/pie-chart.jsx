@@ -68,7 +68,7 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
       : prevData.total
 
   const handlePress = (item, i) => {
-    if (pressedItem?.index === i || !item?.category) {
+    if ((pressedItem !== null && i === 0) || pressedItem?.index === i || !item?.category) {
       setPressedItem(null)
       onChartPress([]);
     } else {
