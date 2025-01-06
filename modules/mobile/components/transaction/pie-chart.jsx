@@ -46,7 +46,7 @@ const prepareChartData = (items, mode) => {
   return {data, total}
 }
 
-const focusItem = (items, index) => items.map((d, i) => i === index ? { ...d, focused: true } : { ...d, focused: false })
+const focusItem = (items, index) => items.map((d, i) =>  ({...d, focused: i === index}))
 
 const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
