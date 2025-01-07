@@ -6,6 +6,7 @@ import Classes from '@/constants/classes'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {
   Actionsheet,
+  ActionsheetItem,
   ActionsheetBackdrop,
   ActionsheetContent,
   ActionsheetDragIndicator,
@@ -24,6 +25,14 @@ import {mergeClasses} from '@/utils/css'
 const TransactionFilter = ({mode, className, categories, value, onChange}) => {
   const [show, setShow] = useState(false)
   const handleClose = () => setShow(false)
+
+  const handlePress = (id) => {
+    if (value.includes(id)) {
+      onChange(value.filter(i => i !== id))
+    } else {
+      onChange([...value, id])
+    }
+  }
 
   return (
       <>
@@ -53,19 +62,22 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
                   className="w-full flex justify-end"
               >
                 {categories.map(cat => (
-                    <Checkbox
+                    <ActionsheetItem
                         key={cat.id}
-                        value={cat.id}
-                        size="lg"
-                        isInvalid={false}
-                        isDisabled={false}
-                        className="p-2"
+                        onPress={() => handlePress(cat.id)}
                     >
-                      <CheckboxIndicator>
-                        <CheckboxIcon as={CheckIcon} />
-                      </CheckboxIndicator>
-                      <CheckboxLabel>{cat.name}</CheckboxLabel>
-                    </Checkbox>
+                      <Checkbox
+                          value={cat.id}
+                          size="lg"
+                          isInvalid={false}
+                          isDisabled={false}
+                      >
+                        <CheckboxIndicator>
+                          <CheckboxIcon as={CheckIcon} />
+                        </CheckboxIndicator>
+                        <CheckboxLabel>{cat.name}</CheckboxLabel>
+                      </Checkbox>
+                    </ActionsheetItem>
                 ))}
               </CheckboxGroup>
             </ScrollView>
