@@ -7,11 +7,12 @@ import {printAmount, isExpense} from '@/utils/transactions'
 import {getDaysInMonth} from 'date-fns'
 import Classes from '@/constants/classes'
 
-const calculateMonthlyTotal = (txs, daysInMonth = 30) => {
+const calculateMonthlyTotal = (transactions, currentDate) => {
+  const daysInMonth = getDaysInMonth(currentDate)
   let totalAmount = 0
 
-  txs.forEach(tx => {
-    const {recurrence, amount} = tx
+  transactions.forEach(transaction => {
+    const {recurrence, amount} = transaction
     let occurrences = 0
 
     switch (recurrence.frequency) {
@@ -28,7 +29,7 @@ const calculateMonthlyTotal = (txs, daysInMonth = 30) => {
         occurrences = 0
     }
 
-    if (isExpense(tx)) {
+    if (isExpense(transaction)) {
       totalAmount -= occurrences * amount.value
     } else {
       totalAmount += occurrences * amount.value
@@ -48,7 +49,7 @@ const RecurringTransactionHeader = ({items}) => {
     return txDate >= currentDate && txDate < nextWeekDate
   })
 
-  const monthTotal = calculateMonthlyTotal(items, getDaysInMonth(currentDate))
+  const monthTotal = calculateMonthlyTotal(items, currentDate)
 
   if (!items?.length) {
     return null
