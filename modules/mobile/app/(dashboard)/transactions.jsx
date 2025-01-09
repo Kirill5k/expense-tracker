@@ -3,7 +3,6 @@ import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Heading} from '@/components/ui/heading'
-import FloatingButton from '@/components/common/floating-button'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionList from '@/components/transaction/list'
 import TransactionFilter from '@/components/transaction/filter'
@@ -89,14 +88,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
                 setIsScrolling(true)
               }
             }}
-        />
-        <FloatingButton
-            onPress={() => {
-              setTxToUpdate(null)
-              router.push('transaction')
-            }}
-            mode={mode}
-            iconCode={"plus"}
         />
       </VStack>
   )

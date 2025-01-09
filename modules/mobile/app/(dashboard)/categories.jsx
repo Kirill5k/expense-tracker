@@ -3,7 +3,6 @@ import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import {ProgressBar} from '@/components/common/progress'
-import FloatingButton from '@/components/common/floating-button'
 import CategoryList from '@/components/category/list'
 import Classes from '@/constants/classes'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -36,11 +35,6 @@ const Categories = ({categories}) => {
     router.push('category')
   }
 
-  const handleFabPress = () => {
-    setCatToUpdate(null)
-    router.push('category')
-  }
-
   return (
       <VStack className={Classes.dashboardLayout}>
         <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
@@ -59,11 +53,6 @@ const Categories = ({categories}) => {
                 setIsScrolling(true)
               }
             }}
-        />
-        <FloatingButton
-            onPress={handleFabPress}
-            mode={mode}
-            iconCode={"plus"}
         />
       </VStack>
   )

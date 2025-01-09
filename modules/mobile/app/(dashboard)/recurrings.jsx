@@ -3,7 +3,6 @@ import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
 import Classes from '@/constants/classes'
 import ToggleButton from '@/components/common/toggle-button'
-import FloatingButton from '@/components/common/floating-button'
 import {ProgressBar} from '@/components/common/progress'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -42,11 +41,6 @@ const Recurring = ({user, categories, recurringTransactions}) => {
     router.push('recurring')
   }
 
-  const handleFabPress = () => {
-    setRtxToUpdate(null)
-    router.push('recurring')
-  }
-
   const transactions = mapTransactions(recurringTransactions, categories, user)
   const displayedTxs = kind.value === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind.value)
 
@@ -75,11 +69,6 @@ const Recurring = ({user, categories, recurringTransactions}) => {
                 setIsScrolling(true)
               }
             }}
-        />
-        <FloatingButton
-            onPress={handleFabPress}
-            mode={mode}
-            iconCode={"plus"}
         />
       </VStack>
   )

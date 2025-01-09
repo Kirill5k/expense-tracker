@@ -1,8 +1,9 @@
-import {Tabs} from 'expo-router'
+import {router, Tabs} from 'expo-router'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import Colors from '@/constants/colors'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import {useColorScheme} from '@/components/useColorScheme'
+import {FloatingButtonStack} from '@/components/common/floating-button'
 
 const tabs = [
   {icon: 'chart-bar', text: 'Analytics', path: 'analytics'},
@@ -12,6 +13,12 @@ const tabs = [
   {icon: 'account-cog', text: 'Settings', path: 'settings'}
 ]
 
+const floatingButtons = [
+  {icon: 'shape', text: 'Category', onPress: () => router.push('category')},
+  {icon: 'calendar-sync-outline', text: 'Recurring', onPress: () => router.push('recurring')},
+  {icon: 'bank-transfer', text: 'Transaction', onPress: () => router.push('transaction')},
+]
+
 const DashboardLayout = () => {
   const mode = useColorScheme()
 
@@ -19,6 +26,7 @@ const DashboardLayout = () => {
       <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
             screenOptions={{
+              animation: 'shift',
               tabBarActiveTintColor: Colors[mode].text,
               // Disable the static render of the header on web
               // to prevent a hydration error in React Navigation v6.
@@ -41,11 +49,11 @@ const DashboardLayout = () => {
                   name={tab.path}
                   options={{
                     title: tab.text,
-                    tabBarIcon: ({ color }) => (
+                    tabBarIcon: ({color}) => (
                         <MaterialCommunityIcons
                             name={tab.icon}
                             size={tab.iconSize || 26}
-                            style={{ marginBottom: tab.iconMarginBottom || -3 }}
+                            style={{marginBottom: tab.iconMarginBottom || -3}}
                             color={color}
                         />
                     ),
@@ -53,6 +61,11 @@ const DashboardLayout = () => {
               />
           ))}
         </Tabs>
+        <FloatingButtonStack
+            className="absolute bottom-[66px] right-4"
+            mode={mode}
+            buttons={floatingButtons}
+        />
       </SafeAreaView>
   );
 };

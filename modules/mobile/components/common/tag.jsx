@@ -2,7 +2,6 @@ import {HStack} from '@/components/ui/hstack'
 import {Box} from '@/components/ui/box'
 import {Text} from '@/components/ui/text'
 import {mergeClasses} from '@/utils/css'
-import React from "react";
 
 export const TagList = ({items, className, tagClassName}) => {
 
