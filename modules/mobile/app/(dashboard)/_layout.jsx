@@ -1,4 +1,4 @@
-import {router, Tabs} from 'expo-router'
+import {router, Tabs, usePathname} from 'expo-router'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import Colors from '@/constants/colors'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
@@ -21,6 +21,9 @@ const floatingButtons = [
 
 const DashboardLayout = () => {
   const mode = useColorScheme()
+  const path = usePathname()
+
+  console.log(path)
 
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
@@ -61,11 +64,13 @@ const DashboardLayout = () => {
               />
           ))}
         </Tabs>
-        <FloatingButtonStack
-            className="absolute bottom-[66px] right-4"
-            mode={mode}
-            buttons={floatingButtons}
-        />
+        {path !== '/settings' && (
+            <FloatingButtonStack
+                className="absolute bottom-[66px] right-4"
+                mode={mode}
+                buttons={floatingButtons}
+            />
+        )}
       </SafeAreaView>
   );
 };
