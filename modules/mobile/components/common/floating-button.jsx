@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, forwardRef, useImperativeHandle} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {
   Button,
@@ -10,13 +10,17 @@ import {MaterialIcon} from '@/components/ui/icon'
 import colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
 
-export const FloatingButtonStack = ({mode, className, buttons}) => {
+export const FloatingButtonStack = forwardRef(({mode, className, buttons}, ref) => {
   const [isOpen, setIsOpen] = useState(false)
+
+  useImperativeHandle(ref, () => ({
+    close: () => setIsOpen(false)
+  }))
 
   return (
       <VStack
-        className={mergeClasses('items-end', className)}
-        space="md"
+          className={mergeClasses('items-end', className)}
+          space="md"
       >
         <Button
             size="lg"
@@ -50,7 +54,7 @@ export const FloatingButtonStack = ({mode, className, buttons}) => {
         ))}
       </VStack>
   )
-}
+})
 
 const FloatingButton = ({onPress, mode, iconCode}) => {
   return (

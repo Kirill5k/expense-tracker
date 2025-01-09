@@ -1,3 +1,4 @@
+import {useEffect, useRef} from 'react'
 import {router, Tabs, usePathname} from 'expo-router'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import Colors from '@/constants/colors'
@@ -20,10 +21,15 @@ const floatingButtons = [
 ]
 
 const DashboardLayout = () => {
+  const floatingButtonRef = useRef(null)
   const mode = useColorScheme()
   const path = usePathname()
 
   console.log(path)
+
+  useEffect(() => {
+    floatingButtonRef?.current?.close()
+  }, [path])
 
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
@@ -66,6 +72,7 @@ const DashboardLayout = () => {
         </Tabs>
         {path !== '/settings' && (
             <FloatingButtonStack
+                ref={floatingButtonRef}
                 className="absolute bottom-[66px] right-4"
                 mode={mode}
                 buttons={floatingButtons}
