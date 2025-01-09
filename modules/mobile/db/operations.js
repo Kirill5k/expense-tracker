@@ -156,7 +156,7 @@ export const createRecurringTransactionInstancesWithTodayDate = async (database)
     await database.write(async () => {
       const actions = []
       for (const rtx of rtxs) {
-        const {transactions, recurringTransaction} = generateRecurrences(rtx.toDomain())
+        const {transactions, recurringTransaction} = generateRecurrences(rtx.toDomain)
         for (const tx of transactions) {
           const txId = await generateRecurrenceInstanceId(rtx.id, tx.date)
           const createTxAction = database.get('transactions').prepareCreate(rec => {

@@ -117,6 +117,10 @@ function RootLayoutNav() {
     }
   }, [locales]);
 
+  useEffect(() => {
+    createRecurringTransactionInstancesWithTodayDate(database)
+  }, [])
+
   return (
       <SafeAreaProvider>
         <GestureHandlerRootView style={{flex: 1}}>
