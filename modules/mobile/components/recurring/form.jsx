@@ -173,7 +173,6 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <ToggleButton
-                      selectedItemClassName="bg-background-200"
                       items={[
                         {label: 'Spending', value: 'expense'},
                         {label: 'Income', value: 'income'}
@@ -284,7 +283,6 @@ const RecurringTransactionForm = ({
               render={({field: {onChange, onBlur, value}}) => (
                   <ToggleButton
                       size="sm"
-                      selectedItemClassName="bg-background-200"
                       items={[
                         {label: 'Daily', value: 'daily'},
                         {label: 'Weekly', value: 'weekly'},

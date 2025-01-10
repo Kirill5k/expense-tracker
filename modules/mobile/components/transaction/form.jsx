@@ -112,7 +112,6 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <ToggleButton
-                      selectedItemClassName="bg-background-200"
                       items={[
                         {label: 'Spending', value: 'expense'},
                         {label: 'Income', value: 'income'}
