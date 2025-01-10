@@ -1,5 +1,5 @@
 import {useState, forwardRef, useImperativeHandle, useRef} from 'react'
-import {Animated} from 'react-native'
+import {Animated, StyleSheet, Platform} from 'react-native'
 import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
 import {Button, ButtonIcon} from '@/components/ui/button'
@@ -118,6 +118,7 @@ const FloatingButton = ({mode, buttons = []}) => {
                       handlePress()
                       button.onPress()
                     }}
+                    style={[styles.floating]}
                 >
                   <ButtonIcon
                       as={MaterialIcon}
@@ -138,6 +139,7 @@ const FloatingButton = ({mode, buttons = []}) => {
               onPress={handlePress}
               size="lg"
               className="rounded-full px-2 h-14 w-14"
+              style={[styles.floating]}
           >
             <ButtonIcon
                 as={MaterialIcon}
@@ -150,5 +152,21 @@ const FloatingButton = ({mode, buttons = []}) => {
       </Box>
   )
 }
+
+const styles = StyleSheet.create({
+  floating: {
+    opacity: 0.87,
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    // Android shadow
+    elevation: 8,
+  },
+})
 
 export default FloatingButton
