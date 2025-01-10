@@ -26,7 +26,7 @@ const Recurring = ({user, categories, recurringTransactions}) => {
   const mode = useColorScheme()
 
   const {setUndoAlert, setRtxToUpdate} = useStore()
-  const [kind, setKind] = useState(kinds[0])
+  const [kind, setKind] = useState(kinds[0].value)
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -43,7 +43,7 @@ const Recurring = ({user, categories, recurringTransactions}) => {
   }
 
   const transactions = mapTransactions(recurringTransactions, categories, user)
-  const displayedTxs = kind.value === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind.value)
+  const displayedTxs = kind === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind)
 
   return (
       <VStack className={Classes.dashboardLayout}>

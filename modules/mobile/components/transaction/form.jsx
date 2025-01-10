@@ -1,10 +1,9 @@
 import React, {useState, useEffect} from 'react'
-import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/components/ui/radio'
 import {Text} from '@/components/ui/text'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Button, ButtonText} from '@/components/ui/button'
-import {CircleIcon} from '@/components/ui/icon'
+import ToggleButton from '@/components/common/toggle-button'
 import {
   FormControl,
   FormControlError,
@@ -112,22 +111,15 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               defaultValue="expense"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <RadioGroup value={value} onChange={onChange}>
-                    <HStack space="md">
-                      <Radio value="expense" size="md">
-                        <RadioLabel className="p-1">Expense</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                      <Radio value="income" size="md">
-                        <RadioLabel className="p-1">Income</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                    </HStack>
-                  </RadioGroup>
+                  <ToggleButton
+                      selectedItemClassName="bg-background-200"
+                      items={[
+                        {label: 'Spending', value: 'expense'},
+                        {label: 'Income', value: 'income'}
+                      ]}
+                      value={value}
+                      onChange={onChange}
+                  />
               )}
           />
           <FormControlError>

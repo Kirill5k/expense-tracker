@@ -3,7 +3,7 @@ import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Input, InputField} from '@/components/ui/input'
-import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/components/ui/radio'
+import ToggleButton from '@/components/common/toggle-button'
 import {
   FormControl,
   FormControlError,
@@ -11,8 +11,7 @@ import {
   FormControlErrorText,
   FormControlLabel,
   FormControlLabelText
-} from "@/components/ui/form-control"
-import {CircleIcon} from '@/components/ui/icon'
+} from'@/components/ui/form-control'
 import IconSelect from '@/components/common/icon-select'
 import {AlertTriangle} from 'lucide-react-native'
 import ColorPicker, {HueSlider} from 'reanimated-color-picker';
@@ -64,22 +63,15 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               defaultValue="expense"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <RadioGroup value={value} onChange={onChange}>
-                    <HStack space="md">
-                      <Radio value="expense" size="md">
-                        <RadioLabel className="p-1">Expense</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                      <Radio value="income" size="md">
-                        <RadioLabel className="p-1">Income</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                    </HStack>
-                  </RadioGroup>
+                  <ToggleButton
+                      selectedItemClassName="bg-background-200"
+                      items={[
+                        {label: 'Spending', value: 'expense'},
+                        {label: 'Income', value: 'income'}
+                      ]}
+                      value={value}
+                      onChange={onChange}
+                  />
               )}
           />
           <FormControlError>

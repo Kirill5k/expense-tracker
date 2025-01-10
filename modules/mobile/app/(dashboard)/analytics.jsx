@@ -28,11 +28,11 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [kind, setKind] = useState(kinds[0])
+  const [kind, setKind] = useState(kinds[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
-  const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind.value)
-  const previousTransactions = mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind.value)
+  const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
+  const previousTransactions = mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
 
   useEffect(() => {
     setSelectedTransactions([])
@@ -63,7 +63,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
             }}
         >
           <TransactionChart
-              kind={kind.value}
+              kind={kind}
               mode={mode}
               items={analysedTransactions}
               previousPeriodItems={previousTransactions}

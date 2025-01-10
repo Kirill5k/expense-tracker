@@ -1,10 +1,8 @@
-import React, {useState, useEffect} from 'react'
-import {RadioGroup, Radio, RadioIndicator, RadioIcon, RadioLabel} from '@/components/ui/radio'
+import {useState, useEffect} from 'react'
 import {Text} from '@/components/ui/text'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Button, ButtonText} from '@/components/ui/button'
-import {CircleIcon} from '@/components/ui/icon'
 import {
   FormControl,
   FormControlError,
@@ -25,6 +23,7 @@ import {AlertTriangle} from 'lucide-react-native'
 import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
+import ToggleButton from '@/components/common/toggle-button'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 import {calculateLastOccurrenceDate} from '@/utils/transactions'
 
@@ -173,22 +172,15 @@ const RecurringTransactionForm = ({
               defaultValue="expense"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <RadioGroup value={value} onChange={onChange}>
-                    <HStack space="md">
-                      <Radio value="expense" size="md">
-                        <RadioLabel className="p-1">Expense</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                      <Radio value="income" size="md">
-                        <RadioLabel className="p-1">Income</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                    </HStack>
-                  </RadioGroup>
+                  <ToggleButton
+                      selectedItemClassName="bg-background-200"
+                      items={[
+                        {label: 'Spending', value: 'expense'},
+                        {label: 'Income', value: 'income'}
+                      ]}
+                      value={value}
+                      onChange={onChange}
+                  />
               )}
           />
           <FormControlError>
@@ -290,28 +282,17 @@ const RecurringTransactionForm = ({
               defaultValue="monthly"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <RadioGroup value={value} onChange={onChange}>
-                    <HStack space="md">
-                      <Radio value="daily" size="md">
-                        <RadioLabel className="p-1">Daily</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                      <Radio value="weekly" size="md">
-                        <RadioLabel className="p-1">Weekly</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                      <Radio value="monthly" size="md">
-                        <RadioLabel className="p-1">Monthly</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon}/>
-                        </RadioIndicator>
-                      </Radio>
-                    </HStack>
-                  </RadioGroup>
+                  <ToggleButton
+                      size="sm"
+                      selectedItemClassName="bg-background-200"
+                      items={[
+                        {label: 'Daily', value: 'daily'},
+                        {label: 'Weekly', value: 'weekly'},
+                        {label: 'Monthly', value: 'monthly'}
+                      ]}
+                      value={value}
+                      onChange={onChange}
+                  />
               )}
           />
           <FormControlError>

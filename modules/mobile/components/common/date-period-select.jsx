@@ -1,13 +1,10 @@
-import React, {useState} from 'react'
-import {ScrollView} from '@/components/ui/scroll-view'
+import {useState} from 'react'
 import {HStack} from '@/components/ui/hstack'
-import {Divider} from '@/components/ui/divider'
 import {Menu, MenuItem, MenuItemLabel} from '@/components/ui/menu'
 import {ButtonIcon, ButtonText, Button} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
 import colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
-import ToggleButton from './toggle-button'
 import {
   format,
   startOfWeek,
@@ -59,56 +56,6 @@ const ranges = {
   weekly: {label: 'Week', value: 'weekly'},
   monthly: {label: 'Month', value: 'monthly'},
   yearly: {label: 'Year', value: 'yearly'}
-}
-
-export const FlatDatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
-  const dates = [incrementBy(value, -1), value, incrementBy(value, 1)]
-
-  const handleRangeChange = (newRange) => {
-    const newDateRange = newDisplayDateForToday(newRange.value)
-    const previous = incrementBy(newDateRange, -1)
-    const next = incrementBy(newDateRange, 1)
-    // setDates([previous, newDateRange, next])
-    onSelect({...newDateRange, previous, next})
-  }
-
-  const handleDateChange = (newDate) => {
-    const newDateRange = newDate.value
-    const previous = incrementBy(newDateRange, -1)
-    const next = incrementBy(newDateRange, 1)
-    // setDates([previous, newDateRange, next])
-    onSelect({...newDateRange, previous, next})
-  }
-
-  return (
-      <ScrollView
-          bounces={false}
-          horizontal
-          className={`py-1 ${className}`}
-          showsHorizontalScrollIndicator={false}
-      >
-        <HStack space="sm">
-          <ToggleButton
-              disabled={disabled}
-              size="sm"
-              onChange={handleDateChange}
-              value={{value: dates[1], label: dates[1].text}}
-              items={dates.map(v => ({value: v, label: v.text}))}
-          />
-          <Divider
-              className="min-h-7"
-              orientation="vertical"
-          />
-          <ToggleButton
-              disabled={disabled}
-              size="sm"
-              value={ranges[value.range]}
-              items={Object.values(ranges)}
-              onChange={handleRangeChange}
-          />
-        </HStack>
-      </ScrollView>
-  )
 }
 
 export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
