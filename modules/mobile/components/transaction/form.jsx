@@ -258,15 +258,17 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
-                    placeholder=""
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
+                      mode={mode}
+                      placeholder="Add tags"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
                   />
               )}
           />
           <FormControlHelper>
-            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each tag</FormControlHelperText>
+            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each
+              tag</FormControlHelperText>
           </FormControlHelper>
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>

@@ -1,10 +1,11 @@
 import React, {useState} from 'react'
-import {Pressable} from '@/components/ui/pressable'
-import {Text} from '@/components/ui/text'
-import {Input, InputSlot, InputField} from '@/components/ui/input'
-import {HStack} from '@/components/ui/hstack'
+import {MaterialIcon} from '@/components/ui/icon'
+import {Input, InputSlot, InputField, InputIcon} from '@/components/ui/input'
+import {VStack} from '@/components/ui/vstack'
+import {TagList} from './tag'
+import Colors from '@/constants/colors'
 
-const TagsInput = ({placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md'}) => {
+const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md'}) => {
   const [currentTags, setCurrentTags] = useState(value || [])
   const [latestTag, setLatestTag] = useState('')
 
@@ -22,14 +23,14 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, onSubmitEditing, s
     }
   }
 
-  const removeTag = (indexToRemove) => {
-    updateTags([...currentTags.slice(0, indexToRemove), ...currentTags.slice(indexToRemove + 1)])
+  const removeTag = (tagToRemove) => {
+    updateTags(currentTags.filter(t => t !== tagToRemove))
   }
 
   const handleKeyPress = (key) => {
     if (key === 'Backspace' && latestTag === '') {
       const tagToRemove = currentTags[currentTags.length - 1]
-      removeTag(currentTags.length - 1)
+      removeTag(tagToRemove)
       setLatestTag(tagToRemove)
     }
   }
@@ -46,40 +47,42 @@ const TagsInput = ({placeholder, value, onChangeText, onBlur, onSubmitEditing, s
   }
 
   return (
-      <Input
-          variant="outline"
-          size={size}
-          className="pl-3"
-      >
-        {currentTags?.length > 0 && (
-            <InputSlot>
-              <HStack className="pl-2" space="xs">
-                {currentTags.map((t, i) => (
-                    <Pressable key={i} onPress={() => removeTag(i)}>
-                      <Text className="rounded-lg px-1 border border-secondary-700 text-typography-700 text-md">
-                        {t}
-                      </Text>
-                    </Pressable>
-                ))}
-              </HStack>
-            </InputSlot>
-        )}
-        <InputField
-            placeholder={currentTags.length > 0 ? '' : placeholder}
-            value={latestTag}
-            onChangeText={handleTextChange}
-            onBlur={onBlur}
-            onSubmitEditing={handleSumit}
-            returnKeyType="done"
-            autoComplete="off"
-            onKeyPress={(e) => handleKeyPress(e.nativeEvent.key)}
-            autoCapitalize="none"
-            autoCorrect="none"
-            importantForAutofill="no"
-            inputMode="text"
-            textContentType="none"
+      <VStack>
+        <TagList
+          items={currentTags}
+          className="mb-2"
+          onPress={(t) => removeTag(t)}
         />
-      </Input>
+        <Input
+            variant="outline"
+            size={size}
+            className="pl-5"
+        >
+          <InputSlot>
+            <InputIcon
+                as={MaterialIcon}
+                code="tag"
+                dsize={20}
+                dcolor={Colors[mode].text}
+            />
+          </InputSlot>
+          <InputField
+              placeholder={placeholder}
+              value={latestTag}
+              onChangeText={handleTextChange}
+              onBlur={onBlur}
+              onSubmitEditing={handleSumit}
+              returnKeyType="done"
+              autoComplete="off"
+              onKeyPress={(e) => handleKeyPress(e.nativeEvent.key)}
+              autoCapitalize="none"
+              autoCorrect="none"
+              importantForAutofill="no"
+              inputMode="text"
+              textContentType="none"
+          />
+        </Input>
+      </VStack>
   )
 }
 

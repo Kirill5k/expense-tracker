@@ -429,7 +429,8 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
-                      placeholder=""
+                      mode={mode}
+                      placeholder="Add tags"
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}

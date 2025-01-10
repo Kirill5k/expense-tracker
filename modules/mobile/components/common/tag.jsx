@@ -1,9 +1,10 @@
 import {HStack} from '@/components/ui/hstack'
-import {Box} from '@/components/ui/box'
 import {Text} from '@/components/ui/text'
+import {Button, ButtonIcon} from '@/components/ui/button'
+import {CloseIcon} from '@/components/ui/icon'
 import {mergeClasses} from '@/utils/css'
 
-export const TagList = ({items, className, tagClassName}) => {
+export const TagList = ({items, className, tagClassName, onPress}) => {
 
   if (!items?.length) {
     return null
@@ -11,18 +12,28 @@ export const TagList = ({items, className, tagClassName}) => {
 
   return (
       <HStack space="xs" className={mergeClasses('flex flex-wrap', className)}>
-        {items.map(((t, i) => (<Tag key={`${t}-${i}`} text={t} className={tagClassName}/>)))}
+        {items.map(((t, i) => (<Tag key={`${t}-${i}`} text={t} onPress={onPress} className={tagClassName}/>)))}
       </HStack>
   )
 }
 
-const Tag = ({text, className}) => {
+const Tag = ({text, className, onPress}) => {
+
   return (
-      <Box className={mergeClasses('rounded-lg bg-background-200', className)}>
-        <Text className="rounded-lg text-typography-900 text-sm font-medium p-1.5 py-0.5">
+      <HStack className={mergeClasses('rounded-lg bg-background-200 items-center justify-center px-2', className)} space="xs">
+        <Text className="rounded-lg text-typography-900 text-sm font-medium pb-0.5">
           {text}
         </Text>
-      </Box>
+        {onPress && (
+            <Button
+                size="xs"
+                variant="link"
+                onPress={() => onPress(text)}
+            >
+              <ButtonIcon as={CloseIcon}/>
+            </Button>
+        )}
+      </HStack>
   )
 }
 
