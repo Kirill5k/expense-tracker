@@ -19,7 +19,6 @@ const DashboardLayout = () => {
       <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
             screenOptions={{
-              animation: 'shift',
               tabBarActiveTintColor: Colors[mode].text,
               // Disable the static render of the header on web
               // to prevent a hydration error in React Navigation v6.
