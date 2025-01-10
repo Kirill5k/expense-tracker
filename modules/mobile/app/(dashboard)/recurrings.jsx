@@ -4,6 +4,7 @@ import {Heading} from '@/components/ui/heading'
 import Classes from '@/constants/classes'
 import ToggleButton from '@/components/common/toggle-button'
 import {ProgressBar} from '@/components/common/progress'
+import FloatingButton from '@/components/common/floating-button'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithRecurringTransactions} from '@/db/observers'
@@ -69,6 +70,14 @@ const Recurring = ({user, categories, recurringTransactions}) => {
                 setIsScrolling(true)
               }
             }}
+        />
+        <FloatingButton
+            mode={mode}
+            buttons={[
+              {icon: 'bank-transfer', text: 'Transaction', onPress: () => router.push('transaction')},
+              {icon: 'calendar-sync-outline', text: 'Recurring', onPress: () => router.push('recurring')},
+              {icon: 'shape', text: 'Category', onPress: () => router.push('category')},
+            ]}
         />
       </VStack>
   )

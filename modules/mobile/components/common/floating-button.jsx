@@ -1,11 +1,8 @@
-import {useState, forwardRef, useImperativeHandle} from 'react'
+import {useState, forwardRef, useImperativeHandle, useRef} from 'react'
+import {Animated} from 'react-native'
+import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
-import {
-  Button,
-  ButtonText,
-  ButtonIcon,
-} from '@/components/ui/button'
-import {Fab, FabIcon} from '@/components/ui/fab'
+import {Button, ButtonIcon} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
 import colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
@@ -19,12 +16,12 @@ export const FloatingButtonStack = forwardRef(({mode, className, buttons}, ref) 
 
   return (
       <VStack
-          className={mergeClasses('items-end', className)}
+          className={mergeClasses('', className)}
           space="md"
       >
         <Button
             size="lg"
-            className="rounded-full px-2 h-12 w-12"
+            className="rounded-full px-2 h-14 w-14"
             onPress={() => setIsOpen(!isOpen)}
         >
           <ButtonIcon
@@ -37,7 +34,7 @@ export const FloatingButtonStack = forwardRef(({mode, className, buttons}, ref) 
         {buttons.map((button) => isOpen && (
             <Button
                 size="lg"
-                className="rounded-full px-2 h-12 w-12 bg-background-700"
+                className="rounded-full px-2 h-14 w-14 bg-background-700"
                 key={button.icon}
                 onPress={() => {
                   setIsOpen(false)
@@ -56,20 +53,101 @@ export const FloatingButtonStack = forwardRef(({mode, className, buttons}, ref) 
   )
 })
 
-const FloatingButton = ({onPress, mode, iconCode}) => {
+const FloatingButton = ({mode, buttons = []}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const animation = useRef(new Animated.Value(0)).current
+
+  const radius = 60
+
+  const handlePress = () => {
+    const toValue = isOpen ? 0 : 1;
+
+    Animated.spring(animation, {
+      toValue,
+      friction: 6,
+      useNativeDriver: true,
+    }).start()
+
+    setIsOpen(!isOpen)
+  }
+
+  const rotateInterpolate = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '45deg']
+  })
+
   return (
-      <Fab
-          onPress={onPress}
-          placement="bottom right"
-          className=""
-      >
-        <FabIcon
-            as={MaterialIcon}
-            code={iconCode}
-            dsize={26}
-            dcolor={colors[mode].background}
-        />
-      </Fab>
+      <Box className="absolute bottom-4 right-4 items-center justify-center">
+        {buttons.map((button, i) => {
+          const angle = -Math.PI - 0.1 + (i * Math.PI * 0.56) / (buttons.length - 1)
+
+          const translateX = animation.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, radius * Math.cos(angle)],
+          })
+
+          const translateY = animation.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, radius * Math.sin(angle)],
+          })
+
+          const scale = animation.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.5, 1],
+          })
+
+          const opacity = animation.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 1],
+          })
+
+          return (
+              <Animated.View
+                  key={i}
+                  className="absolute w-12 h-12"
+                  style={{
+                    transform: [{translateX}, {translateY}, {scale}],
+                    opacity,
+                  }}
+              >
+                <Button
+                    size="lg"
+                    className="rounded-full px-2 h-12 w-12"
+                    key={button.icon}
+                    onPress={() => {
+                      handlePress()
+                      button.onPress()
+                    }}
+                >
+                  <ButtonIcon
+                      as={MaterialIcon}
+                      code={button.icon}
+                      dsize={26}
+                      dcolor={colors[mode].background}
+                  />
+                </Button>
+              </Animated.View>
+          )
+        })}
+        <Animated.View
+            style={{
+              transform: [{rotate: rotateInterpolate}]
+            }}
+        >
+          <Button
+              onPress={handlePress}
+              size="lg"
+              className="rounded-full px-2 h-14 w-14"
+          >
+            <ButtonIcon
+                as={MaterialIcon}
+                code={'plus'}
+                dsize={28}
+                dcolor={colors[mode].background}
+            />
+          </Button>
+        </Animated.View>
+      </Box>
   )
 }
 

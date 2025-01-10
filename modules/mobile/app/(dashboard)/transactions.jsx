@@ -8,6 +8,7 @@ import TransactionList from '@/components/transaction/list'
 import TransactionFilter from '@/components/transaction/filter'
 import {ProgressBar} from '@/components/common/progress'
 import SearchInput from '@/components/common/search-input'
+import FloatingButton from '@/components/common/floating-button'
 import Classes from '@/constants/classes'
 import {useColorScheme} from '@/components/useColorScheme'
 import {mapTransactions} from '@/db/mappers'
@@ -88,6 +89,14 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
                 setIsScrolling(true)
               }
             }}
+        />
+        <FloatingButton
+            mode={mode}
+            buttons={[
+              {icon: 'bank-transfer', text: 'Transaction', onPress: () => router.push('transaction')},
+              {icon: 'calendar-sync-outline', text: 'Recurring', onPress: () => router.push('recurring')},
+              {icon: 'shape', text: 'Category', onPress: () => router.push('category')},
+            ]}
         />
       </VStack>
   )

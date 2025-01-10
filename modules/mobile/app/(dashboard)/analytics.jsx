@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react'
+import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
 import {Heading} from '@/components/ui/heading'
@@ -8,6 +9,7 @@ import DatePeriodSelect from '@/components/common/date-period-select'
 import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
 import CategoryGroupedTransactionList from '@/components/analytics/list'
+import FloatingButton from '@/components/common/floating-button'
 import Classes from '@/constants/classes'
 import {useColorScheme} from '@/components/useColorScheme'
 import {updateStateDisplayDate} from '@/db/operations'
@@ -82,6 +84,14 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
           />
           <Box className="py-5 my-0.5"></Box>
         </ScrollView>
+        <FloatingButton
+          mode={mode}
+          buttons={[
+            {icon: 'bank-transfer', text: 'Transaction', onPress: () => router.push('transaction')},
+            {icon: 'calendar-sync-outline', text: 'Recurring', onPress: () => router.push('recurring')},
+            {icon: 'shape', text: 'Category', onPress: () => router.push('category')},
+          ]}
+        />
       </VStack>
   )
 }
