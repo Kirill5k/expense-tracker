@@ -23,7 +23,7 @@ const ToggleButton = ({value, items, onChange, className, size, disabled}) => {
 
   return (
       <HStack>
-        <HStack className={mergeClasses('min-h-7 items-center rounded-lg justify-between bg-background-50', className)} space="xs">
+        <HStack className={mergeClasses('min-h-6 items-center rounded-lg justify-between bg-background-50', className)} space="xs">
           {items.map((item, i) => (
               <Pressable
                   className="min-h-7"
