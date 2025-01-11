@@ -26,7 +26,7 @@ const ToggleButton = ({value, items, onChange, className, size, disabled}) => {
         <HStack className={mergeClasses('min-h-6 items-center rounded-lg justify-between bg-background-50', className)} space="xs">
           {items.map((item, i) => (
               <Pressable
-                  className="min-h-7"
+                  className="min-h-6"
                   disabled={disabled}
                   key={`${i}-${item.value}`}
                   onPress={() => handleChange(item)}
