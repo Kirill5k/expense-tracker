@@ -53,11 +53,9 @@ export const FloatingButtonStack = forwardRef(({mode, className, buttons}, ref) 
   )
 })
 
-const FloatingButton = ({mode, buttons = []}) => {
+const FloatingButton = ({mode, buttons = [], radius = 65}) => {
   const [isOpen, setIsOpen] = useState(false)
   const animation = useRef(new Animated.Value(0)).current
-
-  const radius = 60
 
   const handlePress = () => {
     const toValue = isOpen ? 0 : 1;
@@ -104,7 +102,7 @@ const FloatingButton = ({mode, buttons = []}) => {
           return (
               <Animated.View
                   key={i}
-                  className="absolute w-12 h-12"
+                  className="absolute w-14 h-14"
                   style={{
                     transform: [{translateX}, {translateY}, {scale}],
                     opacity,
