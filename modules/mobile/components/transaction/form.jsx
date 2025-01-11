@@ -4,6 +4,7 @@ import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Button, ButtonText} from '@/components/ui/button'
 import ToggleButton from '@/components/common/toggle-button'
+import {categoryOptions} from '@/constants/categories'
 import {
   FormControl,
   FormControlError,
@@ -112,10 +113,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <ToggleButton
-                      items={[
-                        {label: 'Spending', value: 'expense'},
-                        {label: 'Income', value: 'income'}
-                      ]}
+                      items={categoryOptions}
                       value={value}
                       onChange={onChange}
                   />

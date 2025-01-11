@@ -14,6 +14,7 @@ import {
   FormControlLabelText
 } from '@/components/ui/form-control'
 import {Input, InputField, InputSlot} from '@/components/ui/input'
+import {categoryOptions} from '@/constants/categories'
 import {z} from 'zod'
 import {format, subHours} from 'date-fns'
 import {Controller, useForm} from 'react-hook-form'
@@ -173,10 +174,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <ToggleButton
-                      items={[
-                        {label: 'Spending', value: 'expense'},
-                        {label: 'Income', value: 'income'}
-                      ]}
+                      items={categoryOptions}
                       value={value}
                       onChange={onChange}
                   />

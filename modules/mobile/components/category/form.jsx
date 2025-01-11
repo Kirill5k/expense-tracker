@@ -13,6 +13,7 @@ import {
   FormControlLabelText
 } from'@/components/ui/form-control'
 import IconSelect from '@/components/common/icon-select'
+import {categoryOptions} from '@/constants/categories'
 import {AlertTriangle} from 'lucide-react-native'
 import ColorPicker, {HueSlider} from 'reanimated-color-picker';
 import {Keyboard} from 'react-native'
@@ -64,10 +65,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <ToggleButton
-                      items={[
-                        {label: 'Spending', value: 'expense'},
-                        {label: 'Income', value: 'income'}
-                      ]}
+                      items={categoryOptions}
                       value={value}
                       onChange={onChange}
                   />

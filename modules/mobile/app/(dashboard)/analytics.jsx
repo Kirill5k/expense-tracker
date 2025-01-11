@@ -11,16 +11,12 @@ import TransactionChart from '@/components/transaction/chart'
 import CategoryGroupedTransactionList from '@/components/analytics/list'
 import FloatingButton from '@/components/common/floating-button'
 import Classes from '@/constants/classes'
+import {categoryOptions} from '@/constants/categories'
 import {useColorScheme} from '@/components/useColorScheme'
 import {updateStateDisplayDate} from '@/db/operations'
 import {mapTransactions} from '@/db/mappers'
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
-
-const kinds = [
-  {label: 'Spending', value: 'expense'},
-  {label: 'Income', value: 'income'}
-]
 
 const Analytics = ({state, user, displayedTransactions, categories, previousDisplayedTransactions}) => {
   const database = useDatabase()
@@ -28,7 +24,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [kind, setKind] = useState(kinds[0].value)
+  const [kind, setKind] = useState(categoryOptions[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
   const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
@@ -48,7 +44,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
             className="mb-2"
             size="lg"
             value={kind}
-            items={kinds}
+            items={categoryOptions}
             onChange={setKind}
         />
         <ScrollView

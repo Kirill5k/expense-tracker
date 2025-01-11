@@ -51,7 +51,7 @@ const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEdit
         <TagList
           items={currentTags}
           className="mb-2"
-          onPress={(t) => removeTag(t)}
+          onPress={removeTag}
         />
         <Input
             variant="outline"

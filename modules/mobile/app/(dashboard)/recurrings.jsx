@@ -7,6 +7,7 @@ import {ProgressBar} from '@/components/common/progress'
 import FloatingButton from '@/components/common/floating-button'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
+import {categoryOptions} from '@/constants/categories'
 import {enhanceWithRecurringTransactions} from '@/db/observers'
 import {hideRecurringTransaction} from '@/db/operations'
 import {mapTransactions} from '@/db/mappers'
@@ -15,18 +16,12 @@ import {router} from 'expo-router'
 import {useDatabase} from '@nozbe/watermelondb/react'
 
 
-const kinds = [
-  {label: 'All', value: 'all'},
-  {label: 'Spending', value: 'expense'},
-  {label: 'Income', value: 'income'}
-]
-
 const Recurring = ({user, categories, recurringTransactions}) => {
   const database = useDatabase()
   const mode = useColorScheme()
 
   const {setUndoAlert, setRtxToUpdate} = useStore()
-  const [kind, setKind] = useState(kinds[0].value)
+  const [kind, setKind] = useState('all')
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -55,7 +50,7 @@ const Recurring = ({user, categories, recurringTransactions}) => {
             className="mb-2"
             size="lg"
             value={kind}
-            items={kinds}
+            items={[{label: 'All', value: 'all'}, ...categoryOptions]}
             onChange={setKind}
         />
         <RecurringTransactionList
