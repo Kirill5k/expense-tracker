@@ -88,6 +88,7 @@ const endDateHelpText = ({frequency, interval, endDate, startDate}) => {
   if (lastTxDate) {
     return `Last recurrence on ${format(lastTxDate, 'dd MMM yyyy')}`
   }
+  return 'No end date set — this transaction will repeat indefinitely'
 }
 
 const RecurringTransactionForm = ({
