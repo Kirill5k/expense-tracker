@@ -153,15 +153,15 @@ const FloatingButton = ({mode, buttons = [], radius = 65}) => {
 
 const styles = StyleSheet.create({
   floating: {
-    opacity: 0.87,
+    opacity: 0.95,
     // iOS shadow
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    shadowOpacity: 0.6,
+    shadowRadius: 3.65,
     // Android shadow
     elevation: 8,
   },
