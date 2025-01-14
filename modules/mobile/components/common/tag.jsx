@@ -21,7 +21,7 @@ const Tag = ({text, className, onPress, index = 0}) => {
 
   return (
       <HStack className={mergeClasses('rounded-lg bg-background-200 items-center justify-center px-2', className)} space="xs">
-        <Text className="rounded-lg text-typography-900 text-sm font-medium pb-0.5">
+        <Text className="rounded-lg text-typography-900 text-sm font-medium py-0.5">
           {text}
         </Text>
         {onPress && (
