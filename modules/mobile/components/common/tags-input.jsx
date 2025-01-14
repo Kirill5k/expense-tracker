@@ -23,14 +23,14 @@ const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEdit
     }
   }
 
-  const removeTag = (tagToRemove) => {
-    updateTags(currentTags.filter(t => t !== tagToRemove))
+  const removeTag = (tagToRemove, index) => {
+    updateTags([...currentTags.slice(0, index), ...currentTags.slice(index + 1)])
   }
 
   const handleKeyPress = (key) => {
     if (key === 'Backspace' && latestTag === '') {
       const tagToRemove = currentTags[currentTags.length - 1]
-      removeTag(tagToRemove)
+      removeTag(tagToRemove, currentTags.length - 1)
       setLatestTag(tagToRemove)
     }
   }
