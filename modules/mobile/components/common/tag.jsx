@@ -12,12 +12,12 @@ export const TagList = ({items, className, tagClassName, onPress}) => {
 
   return (
       <HStack space="xs" className={mergeClasses('flex flex-wrap', className)}>
-        {items.map(((t, i) => (<Tag key={`${t}-${i}`} text={t} onPress={() => onPress(t, i)} className={tagClassName}/>)))}
+        {items.map(((t, i) => (<Tag key={`${t}-${i}`} text={t} index={i} onPress={onPress} className={tagClassName}/>)))}
       </HStack>
   )
 }
 
-const Tag = ({text, className, onPress}) => {
+const Tag = ({text, className, onPress, index = 0}) => {
 
   return (
       <HStack className={mergeClasses('rounded-lg bg-background-200 items-center justify-center px-2', className)} space="xs">
@@ -28,7 +28,7 @@ const Tag = ({text, className, onPress}) => {
             <Button
                 size="xs"
                 variant="link"
-                onPress={onPress}
+                onPress={() => onPress(text, index)}
             >
               <ButtonIcon as={CloseIcon}/>
             </Button>
