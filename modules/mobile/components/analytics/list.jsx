@@ -83,27 +83,27 @@ const CategoryGroupedTransactionList = ({items, mode}) => {
                   {item.transactions.map(tx => (
                       <HStack key={tx.id} className="w-full justify-between bg-background-100 rounded-xl py-3 px-3">
                         <VStack className="items-start gap-1">
-                          <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
+                          <HStack space="xs" className="items-center">
+                            <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
+                            {tx.isRecurring && (
+                                <Badge
+                                    className="bg-transparent p-0"
+                                    variant="solid"
+                                >
+                                  <BadgeIcon
+                                      className="text-white"
+                                      as={MaterialIcon}
+                                      code="repeat-variant"
+                                      dsize={16}
+                                      dcolor={Colors[mode].tabIconDefault}
+                                  />
+                                </Badge>
+                            )}
+                          </HStack>
                           {tx.note && <Text className="line-clamp-1 text-md">{tx.note}</Text>}
                           <TagList items={tx.tags}/>
                         </VStack>
-                        <VStack>
-                          {tx.isRecurring && (
-                              <Badge
-                                  className="absolute -z-10 bg-transparent -top-2.5 -right-4"
-                                  variant="solid"
-                              >
-                                <BadgeIcon
-                                    className="text-white"
-                                    as={MaterialIcon}
-                                    code="repeat-variant"
-                                    dsize={12}
-                                    dcolor={Colors[mode].tabIconDefault}
-                                />
-                              </Badge>
-                          )}
-                          <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
-                        </VStack>
+                        <Text className="line-clamp-1 text-md text-right font-semibold">{formatAmount(tx)}</Text>
                       </HStack>
                   ))}
                 </VStack>

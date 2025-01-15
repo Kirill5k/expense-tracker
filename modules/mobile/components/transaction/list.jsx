@@ -33,28 +33,28 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
                     color={tx.category.color}
                 />
                 <VStack className="justify-center gap-1">
-                  <HStack>
+                  <HStack space="xs" className="items-center">
                     <Text className={Classes.listItemMainText}>
                       {tx.note || tx.category.name}
                     </Text>
+                    {tx.isRecurring && (
+                        <Badge
+                            className="bg-transparent p-0"
+                            variant="solid"
+                        >
+                          <BadgeIcon
+                              className="text-white"
+                              as={MaterialIcon}
+                              code="repeat-variant"
+                              dsize={20}
+                              dcolor={Colors[mode].tabIconDefault}
+                          />
+                        </Badge>
+                    )}
                   </HStack>
                   <TagList items={tx.tags} className="w-64"/>
                 </VStack>
                 <VStack className="ml-auto relative">
-                  {tx.isRecurring && (
-                      <Badge
-                          className="absolute -z-10 bg-transparent -top-2 -right-4"
-                          variant="solid"
-                      >
-                        <BadgeIcon
-                            className="text-white"
-                            as={MaterialIcon}
-                            code="repeat-variant"
-                            dsize={14}
-                            dcolor={Colors[mode].tabIconDefault}
-                        />
-                      </Badge>
-                  )}
                   <Text
                       className={mergeClasses(
                           Classes.listItemAmount,
