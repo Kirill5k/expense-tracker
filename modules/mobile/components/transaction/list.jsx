@@ -39,14 +39,14 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
                     </Text>
                     {tx.isRecurring && (
                         <Badge
-                            className="bg-transparent p-0"
+                            className="bg-transparent p-0 pb-0.5"
                             variant="solid"
                         >
                           <BadgeIcon
                               className="text-white"
                               as={MaterialIcon}
                               code="repeat-variant"
-                              dsize={20}
+                              dsize={22}
                               dcolor={Colors[mode].tabIconDefault}
                           />
                         </Badge>

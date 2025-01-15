@@ -87,7 +87,7 @@ const CategoryGroupedTransactionList = ({items, mode}) => {
                             <Text className="line-clamp-1 text-md text-right font-semibold">{formatDate(tx)}</Text>
                             {tx.isRecurring && (
                                 <Badge
-                                    className="bg-transparent p-0"
+                                    className="bg-transparent p-0 m-0"
                                     variant="solid"
                                 >
                                   <BadgeIcon
