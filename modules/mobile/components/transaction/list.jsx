@@ -46,7 +46,7 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
                               className="text-white"
                               as={MaterialIcon}
                               code="repeat-variant"
-                              dsize={22}
+                              dsize={20}
                               dcolor={Colors[mode].tabIconDefault}
                           />
                         </Badge>
