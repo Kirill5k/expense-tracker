@@ -60,35 +60,18 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const [appState, setAppState] = useState(AppState.currentState)
-  const [intervalId, setIntervalId] = useState(null)
   const {mode, alert, clearAlert, accessToken, setLocale} = useStore()
   const locales = useLocales()
 
   const syncDb = () => {
-    console.log('Initiating db sync', intervalId)
+    console.log('Initiating db sync')
     initSync(database)
   }
 
-  const startSync = (accessToken) => {
+  useEffect(() => {
     if (accessToken) {
       syncDb()
-      const intervalId = setInterval(syncDb, 600000) // 10 minutes
-      setIntervalId(intervalId)
     }
-  }
-
-  const stopSync = (intervalId) => {
-    if (intervalId) {
-      console.log('stopping db sync')
-      clearInterval(intervalId)
-      setIntervalId(null)
-    }
-  }
-
-  useEffect(() => {
-    stopSync(intervalId)
-    startSync(accessToken)
-    return () => stopSync(intervalId)
   }, [accessToken])
 
   useEffect(() => {
@@ -101,6 +84,7 @@ function RootLayoutNav() {
 
       if (nextAppState === 'background') {
         console.log('App has gone to the background')
+        syncDb()
       }
 
       setAppState(nextAppState)
