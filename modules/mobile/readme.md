@@ -6,6 +6,7 @@
 
 ```shell
 npx expo install --fix
+npx expo-doctor
 ```
 
 ## Run on device
