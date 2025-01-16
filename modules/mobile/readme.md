@@ -5,8 +5,9 @@
 ## Update dependencies
 
 ```shell
-npx expo install --fix
 npx expo-doctor
+npx expo install --check
+npx expo install --fix
 ```
 
 ## Run on device
