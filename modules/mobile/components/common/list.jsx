@@ -51,6 +51,14 @@ const RightAction = ({onCopy, onDelete, swipeableRef}) => (prog, drag) => {
 export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
   const ref = React.useRef(null)
   const [isPressed, setIsPressed] = useState(false)
+  const [isSwiped, setIsSwiped] = useState(false)
+
+  const handleSwipeableWillOpen = () => {
+    if (!isSwiped) {
+      setIsSwiped(true)
+    }
+  }
+
   return (
       <Swipeable
           ref={ref}
@@ -59,9 +67,11 @@ export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete
           enableTrackpadTwoFingerGesture
           rightThreshold={40}
           renderRightActions={RightAction({onCopy, onDelete, swipeableRef: ref})}
+          onSwipeableWillOpen={handleSwipeableWillOpen}
+          onSwipeableClose={(args) => setIsSwiped(false)}
       >
         <Pressable
-            disabled={disabled}
+            disabled={disabled || isSwiped}
             onPressIn={() => setIsPressed(true)}
             onPressOut={() => setIsPressed(false)}
             className={`rounded-xl hover:bg-background-100 ${isPressed ? 'bg-background-200' : ''}`}
