@@ -7,12 +7,15 @@ import { colorScheme as colorSchemeNW } from 'nativewind';
 
 const getColorSchemeName = (colorScheme, mode) => {
   if (mode === 'system') {
-    return colorScheme || 'light';
+    return colorScheme ?? 'light';
   }
   return mode;
 };
 
-export function GluestackUIProvider({mode = 'light', ...props}) {
+export function GluestackUIProvider({
+  mode = 'light',
+  ...props
+}) {
   const colorScheme = useColorScheme();
 
   const colorSchemeName = getColorSchemeName(colorScheme, mode);
@@ -20,16 +23,17 @@ export function GluestackUIProvider({mode = 'light', ...props}) {
   colorSchemeNW.set(mode);
 
   return (
-    <View
-      style={[
-        config[colorSchemeName],
-        { flex: 1, height: '100%', width: '100%' },
-        props.style,
-      ]}
-    >
-      <OverlayProvider>
-        <ToastProvider>{props.children}</ToastProvider>
-      </OverlayProvider>
-    </View>
+      <View
+          style={[
+            config[colorSchemeName],
+            // eslint-disable-next-line react-native/no-inline-styles
+            { flex: 1, height: '100%', width: '100%' },
+            props.style,
+          ]}
+      >
+        <OverlayProvider>
+          <ToastProvider>{props.children}</ToastProvider>
+        </OverlayProvider>
+      </View>
   );
 }

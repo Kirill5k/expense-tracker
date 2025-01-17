@@ -48,13 +48,11 @@
         "expo-build-properties",
         {
           "android": {
-            "newArchEnabled": false,
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
             "buildToolsVersion": "35.0.0"
           },
           "ios": {
-            "newArchEnabled": false,
             "deploymentTarget": "15.1"
           }
         }
