@@ -91,7 +91,8 @@
     "expo-crypto": "~13.0.2",
     "expo-image": "~1.13.0",
     "expo-localization": "~15.0.3",
-    "expo-insights": "~0.7.0"
+    "expo-insights": "~0.7.0",
+    "expo-haptics": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

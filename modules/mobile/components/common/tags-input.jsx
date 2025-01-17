@@ -35,7 +35,7 @@ const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEdit
     }
   }
 
-  const handleSumit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     if (latestTag !== '') {
       updateTags([...currentTags, latestTag])
@@ -71,7 +71,7 @@ const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEdit
               value={latestTag}
               onChangeText={handleTextChange}
               onBlur={onBlur}
-              onSubmitEditing={handleSumit}
+              onSubmitEditing={handleSubmit}
               returnKeyType="done"
               autoComplete="off"
               onKeyPress={(e) => handleKeyPress(e.nativeEvent.key)}
