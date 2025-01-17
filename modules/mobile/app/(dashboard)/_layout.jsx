@@ -7,14 +7,13 @@ import {useColorScheme} from '@/components/useColorScheme'
 const tabs = [
   {icon: 'chart-bar', text: 'Analytics', path: 'analytics'},
   {icon: 'bank-transfer', iconSize: 30, iconMarginBottom: -5, text: 'Transactions', path: 'transactions'},
-  {icon: 'calendar-sync-outline', iconSize: 24, iconMarginBottom: -7, text: 'Recurring', path: 'recurrings'},
+  {icon: 'calendar-sync-outline', iconSize: 25, iconMarginBottom: -3, text: 'Recurring', path: 'recurrings'},
   {icon: 'shape', text: 'Categories', path: 'categories'},
   {icon: 'account-cog', text: 'Settings', path: 'settings'}
 ]
 
 const DashboardLayout = () => {
-  const mode = useColorScheme()
-
+  const mode = useColorScheme() || 'light'
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
@@ -24,14 +23,11 @@ const DashboardLayout = () => {
               // to prevent a hydration error in React Navigation v6.
               headerShown: false,
               tabBarStyle: {
-                paddingTop: 5,
                 backgroundColor: Colors[mode].backgroundColor,
                 borderTopColor: Colors[mode].tabTopBorder,
               },
               tabBarLabelStyle: {
-                fontSize: 12,
-                paddingBottom: 3,
-                paddingTop: 3
+                fontSize: 10,
               },
             }}
         >
@@ -45,7 +41,7 @@ const DashboardLayout = () => {
                         <MaterialCommunityIcons
                             name={tab.icon}
                             size={tab.iconSize || 26}
-                            style={{marginBottom: tab.iconMarginBottom || -3}}
+                            style={{marginBottom: tab.iconMarginBottom || 0}}
                             color={color}
                         />
                     ),

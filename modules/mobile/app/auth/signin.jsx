@@ -18,7 +18,7 @@ import Features from '@/config/features'
 
 const SignIn = () => {
   const database = useDatabase()
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
   const {setLoginSuccessAlert, accessToken, setAccessToken} = useStore()
 
   const handleLogin = async (credentials) => {

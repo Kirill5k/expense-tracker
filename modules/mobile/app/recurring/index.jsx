@@ -12,7 +12,7 @@ import useStore from '@/store'
 const Recurring = ({user, categories}) => {
   const {rtxToUpdate, setRtxToUpdate} = useStore()
   const database = useDatabase()
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
 
   const incomeCategories = categories.filter(c => c.kind === 'income').map(c => c.toDomain)
   const expenseCategories = categories.filter(c => c.kind === 'expense').map(c => c.toDomain)

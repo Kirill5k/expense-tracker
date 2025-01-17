@@ -16,7 +16,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Categories = ({categories}) => {
   const database = useDatabase()
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
   const {setUndoAlert, setCatToUpdate} = useStore()
 
   const [isScrolling, setIsScrolling] = useState(false)
