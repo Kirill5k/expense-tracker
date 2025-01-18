@@ -27,7 +27,7 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
                 onCopy={() => onItemCopy(tx)}
                 onDelete={() => onItemDelete(tx)}
             >
-              <HStack className={Classes.listItemLayout}>
+              <HStack className={Classes.listItemLayout + ' '}>
                 <ListItemIcon
                     icon={tx.category.icon}
                     color={tx.category.color}
@@ -52,17 +52,15 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
                         </Badge>
                     )}
                   </HStack>
-                  <TagList items={tx.tags} className="w-64"/>
+                  <TagList items={tx.tags} className="max-w-64"/>
                 </VStack>
-                <VStack className="ml-auto relative">
-                  <Text
-                      className={mergeClasses(
-                          Classes.listItemAmount,
-                          isExpense(tx) ? 'text-red-500' : 'text-green-500'
-                      )}>
-                    {formatAmount(tx)}
-                  </Text>
-                </VStack>
+                <Text
+                    className={mergeClasses(
+                        Classes.listItemAmount,
+                        isExpense(tx) ? 'text-red-500' : 'text-green-500'
+                    )}>
+                  {formatAmount(tx)}
+                </Text>
               </HStack>
             </ListItemPressable>
         ))}

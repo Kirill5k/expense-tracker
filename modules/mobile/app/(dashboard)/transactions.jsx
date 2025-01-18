@@ -22,7 +22,7 @@ import {filterBySearchQuery, filterByCategory} from '@/utils/transactions'
 const Transactions = ({state, user, displayedTransactions, categories}) => {
   const database = useDatabase()
   const {setUndoAlert, setTxToUpdate} = useStore()
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)

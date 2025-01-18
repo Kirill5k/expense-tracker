@@ -50,7 +50,7 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 }
 
 const Settings = ({user, state, totalTransactionCount}) => {
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
   const database = useDatabase()
   const {setMode, clearAccessToken, setErrorAlert, setPasswordChangeSuccessAlert, setDataDeletionSuccessAlert} = useStore()
 

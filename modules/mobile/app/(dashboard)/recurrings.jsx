@@ -18,7 +18,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Recurring = ({user, categories, recurringTransactions}) => {
   const database = useDatabase()
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
 
   const {setUndoAlert, setRtxToUpdate} = useStore()
   const [kind, setKind] = useState('all')

@@ -20,7 +20,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Analytics = ({state, user, displayedTransactions, categories, previousDisplayedTransactions}) => {
   const database = useDatabase()
-  const mode = useColorScheme()
+  const mode = useColorScheme() || 'light'
 
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
