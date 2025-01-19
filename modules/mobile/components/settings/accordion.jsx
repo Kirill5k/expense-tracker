@@ -30,14 +30,14 @@ export const SettingsAccordion = ({isDisabled, className, children}) => {
 export const SettingsAccordionItem = ({isLast, value, children, headerTitle, headerValue}) => {
   return (
       <>
-        <AccordionItem value={value}>
+        <AccordionItem value={value} className="py-1">
           <SettingsAccordionHeader
               title={headerTitle}
               value={headerValue}
           />
           {children}
         </AccordionItem>
-        {!isLast && <Divider className="mx-5"/>}
+        {!isLast && <Divider className=""/>}
       </>
   )
 }
