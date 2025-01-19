@@ -1,10 +1,12 @@
 import {useState, useEffect} from 'react'
 import {router} from 'expo-router'
+import {Platform} from 'react-native'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
 import {VStack} from '@/components/ui/vstack'
 import {ScrollView} from '@/components/ui/scroll-view'
+import {KeyboardAvoidingView} from '@/components/ui/keyboard-avoiding-view'
 import Profile from '@/components/settings/profile'
 import {CurrencySelect} from '@/components/settings/currency-select'
 import ThemeSelect from '@/components/settings/theme-select'
@@ -123,6 +125,11 @@ const Settings = ({user, state, totalTransactionCount}) => {
   }
 
   return (
+      <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="w-full h-full bg-transparent"
+          keyboardVerticalOffset={20}
+      >
       <VStack className={Classes.dashboardLayout}>
         <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
           Settings
@@ -267,6 +274,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
           </Box>
         </ScrollView>
       </VStack>
+      </KeyboardAvoidingView>
   )
 }
 
