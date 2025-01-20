@@ -53,7 +53,7 @@ export const FloatingButtonStack = forwardRef(({mode, className, buttons}, ref) 
   )
 })
 
-const FloatingButton = ({mode, buttons = [], radius = 65}) => {
+const FloatingButton = ({mode, buttons = [], radius = 75}) => {
   const [isOpen, setIsOpen] = useState(false)
   const animation = useRef(new Animated.Value(0)).current
 
@@ -110,7 +110,7 @@ const FloatingButton = ({mode, buttons = [], radius = 65}) => {
               >
                 <Button
                     size="lg"
-                    className="rounded-full px-2 h-12 w-12"
+                    className="rounded-full px-2 h-14 w-14"
                     key={button.icon}
                     onPress={() => {
                       handlePress()
