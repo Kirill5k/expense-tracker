@@ -27,11 +27,11 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
             className="mt-4"
         >
           <InputField
+              autoCorrect={false}
               value={input}
               onChangeText={setInput}
               placeholder={`Type ${confirmationText} to confirm`}
-              autoCapitalize="none"
-              autoCorrect="none"
+              autoCapitalize="characters"
               importantForAutofill="no"
               inputMode="text"
               autoComplete="off"
