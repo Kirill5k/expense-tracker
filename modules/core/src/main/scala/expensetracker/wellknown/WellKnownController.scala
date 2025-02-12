@@ -16,29 +16,26 @@ final class WellKnownController[F[_]: Async](
     private val config: WellKnownConfig
 ) extends Controller[F] {
 
-  private val statusEndpoint: ServerEndpoint[Fs2Streams[F], F] =
-    WellKnownController.aasaEndpoint
-      .serverLogicPure { _ =>
-        Right(
-          AppleAppSiteAssociation(
-            applinks = AasaAppLinks(
-              apps = Nil,
-              details = List(
-                AasaAppLinksDetails(
-                  appID = s"${config.apple.developerId}.${config.apple.bundleId}",
-                  paths = List("/")
-                )
-              )
-            ),
-            activitycontinuation = AasaActivityContinuation(
-              apps = List(s"${config.apple.developerId}.${config.apple.bundleId}")
-            ),
-            webcredentials = AasaWebCredentials(
-              apps = List(s"${config.apple.developerId}.${config.apple.bundleId}")
-            )
-          )
+  private val appleAppSiteAssociation = AppleAppSiteAssociation(
+    applinks = AasaAppLinks(
+      apps = Nil,
+      details = List(
+        AasaAppLinksDetails(
+          appID = s"${config.apple.developerId}.${config.apple.bundleId}",
+          paths = List("/")
         )
-      }
+      )
+    ),
+    activitycontinuation = AasaActivityContinuation(
+      apps = List(s"${config.apple.developerId}.${config.apple.bundleId}")
+    ),
+    webcredentials = AasaWebCredentials(
+      apps = List(s"${config.apple.developerId}.${config.apple.bundleId}")
+    )
+  )
+  
+  private val statusEndpoint: ServerEndpoint[Fs2Streams[F], F] =
+    WellKnownController.aasaEndpoint.serverLogicPure(_ => Right(appleAppSiteAssociation))
 
   def routes(using auth: Authenticator[F]): HttpRoutes[F] = Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
 }
