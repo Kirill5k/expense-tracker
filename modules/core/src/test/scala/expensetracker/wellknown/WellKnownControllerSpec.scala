@@ -24,6 +24,7 @@ class WellKnownControllerSpec extends HttpRoutesWordSpec:
         val req = Request[IO](uri = uri"/.well-known/apple-app-site-association", method = Method.GET)
         val res = WellKnownController.make[IO](config).flatMap(_.routes.orNotFound.run(req))
 
+        res mustContainHeaders Map("Content-Type" -> "application/json")
         res mustHaveStatus (Status.Ok, Some(
           """
             |{
