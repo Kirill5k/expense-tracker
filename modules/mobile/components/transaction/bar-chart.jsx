@@ -149,6 +149,7 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
         <Heading size="3xl">{printAmount(total, currency, false)}</Heading>
         <Text size="sm" className="pb-2 pt-0 mb-1">{pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)}</Text>
         <BarChart
+            isAnimated
             spacing={calcSpacing(chartWidth, displayDate.range)}
             barWidth={calcBarWidth(chartWidth, displayDate.range) / 2}
             frontColor={Colors[mode][kind].barChartMain}
