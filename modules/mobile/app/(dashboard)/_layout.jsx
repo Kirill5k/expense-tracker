@@ -18,9 +18,7 @@ const DashboardLayout = () => {
   const insets = useSafeAreaInsets()
 
   return (
-      <SafeAreaView
-          className="w-full h-full bg-background-0"
-      >
+      <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
             screenOptions={{
               tabBarActiveTintColor: Colors[mode].text,
