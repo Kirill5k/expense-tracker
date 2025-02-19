@@ -1,4 +1,5 @@
 import {Tabs} from 'expo-router'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
 import Colors from '@/constants/colors'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
@@ -13,9 +14,13 @@ const tabs = [
 ]
 
 const DashboardLayout = () => {
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
+  const insets = useSafeAreaInsets()
+
   return (
-      <SafeAreaView className="w-full h-full bg-background-0">
+      <SafeAreaView
+          className="w-full h-full bg-background-0"
+      >
         <Tabs
             screenOptions={{
               tabBarActiveTintColor: Colors[mode].text,
@@ -25,6 +30,9 @@ const DashboardLayout = () => {
               tabBarStyle: {
                 backgroundColor: Colors[mode].backgroundColor,
                 borderTopColor: Colors[mode].tabTopBorder,
+                height: 30 + insets.bottom,
+                paddingBottom: insets.bottom,
+                paddingTop: 2,
               },
               tabBarLabelStyle: {
                 fontSize: 10,
