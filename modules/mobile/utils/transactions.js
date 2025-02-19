@@ -22,7 +22,7 @@ export const printAmount = (total, currency, withSign = true) => {
     maximumFractionDigits: total > 10000 ? 0 : 2,
   }).format(Math.abs(total))
 
-  const sign = withSign ? (total < 0 ? '-' : '+') : '';
+  const sign = withSign && total !== 0 ? (total < 0 ? '-' : '+') : '';
 
   return `${sign}${currency ? currency.symbol : ''}${formattedNumber}`
 }
