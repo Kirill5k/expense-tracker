@@ -13,6 +13,11 @@
       "backgroundColor": "#121212"
     },
     "ios": {
+      "icon": {
+        "light": "./assets/images/icon-light.png",
+        "dark": "./assets/images/icon-dark.png",
+        "tinted": "./assets/images/icon-tinted.png"
+      },
       "newArchEnabled": true,
       "supportsTablet": false,
       "bundleIdentifier": "com.github.kirill5k.spendsync",
