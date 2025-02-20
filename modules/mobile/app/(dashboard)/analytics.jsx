@@ -60,7 +60,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
-              className="mt-3 mb-1"
+              className="mt-6 mb-2"
               disabled={loading}
               mode={mode}
               value={state.displayDate}

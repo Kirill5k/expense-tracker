@@ -103,7 +103,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   <ButtonIcon
                       as={MaterialIcon}
                       code="chevron-left"
-                      dsize={28}
+                      dsize={36}
                       dcolor={colors[mode].text}
                   />
                 </Button>
@@ -122,7 +122,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                       as={MaterialIcon}
                       code={isOpen ? 'chevron-up' : 'chevron-down'}
                       dcolor={colors[mode].text}
-                      dsize={20}
+                      dsize={24}
                   />
                 </Button>
                 <Button
@@ -135,7 +135,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   <ButtonIcon
                       as={MaterialIcon}
                       code="chevron-right"
-                      dsize={28}
+                      dsize={36}
                       dcolor={colors[mode].text}
                   />
                 </Button>

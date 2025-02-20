@@ -46,7 +46,7 @@ const Recurring = ({user, categories, recurringTransactions}) => {
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
         <ToggleButton
-            className="mb-2"
+            className="mb-4"
             size="lg"
             value={kind}
             items={[{label: 'All', value: 'all'}, ...categoryOptions]}

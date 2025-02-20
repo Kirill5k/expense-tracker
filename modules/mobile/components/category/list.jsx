@@ -46,7 +46,7 @@ const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) =>
           bounces={true}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
-          initialNumToRender={11}
+          initialNumToRender={13}
           onScroll={onScroll}
           data={data}
           keyExtractor={(item) => item.id}
