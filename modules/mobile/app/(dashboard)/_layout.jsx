@@ -17,6 +17,7 @@ const DashboardLayout = () => {
   const mode = useColorScheme()
   const insets = useSafeAreaInsets()
 
+  console.log('insets.bottom', insets.bottom)
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
@@ -28,13 +29,12 @@ const DashboardLayout = () => {
               tabBarStyle: {
                 backgroundColor: Colors[mode].backgroundColor,
                 borderTopColor: Colors[mode].tabTopBorder,
-                height: 30 + insets.bottom,
-                paddingBottom: insets.bottom,
-                paddingTop: 2,
+                height: 50 + (insets.bottom * 0.15),
               },
               tabBarLabelStyle: {
                 fontSize: 10,
               },
+              safeAreaInsets: { bottom: 'always' },
             }}
         >
           {tabs.map((tab, i) => (
