@@ -103,7 +103,7 @@ const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItem
   return (
       <FlatList
           ref={flatListRef}
-          bounces={false}
+          bounces={true}
           onScroll={onScroll}
           showsVerticalScrollIndicator={false}
           className={Classes.scrollList}

@@ -96,7 +96,7 @@ const RecurringTransactionList = ({items, onScroll, onItemPress, onItemDelete, d
   const data = nonNullDates.concat(nullDates).map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
   return (
       <FlatList
-          bounces={false}
+          bounces={true}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
           initialNumToRender={5}

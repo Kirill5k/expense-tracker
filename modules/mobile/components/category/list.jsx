@@ -43,7 +43,7 @@ const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) =>
   const data = items.map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
   return (
       <FlatList
-          bounces={false}
+          bounces={true}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
           initialNumToRender={11}

@@ -20,9 +20,8 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Analytics = ({state, user, displayedTransactions, categories, previousDisplayedTransactions}) => {
   const database = useDatabase()
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
 
-  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
   const [kind, setKind] = useState(categoryOptions[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
@@ -36,7 +35,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   return (
       <VStack className={`${Classes.dashboardLayout}`}>
-        <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           Analytics
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
@@ -48,15 +47,8 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
             onChange={setKind}
         />
         <ScrollView
-            bounces={false}
+            bounces={true}
             showsVerticalScrollIndicator={false}
-            onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
-                setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
-                setIsScrolling(true)
-              }
-            }}
         >
           <TransactionChart
               kind={kind}

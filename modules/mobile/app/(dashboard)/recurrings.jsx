@@ -22,7 +22,6 @@ const Recurring = ({user, categories, recurringTransactions}) => {
 
   const {setUndoAlert, setRtxToUpdate} = useStore()
   const [kind, setKind] = useState('all')
-  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleItemDelete = (rtx) => {
@@ -42,7 +41,7 @@ const Recurring = ({user, categories, recurringTransactions}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           Recurring
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
@@ -58,13 +57,6 @@ const Recurring = ({user, categories, recurringTransactions}) => {
             disabled={loading}
             onItemPress={handleItemPress}
             onItemDelete={handleItemDelete}
-            onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
-                setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
-                setIsScrolling(true)
-              }
-            }}
         />
         <FloatingButton
             mode={mode}

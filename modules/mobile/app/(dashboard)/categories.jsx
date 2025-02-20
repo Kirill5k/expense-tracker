@@ -19,7 +19,6 @@ const Categories = ({categories}) => {
   const mode = useColorScheme() || 'light'
   const {setUndoAlert, setCatToUpdate} = useStore()
 
-  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const displayedCategories = mapCategories(categories)
@@ -38,7 +37,7 @@ const Categories = ({categories}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           Categories
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
@@ -47,13 +46,6 @@ const Categories = ({categories}) => {
             disabled={loading}
             onItemPress={handleItemPress}
             onItemDelete={handleItemDelete}
-            onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 20 && isScrolling) {
-                setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 20 && !isScrolling) {
-                setIsScrolling(true)
-              }
-            }}
         />
         <FloatingButton
             mode={mode}

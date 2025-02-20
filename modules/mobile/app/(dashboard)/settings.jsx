@@ -56,7 +56,6 @@ const Settings = ({user, state, totalTransactionCount}) => {
   const database = useDatabase()
   const {setMode, clearAccessToken, setErrorAlert, setPasswordChangeSuccessAlert, setDataDeletionSuccessAlert} = useStore()
 
-  const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleLogout = () => {
@@ -131,20 +130,13 @@ const Settings = ({user, state, totalTransactionCount}) => {
           keyboardVerticalOffset={20}
       >
       <VStack className={Classes.dashboardLayout}>
-        <Heading size={isScrolling ? 'md' : '2xl'} className={loading ? 'pb-0' : 'pb-2'}>
+        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           Settings
         </Heading>
         {loading && <ProgressBar mode={mode}/>}
         <ScrollView
-            bounces={false}
+            bounces={true}
             showsVerticalScrollIndicator={false}
-            onScroll={({nativeEvent}) => {
-              if (nativeEvent.contentOffset.y <= 10 && isScrolling) {
-                setIsScrolling(false)
-              } else if (nativeEvent.contentOffset.y > 10 && !isScrolling) {
-                setIsScrolling(true)
-              }
-            }}
         >
           <Profile user={{...user.toDomain, totalTransactionCount}}/>
           <Heading className="py-2" size="xl">
