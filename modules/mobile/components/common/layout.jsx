@@ -7,6 +7,22 @@ import {KeyboardAvoidingView} from '@/components/ui/keyboard-avoiding-view'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {Pressable} from '@/components/ui/pressable'
 import {ArrowLeftIcon, Icon} from '@/components/ui/icon'
+import {ProgressBar} from '@/components/common/progress'
+import {useColorScheme} from '@/components/useColorScheme'
+
+
+export const ScreenHeading = ({heading, subHeading, loading = false}) => {
+  const mode = useColorScheme()
+  return (
+      <VStack>
+        <Heading size="2xl" className={loading ? 'pb-2' : 'pb-4'}>
+          {heading}
+        </Heading>
+        {loading && <ProgressBar mode={mode}/>}
+        {subHeading && <Text>{subHeading}</Text>}
+      </VStack>
+  )
+}
 
 export const ScreenHeader = ({heading, subHeading, onBack = () => router.back()}) => {
   return (
@@ -18,12 +34,10 @@ export const ScreenHeader = ({heading, subHeading, onBack = () => router.back()}
               size="xl"
           />
         </Pressable>
-        <VStack>
-          <Heading size="2xl">
-            {heading}
-          </Heading>
-          {subHeading && <Text>{subHeading}</Text>}
-        </VStack>
+        <ScreenHeading
+          heading={heading}
+          subHeading={subHeading}
+        />
       </>
   )
 }

@@ -2,9 +2,8 @@ import {useEffect, useState} from 'react'
 import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
-import {Heading} from '@/components/ui/heading'
+import {ScreenHeading} from '@/components/common/layout'
 import {ScrollView} from '@/components/ui/scroll-view'
-import {ProgressBar} from '@/components/common/progress'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import ToggleButton from '@/components/common/toggle-button'
 import TransactionChart from '@/components/transaction/chart'
@@ -35,10 +34,10 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   return (
       <VStack className={`${Classes.dashboardLayout}`}>
-        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
-          Analytics
-        </Heading>
-        {loading && <ProgressBar mode={mode}/>}
+        <ScreenHeading
+            heading="Analytics"
+            loading={loading}
+        />
         <ToggleButton
             className="mb-2"
             size="lg"

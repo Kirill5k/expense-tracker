@@ -1,8 +1,7 @@
 import React, {useState} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
-import {Heading} from '@/components/ui/heading'
-import {ProgressBar} from '@/components/common/progress'
+import {ScreenHeading} from '@/components/common/layout'
 import FloatingButton from '@/components/common/floating-button'
 import CategoryList from '@/components/category/list'
 import Classes from '@/constants/classes'
@@ -37,10 +36,10 @@ const Categories = ({categories}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
-          Categories
-        </Heading>
-        {loading && <ProgressBar mode={mode}/>}
+        <ScreenHeading
+            heading="Categories"
+            loading={loading}
+        />
         <CategoryList
             items={displayedCategories}
             disabled={loading}

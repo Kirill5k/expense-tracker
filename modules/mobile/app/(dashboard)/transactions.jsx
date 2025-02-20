@@ -2,11 +2,10 @@ import React, {useState} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
-import {Heading} from '@/components/ui/heading'
+import {ScreenHeading} from '@/components/common/layout'
 import DatePeriodSelect from '@/components/common/date-period-select'
 import TransactionList from '@/components/transaction/list'
 import TransactionFilter from '@/components/transaction/filter'
-import {ProgressBar} from '@/components/common/progress'
 import SearchInput from '@/components/common/search-input'
 import FloatingButton from '@/components/common/floating-button'
 import Classes from '@/constants/classes'
@@ -51,25 +50,24 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   return (
       <VStack className={Classes.dashboardLayout}>
         <HStack className="relative">
-          <Heading size="2xl" className={loading ? 'pb-0' : 'pb-1'}>
-            Transactions
-          </Heading>
+          <ScreenHeading
+            heading="Transactions"
+            loading={loading}
+          />
           <SearchInput
               mode={mode}
-              className="absolute ml-auto z-10 bg-background-0 right-14 -top-1"
+              className="absolute ml-auto z-10 bg-background-0 right-14 top-0"
               onChange={setSearchQuery}
           />
           <TransactionFilter
-              className="absolute mx-1 right-0 -top-1"
+              className="absolute mx-1 right-0 top-0"
               mode={mode}
               categories={categories}
               value={filteredCats}
               onChange={setFilteredCats}
           />
         </HStack>
-        {loading && <ProgressBar mode={mode}/>}
         <DatePeriodSelect
-            className="mt-2"
             disabled={loading}
             mode={mode}
             value={state.displayDate}

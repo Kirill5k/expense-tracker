@@ -1,9 +1,8 @@
 import React, {useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
-import {Heading} from '@/components/ui/heading'
 import Classes from '@/constants/classes'
+import {ScreenHeading} from '@/components/common/layout'
 import ToggleButton from '@/components/common/toggle-button'
-import {ProgressBar} from '@/components/common/progress'
 import FloatingButton from '@/components/common/floating-button'
 import RecurringTransactionList from '@/components/recurring/list'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -41,10 +40,10 @@ const Recurring = ({user, categories, recurringTransactions}) => {
 
   return (
       <VStack className={Classes.dashboardLayout}>
-        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
-          Recurring
-        </Heading>
-        {loading && <ProgressBar mode={mode}/>}
+        <ScreenHeading
+            heading="Recurring"
+            loading={loading}
+        />
         <ToggleButton
             className="mb-1"
             size="lg"

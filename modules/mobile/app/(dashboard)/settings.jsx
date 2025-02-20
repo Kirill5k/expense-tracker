@@ -1,6 +1,7 @@
-import {useState, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import {router} from 'expo-router'
 import {Platform} from 'react-native'
+import {ScreenHeading} from '@/components/common/layout'
 import {Box} from '@/components/ui/box'
 import {Button, ButtonText} from '@/components/ui/button'
 import {Heading} from '@/components/ui/heading'
@@ -15,7 +16,6 @@ import PasswordChange from '@/components/settings/password-change'
 import FutureTransactionsToggle from '@/components/settings/future-transactions-toggle'
 import {SettingsAccordion, SettingsAccordionItem, SettingsAccordionContent} from '@/components/settings/accordion'
 import {AccordionContentText} from '@/components/ui/accordion'
-import {ProgressBar} from '@/components/common/progress'
 import Classes from '@/constants/classes'
 import Client from '@/api/client'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -130,10 +130,10 @@ const Settings = ({user, state, totalTransactionCount}) => {
           keyboardVerticalOffset={20}
       >
       <VStack className={Classes.dashboardLayout}>
-        <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
-          Settings
-        </Heading>
-        {loading && <ProgressBar mode={mode}/>}
+        <ScreenHeading
+            heading="Settings"
+            loading={loading}
+        />
         <ScrollView
             bounces={true}
             showsVerticalScrollIndicator={false}

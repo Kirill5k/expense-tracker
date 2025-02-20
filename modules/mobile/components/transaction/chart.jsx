@@ -19,7 +19,7 @@ const TransactionChart = ({items, previousPeriodItems, mode, displayDate, curren
   }
 
   return (
-      <VStack className="h-72">
+      <VStack className="mt-2 h-72">
         <Fab
             isHovered={false}
             placement="top right"
