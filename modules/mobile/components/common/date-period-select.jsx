@@ -94,7 +94,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   className={`items-center justify-between ${className}`}
               >
                 <Button
-                    size="lg"
+                    size="mg"
                     variant="link"
                     action="primary"
                     onPress={goBack}
@@ -126,7 +126,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   />
                 </Button>
                 <Button
-                    size="lg"
+                    size="md"
                     variant="link"
                     action="primary"
                     onPress={goForward}

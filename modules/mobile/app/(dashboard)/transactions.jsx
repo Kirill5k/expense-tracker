@@ -69,7 +69,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
         </HStack>
         {loading && <ProgressBar mode={mode}/>}
         <DatePeriodSelect
-            className="my-2"
+            className="mt-2"
             disabled={loading}
             mode={mode}
             value={state.displayDate}
