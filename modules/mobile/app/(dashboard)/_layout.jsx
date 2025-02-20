@@ -17,7 +17,6 @@ const DashboardLayout = () => {
   const mode = useColorScheme()
   const insets = useSafeAreaInsets()
 
-  console.log('insets.bottom', insets.bottom)
   return (
       <SafeAreaView className="w-full h-full bg-background-0">
         <Tabs
