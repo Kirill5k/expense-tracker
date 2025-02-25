@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react'
+import {VStack} from '@/components/ui/vstack'
 import {Input, InputField} from '@/components/ui/input'
 import {Button, ButtonText} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
@@ -11,10 +12,10 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
 
   useEffect(() => {
     setIsConfirmed(input === confirmationText)
-  }, [input]);
+  }, [input])
 
   return (
-      <>
+      <VStack space="lg">
         <Alert action="error" variant="solid">
           <AlertIcon as={MaterialIcon} code="alert-circle-outline" dcolor={Colors[mode].error} dsize={16}/>
           <AlertText size="md">
@@ -24,7 +25,6 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
         <Input
             variant="outline"
             size="md"
-            className="mt-4"
         >
           <InputField
               autoCorrect={false}
@@ -40,8 +40,8 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
         </Input>
         <Button
             isDisabled={isDisabled || !isConfirmed}
-            className="my-4 w-full"
-            size="sm"
+            className="w-full"
+            size="md"
             action="negative"
             variant={outline ? 'outline' : 'solid'}
             onPress={onPress}
@@ -50,7 +50,7 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
             {buttonText}
           </ButtonText>
         </Button>
-      </>
+      </VStack>
   )
 }
 
