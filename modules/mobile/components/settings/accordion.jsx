@@ -66,7 +66,7 @@ export const SettingsAccordionHeader = ({title, value}) => {
 
 export const SettingsAccordionContent = ({children}) => {
   return (
-      <AccordionContent className="pb-6">
+      <AccordionContent className="pt-2 pb-6">
         {children}
       </AccordionContent>
   )

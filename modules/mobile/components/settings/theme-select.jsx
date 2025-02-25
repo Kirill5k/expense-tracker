@@ -7,7 +7,7 @@ import {Radio, RadioGroup, RadioIndicator, RadioLabel, RadioIcon} from '@/compon
 const ThemeSelect = ({isDisabled, value, onSelect}) => {
   return (
       <RadioGroup className="ml-1" value={value} onChange={onSelect}>
-        <VStack space="sm">
+        <VStack space="md">
           <Box>
             <Radio isDisabled={isDisabled} value={false} size="md">
               <RadioIndicator>

@@ -74,7 +74,7 @@ const HideFutureTransactionsToggle = ({isDisabled, value, onSelect, mode}) => {
             onSelect(v === 1 ? daysAhead : v)
           }}
       >
-        <VStack space="sm">
+        <VStack space="md">
           <Box>
             <Radio isDisabled={isDisabled} value={0} size="md">
               <RadioIndicator>

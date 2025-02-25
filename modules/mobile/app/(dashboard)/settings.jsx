@@ -147,7 +147,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                 headerValue={user?.currency?.symbol}
             >
               <SettingsAccordionContent>
-                <VStack space="sm">
+                <VStack space="lg">
                   <AccordionContentText>
                     Select your default currency for logging and viewing transactions. Existing transactions will retain
                     their original currency.
