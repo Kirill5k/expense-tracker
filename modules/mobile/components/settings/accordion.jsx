@@ -30,7 +30,7 @@ export const SettingsAccordion = ({isDisabled, className, children}) => {
 export const SettingsAccordionItem = ({isLast, value, children, headerTitle, headerValue}) => {
   return (
       <>
-        <AccordionItem value={value} className="py-1">
+        <AccordionItem value={value} className="py-2">
           <SettingsAccordionHeader
               title={headerTitle}
               value={headerValue}
@@ -66,7 +66,7 @@ export const SettingsAccordionHeader = ({title, value}) => {
 
 export const SettingsAccordionContent = ({children}) => {
   return (
-      <AccordionContent className="pt-2 pb-6">
+      <AccordionContent className="pt-4 pb-6">
         {children}
       </AccordionContent>
   )
