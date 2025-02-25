@@ -52,7 +52,7 @@ const hideFutureTransactionsDisplayLabel = (futureTransactionVisibilityDays) => 
 }
 
 const Settings = ({user, state, totalTransactionCount}) => {
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
   const database = useDatabase()
   const {setMode, clearAccessToken, setErrorAlert, setPasswordChangeSuccessAlert, setDataDeletionSuccessAlert} = useStore()
 
@@ -118,10 +118,6 @@ const Settings = ({user, state, totalTransactionCount}) => {
       handleLogout()
     }
   }, [])
-
-  if (!user) {
-    return null
-  }
 
   return (
       <KeyboardAvoidingView

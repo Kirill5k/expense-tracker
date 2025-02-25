@@ -15,7 +15,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 
 const Categories = ({categories}) => {
   const database = useDatabase()
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
   const {setUndoAlert, setCatToUpdate} = useStore()
 
   const [loading, setLoading] = useState(false)

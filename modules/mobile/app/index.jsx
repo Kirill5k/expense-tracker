@@ -13,7 +13,7 @@ import Text from '@/constants/text'
 
 const Index = ({state, user}) => {
   const [isLoading, setIsLoading] = useState(true)
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
   const {setMode, setAccessToken} = useStore()
 
   useEffect(() => {

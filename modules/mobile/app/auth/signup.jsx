@@ -19,7 +19,7 @@ import Features from '@/config/features'
 
 const SignUp = ({user}) => {
   const database = useDatabase()
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
   const {setRegistrationSuccessAlert, accessToken, setAccessToken, locale} = useStore()
 
   const handleCreateAccount = async (account) => {

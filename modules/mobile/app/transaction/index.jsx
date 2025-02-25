@@ -13,7 +13,7 @@ import useStore from '@/store'
 const Transaction = ({user, categories}) => {
   const {txToUpdate, setTxToUpdate} = useStore()
   const database = useDatabase()
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
 
   const incomeCategories = categories.filter(c => c.kind === 'income').map(c => c.toDomain)
   const expenseCategories = categories.filter(c => c.kind === 'expense').map(c => c.toDomain)

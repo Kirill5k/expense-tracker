@@ -12,7 +12,7 @@ import useStore from '@/store'
 const Category = ({user}) => {
   const {catToUpdate, setCatToUpdate} = useStore()
   const database = useDatabase()
-  const mode = useColorScheme() || 'light'
+  const mode = useColorScheme()
 
   const withUserId = obj => ({...obj, userId: user.id})
 
