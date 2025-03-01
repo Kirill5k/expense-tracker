@@ -7,10 +7,10 @@ import {useColorScheme} from '@/components/useColorScheme'
 
 const tabs = [
   {icon: 'chart-bar', text: 'Analytics', iconMarginBottom: -1, path: 'analytics'},
-  {icon: 'bank-transfer', iconSize: 32, iconMarginBottom: -3, text: 'Transactions', path: 'transactions'},
+  {icon: 'bank-transfer', iconSize: 32, iconMarginBottom: -5, text: 'Transactions', path: 'transactions'},
   {icon: 'calendar-sync-outline', iconSize: 24, iconMarginBottom: -4, text: 'Recurring', path: 'recurrings'},
   {icon: 'shape', text: 'Categories', iconMarginBottom: 0, path: 'categories'},
-  {icon: 'account-cog', text: 'Settings', iconSize: 28, iconMarginBottom: 0, path: 'settings'}
+  {icon: 'account-cog', text: 'Settings', iconSize: 28, iconMarginBottom: -3, path: 'settings'}
 ]
 
 const DashboardLayout = () => {
