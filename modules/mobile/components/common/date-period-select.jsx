@@ -91,7 +91,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
           trigger={(triggerProps) => (
               <HStack
                   space="lg"
-                  className={`items-center justify-between ${className}`}
+                  className={mergeClasses('items-center justify-between', className)}
               >
                 <Button
                     size="mg"
