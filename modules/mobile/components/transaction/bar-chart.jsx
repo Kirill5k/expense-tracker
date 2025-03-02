@@ -7,6 +7,7 @@ import {BarChart, yAxisSides} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 import {nonEmpty, zipFlat} from '@/utils/arrays'
 import {printAmount} from '@/utils/transactions'
+import {mergeClasses} from '@/utils/css'
 
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -19,6 +20,10 @@ const percentageChangeLabel = (currentTotal, previousTotal, displayDate) => {
   }
 
   const change = ((currentTotal - previousTotal) / previousTotal) * 100
+  if (change === 0) {
+    return 'Same as previous month'
+  }
+
   const sign = change >= 0 ? '+' : '-'
   return `${sign}${Math.abs(change).toFixed(0)}% from previous ${displayDate.range.replaceAll('ly', '')}`
 }
@@ -143,11 +148,21 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
 
   const zippedData = zipFlat(data, previousData)
 
+  const percentageChangeLabelText = pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)
   return (
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
         <Heading size="3xl">{printAmount(total, currency, false)}</Heading>
-        <Text size="sm" className="pb-2 pt-0 mb-1">{pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)}</Text>
+        <Text
+            size="sm"
+            className={mergeClasses(
+                'pb-2 pt-0 mb-1',
+                percentageChangeLabelText.startsWith('+') && 'text-red-500',
+                percentageChangeLabelText.startsWith('-') && 'text-green-500',
+            )}
+        >
+          {percentageChangeLabelText}
+        </Text>
         <BarChart
             isAnimated
             spacing={calcSpacing(chartWidth, displayDate.range)}

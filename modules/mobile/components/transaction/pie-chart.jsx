@@ -8,6 +8,8 @@ import {PieChart} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 import {nonEmpty} from '@/utils/arrays'
 import {printAmount} from '@/utils/transactions'
+import {mergeClasses} from '@/utils/css'
+
 
 const percentageChange = (currentTotal, previousTotal) => {
   if (!currentTotal || !previousTotal) {
@@ -15,6 +17,10 @@ const percentageChange = (currentTotal, previousTotal) => {
   }
 
   const change = ((currentTotal - previousTotal) / previousTotal) * 100
+  if (change === 0) {
+    return ''
+  }
+
   const sign = change >= 0 ? '+' : '-'
   return `${sign}${Math.abs(change).toFixed(0)}%`
 }
@@ -77,6 +83,8 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
     }
   }
 
+  const percentageChangeText = percentageChange(total, prevTotal)
+
   return (
       <Box className="w-full flex items-center justify-center my-1 pt-3">
         <PieChart
@@ -96,7 +104,15 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
                     <Heading size="2xl">
                       {printAmount(total, currency, false)}
                     </Heading>
-                    <Text size="md">{percentageChange(total, prevTotal)}</Text>
+                    <Text
+                        size="md"
+                        className={mergeClasses(
+                            percentageChangeText.startsWith('+') && 'text-red-500',
+                            percentageChangeText.startsWith('-') && 'text-green-500',
+                        )}
+                    >
+                      {percentageChangeText}
+                    </Text>
                   </VStack>
                 </Pressable>
             )}
