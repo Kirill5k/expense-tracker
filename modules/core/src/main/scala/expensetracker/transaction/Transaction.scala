@@ -1,6 +1,7 @@
 package expensetracker.transaction
 
 import eu.timepit.refined.types.numeric.PosInt
+import expensetracker.accounts.{Account, AccountId}
 import expensetracker.auth.user.UserId
 import expensetracker.category.{Category, CategoryId}
 import expensetracker.common.types.{EnumType, IdType}
@@ -28,6 +29,8 @@ final case class Transaction(
     note: Option[String],
     tags: Set[String],
     hidden: Boolean,
+    accountId: Option[AccountId] = None,
+    account: Option[Account] = None,
     category: Option[Category] = None,
     createdAt: Option[Instant] = None,
     lastUpdatedAt: Option[Instant] = None
@@ -51,6 +54,8 @@ final case class PeriodicTransaction(
     note: Option[String],
     tags: Set[String],
     hidden: Boolean,
+    accountId: Option[AccountId] = None,
+    account: Option[Account] = None,
     category: Option[Category] = None,
     createdAt: Option[Instant] = None,
     lastUpdatedAt: Option[Instant] = None
