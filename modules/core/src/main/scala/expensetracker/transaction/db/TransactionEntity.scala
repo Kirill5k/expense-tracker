@@ -1,5 +1,6 @@
 package expensetracker.transaction.db
 
+import expensetracker.accounts.AccountId
 import io.circe.Codec
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
@@ -16,6 +17,7 @@ final case class TransactionEntity(
     _id: ObjectId,
     userId: ObjectId,
     categoryId: ObjectId,
+    accountId: Option[ObjectId],
     parentTransactionId: Option[ObjectId],
     isRecurring: Option[Boolean],
     amount: Money,
@@ -32,6 +34,7 @@ final case class TransactionEntity(
       id = TransactionId(_id),
       userId = UserId(userId),
       categoryId = CategoryId(categoryId),
+      accountId = accountId.map(AccountId(_)),
       parentTransactionId = parentTransactionId.map(id => TransactionId(id)),
       isRecurring = isRecurring.getOrElse(false),
       amount = amount,
@@ -49,6 +52,7 @@ object TransactionEntity:
       _id = ObjectId(),
       userId = tx.userId.toObjectId,
       categoryId = tx.categoryId.toObjectId,
+      accountId = tx.accountId.map(_.toObjectId),
       parentTransactionId = None,
       isRecurring = Some(false),
       amount = tx.amount,

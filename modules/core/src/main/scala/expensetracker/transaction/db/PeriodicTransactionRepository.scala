@@ -47,6 +47,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
         .setOnInsert(Field.Id, tx.id.toObjectId)
         .setOnInsert(Field.UId, tx.userId.toObjectId)
         .set(Field.CId, tx.categoryId.toObjectId)
+        .set(Field.AId, tx.accountId.map(_.toObjectId))
         .set(Field.Amount, tx.amount)
         .set(Field.Note, tx.note)
         .set(Field.Recurrence, tx.recurrence)

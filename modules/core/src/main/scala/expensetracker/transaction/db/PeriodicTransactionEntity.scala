@@ -1,5 +1,6 @@
 package expensetracker.transaction.db
 
+import expensetracker.accounts.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.category.db.CategoryEntity
@@ -18,6 +19,7 @@ final case class PeriodicTransactionEntity(
     _id: ObjectId,
     userId: ObjectId,
     categoryId: ObjectId,
+    accountId: Option[ObjectId],
     recurrence: RecurrencePattern,
     amount: Money,
     note: Option[String],
@@ -32,6 +34,7 @@ final case class PeriodicTransactionEntity(
       id = TransactionId(_id),
       userId = UserId(userId),
       categoryId = CategoryId(categoryId),
+      accountId = accountId.map(AccountId(_)),
       recurrence = recurrence,
       amount = amount,
       note = note,
@@ -50,6 +53,7 @@ object PeriodicTransactionEntity extends MongoJsonCodecs with JsonCodecs {
       _id = ObjectId(),
       userId = tx.userId.toObjectId,
       categoryId = tx.categoryId.toObjectId,
+      accountId = tx.accountId.map(_.toObjectId),
       recurrence = tx.recurrence,
       amount = tx.amount,
       note = tx.note,

@@ -20,6 +20,7 @@ trait Repository[F[_]] {
     val Password       = "password"
     val UId            = "userId"
     val CId            = "categoryId"
+    val AId            = "accountId"
     val Email          = "email"
     val Note           = "note"
     val Hidden         = "hidden"
