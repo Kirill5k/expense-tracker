@@ -68,8 +68,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
       tx <-
         if acid then collection.aggregate[PeriodicTransactionEntity](session, agg).first
         else collection.aggregate[PeriodicTransactionEntity](agg).first
-      txCat = tx.flatMap(_.category).filterNot(_.hidden.getOrElse(false))
-      _ <- F.raiseWhen(txCat.isEmpty || txCat.get.userId.exists(_ != ctx.userId.toObjectId))(CategoryDoesNotExist(ctx.categoryId))
+      _ <- F.raiseWhen(tx.exists(_.containsInvalidCategory))(CategoryDoesNotExist(ctx.categoryId))
       _ <- session.commitTransaction
     yield tx.get.toDomain).onError { case _ =>
       session.abortTransaction

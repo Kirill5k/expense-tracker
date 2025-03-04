@@ -29,6 +29,11 @@ final case class PeriodicTransactionEntity(
     tags: Option[Set[String]],
     category: Option[CategoryEntity] = None
 ) {
+  def containsInvalidCategory: Boolean =
+    category.isEmpty ||
+      category.exists(_.hidden.getOrElse(false)) ||
+      category.get.userId.exists(_ != userId)
+    
   def toDomain: PeriodicTransaction =
     PeriodicTransaction(
       id = TransactionId(_id),

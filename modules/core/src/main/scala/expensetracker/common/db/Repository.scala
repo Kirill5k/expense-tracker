@@ -2,6 +2,7 @@ package expensetracker.common.db
 
 import cats.MonadError
 import cats.syntax.option.*
+import com.mongodb.client.model.UnwindOptions
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
@@ -46,8 +47,8 @@ trait Repository[F[_]] {
       .sort(Sort.desc(Field.Date))
       .lookup("categories", Field.CId, Field.Id, Field.Category)
       .lookup("accounts", Field.AId, Field.Id, Field.Account)
-      .unwind("$" + Field.Category)
-      .unwind("$" + Field.Account)
+      .unwind("$" + Field.Category, new UnwindOptions().preserveNullAndEmptyArrays(true))
+      .unwind("$" + Field.Account, new UnwindOptions().preserveNullAndEmptyArrays(true))
 
   private def idEqFilter(name: String, id: Option[ObjectId]): Filter = Filter.eq(name, id)
   protected def idEq(id: ObjectId): Filter                           = idEqFilter(Field.Id, id.some)
