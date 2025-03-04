@@ -4,6 +4,7 @@ import cats.Monad
 import cats.effect.Async
 import cats.syntax.applicative.*
 import cats.syntax.flatMap.*
+import expensetracker.accounts.AccountId
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryController.CategoryView
@@ -84,6 +85,7 @@ object PeriodicTransactionController extends TapirSchema with TapirJson {
 
   final case class CreatePeriodicTransactionRequest(
       categoryId: IdString,
+      accountId: Option[IdString],
       amount: Money,
       recurrence: RecurrencePattern,
       note: Option[String],
@@ -93,6 +95,7 @@ object PeriodicTransactionController extends TapirSchema with TapirJson {
       CreatePeriodicTransaction(
         userId = aid,
         categoryId = CategoryId(categoryId.value),
+        accountId = accountId.map(id => AccountId(id.value)),
         amount = amount,
         recurrence = recurrence,
         note = note.filter(_.nonEmpty),
@@ -103,6 +106,7 @@ object PeriodicTransactionController extends TapirSchema with TapirJson {
   final case class PeriodicTransactionView(
       id: String,
       categoryId: String,
+      accountId: Option[String],
       recurrence: RecurrencePattern,
       amount: Money,
       note: Option[String],
@@ -115,6 +119,7 @@ object PeriodicTransactionController extends TapirSchema with TapirJson {
       PeriodicTransactionView(
         id = tx.id.value,
         categoryId = tx.categoryId.value,
+        accountId = tx.accountId.map(_.value),
         amount = tx.amount,
         recurrence = tx.recurrence,
         note = tx.note,
@@ -128,6 +133,7 @@ object PeriodicTransactionController extends TapirSchema with TapirJson {
   final case class UpdatePeriodicTransactionRequest(
       id: IdString,
       categoryId: IdString,
+      accountId: Option[IdString],
       recurrence: RecurrencePattern,
       amount: Money,
       note: Option[String],
@@ -138,6 +144,7 @@ object PeriodicTransactionController extends TapirSchema with TapirJson {
       PeriodicTransaction(
         id = TransactionId(id.value),
         categoryId = CategoryId(categoryId.value),
+        accountId = accountId.map(id => AccountId(id.value)),
         userId = aid,
         amount = amount,
         recurrence = recurrence,

@@ -1,5 +1,6 @@
 package expensetracker.fixtures
 
+import expensetracker.accounts.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
@@ -19,6 +20,7 @@ object Transactions {
       id: TransactionId = txid,
       uid: UserId = Users.uid1,
       catid: CategoryId = Categories.cid,
+      accid: Option[AccountId] = Some(Accounts.id),
       amount: Money = GBP(15.0),
       date: LocalDate = txdate,
       note: Option[String] = Some("test tx"),
@@ -27,6 +29,7 @@ object Transactions {
     id = id,
     userId = uid,
     categoryId = catid,
+    accountId = accid,
     parentTransactionId = None,
     isRecurring = false,
     amount = amount,
@@ -39,16 +42,18 @@ object Transactions {
   def create(
       uid: UserId = Users.uid1,
       catid: CategoryId = Categories.cid,
+      accid: Option[AccountId] = Some(Accounts.id),
       amount: Money = GBP(15.0),
       date: LocalDate = txdate,
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
-  ): CreateTransaction = CreateTransaction(uid, catid, amount, date, note, tags)
+  ): CreateTransaction = CreateTransaction(uid, catid, accid, amount, date, note, tags)
 
   val txjson =
     s"""{
        |    "id" : "${Transactions.txid}",
        |    "categoryId" : "${Categories.cid}",
+       |    "accountId" : "${Accounts.id}",
        |    "parentTransactionId" : null,
        |    "isRecurring" : false,
        |    "amount" : {

@@ -4,6 +4,7 @@ import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
+import expensetracker.accounts.AccountId
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryController.CategoryView
@@ -97,6 +98,7 @@ object TransactionController extends TapirSchema with TapirJson {
 
   final case class CreateTransactionRequest(
       categoryId: IdString,
+      accountId: Option[IdString],
       amount: Money,
       date: LocalDate,
       note: Option[String],
@@ -106,6 +108,7 @@ object TransactionController extends TapirSchema with TapirJson {
       CreateTransaction(
         userId = aid,
         categoryId = CategoryId(categoryId.value),
+        accountId = accountId.map(id => AccountId(id.value)),
         amount = amount,
         date = date,
         note = note.filter(_.nonEmpty),
@@ -117,6 +120,7 @@ object TransactionController extends TapirSchema with TapirJson {
       id: String,
       categoryId: String,
       parentTransactionId: Option[String],
+      accountId: Option[String],
       isRecurring: Boolean,
       amount: Money,
       date: LocalDate,
@@ -131,6 +135,7 @@ object TransactionController extends TapirSchema with TapirJson {
         id = tx.id.value,
         categoryId = tx.categoryId.value,
         parentTransactionId = tx.parentTransactionId.map(_.value),
+        accountId = tx.accountId.map(_.value),
         isRecurring = tx.isRecurring,
         amount = tx.amount,
         date = tx.date,
@@ -147,6 +152,7 @@ object TransactionController extends TapirSchema with TapirJson {
       categoryId: IdString,
       parentTransactionId: Option[IdString],
       isRecurring: Option[Boolean],
+      accountId: Option[IdString],
       amount: Money,
       date: LocalDate,
       note: Option[String],
@@ -159,6 +165,7 @@ object TransactionController extends TapirSchema with TapirJson {
         categoryId = CategoryId(categoryId.value),
         parentTransactionId = parentTransactionId.map(id => TransactionId(id.value)),
         isRecurring = isRecurring.getOrElse(false),
+        accountId = accountId.map(id => AccountId(id.value)),
         userId = aid,
         amount = amount,
         date = date,

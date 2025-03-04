@@ -4,6 +4,7 @@ import expensetracker.transaction.{CreatePeriodicTransaction, PeriodicTransactio
 import mongo4cats.bson.ObjectId
 import eu.timepit.refined.*
 import eu.timepit.refined.numeric.Positive
+import expensetracker.accounts.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import squants.Money
@@ -28,6 +29,7 @@ object PeriodicTransactions {
       id: TransactionId = txid,
       uid: UserId = Users.uid1,
       catid: CategoryId = Categories.cid,
+      accid: Option[AccountId] = Some(Accounts.id),
       amount: Money = GBP(15.0),
       recurrence: RecurrencePattern = recurrence,
       note: Option[String] = Some("test tx"),
@@ -36,6 +38,7 @@ object PeriodicTransactions {
     id = id,
     userId = uid,
     categoryId = catid,
+    accountId = accid,
     recurrence = recurrence,
     amount = amount,
     note = note,
@@ -46,16 +49,18 @@ object PeriodicTransactions {
   def create(
       uid: UserId = Users.uid1,
       catid: CategoryId = Categories.cid,
+      accid: Option[AccountId] = Some(Accounts.id),
       amount: Money = GBP(15.0),
       recurrence: RecurrencePattern = recurrence,
       note: Option[String] = Some("test tx"),
       tags: Set[String] = Set("foo")
-  ): CreatePeriodicTransaction = CreatePeriodicTransaction(uid, catid, amount, recurrence, note, tags)
+  ): CreatePeriodicTransaction = CreatePeriodicTransaction(uid, catid, accid, amount, recurrence, note, tags)
 
   val txjson =
     s"""{
        |    "id" : "${txid}",
        |    "categoryId" : "${Categories.cid}",
+       |    "accountId" : "${Accounts.id}",
        |    "amount" : {
        |      "value" : 15.00,
        |      "currency": {"code":"GBP","symbol":"£"}

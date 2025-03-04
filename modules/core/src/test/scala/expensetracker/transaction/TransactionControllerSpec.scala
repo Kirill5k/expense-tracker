@@ -4,7 +4,7 @@ import cats.effect.IO
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
-import expensetracker.fixtures.{Categories, Sessions, Transactions, Users}
+import expensetracker.fixtures.{Accounts, Categories, Sessions, Transactions, Users}
 import org.http4s.implicits.*
 import org.http4s.{Method, Request, Status, Uri}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
@@ -26,6 +26,7 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
           .withBody(
             s"""{
                |"categoryId":"${Categories.cid}",
+               |"accountId":"${Accounts.id}",
                |"date": "${Transactions.txdate}",
                |"amount": {"value":15.0,"currency":{"code":"GBP","symbol":"£"}},
                |"note": "test tx",

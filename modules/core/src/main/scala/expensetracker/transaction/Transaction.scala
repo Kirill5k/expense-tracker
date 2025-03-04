@@ -39,6 +39,7 @@ final case class Transaction(
 final case class CreateTransaction(
     userId: UserId,
     categoryId: CategoryId,
+    accountId: Option[AccountId],
     amount: Money,
     date: LocalDate,
     note: Option[String],
@@ -121,6 +122,7 @@ enum RecurrenceFrequency:
 final case class CreatePeriodicTransaction(
     userId: UserId,
     categoryId: CategoryId,
+    accountId: Option[AccountId],
     amount: Money,
     recurrence: RecurrencePattern,
     note: Option[String],

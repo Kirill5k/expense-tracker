@@ -2,7 +2,7 @@ package expensetracker.transaction
 
 import cats.effect.IO
 import expensetracker.auth.Authenticator
-import expensetracker.fixtures.{Categories, PeriodicTransactions, Sessions}
+import expensetracker.fixtures.{Accounts, Categories, PeriodicTransactions, Sessions}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.implicits.*
 import org.http4s.{Method, Request, Status, Uri}
@@ -24,6 +24,7 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
           .withBody(
             s"""{
                |"categoryId":"${Categories.cid}",
+               |"accountId":"${Accounts.id}",
                |"recurrence": {
                |  "startDate": "${LocalDate.now}",
                |  "interval": 1,
