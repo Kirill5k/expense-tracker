@@ -1,22 +1,22 @@
 package expensetracker.transaction.db
 
 import cats.effect.Async
+import cats.syntax.applicativeError.*
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import cats.syntax.applicativeError.*
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
 import expensetracker.transaction.{CreatePeriodicTransaction, PeriodicTransaction, RecurrencePattern, TransactionId}
-import mongo4cats.collection.MongoCollection
-import mongo4cats.operations.{Filter, Update}
 import kirill5k.common.cats.syntax.applicative.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.client.ClientSession
+import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
-import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
+import mongo4cats.models.collection.WriteCommand
+import mongo4cats.operations.{Filter, Update}
 import squants.market.Money
 
 import java.time.{Instant, LocalDate}

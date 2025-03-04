@@ -17,7 +17,7 @@ import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.client.ClientSession
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
-import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
+import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Filter, Update}
 import squants.Money
 

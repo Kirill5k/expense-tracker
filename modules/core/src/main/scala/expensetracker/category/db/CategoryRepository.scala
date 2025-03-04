@@ -3,18 +3,18 @@ package expensetracker.category.db
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import expensetracker.category.{Category, CategoryId, CategoryKind, CreateCategory}
 import expensetracker.auth.user.UserId
+import expensetracker.category.{Category, CategoryId, CategoryKind, CreateCategory}
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
 import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.MongoJsonCodecs
-import mongo4cats.operations.{Filter, Update}
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
-import mongo4cats.models.collection.{UpdateOptions, WriteCommand}
+import mongo4cats.models.collection.WriteCommand
+import mongo4cats.operations.{Filter, Update}
 
 trait CategoryRepository[F[_]] extends Repository[F]:
   def create(cat: CreateCategory): F[Category]
