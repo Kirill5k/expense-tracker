@@ -1,5 +1,6 @@
 package expensetracker.common
 
+import expensetracker.accounts.AccountId
 import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.auth.session.SessionId
 import expensetracker.category.{CategoryId, CategoryName}
@@ -20,11 +21,11 @@ object errors {
     sealed trait Forbidden     extends AppError
     sealed trait Unprocessable extends AppError
 
-    final case class AccountAlreadyExists(email: UserEmail) extends Conflict:
-      override val message: String = s"An account with email $email already exists"
+    final case class UserAlreadyExists(email: UserEmail) extends Conflict:
+      override val message: String = s"A user with email $email already exists"
 
-    final case class AccountDoesNotExist(id: UserId) extends NotFound:
-      override val message: String = s"Account with id $id does not exist"
+    final case class UserDoesNotExist(id: UserId) extends NotFound:
+      override val message: String = s"User with id $id does not exist"
 
     case object InvalidEmailOrPassword extends Unauth:
       override val message: String = "Invalid email or password"
@@ -56,6 +57,9 @@ object errors {
     final case class CategoryDoesNotExist(id: CategoryId) extends NotFound:
       override val message: String = s"Category with id $id does not exist"
 
+    final case class AccountDoesNotExist(id: AccountId) extends NotFound:
+      override val message: String = s"Account with id $id does not exist"
+    
     final case class CategoryAlreadyExists(name: CategoryName) extends Conflict:
       override val message: String = s"A category with name $name already exists"
 

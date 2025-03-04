@@ -6,7 +6,7 @@ import de.flapdoodle.embed.mongo.distribution.Version
 import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserSettings}
 import expensetracker.category.CategoryName
-import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
+import expensetracker.common.errors.AppError.{UserAlreadyExists, UserDoesNotExist}
 import expensetracker.fixtures.{Categories, Transactions, Users}
 import expensetracker.transaction.TransactionId
 import mongo4cats.bson.ObjectId
@@ -34,7 +34,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc  <- repo.find(Users.uid2)
           yield acc
 
-          result.attempt.map(_ mustBe Left(AccountDoesNotExist(Users.uid2)))
+          result.attempt.map(_ mustBe Left(UserDoesNotExist(Users.uid2)))
         }
       }
 
@@ -105,7 +105,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc  <- repo.updateSettings(id, UserSettings.Default)
           yield acc
 
-          result.attempt.map(_ mustBe Left(AccountDoesNotExist(id)))
+          result.attempt.map(_ mustBe Left(UserDoesNotExist(id)))
         }
       }
     }
@@ -134,7 +134,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc  <- repo.updatePassword(id)(Users.hash)
           yield acc
 
-          result.attempt.map(_ mustBe Left(AccountDoesNotExist(id)))
+          result.attempt.map(_ mustBe Left(UserDoesNotExist(id)))
         }
       }
     }
@@ -165,7 +165,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             _    <- repo.create(Users.details, Users.hash)
           yield ()
 
-          result.attempt.map(_ mustBe Left(AccountAlreadyExists(Users.details.email)))
+          result.attempt.map(_ mustBe Left(UserAlreadyExists(Users.details.email)))
         }
       }
     }

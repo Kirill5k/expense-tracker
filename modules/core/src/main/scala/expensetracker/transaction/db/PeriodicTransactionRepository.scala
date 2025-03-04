@@ -64,7 +64,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
       _ <- session.startTransaction
       create = PeriodicTransactionEntity.create(ctx)
       res <- if acid then collection.insertOne(session, create) else collection.insertOne(create)
-      agg = findTxWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
+      agg = findTxWithCategoryAndAccount(idEq(res.getInsertedId.asObjectId().getValue))
       tx <-
         if acid then collection.aggregate[PeriodicTransactionEntity](session, agg).first
         else collection.aggregate[PeriodicTransactionEntity](agg).first
@@ -82,7 +82,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
 
   override def getAll(uid: UserId): F[List[PeriodicTransaction]] =
     collection
-      .aggregate[PeriodicTransactionEntity](findTxWithCategory(userIdEq(uid) && notHidden))
+      .aggregate[PeriodicTransactionEntity](findTxWithCategoryAndAccount(userIdEq(uid) && notHidden))
       .all
       .mapList(_.toDomain)
 

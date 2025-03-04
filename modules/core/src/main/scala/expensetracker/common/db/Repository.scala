@@ -32,6 +32,7 @@ trait Repository[F[_]] {
     val Recurrence     = "recurrence"
     val Tags           = "tags"
     val Category       = "category"
+    val Account       = "account"
     val Categories     = "categories"
     val Transactions   = "transactions"
   }
@@ -39,12 +40,14 @@ trait Repository[F[_]] {
   protected val notHidden: Filter = Filter.ne(Field.Hidden, true)
   protected val isHidden: Filter  = Filter.eq(Field.Hidden, true)
 
-  protected val findTxWithCategory = (filter: Filter) =>
+  protected val findTxWithCategoryAndAccount: Filter => Aggregate = (filter: Filter) =>
     Aggregate
       .matchBy(filter)
       .sort(Sort.desc(Field.Date))
       .lookup("categories", Field.CId, Field.Id, Field.Category)
+      .lookup("accounts", Field.AId, Field.Id, Field.Account)
       .unwind("$" + Field.Category)
+      .unwind("$" + Field.Account)
 
   private def idEqFilter(name: String, id: Option[ObjectId]): Filter = Filter.eq(name, id)
   protected def idEq(id: ObjectId): Filter                           = idEqFilter(Field.Id, id.some)

@@ -6,7 +6,7 @@ import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.auth.user.*
 import expensetracker.common.db.Repository
-import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
+import expensetracker.common.errors.AppError.{UserAlreadyExists, UserDoesNotExist}
 import kirill5k.common.cats.syntax.applicative.*
 import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.bson.syntax.*
@@ -55,7 +55,7 @@ final private class LiveUserRepository[F[_]](
           val createAcc = UserEntity.create(details, password)
           collection.insertOne(createAcc).as(UserId(createAcc._id.toHexString))
         case _ =>
-          AccountAlreadyExists(details.email).raiseError[F, UserId]
+          UserAlreadyExists(details.email).raiseError[F, UserId]
       }
 
   override def find(uid: UserId): F[User] =
@@ -97,23 +97,23 @@ final private class LiveUserRepository[F[_]](
           .project(Projection.exclude(Field.Transactions))
       )
       .first
-      .unwrapOpt(AccountDoesNotExist(uid))
+      .unwrapOpt(UserDoesNotExist(uid))
       .map(_.toDomain)
 
   override def updateSettings(uid: UserId, settings: UserSettings): F[Unit] =
     collection
       .updateOne(idEq(uid.toObjectId), Update.set(Field.Settings, settings).currentDate(Field.LastUpdatedAt))
-      .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
+      .flatMap(errorIfNoMatches(UserDoesNotExist(uid)))
 
   override def updatePassword(uid: UserId)(password: PasswordHash): F[Unit] =
     collection
       .updateOne(idEq(uid.toObjectId), Update.set(Field.Password, password.value))
-      .flatMap(errorIfNoMatches(AccountDoesNotExist(uid)))
+      .flatMap(errorIfNoMatches(UserDoesNotExist(uid)))
 
   override def delete(uid: UserId): F[Unit] =
     collection
       .deleteOne(idEq(uid.toObjectId))
-      .flatMap(r => F.raiseWhen(r.getDeletedCount == 0)(AccountDoesNotExist(uid)))
+      .flatMap(r => F.raiseWhen(r.getDeletedCount == 0)(UserDoesNotExist(uid)))
 }
 
 object UserRepository extends MongoJsonCodecs:

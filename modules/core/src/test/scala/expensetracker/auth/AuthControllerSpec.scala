@@ -4,7 +4,7 @@ import cats.effect.IO
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionService}
 import expensetracker.auth.user.*
-import expensetracker.common.errors.AppError.{AccountAlreadyExists, InvalidEmailOrPassword, SessionDoesNotExist}
+import expensetracker.common.errors.AppError.{UserAlreadyExists, InvalidEmailOrPassword, SessionDoesNotExist}
 import expensetracker.fixtures.{Sessions, Users}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.implicits.*
@@ -127,7 +127,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
       "return bad request if email is already taken" in {
         val (usrSvc, sessSvc) = mocks
 
-        when(usrSvc.create(any[UserDetails], any[Password])).thenRaiseError(AccountAlreadyExists(UserEmail("foo@bar.com")))
+        when(usrSvc.create(any[UserDetails], any[Password])).thenRaiseError(UserAlreadyExists(UserEmail("foo@bar.com")))
 
         val req = Request[IO](Method.POST, uri"/auth/user")
           .withBody("""{
@@ -139,7 +139,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
               |}""".stripMargin)
         val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.Conflict, Some("""{"message":"An account with email foo@bar.com already exists"}"""))
+        res mustHaveStatus (Status.Conflict, Some("""{"message":"A user with email foo@bar.com already exists"}"""))
         verify(usrSvc).create(
           UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), Some(GBP)),
           Password("pwd")

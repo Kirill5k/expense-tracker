@@ -29,6 +29,17 @@ final case class TransactionEntity(
     tags: Option[Set[String]],
     category: Option[CategoryEntity] = None
 ) derives Codec.AsObject {
+  def containsInvalidCategory: Boolean =
+    category.isEmpty ||
+      category.exists(_.hidden.getOrElse(false)) ||
+      category.get.userId.exists(_ != userId)
+
+  //TODO: Return account
+//  def containsInvalidAccount: Boolean =
+//    account.isEmpty ||
+//      account.exists(_.hidden.getOrElse(false)) ||
+//      account.get.userId.exists(_ != userId)
+
   def toDomain: Transaction =
     Transaction(
       id = TransactionId(_id),

@@ -70,10 +70,9 @@ final private class LiveTransactionRepository[F[_]](
       _ <- session.startTransaction
       create = TransactionEntity.create(ctx)
       res <- if acid then collection.insertOne(session, create) else collection.insertOne(create)
-      agg = findTxWithCategory(idEq(res.getInsertedId.asObjectId().getValue))
+      agg = findTxWithCategoryAndAccount(idEq(res.getInsertedId.asObjectId().getValue))
       tx <- if acid then collection.aggregate[TransactionEntity](session, agg).first else collection.aggregate[TransactionEntity](agg).first
-      txCat = tx.flatMap(_.category).filterNot(_.hidden.getOrElse(false))
-      _ <- F.raiseWhen(txCat.isEmpty || txCat.get.userId.exists(_ != ctx.userId.toObjectId))(AppError.CategoryDoesNotExist(ctx.categoryId))
+      _ <- F.raiseWhen(tx.exists(_.containsInvalidCategory))(AppError.CategoryDoesNotExist(ctx.categoryId))
       _ <- session.commitTransaction
     yield tx.get.toDomain).onError { case _ =>
       session.abortTransaction
@@ -81,7 +80,7 @@ final private class LiveTransactionRepository[F[_]](
 
   override def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]] =
     collection
-      .aggregate[TransactionEntity](findTxWithCategory(userIdEq(uid) && notHidden && dateRangeSelector(from, to)))
+      .aggregate[TransactionEntity](findTxWithCategoryAndAccount(userIdEq(uid) && notHidden && dateRangeSelector(from, to)))
       .all
       .mapList(_.toDomain)
 
