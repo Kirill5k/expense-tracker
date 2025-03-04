@@ -76,7 +76,7 @@ final private class LivePeriodicTransactionService[F[_]](
 }
 
 object PeriodicTransactionService:
-  def make[F[_]: Temporal: Clock](
+  def make[F[_]: {Temporal, Clock}](
       repository: PeriodicTransactionRepository[F],
       dispatcher: ActionDispatcher[F]
   ): F[PeriodicTransactionService[F]] =

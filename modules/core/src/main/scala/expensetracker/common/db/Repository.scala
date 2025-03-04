@@ -2,10 +2,10 @@ package expensetracker.common.db
 
 import cats.MonadError
 import cats.syntax.option.*
-import com.mongodb.client.model.UnwindOptions
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
+import mongo4cats.models.collection.{UnwindOptions, UpdateOptions}
 import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 
 trait Repository[F[_]] {
@@ -33,7 +33,7 @@ trait Repository[F[_]] {
     val Recurrence     = "recurrence"
     val Tags           = "tags"
     val Category       = "category"
-    val Account       = "account"
+    val Account        = "account"
     val Categories     = "categories"
     val Transactions   = "transactions"
   }
@@ -47,8 +47,8 @@ trait Repository[F[_]] {
       .sort(Sort.desc(Field.Date))
       .lookup("categories", Field.CId, Field.Id, Field.Category)
       .lookup("accounts", Field.AId, Field.Id, Field.Account)
-      .unwind("$" + Field.Category, new UnwindOptions().preserveNullAndEmptyArrays(true))
-      .unwind("$" + Field.Account, new UnwindOptions().preserveNullAndEmptyArrays(true))
+      .unwind("$" + Field.Category, UnwindOptions().preserveNullAndEmptyArrays(true))
+      .unwind("$" + Field.Account, UnwindOptions().preserveNullAndEmptyArrays(true))
 
   private def idEqFilter(name: String, id: Option[ObjectId]): Filter = Filter.eq(name, id)
   protected def idEq(id: ObjectId): Filter                           = idEqFilter(Field.Id, id.some)
@@ -60,4 +60,6 @@ trait Repository[F[_]] {
 
   protected def updateHidden(hidden: Boolean): Update =
     Update.set(Field.Hidden, hidden).currentDate(Field.LastUpdatedAt)
+
+  protected val upsertUpdateOpt: UpdateOptions = UpdateOptions(upsert = true)
 }

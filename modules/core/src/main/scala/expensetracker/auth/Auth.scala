@@ -21,7 +21,7 @@ final class Auth[F[_]] private (
 )
 
 object Auth:
-  def make[F[_]: Async: Logger](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
+  def make[F[_]: {Async, Logger}](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
     for
       sessRepo <- SessionRepository.make[F](resources.mongoDb)
       jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)

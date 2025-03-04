@@ -15,7 +15,7 @@ final class PeriodicTransactions[F[_]] private (
 )
 
 object PeriodicTransactions:
-  def make[F[_]: Async: Logger](resources: Resources[F], dispatcher: ActionDispatcher[F]): F[PeriodicTransactions[F]] =
+  def make[F[_]: {Async, Logger}](resources: Resources[F], dispatcher: ActionDispatcher[F]): F[PeriodicTransactions[F]] =
     for
       repo <- PeriodicTransactionRepository.make[F](resources.mongoDb, resources.mongoSession)
       svc  <- PeriodicTransactionService.make[F](repo, dispatcher)

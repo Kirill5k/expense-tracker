@@ -75,8 +75,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
     }
 
   override def save(txs: List[PeriodicTransaction]): F[Unit] =
-    val options = UpdateOptions(upsert = true)
-    val cmds    = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, options))
+    val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, upsertUpdateOpt))
     collection.bulkWrite(cmds).void
 
   override def getAll(uid: UserId): F[List[PeriodicTransaction]] =

@@ -52,7 +52,7 @@ final private class LiveCategoryRepository[F[_]](
     }
 
   override def save(cats: List[Category]): F[Unit] =
-    val commands = cats.map(c => WriteCommand.UpdateOne(c.toFilterById, c.toUpdate, UpdateOptions(upsert = true)))
+    val commands = cats.map(c => WriteCommand.UpdateOne(c.toFilterById, c.toUpdate, upsertUpdateOpt))
     collection.bulkWrite(commands).void
 
   override def getAll(uid: UserId): F[List[Category]] =

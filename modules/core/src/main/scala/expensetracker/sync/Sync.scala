@@ -15,7 +15,7 @@ final class Sync[F[_]] private (
 )
 
 object Sync {
-  def make[F[_]: Async: Logger](resources: Resources[F], disp: ActionDispatcher[F]): F[Sync[F]] =
+  def make[F[_]: {Async, Logger}](resources: Resources[F], disp: ActionDispatcher[F]): F[Sync[F]] =
     for
       repo <- SyncRepository.make[F](resources.mongoDb)
       svc  <- SyncService.make[F](repo, disp)
