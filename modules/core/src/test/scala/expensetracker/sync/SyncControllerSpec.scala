@@ -5,7 +5,7 @@ import expensetracker.auth.Authenticator
 import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.Category
 import expensetracker.transaction.{PeriodicTransaction, Transaction}
-import expensetracker.fixtures.{Categories, PeriodicTransactions, Sessions, Transactions, Users}
+import expensetracker.fixtures.{Accounts, Categories, PeriodicTransactions, Sessions, Transactions, Users}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.{Method, Request, Status, Uri}
 import org.http4s.implicits.*
@@ -34,6 +34,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |        {
        |          "id" : "${Transactions.txid}",
        |          "category_id" : "${Categories.cid}",
+       |          "account_id" : "${Accounts.id}",
        |          "parent_transaction_id" : null,
        |          "is_recurring" : false,
        |          "amount_value" : 15.0,
@@ -50,6 +51,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |        {
        |          "id" : "${Transactions.txid2}",
        |          "category_id" : "${Categories.cid}",
+       |          "account_id" : "${Accounts.id}",
        |          "parent_transaction_id" : null,
        |          "is_recurring" : false,
        |          "amount_value" : 15.0,
@@ -115,6 +117,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |        {
        |          "id" : "${PeriodicTransactions.txid}",
        |          "category_id" : "${Categories.cid}",
+       |          "account_id" : "${Accounts.id}",
        |          "amount_value" : 15.0,
        |          "amount_currency_code" : "GBP",
        |          "amount_currency_symbol" : "£",
@@ -133,6 +136,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |        {
        |          "id" : "${PeriodicTransactions.txid2}",
        |          "category_id" : "${Categories.cid}",
+       |          "account_id" : "${Accounts.id}",
        |          "amount_value" : 15.0,
        |          "amount_currency_code" : "GBP",
        |          "amount_currency_symbol" : "£",

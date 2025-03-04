@@ -12,11 +12,12 @@ import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPull
 import expensetracker.transaction.{PeriodicTransaction, RecurrenceFrequency, RecurrencePattern, Transaction, TransactionId}
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.refineV
+import expensetracker.accounts.AccountId
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
-import squants.market.{defaultMoneyContext, Currency, Money}
+import squants.market.{Currency, Money, defaultMoneyContext}
 import sttp.model.StatusCode
 import sttp.tapir.*
 
@@ -168,6 +169,7 @@ object SyncController extends TapirSchema with TapirJson {
   final case class WatermelonTransaction(
       id: TransactionId,
       category_id: CategoryId,
+      account_id: Option[AccountId],
       parent_transaction_id: Option[TransactionId],
       is_recurring: Option[Boolean],
       amount_value: Double,
@@ -187,6 +189,7 @@ object SyncController extends TapirSchema with TapirJson {
             id = id,
             userId = user_id,
             categoryId = category_id,
+            accountId = account_id,
             parentTransactionId = parent_transaction_id,
             isRecurring = is_recurring.getOrElse(false),
             amount = Money(amount_value, currency),
@@ -206,6 +209,7 @@ object SyncController extends TapirSchema with TapirJson {
       WatermelonTransaction(
         id = tx.id,
         category_id = tx.categoryId,
+        account_id = tx.accountId,
         parent_transaction_id = tx.parentTransactionId,
         is_recurring = Some(tx.isRecurring),
         amount_value = tx.amount.value,
@@ -221,6 +225,7 @@ object SyncController extends TapirSchema with TapirJson {
   final case class WatermelonPeriodicTransaction(
       id: TransactionId,
       category_id: CategoryId,
+      account_id: Option[AccountId],
       amount_value: Double,
       amount_currency_code: String,
       amount_currency_symbol: String,
@@ -242,6 +247,7 @@ object SyncController extends TapirSchema with TapirJson {
             id = id,
             userId = user_id,
             categoryId = category_id,
+            accountId = account_id,
             recurrence = RecurrencePattern(
               startDate = recurrence_start_date,
               nextDate = recurrence_next_date,
@@ -265,6 +271,7 @@ object SyncController extends TapirSchema with TapirJson {
       WatermelonPeriodicTransaction(
         id = tx.id,
         category_id = tx.categoryId,
+        account_id = tx.accountId,
         recurrence_start_date = tx.recurrence.startDate,
         recurrence_next_date = tx.recurrence.nextDate,
         recurrence_end_date = tx.recurrence.endDate,
@@ -352,6 +359,6 @@ object SyncController extends TapirSchema with TapirJson {
     .in(jsonBody[WatermelonDataChanges])
     .out(statusCode(StatusCode.NoContent))
 
-  def make[F[_]: Async: Logger](service: SyncService[F]): F[Controller[F]] =
+  def make[F[_]: {Async, Logger}](service: SyncService[F]): F[Controller[F]] =
     Monad[F].pure(SyncController[F](service))
 }
