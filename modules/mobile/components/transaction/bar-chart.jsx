@@ -149,6 +149,7 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
   const zippedData = zipFlat(data, previousData)
 
   const percentageChangeLabelText = pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)
+  const axisLabelStyle = {color: Colors[mode].text, fontSize: 12, lineHeight: 12}
   return (
       <VStack>
         <Text size="md">{kind === 'expense' ? 'Spent' : 'Received'}</Text>
@@ -180,8 +181,8 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
             yAxisThickness={0}
             xAxisThickness={1}
             xAxisColor={Colors[mode].tabIconDefault}
-            yAxisTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16, textAlign: 'right'}}
-            xAxisLabelTextStyle={{color: Colors[mode].text, fontSize: 12, lineHeight: 16}}
+            yAxisTextStyle={{...axisLabelStyle, textAlign: 'right'}}
+            xAxisLabelTextStyle={axisLabelStyle}
             noOfSections={1}
             onPress={handleItemPress}
             showReferenceLine1
