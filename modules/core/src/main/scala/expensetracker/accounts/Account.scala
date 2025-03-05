@@ -18,5 +18,12 @@ final case class Account(
     name: AccountName,
     currency: Currency,
     createdAt: Option[Instant] = None,
-    lastUpdatedAt: Option[Instant] = None
+    lastUpdatedAt: Option[Instant] = None,
+    hidden: Option[Boolean] = None
+)
+
+final case class CreateAccount(
+    userId: UserId,
+    name: AccountName,
+    currency: Currency
 )
