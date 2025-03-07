@@ -39,17 +39,17 @@ const Recurring = ({user, categories, recurringTransactions}) => {
   const displayedTxs = kind === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind)
 
   return (
-      <VStack className={Classes.dashboardLayout}>
+      <VStack className={Classes.dashboardLayout} space="md">
         <ScreenHeading
             heading="Recurring"
             loading={loading}
         />
         <ToggleButton
-            className="mb-1"
             size="lg"
             value={kind}
             items={[{label: 'All', value: 'all'}, ...categoryOptions]}
             onChange={setKind}
+            className="mb-2"
         />
         <RecurringTransactionList
             items={displayedTxs}

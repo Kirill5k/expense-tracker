@@ -35,7 +35,7 @@ const Categories = ({categories}) => {
   }
 
   return (
-      <VStack className={Classes.dashboardLayout}>
+      <VStack className={Classes.dashboardLayout} space="md">
         <ScreenHeading
             heading="Categories"
             loading={loading}

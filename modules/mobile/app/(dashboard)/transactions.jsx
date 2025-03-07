@@ -48,7 +48,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   }
 
   return (
-      <VStack className={Classes.dashboardLayout}>
+      <VStack className={Classes.dashboardLayout} space="md">
         <HStack className="relative">
           <ScreenHeading
             heading="Transactions"

@@ -21,7 +21,6 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
   const database = useDatabase()
   const mode = useColorScheme()
 
-  const [loading, setLoading] = useState(false)
   const [kind, setKind] = useState(categoryOptions[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
@@ -33,13 +32,9 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
   }, [state.displayDateText])
 
   return (
-      <VStack className={`${Classes.dashboardLayout}`}>
-        <ScreenHeading
-            heading="Analytics"
-            loading={loading}
-        />
+      <VStack className={`${Classes.dashboardLayout}`} space="md">
+        <ScreenHeading heading="Analytics"/>
         <ToggleButton
-            className="mb-2"
             size="lg"
             value={kind}
             items={categoryOptions}
@@ -59,8 +54,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
-              className="mb-2"
-              disabled={loading}
+              className="my-1"
               mode={mode}
               value={state.displayDate}
               onSelect={(dd) => updateStateDisplayDate(database, dd)}
