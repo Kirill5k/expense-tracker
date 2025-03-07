@@ -107,8 +107,10 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
                     <Text
                         size="md"
                         className={mergeClasses(
-                            percentageChangeText.startsWith('+') && 'text-red-500',
-                            percentageChangeText.startsWith('-') && 'text-green-500',
+                            percentageChangeText.startsWith('-') && kind === 'income' && 'text-red-500',
+                            percentageChangeText.startsWith('+') && kind === 'expense' && 'text-red-500',
+                            percentageChangeText.startsWith('+') && kind === 'income' && 'text-green-500',
+                            percentageChangeText.startsWith('-') && kind === 'expense' && 'text-green-500',
                         )}
                     >
                       {percentageChangeText}

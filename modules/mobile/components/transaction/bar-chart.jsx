@@ -158,8 +158,10 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
             size="sm"
             className={mergeClasses(
                 'pb-2 pt-0 mb-1',
-                percentageChangeLabelText.startsWith('+') && 'text-red-500',
-                percentageChangeLabelText.startsWith('-') && 'text-green-500',
+                percentageChangeLabelText.startsWith('-') && kind === 'income' && 'text-red-500',
+                percentageChangeLabelText.startsWith('+') && kind === 'expense' && 'text-red-500',
+                percentageChangeLabelText.startsWith('+') && kind === 'income' && 'text-green-500',
+                percentageChangeLabelText.startsWith('-') && kind === 'expense' && 'text-green-500',
             )}
         >
           {percentageChangeLabelText}
