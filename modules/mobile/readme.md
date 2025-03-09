@@ -21,7 +21,7 @@ npx expo run:ios --device
 ## Build production binary
 
 ```shell
-rm package-lock.json; eas build --platform ios
+eas build --platform ios
 ```
 
 ## Submit to App Store

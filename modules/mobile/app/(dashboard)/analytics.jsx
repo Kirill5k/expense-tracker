@@ -54,7 +54,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               onChartPress={setSelectedTransactions}
           />
           <DatePeriodSelect
-              className="my-1"
+              className="mb-1"
               mode={mode}
               value={state.displayDate}
               onSelect={(dd) => updateStateDisplayDate(database, dd)}
