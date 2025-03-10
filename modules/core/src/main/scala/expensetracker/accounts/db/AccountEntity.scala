@@ -11,7 +11,7 @@ import squants.market.Currency
 import java.time.Instant
 
 final case class AccountEntity(
-    id: ObjectId,
+    _id: ObjectId,
     userId: ObjectId,
     name: String,
     currency: Currency,
@@ -21,7 +21,7 @@ final case class AccountEntity(
 ) derives Codec.AsObject {
   def toDomain: Account =
     Account(
-      id = AccountId(id),
+      id = AccountId(_id),
       userId = UserId(userId),
       name = AccountName(name),
       currency = currency,
@@ -34,7 +34,7 @@ final case class AccountEntity(
 object AccountEntity:
   def from(account: CreateAccount): AccountEntity =
     AccountEntity(
-      id = ObjectId.gen,
+      _id = ObjectId.gen,
       userId = account.userId.toObjectId,
       name = account.name.value,
       currency = account.currency,

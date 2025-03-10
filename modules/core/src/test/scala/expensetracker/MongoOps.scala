@@ -1,5 +1,6 @@
 package expensetracker
 
+import expensetracker.accounts.{AccountId, AccountName}
 import expensetracker.auth.user.{PasswordHash, UserEmail, UserId}
 import expensetracker.category.CategoryId
 import expensetracker.transaction.TransactionId
@@ -48,5 +49,17 @@ trait MongoOps {
       "password"         := password.value,
       "name"             := Document.parse("""{"first":"John","last":"Bloggs"}"""),
       "registrationDate" := registrationDate
+    )
+
+  def accountDoc(
+      id: AccountId,
+      uid: UserId,
+      name: AccountName
+  ): Document =
+    Document(
+      "_id"      := id.toObjectId,
+      "userId"   := uid.toObjectId,
+      "name"     := name.value,
+      "currency" := Document.parse("""{"code":"GBP","symbol":"£"}""")
     )
 }
