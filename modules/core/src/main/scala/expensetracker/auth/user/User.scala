@@ -1,5 +1,6 @@
 package expensetracker.auth.user
 
+import expensetracker.accounts.Account
 import expensetracker.category.Category
 import io.circe.Codec
 import expensetracker.common.types.{IdType, StringType}
@@ -51,6 +52,7 @@ final case class User(
     settings: UserSettings,
     registrationDate: Instant,
     categories: Option[List[Category]] = None,
+    accounts: Option[List[Account]] = None,
     totalTransactionCount: Option[Int] = None,
     lastUpdatedAt: Option[Instant] = None
 )
