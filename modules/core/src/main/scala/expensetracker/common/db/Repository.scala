@@ -5,6 +5,7 @@ import cats.syntax.option.*
 import com.mongodb.client.result.UpdateResult
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
+import mongo4cats.collection.MongoCollection
 import mongo4cats.models.collection.{UnwindOptions, UpdateOptions}
 import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 
@@ -16,6 +17,7 @@ trait Repository[F[_]] {
     val Color          = "color"
     val Amount         = "amount"
     val Icon           = "icon"
+    val Currency       = "currency"
     val Kind           = "kind"
     val Settings       = "settings"
     val Password       = "password"
@@ -62,4 +64,7 @@ trait Repository[F[_]] {
     Update.set(Field.Hidden, hidden).currentDate(Field.LastUpdatedAt)
 
   protected val upsertUpdateOpt: UpdateOptions = UpdateOptions(upsert = true)
+
+  protected def countByName[T](collection: MongoCollection[F, T], uid: UserId, name: String): F[Long] =
+    collection.count(userIdEq(uid) && notHidden && Filter.regex(Field.Name, "(?i)^" + name + "$"))
 }

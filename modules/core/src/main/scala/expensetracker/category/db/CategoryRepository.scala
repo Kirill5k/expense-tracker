@@ -78,8 +78,7 @@ final private class LiveCategoryRepository[F[_]](
 
   override def create(cat: CreateCategory): F[Category] = {
     val newCat = CategoryEntity.from(cat)
-    collection
-      .count(userIdEq(cat.userId) && notHidden && Filter.regex(Field.Name, "(?i)^" + newCat.name + "$"))
+    countByName(collection, cat.userId, newCat.name)
       .flatMap {
         case 0 => collection.insertOne(newCat).as(newCat.toDomain)
         case _ => F.raiseError(AppError.CategoryAlreadyExists(cat.name))

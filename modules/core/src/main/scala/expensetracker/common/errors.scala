@@ -1,6 +1,6 @@
 package expensetracker.common
 
-import expensetracker.accounts.AccountId
+import expensetracker.accounts.{AccountId, AccountName}
 import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.auth.session.SessionId
 import expensetracker.category.{CategoryId, CategoryName}
@@ -63,6 +63,9 @@ object errors {
     final case class CategoryAlreadyExists(name: CategoryName) extends Conflict:
       override val message: String = s"A category with name $name already exists"
 
+    final case class AccountAlreadyExists(name: AccountName) extends Conflict:
+      override val message: String = s"An account with name $name already exists"
+    
     final case class TransactionDoesNotExist(id: TransactionId) extends NotFound:
       override val message: String = s"Transaction with id $id does not exist"
 
