@@ -7,7 +7,6 @@ import cats.syntax.functor.*
 import cats.syntax.applicativeError.*
 import expensetracker.auth.user.UserService
 import expensetracker.category.CategoryService
-import expensetracker.common.actions.Action.HideTransactionsByAccount
 import expensetracker.common.errors.AppError
 import expensetracker.transaction.{PeriodicTransactionService, TransactionService}
 import kirill5k.common.syntax.time.*
@@ -37,13 +36,13 @@ final private class LiveActionProcessor[F[_]: Temporal](
 
   private def handleAction(action: Action): F[Unit] =
     (action match
-      case Action.DeleteAllCategories(uid)                        => catService.deleteAll(uid)
-      case Action.DeleteAllTransactions(uid)                      => txService.deleteAll(uid)
-      case Action.DeleteAllPeriodicTransactions(uid)              => ptxService.deleteAll(uid)
-      //TODO: Create default account
+      case Action.DeleteAllCategories(uid)           => catService.deleteAll(uid)
+      case Action.DeleteAllTransactions(uid)         => txService.deleteAll(uid)
+      case Action.DeleteAllPeriodicTransactions(uid) => ptxService.deleteAll(uid)
+      // TODO: Create default account
       case Action.SetupNewUser(uid)                               => catService.assignDefault(uid)
       case Action.HideTransactionsByCategory(cid, hidden)         => txService.hide(cid, hidden) >> ptxService.hide(cid, hidden)
-      case HideTransactionsByAccount(aid, hidden) => Temporal[F].unit //TODO: Implement
+      case Action.HideTransactionsByAccount(aid, hidden)          => Temporal[F].unit // TODO: Implement
       case Action.SaveUsers(users)                                => userService.save(users)
       case Action.SaveCategories(categories)                      => catService.save(categories)
       case Action.SaveTransactions(transactions)                  => txService.save(transactions)
