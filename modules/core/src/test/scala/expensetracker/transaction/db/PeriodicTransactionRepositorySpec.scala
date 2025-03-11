@@ -3,11 +3,12 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
+import expensetracker.accounts.{AccountId, AccountName}
 import expensetracker.auth.user.UserEmail
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
-import expensetracker.fixtures.{Categories, PeriodicTransactions, Users}
+import expensetracker.fixtures.{Accounts, Categories, PeriodicTransactions, Users}
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.{ClientSession, MongoClient}
 import mongo4cats.database.MongoDatabase
@@ -28,7 +29,7 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            tx   <- repo.create(PeriodicTransactions.create())
+            tx   <- repo.create(PeriodicTransactions.create(accid = None))
             txs  <- repo.getAll(Users.uid1)
           yield txs mustBe List(tx)
         }
@@ -41,6 +42,16 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             catid = CategoryId(ObjectId.gen)
             res <- repo.create(PeriodicTransactions.create(catid = catid)).attempt
           yield res mustBe Left(AppError.CategoryDoesNotExist(catid))
+        }
+      }
+
+      "return an error when trying to create a transaction with invalid account" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo <- PeriodicTransactionRepository.make(db, sess, false)
+            accid = AccountId(ObjectId.gen)
+            res <- repo.create(PeriodicTransactions.create(accid = Some(accid))).attempt
+          yield res mustBe Left(AppError.AccountDoesNotExist(accid))
         }
       }
     }
@@ -109,7 +120,7 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             repo <- PeriodicTransactionRepository.make(db, sess, false)
             _    <- repo.save(List(PeriodicTransactions.tx()))
             txs  <- repo.getAll(Users.uid1)
-          yield txs.map(_.copy(category = None, createdAt = None, lastUpdatedAt = None)) mustBe List(tx)
+          yield txs.map(_.copy(category = None, createdAt = None, lastUpdatedAt = None, account = None)) mustBe List(tx)
         }
       }
 
@@ -134,7 +145,7 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             repo <- PeriodicTransactionRepository.make(db, sess, false)
             tx   <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
             txs  <- repo.getAllByRecurrenceDate(date)
-          yield txs mustBe List(tx.copy(category = None))
+          yield txs mustBe List(tx.copy(category = None, account = None))
         }
       }
 
@@ -146,7 +157,7 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             repo <- PeriodicTransactionRepository.make(db, sess, false)
             tx   <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
             txs  <- repo.getAllByRecurrenceDate(date)
-          yield txs mustBe List(tx.copy(category = None))
+          yield txs mustBe List(tx.copy(category = None, account = None))
         }
       }
 
@@ -186,6 +197,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
         .use { case (client, sess) =>
           for
             db         <- client.getDatabase("expense-tracker")
+            accounts   <- db.getCollection("accounts")
+            _          <- accounts.insertMany(List(accountDoc(Accounts.id, Users.uid1, AccountName("test-account"))))
             categories <- db.getCollection("categories")
             _          <- categories.insertMany(List(categoryDoc(Categories.cid, "category-1"), categoryDoc(Categories.cid2, "category-2")))
             accs       <- db.getCollection("users")

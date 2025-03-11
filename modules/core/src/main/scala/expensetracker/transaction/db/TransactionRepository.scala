@@ -73,6 +73,7 @@ final private class LiveTransactionRepository[F[_]](
       agg = findTxWithCategoryAndAccount(idEq(res.getInsertedId.asObjectId().getValue))
       tx <- if acid then collection.aggregate[TransactionEntity](session, agg).first else collection.aggregate[TransactionEntity](agg).first
       _  <- F.raiseWhen(tx.exists(_.containsInvalidCategory))(AppError.CategoryDoesNotExist(ctx.categoryId))
+      _  <- F.raiseWhen(tx.exists(_.containsInvalidAccount))(AppError.AccountDoesNotExist(ctx.accountId.get))
       _  <- session.commitTransaction
     yield tx.get.toDomain).onError { case _ =>
       session.abortTransaction

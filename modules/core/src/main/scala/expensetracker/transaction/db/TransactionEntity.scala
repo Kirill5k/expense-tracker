@@ -1,6 +1,7 @@
 package expensetracker.transaction.db
 
 import expensetracker.accounts.AccountId
+import expensetracker.accounts.db.AccountEntity
 import io.circe.Codec
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
@@ -27,18 +28,17 @@ final case class TransactionEntity(
     createdAt: Option[Instant],
     lastUpdatedAt: Option[Instant],
     tags: Option[Set[String]],
-    category: Option[CategoryEntity] = None
+    category: Option[CategoryEntity] = None,
+    account: Option[AccountEntity] = None
 ) derives Codec.AsObject {
   def containsInvalidCategory: Boolean =
-    category.isEmpty ||
-      category.exists(_.hidden.getOrElse(false)) ||
-      category.get.userId.exists(_ != userId)
+    category.isEmpty || category.exists(cat => cat.hidden.getOrElse(false) || cat.userId.exists(_ != userId))
 
-  //TODO: Return account
-//  def containsInvalidAccount: Boolean =
-//    account.isEmpty ||
-//      account.exists(_.hidden.getOrElse(false)) ||
-//      account.get.userId.exists(_ != userId)
+  def containsInvalidAccount: Boolean =
+    accountId.isDefined && (
+      account.isEmpty ||
+        account.exists(acc => acc.hidden.getOrElse(false) || acc.userId != userId)
+      )
 
   def toDomain: Transaction =
     Transaction(
@@ -53,6 +53,7 @@ final case class TransactionEntity(
       note = note,
       tags = tags.getOrElse(Set.empty),
       category = category.map(_.toDomain),
+      account = account.map(_.toDomain),
       hidden = hidden.getOrElse(false),
       createdAt = createdAt,
       lastUpdatedAt = lastUpdatedAt

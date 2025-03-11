@@ -8,6 +8,7 @@ import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
+import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
 import expensetracker.transaction.{CreatePeriodicTransaction, PeriodicTransaction, RecurrencePattern, TransactionId}
 import kirill5k.common.cats.syntax.applicative.*
@@ -69,6 +70,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
         if acid then collection.aggregate[PeriodicTransactionEntity](session, agg).first
         else collection.aggregate[PeriodicTransactionEntity](agg).first
       _ <- F.raiseWhen(tx.exists(_.containsInvalidCategory))(CategoryDoesNotExist(ctx.categoryId))
+      _ <- F.raiseWhen(tx.exists(_.containsInvalidAccount))(AppError.AccountDoesNotExist(ctx.accountId.get))
       _ <- session.commitTransaction
     yield tx.get.toDomain).onError { case _ =>
       session.abortTransaction
