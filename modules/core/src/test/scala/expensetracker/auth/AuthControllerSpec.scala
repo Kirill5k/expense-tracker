@@ -154,7 +154,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
           .withBody("""{"email":"foo@bar.com","password":"","firstName":"John","lastName":"Bloggs"}""")
         val res = AuthController.make[IO](usrSvc, sessSvc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"password must not be empty"}"""))
+        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"password must not be empty, currency is required"}"""))
         verifyNoInteractions(usrSvc, sessSvc)
       }
 
