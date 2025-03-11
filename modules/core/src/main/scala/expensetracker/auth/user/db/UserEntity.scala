@@ -40,7 +40,7 @@ object UserEntity {
       password.value,
       Some(
         UserSettings(
-          currency = details.currency.getOrElse(UserSettings.Default.currency),
+          currency = details.currency,
           hideFutureTransactions = false,
           darkMode = None,
           futureTransactionVisibilityDays = None

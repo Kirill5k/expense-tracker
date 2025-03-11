@@ -9,6 +9,7 @@ import expensetracker.transaction.{PeriodicTransaction, PeriodicTransactionServi
 import kirill5k.common.cats.Clock
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
+import squants.market.GBP
 
 import scala.concurrent.duration.*
 import java.time.Instant
@@ -46,7 +47,7 @@ class ActionProcessorSpec extends IOWordSpec {
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
         processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _          <- dispatcher.dispatch(Action.SetupNewUser(Users.uid1))
+        _          <- dispatcher.dispatch(Action.SetupNewUser(Users.uid1, GBP))
         res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 

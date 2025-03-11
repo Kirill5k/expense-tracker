@@ -15,6 +15,6 @@ object Users {
   lazy val pwd     = Password("password")
   lazy val hash    = PasswordHash("hash")
   lazy val email   = UserEmail("acc1@et.com")
-  lazy val details = UserDetails(email, UserName("John", "Bloggs"), Some(GBP))
+  lazy val details = UserDetails(email, UserName("John", "Bloggs"), GBP)
   lazy val user    = User(uid1, details.email, details.name, hash, UserSettings.Default, regDate)
 }

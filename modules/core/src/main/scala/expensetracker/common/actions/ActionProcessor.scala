@@ -40,7 +40,7 @@ final private class LiveActionProcessor[F[_]: Temporal](
       case Action.DeleteAllTransactions(uid)         => txService.deleteAll(uid)
       case Action.DeleteAllPeriodicTransactions(uid) => ptxService.deleteAll(uid)
       // TODO: Create default account
-      case Action.SetupNewUser(uid)                               => catService.assignDefault(uid)
+      case Action.SetupNewUser(uid, _)                            => catService.assignDefault(uid)
       case Action.HideTransactionsByCategory(cid, hidden)         => txService.hide(cid, hidden) >> ptxService.hide(cid, hidden)
       case Action.HideTransactionsByAccount(aid, hidden)          => Temporal[F].unit // TODO: Implement
       case Action.SaveUsers(users)                                => userService.save(users)

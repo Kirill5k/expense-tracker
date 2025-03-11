@@ -21,6 +21,8 @@ import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Filter, Update}
 import squants.Money
 
+import java.time.Instant
+
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[Transaction]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]

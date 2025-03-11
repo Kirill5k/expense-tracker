@@ -19,7 +19,7 @@ import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Filter, Update}
 import squants.market.Money
 
-import java.time.{LocalDate}
+import java.time.LocalDate
 
 trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction]

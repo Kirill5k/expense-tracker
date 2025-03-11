@@ -32,7 +32,7 @@ final private class LiveUserService[F[_]](
     encryptor
       .hash(password)
       .flatMap(h => repository.create(details, h))
-      .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid)))
+      .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid, details.currency)))
 
   override def login(login: Login): F[User] =
     repository

@@ -7,6 +7,7 @@ import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.actions.Action.SetupNewUser
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
+import squants.market.GBP
 
 class UserServiceSpec extends IOWordSpec {
 
@@ -26,7 +27,7 @@ class UserServiceSpec extends IOWordSpec {
         result.asserting { res =>
           verify(encr).hash(Users.pwd)
           verify(repo).create(Users.details, Users.hash)
-          verify(disp).dispatch(SetupNewUser(Users.uid1))
+          verify(disp).dispatch(SetupNewUser(Users.uid1, GBP))
           res mustBe Users.uid1
         }
       }

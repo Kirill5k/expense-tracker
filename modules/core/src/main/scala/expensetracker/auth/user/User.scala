@@ -60,7 +60,7 @@ final case class User(
 final case class UserDetails(
     email: UserEmail,
     name: UserName,
-    currency: Option[Currency]
+    currency: Currency
 )
 
 final case class ChangePassword(

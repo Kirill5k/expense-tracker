@@ -141,7 +141,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
 
         res mustHaveStatus (Status.Conflict, Some("""{"message":"A user with email foo@bar.com already exists"}"""))
         verify(usrSvc).create(
-          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), Some(GBP)),
+          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), GBP),
           Password("pwd")
         )
         verifyNoInteractions(sessSvc)
@@ -175,7 +175,7 @@ class AuthControllerSpec extends HttpRoutesWordSpec {
 
         res mustHaveStatus (Status.Created, Some(s"""{"id":"${Users.uid1}"}"""))
         verify(usrSvc).create(
-          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), Some(GBP)),
+          UserDetails(UserEmail("foo@bar.com"), UserName("John", "Bloggs"), GBP),
           Password("pwd")
         )
         verifyNoInteractions(sessSvc)
