@@ -17,7 +17,8 @@ final case class AccountEntity(
     currency: Currency,
     createdAt: Option[Instant],
     lastUpdatedAt: Option[Instant],
-    hidden: Option[Boolean]
+    hidden: Option[Boolean],
+    isDefault: Option[Boolean]
 ) derives Codec.AsObject {
   def toDomain: Account =
     Account(
@@ -27,7 +28,8 @@ final case class AccountEntity(
       currency = currency,
       createdAt = createdAt,
       lastUpdatedAt = lastUpdatedAt,
-      hidden = hidden
+      hidden = hidden,
+      isDefault = isDefault.getOrElse(false)
     )
 }
 
@@ -40,5 +42,6 @@ object AccountEntity:
       currency = account.currency,
       createdAt = Some(Instant.now),
       lastUpdatedAt = None,
-      hidden = None
+      hidden = None,
+      isDefault = Some(account.isDefault)
     )
