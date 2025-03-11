@@ -36,6 +36,7 @@ final private class LiveAccountRepository[F[_]](
       var upd = Update
         .setOnInsert(Field.Id, acc.id.toObjectId)
         .setOnInsert(Field.UId, acc.userId.toObjectId)
+        .setOnInsert(Field.CreatedAt, now)
         .set(Field.Name, acc.name)
         .set(Field.Currency, acc.currency)
         .set(Field.Hidden, acc.hidden)

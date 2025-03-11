@@ -40,6 +40,7 @@ final private class LiveCategoryRepository[F[_]](
       var upd = Update
         .setOnInsert(Field.Id, cat.id.toObjectId)
         .setOnInsert(Field.UId, cat.userId.map(_.toObjectId))
+        .setOnInsert(Field.CreatedAt, now)
         .set(Field.Kind, cat.kind)
         .set(Field.Name, cat.name)
         .set(Field.Icon, cat.icon)

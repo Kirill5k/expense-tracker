@@ -9,6 +9,8 @@ import mongo4cats.collection.MongoCollection
 import mongo4cats.models.collection.{UnwindOptions, UpdateOptions}
 import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 
+import java.time.Instant
+
 trait Repository[F[_]] {
 
   protected object Field {
@@ -67,4 +69,6 @@ trait Repository[F[_]] {
 
   protected def countByName[T](collection: MongoCollection[F, T], uid: UserId, name: String): F[Long] =
     collection.count(userIdEq(uid) && notHidden && Filter.regex(Field.Name, "(?i)^" + name + "$"))
+    
+  protected def now: Instant = Instant.now()
 }

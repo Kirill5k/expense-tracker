@@ -37,7 +37,12 @@ final private class LiveSyncRepository[F[_]](
           "$filter" := Document(
             "input" := "$" + collection,
             "as"    := item,
-            "cond" := BV.document("$gt" := BV.array(BV.string("$$" + item + ".createdAt"), BV.instant(value)))
+            "cond" := Document(
+              "$and" := BV.array(
+                BV.document("$gt" := BV.array(BV.string("$$" + item + ".createdAt"), BV.instant(value))),
+                BV.document("$eq" := BV.array(BV.string("$$" + item + ".lastUpdatedAt"), BV.Null))
+              )
+            )
           )
         )
       case None =>
