@@ -40,14 +40,13 @@ final private class LiveCategoryRepository[F[_]](
       var upd = Update
         .setOnInsert(Field.Id, cat.id.toObjectId)
         .setOnInsert(Field.UId, cat.userId.map(_.toObjectId))
-        .setOnInsert(Field.CreatedAt, now)
         .set(Field.Kind, cat.kind)
         .set(Field.Name, cat.name)
         .set(Field.Icon, cat.icon)
         .set(Field.Color, cat.color)
         .set(Field.Hidden, cat.hidden)
 
-      upd = cat.createdAt.fold(upd)(ts => upd.set(Field.CreatedAt, ts))
+      upd = cat.createdAt.fold(upd.setOnInsert(Field.CreatedAt, now))(ts => upd.set(Field.CreatedAt, ts))
       upd = cat.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
       upd
     }

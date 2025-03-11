@@ -1,6 +1,7 @@
 package expensetracker.common.actions
 
 import expensetracker.auth.user.{User, UserId}
+import expensetracker.accounts.AccountId
 import expensetracker.category.{Category, CategoryId}
 import expensetracker.transaction.{PeriodicTransaction, Transaction}
 
@@ -14,5 +15,6 @@ enum Action:
   case SaveUsers(users: List[User])
   case SetupNewUser(uid: UserId)
   case HideTransactionsByCategory(cid: CategoryId, hidden: Boolean)
+  case HideTransactionsByAccount(aid: AccountId, hidden: Boolean)
   case GeneratePeriodicTransactionRecurrences
   case SchedulePeriodicTransactionRecurrenceGeneration

@@ -19,7 +19,7 @@ import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Filter, Update}
 import squants.market.Money
 
-import java.time.{Instant, LocalDate}
+import java.time.{LocalDate}
 
 trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction]
@@ -54,7 +54,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
         .set(Field.Tags, tx.tags)
         .set(Field.Hidden, tx.hidden)
 
-      upd = tx.createdAt.fold(upd.setOnInsert(Field.CreatedAt, Instant.now))(ts => upd.set(Field.CreatedAt, ts))
+      upd = tx.createdAt.fold(upd.setOnInsert(Field.CreatedAt, now))(ts => upd.set(Field.CreatedAt, ts))
       upd = tx.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
       upd
     }

@@ -36,12 +36,11 @@ final private class LiveAccountRepository[F[_]](
       var upd = Update
         .setOnInsert(Field.Id, acc.id.toObjectId)
         .setOnInsert(Field.UId, acc.userId.toObjectId)
-        .setOnInsert(Field.CreatedAt, now)
         .set(Field.Name, acc.name)
         .set(Field.Currency, acc.currency)
         .set(Field.Hidden, acc.hidden)
 
-      upd = acc.createdAt.fold(upd)(ts => upd.set(Field.CreatedAt, ts))
+      upd = acc.createdAt.fold(upd.setOnInsert(Field.CreatedAt, now))(ts => upd.set(Field.CreatedAt, ts))
       upd = acc.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
       upd
     }

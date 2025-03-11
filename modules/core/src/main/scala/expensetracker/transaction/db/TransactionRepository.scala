@@ -21,8 +21,6 @@ import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Filter, Update}
 import squants.Money
 
-import java.time.Instant
-
 trait TransactionRepository[F[_]] extends Repository[F]:
   def create(tx: CreateTransaction): F[Transaction]
   def getAll(uid: UserId, from: Option[Instant], to: Option[Instant]): F[List[Transaction]]
@@ -60,7 +58,7 @@ final private class LiveTransactionRepository[F[_]](
         .set("parentTransactionId", tx.parentTransactionId.map(_.toObjectId))
         .set("isRecurring", tx.isRecurring)
 
-      upd = tx.createdAt.fold(upd.setOnInsert(Field.CreatedAt, Instant.now))(ts => upd.set(Field.CreatedAt, ts))
+      upd = tx.createdAt.fold(upd.setOnInsert(Field.CreatedAt, now))(ts => upd.set(Field.CreatedAt, ts))
       upd = tx.lastUpdatedAt.fold(upd.currentDate(Field.LastUpdatedAt))(ts => upd.set(Field.LastUpdatedAt, ts))
       upd
     }
