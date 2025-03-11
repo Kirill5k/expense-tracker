@@ -3,11 +3,12 @@ package expensetracker.accounts.db
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
-import expensetracker.accounts.AccountName
+import expensetracker.accounts.{AccountId, AccountName}
 import expensetracker.auth.user.UserEmail
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.fixtures.Accounts
 import expensetracker.fixtures.Users
+import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
@@ -124,6 +125,30 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           yield res
 
           result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
+        }
+      }
+    }
+
+    "save" should {
+      "insert data into db if it doesn't exist" in {
+        withEmbeddedMongoDb { db =>
+          val newAcc = Accounts.acc(id = AccountId(ObjectId()), name = AccountName("account"), uid = Users.uid2)
+          for
+            repo <- AccountRepository.make(db)
+            _    <- repo.save(List(newAcc))
+            accs  <- repo.getAll(Users.uid2)
+          yield accs.map(_.copy(lastUpdatedAt = None, createdAt = None)) mustBe List(newAcc)
+        }
+      }
+
+      "update existing data" in {
+        withEmbeddedMongoDb { db =>
+          val updatedAcc = Accounts.acc(id = Accounts.id, name = AccountName("updated"), uid = Users.uid1)
+          for
+            repo <- AccountRepository.make(db)
+            _    <- repo.save(List(updatedAcc))
+            accs <- repo.getAll(Users.uid1)
+          yield accs.map(_.copy(lastUpdatedAt = None, createdAt = None)) mustBe List(updatedAcc)
         }
       }
     }
