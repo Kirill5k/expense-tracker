@@ -7,6 +7,7 @@ import expensetracker.transaction.{PeriodicTransaction, Transaction}
 import squants.market.Currency
 
 enum Action:
+  case DeleteAllAccounts(uid: UserId)
   case DeleteAllCategories(uid: UserId)
   case DeleteAllTransactions(uid: UserId)
   case DeleteAllPeriodicTransactions(uid: UserId)

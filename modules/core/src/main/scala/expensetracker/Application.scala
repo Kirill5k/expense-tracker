@@ -1,6 +1,7 @@
 package expensetracker
 
 import cats.effect.{IO, IOApp}
+import expensetracker.account.Accounts
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
 import expensetracker.common.actions.{Action, ActionDispatcher, ActionProcessor}
@@ -26,12 +27,13 @@ object Application extends IOApp.Simple:
           health     <- Health.make[IO]
           wellKnown  <- WellKnown.make[IO](config.wellKnown)
           auth       <- Auth.make(config.auth, res, dispatcher)
+          accs       <- Accounts.make(res, dispatcher)
           cats       <- Categories.make(res, dispatcher)
           txs        <- Transactions.make(res)
           ptxs       <- PeriodicTransactions.make(res, dispatcher)
           sync       <- Sync.make(res, dispatcher)
           http       <- Http.make(health, wellKnown, auth, cats, txs, ptxs, sync)
-          processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service, ptxs.service)
+          processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service, ptxs.service, accs.service)
           _          <- dispatcher.dispatch(Action.SchedulePeriodicTransactionRecurrenceGeneration)
           _ <- logger.info("starting http server") >> http
             .serve(config.server)

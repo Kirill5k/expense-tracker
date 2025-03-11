@@ -21,6 +21,7 @@ trait AccountRepository[F[_]] extends Repository[F]:
   def update(acc: Account): F[Unit]
   def getAll(uid: UserId): F[List[Account]]
   def delete(uid: UserId, aid: AccountId): F[Unit]
+  def deleteAll(uid: UserId): F[Unit]
   def hide(uid: UserId, aid: AccountId, hidden: Boolean = true): F[Unit]
   def save(accs: List[Account]): F[Unit]
 
@@ -59,6 +60,9 @@ final private class LiveAccountRepository[F[_]](
         F.raiseWhen(result.getDeletedCount == 0)(AppError.AccountDoesNotExist(aid))
       }
 
+  override def deleteAll(uid: UserId): F[Unit] =
+    collection.deleteMany(userIdEq(uid)).void
+  
   override def hide(uid: UserId, aid: AccountId, hidden: Boolean): F[Unit] =
     collection
       .updateOne(userIdEq(uid) && idEq(aid.toObjectId), updateHidden(hidden))

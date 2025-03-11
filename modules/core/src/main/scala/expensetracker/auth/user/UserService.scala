@@ -71,7 +71,8 @@ final private class LiveUserService[F[_]](
   override def deleteData(userId: UserId): F[Unit] =
     dispatcher.dispatch(Action.DeleteAllCategories(userId)) >>
       dispatcher.dispatch(Action.DeleteAllTransactions(userId)) >>
-      dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(userId))
+      dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(userId)) >>
+      dispatcher.dispatch(Action.DeleteAllAccounts(userId))
 }
 
 object UserService:

@@ -12,6 +12,48 @@ import squants.market.GBP
 class UserServiceSpec extends IOWordSpec {
 
   "A UserService" when {
+    "deleteData" should {
+      "dispatch an action for delete all user data" in {
+        val (repo, encr, disp) = mocks
+        when(disp.dispatch(any[Action])).thenReturnUnit
+
+        val result = for
+          service <- UserService.make[IO](repo, encr, disp)
+          res <- service.deleteData(Users.uid1)
+        yield res
+
+        result.asserting { res =>
+          verify(disp).dispatch(Action.DeleteAllAccounts(Users.uid1))
+          verify(disp).dispatch(Action.DeleteAllCategories(Users.uid1))
+          verify(disp).dispatch(Action.DeleteAllTransactions(Users.uid1))
+          verify(disp).dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
+          res mustBe ()
+        }
+      }
+    }
+
+    "delete" should {
+      "delete user as well as dispatch an action for delete all user data" in {
+        val (repo, encr, disp) = mocks
+        when(repo.delete(any[UserId])).thenReturnUnit
+        when(disp.dispatch(any[Action])).thenReturnUnit
+
+        val result = for
+          service <- UserService.make[IO](repo, encr, disp)
+          res <- service.delete(Users.uid1)
+        yield res
+
+        result.asserting { res =>
+          verify(repo).delete(Users.uid1)
+          verify(disp).dispatch(Action.DeleteAllAccounts(Users.uid1))
+          verify(disp).dispatch(Action.DeleteAllCategories(Users.uid1))
+          verify(disp).dispatch(Action.DeleteAllTransactions(Users.uid1))
+          verify(disp).dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
+          res mustBe()
+        }
+      }
+    }
+
     "create" should {
       "return account id on success" in {
         val (repo, encr, disp) = mocks
