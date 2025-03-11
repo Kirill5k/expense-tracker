@@ -1,6 +1,6 @@
 package expensetracker.fixtures
 
-import expensetracker.accounts.{Account, AccountId, AccountName, CreateAccount}
+import expensetracker.account.{Account, AccountId, AccountName, CreateAccount}
 import expensetracker.auth.user.UserId
 import mongo4cats.bson.ObjectId
 import squants.market.{Currency, GBP}

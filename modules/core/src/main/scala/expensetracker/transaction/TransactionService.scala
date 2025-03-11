@@ -2,6 +2,7 @@ package expensetracker.transaction
 
 import cats.Monad
 import expensetracker.transaction.db.TransactionRepository
+import expensetracker.account.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 
@@ -14,7 +15,8 @@ trait TransactionService[F[_]]:
   def create(tx: CreateTransaction): F[Transaction]
   def update(tx: Transaction): F[Unit]
   def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
-  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]
   def save(txs: List[Transaction]): F[Unit]
   def deleteAll(uid: UserId): F[Unit]
 
@@ -41,9 +43,12 @@ final private class LiveTransactionService[F[_]](
   override def hide(aid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     repository.hide(aid, txid, hidden)
 
-  override def hide(cid: CategoryId, hidden: Boolean): F[Unit] =
-    repository.hide(cid, hidden)
+  override def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit] =
+    repository.hideByCategory(cid, hidden)
 
+  override def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit] =
+    repository.hideByAccount(cid, hidden)
+  
   override def save(txs: List[Transaction]): F[Unit] =
     F.whenA(txs.nonEmpty)(repository.save(txs))
 

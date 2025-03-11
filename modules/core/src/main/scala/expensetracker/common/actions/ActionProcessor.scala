@@ -40,12 +40,13 @@ final private class LiveActionProcessor[F[_]: Temporal](
       case Action.DeleteAllTransactions(uid)         => txService.deleteAll(uid)
       case Action.DeleteAllPeriodicTransactions(uid) => ptxService.deleteAll(uid)
       // TODO: Create default account
-      case Action.SetupNewUser(uid, _)                            => catService.assignDefault(uid)
-      case Action.HideTransactionsByCategory(cid, hidden)         => txService.hide(cid, hidden) >> ptxService.hide(cid, hidden)
-      case Action.HideTransactionsByAccount(aid, hidden)          => Temporal[F].unit // TODO: Implement
-      case Action.SaveUsers(users)                                => userService.save(users)
-      case Action.SaveCategories(categories)                      => catService.save(categories)
-      case Action.SaveTransactions(transactions)                  => txService.save(transactions)
+      case Action.SetupNewUser(uid, _)                    => catService.assignDefault(uid)
+      case Action.HideTransactionsByCategory(cid, hidden) => txService.hideByCategory(cid, hidden) >> ptxService.hideByCategory(cid, hidden)
+      // TODO: emit this event from svc
+      case Action.HideTransactionsByAccount(aid, hidden)  => txService.hideByAccount(aid, hidden) >> ptxService.hideByAccount(aid, hidden)
+      case Action.SaveUsers(users)                        => userService.save(users)
+      case Action.SaveCategories(categories)              => catService.save(categories)
+      case Action.SaveTransactions(transactions)          => txService.save(transactions)
       case Action.SavePeriodicTransactions(periodicTransactions)  => ptxService.save(periodicTransactions)
       case Action.GeneratePeriodicTransactionRecurrences          => ptxService.generateRecurrencesForToday
       case Action.SchedulePeriodicTransactionRecurrenceGeneration => schedulePeriodicTransactionRecurrenceGeneration

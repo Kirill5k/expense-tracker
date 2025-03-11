@@ -12,7 +12,7 @@ import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPull
 import expensetracker.transaction.{PeriodicTransaction, RecurrenceFrequency, RecurrencePattern, Transaction, TransactionId}
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.refineV
-import expensetracker.accounts.AccountId
+import expensetracker.account.AccountId
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes

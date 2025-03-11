@@ -1,7 +1,7 @@
 package expensetracker.common.actions
 
+import expensetracker.account.AccountId
 import expensetracker.auth.user.{User, UserId}
-import expensetracker.accounts.AccountId
 import expensetracker.category.{Category, CategoryId}
 import expensetracker.transaction.{PeriodicTransaction, Transaction}
 import squants.market.Currency

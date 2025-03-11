@@ -5,6 +5,7 @@ import cats.syntax.applicativeError.*
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
 import expensetracker.auth.user.UserId
+import expensetracker.account.AccountId
 import expensetracker.category.CategoryId
 import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
@@ -27,7 +28,8 @@ trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def getAll(uid: UserId): F[List[PeriodicTransaction]]
   def update(tx: PeriodicTransaction): F[Unit]
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
-  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByAccount(aid: AccountId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
   def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]]
   def deleteAll(uid: UserId): F[Unit]
@@ -96,11 +98,16 @@ final private class LivePeriodicTransactionRepository[F[_]](
       .updateOne(userIdEq(uid) && idEq(txid.toObjectId), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
-  override def hide(cid: CategoryId, hidden: Boolean): F[Unit] =
+  override def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit] =
     collection
       .updateMany(Filter.eq(Field.CId, cid.toObjectId), updateHidden(hidden))
       .void
 
+  override def hideByAccount(aid: AccountId, hidden: Boolean): F[Unit] =
+    collection
+      .updateMany(Filter.eq(Field.AId, aid.toObjectId), updateHidden(hidden))
+      .void
+    
   override def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]] =
     collection
       .find(

@@ -3,7 +3,7 @@ package expensetracker.transaction.db
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
-import expensetracker.accounts.{AccountId, AccountName}
+import expensetracker.account.{AccountId, AccountName}
 import expensetracker.auth.user.UserEmail
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError
@@ -105,8 +105,19 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
             _    <- repo.create(PeriodicTransactions.create())
-            _    <- repo.hide(Categories.cid, true)
+            _    <- repo.hideByCategory(Categories.cid, true)
             txs  <- repo.getAll(Users.uid1)
+          yield txs mustBe Nil
+        }
+      }
+
+      "update hidden field of a tx by account id" in {
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo <- PeriodicTransactionRepository.make(db, sess, false)
+            _ <- repo.create(PeriodicTransactions.create())
+            _ <- repo.hideByAccount(Accounts.id, true)
+            txs <- repo.getAll(Users.uid1)
           yield txs mustBe Nil
         }
       }

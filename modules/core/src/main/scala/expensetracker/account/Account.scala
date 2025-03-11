@@ -1,4 +1,4 @@
-package expensetracker.accounts
+package expensetracker.account
 
 import expensetracker.auth.user.UserId
 import expensetracker.common.types.{IdType, StringType}

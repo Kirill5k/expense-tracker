@@ -1,6 +1,6 @@
 package expensetracker.common
 
-import expensetracker.accounts.{AccountId, AccountName}
+import expensetracker.account.{AccountId, AccountName}
 import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.auth.session.SessionId
 import expensetracker.category.{CategoryId, CategoryName}

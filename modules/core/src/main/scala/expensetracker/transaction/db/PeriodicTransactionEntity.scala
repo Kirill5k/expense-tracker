@@ -1,7 +1,7 @@
 package expensetracker.transaction.db
 
-import expensetracker.accounts.AccountId
-import expensetracker.accounts.db.AccountEntity
+import expensetracker.account.AccountId
+import expensetracker.account.db.AccountEntity
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.category.db.CategoryEntity

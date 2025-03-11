@@ -4,7 +4,7 @@ import expensetracker.transaction.{CreatePeriodicTransaction, PeriodicTransactio
 import mongo4cats.bson.ObjectId
 import eu.timepit.refined.*
 import eu.timepit.refined.numeric.Positive
-import expensetracker.accounts.AccountId
+import expensetracker.account.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import squants.Money

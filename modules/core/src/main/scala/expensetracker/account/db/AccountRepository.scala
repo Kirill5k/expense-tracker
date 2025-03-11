@@ -1,9 +1,9 @@
-package expensetracker.accounts.db
+package expensetracker.account.db
 
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
-import expensetracker.accounts.{Account, AccountId, CreateAccount}
+import expensetracker.account.{Account, AccountId, CreateAccount}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError

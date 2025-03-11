@@ -4,7 +4,7 @@ import cats.Monad
 import cats.effect.Async
 import cats.syntax.flatMap.*
 import cats.syntax.applicative.*
-import expensetracker.accounts.AccountId
+import expensetracker.account.AccountId
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryController.CategoryView

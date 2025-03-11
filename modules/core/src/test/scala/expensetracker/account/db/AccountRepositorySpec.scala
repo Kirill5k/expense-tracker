@@ -1,9 +1,9 @@
-package expensetracker.accounts.db
+package expensetracker.account.db
 
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
-import expensetracker.accounts.{AccountId, AccountName}
+import expensetracker.account.{AccountId, AccountName}
 import expensetracker.auth.user.UserEmail
 import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.fixtures.Accounts

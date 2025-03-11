@@ -1,7 +1,7 @@
 package expensetracker.transaction
 
 import eu.timepit.refined.types.numeric.PosInt
-import expensetracker.accounts.{Account, AccountId}
+import expensetracker.account.{Account, AccountId}
 import expensetracker.auth.user.UserId
 import expensetracker.category.{Category, CategoryId}
 import expensetracker.common.types.{EnumType, IdType}

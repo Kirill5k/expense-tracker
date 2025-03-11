@@ -1,6 +1,6 @@
-package expensetracker.accounts.db
+package expensetracker.account.db
 
-import expensetracker.accounts.{Account, AccountId, AccountName, CreateAccount}
+import expensetracker.account.{Account, AccountId, AccountName, CreateAccount}
 import expensetracker.auth.user.UserId
 import expensetracker.common.json.given
 import io.circe.Codec

@@ -2,7 +2,8 @@ package expensetracker.common.actions
 
 import cats.effect.IO
 import kirill5k.common.cats.test.IOWordSpec
-import expensetracker.fixtures.{Categories, PeriodicTransactions, Transactions, Users}
+import expensetracker.fixtures.{Accounts, Categories, PeriodicTransactions, Transactions, Users}
+import expensetracker.account.AccountId
 import expensetracker.auth.user.{User, UserId, UserService}
 import expensetracker.category.{Category, CategoryId, CategoryService}
 import expensetracker.transaction.{PeriodicTransaction, PeriodicTransactionService, Transaction, TransactionService}
@@ -16,8 +17,7 @@ import java.time.Instant
 
 class ActionProcessorSpec extends IOWordSpec {
 
-  given Clock[IO] = Clock.mock(Instant.parse("2024-11-10T01:00:00Z"))
-
+  given Clock[IO]  = Clock.mock(Instant.parse("2024-11-10T01:00:00Z"))
   given Logger[IO] = Slf4jLogger.getLogger[IO]
 
   "An ActionProcessor" should {
@@ -60,8 +60,8 @@ class ActionProcessorSpec extends IOWordSpec {
 
     "hide transactions by category" in {
       val (usrSvc, catSvc, txSvc, ptxSvc) = mocks
-      when(txSvc.hide(any[CategoryId], anyBoolean)).thenReturn(IO.unit)
-      when(ptxSvc.hide(any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+      when(txSvc.hideByCategory(any[CategoryId], anyBoolean)).thenReturn(IO.unit)
+      when(ptxSvc.hideByCategory(any[CategoryId], anyBoolean)).thenReturn(IO.unit)
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
@@ -71,8 +71,28 @@ class ActionProcessorSpec extends IOWordSpec {
       yield res
 
       result.asserting { r =>
-        verify(txSvc).hide(Categories.cid, false)
-        verify(ptxSvc).hide(Categories.cid, false)
+        verify(txSvc).hideByCategory(Categories.cid, false)
+        verify(ptxSvc).hideByCategory(Categories.cid, false)
+        verifyNoInteractions(catSvc, usrSvc)
+        r mustBe ()
+      }
+    }
+
+    "hide transactions by accounts" in {
+      val (usrSvc, catSvc, txSvc, ptxSvc) = mocks
+      when(txSvc.hideByAccount(any[AccountId], anyBoolean)).thenReturn(IO.unit)
+      when(ptxSvc.hideByAccount(any[AccountId], anyBoolean)).thenReturn(IO.unit)
+
+      val result = for
+        dispatcher <- ActionDispatcher.make[IO]
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.HideTransactionsByAccount(Accounts.id, false))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
+      yield res
+
+      result.asserting { r =>
+        verify(txSvc).hideByAccount(Accounts.id, false)
+        verify(ptxSvc).hideByAccount(Accounts.id, false)
         verifyNoInteractions(catSvc, usrSvc)
         r mustBe ()
       }
@@ -156,15 +176,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(ptxSvc).deleteAll(Users.uid1)
         verifyNoInteractions(catSvc, usrSvc, txSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
 
@@ -174,15 +194,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.DeleteAllTransactions(Users.uid1))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.DeleteAllTransactions(Users.uid1))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(txSvc).deleteAll(Users.uid1)
         verifyNoInteractions(catSvc, usrSvc, ptxSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
 
@@ -192,15 +212,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
-        _ <- dispatcher.dispatch(Action.DeleteAllCategories(Users.uid1))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc)
+        _          <- dispatcher.dispatch(Action.DeleteAllCategories(Users.uid1))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(catSvc).deleteAll(Users.uid1)
         verifyNoInteractions(txSvc, usrSvc, ptxSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
   }

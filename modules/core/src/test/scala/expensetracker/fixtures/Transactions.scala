@@ -1,6 +1,6 @@
 package expensetracker.fixtures
 
-import expensetracker.accounts.AccountId
+import expensetracker.account.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}

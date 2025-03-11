@@ -4,6 +4,7 @@ import cats.Monad
 import cats.effect.Temporal
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
+import expensetracker.account.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.actions.{Action, ActionDispatcher}
@@ -18,7 +19,8 @@ trait PeriodicTransactionService[F[_]]:
   def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction]
   def update(tx: PeriodicTransaction): F[Unit]
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]
-  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
   def generateRecurrencesForToday: F[Unit]
   def deleteAll(uid: UserId): F[Unit]
@@ -33,7 +35,8 @@ final private class LivePeriodicTransactionService[F[_]](
 
   def getAll(uid: UserId): F[List[PeriodicTransaction]]                = repository.getAll(uid)
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] = repository.hide(uid, txid, hidden)
-  def hide(cid: CategoryId, hidden: Boolean): F[Unit]                  = repository.hide(cid, hidden)
+  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]        = repository.hideByCategory(cid, hidden)
+  def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]          = repository.hideByAccount(cid, hidden)
   def save(txs: List[PeriodicTransaction]): F[Unit]                    = F.whenA(txs.nonEmpty)(repository.save(txs))
 
   override def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction] =

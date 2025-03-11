@@ -4,6 +4,7 @@ import cats.effect.Async
 import cats.syntax.applicativeError.*
 import cats.syntax.flatMap.*
 import cats.syntax.functor.*
+import expensetracker.account.AccountId
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.common.JsonCodecs
@@ -30,7 +31,8 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def delete(uid: UserId, txid: TransactionId): F[Unit]
   def update(tx: Transaction): F[Unit]
   def hide(uid: UserId, txid: TransactionId, hidden: Boolean = true): F[Unit]
-  def hide(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
+  def hideByAccount(aid: AccountId, hidden: Boolean): F[Unit]
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
   def save(txs: List[Transaction]): F[Unit]
   def deleteAll(uid: UserId): F[Unit]
@@ -115,11 +117,16 @@ final private class LiveTransactionRepository[F[_]](
       .updateOne(userIdEq(uid) && idEq(txid.toObjectId), updateHidden(hidden))
       .flatMap(errorIfNoMatches(TransactionDoesNotExist(txid)))
 
-  override def hide(cid: CategoryId, hidden: Boolean): F[Unit] =
+  override def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit] =
     collection
       .updateMany(Filter.eq(Field.CId, cid.toObjectId), updateHidden(hidden))
       .void
 
+  override def hideByAccount(aid: AccountId, hidden: Boolean): F[Unit] =
+    collection
+      .updateMany(Filter.eq(Field.AId, aid.toObjectId), updateHidden(hidden))
+      .void
+  
   override def isHidden(uid: UserId, txid: TransactionId): F[Boolean] =
     collection
       .count(userIdEq(uid) && idEq(txid.toObjectId) && Filter.eq(Field.Hidden, true))
