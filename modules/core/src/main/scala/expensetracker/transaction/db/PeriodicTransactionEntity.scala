@@ -45,7 +45,9 @@ final case class PeriodicTransactionEntity(
       note = note,
       tags = tags.getOrElse(Set.empty),
       category = category.map(_.toDomain),
-      hidden = hidden.getOrElse(false)
+      hidden = hidden.getOrElse(false),
+      createdAt = createdAt,
+      lastUpdatedAt = lastUpdatedAt,
     )
 }
 
