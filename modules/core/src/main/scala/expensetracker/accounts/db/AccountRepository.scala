@@ -7,12 +7,14 @@ import expensetracker.accounts.{Account, AccountId, CreateAccount}
 import expensetracker.auth.user.UserId
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
+import expensetracker.common.JsonCodecs
 import kirill5k.common.cats.syntax.applicative.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
 import mongo4cats.models.collection.WriteCommand
 import mongo4cats.operations.{Filter, Update}
+import squants.market.Currency
 
 trait AccountRepository[F[_]] extends Repository[F]:
   def create(acc: CreateAccount): F[Account]
@@ -79,7 +81,8 @@ final private class LiveAccountRepository[F[_]](
     collection.bulkWrite(commands).void
 }
 
-object AccountRepository extends MongoJsonCodecs:
-  def make[F[_] : Async](db: MongoDatabase[F]): F[AccountRepository[F]] =
+object AccountRepository extends MongoJsonCodecs with JsonCodecs:
+  def make[F[_]: Async](db: MongoDatabase[F]): F[AccountRepository[F]] =
     db.getCollectionWithCodec[AccountEntity]("accounts")
+      .map(_.withAddedCodec[Currency])
       .map(LiveAccountRepository[F](_))

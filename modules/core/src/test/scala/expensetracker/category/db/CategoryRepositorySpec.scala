@@ -45,8 +45,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- CategoryRepository.make(client)
-            id   <- repo.create(Categories.create(name = CategoryName("C2"), uid = Users.uid2))
-          yield id
+            _    <- repo.create(Categories.create(name = CategoryName("C2"), uid = Users.uid2))
+          yield ()
 
           result.attempt.map(_ mustBe Left(CategoryAlreadyExists(CategoryName("C2"))))
         }
@@ -152,7 +152,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
     }
 
     "delete" should {
-      "remove account's category" in {
+      "remove user's category" in {
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- CategoryRepository.make(client)
@@ -187,7 +187,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           yield cats
 
           result.map { cats =>
-            cats mustBe List(update)
+            cats.map(_.copy(lastUpdatedAt = None)) mustBe List(update)
           }
         }
       }
@@ -215,7 +215,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           yield cat
 
           result.map { cat =>
-            cat mustBe newCat
+            cat.copy(lastUpdatedAt = None) mustBe newCat
           }
         }
       }
@@ -230,7 +230,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
           yield cat
 
           result.map { cat =>
-            cat mustBe updatedCat
+            cat.copy(lastUpdatedAt = None) mustBe updatedCat
           }
         }
       }

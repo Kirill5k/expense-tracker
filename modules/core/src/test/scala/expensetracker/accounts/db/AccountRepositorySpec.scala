@@ -5,6 +5,7 @@ import cats.effect.unsafe.IORuntime
 import expensetracker.MongoOps
 import expensetracker.accounts.AccountName
 import expensetracker.auth.user.UserEmail
+import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountDoesNotExist}
 import expensetracker.fixtures.Accounts
 import expensetracker.fixtures.Users
 import mongo4cats.client.MongoClient
@@ -34,6 +35,95 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           result.map { (accs, newAcc) =>
             accs.map(_.id) must contain(newAcc.id)
           }
+        }
+      }
+
+      "return error if acc with such name already exists" in {
+        withEmbeddedMongoDb { client =>
+          val result = for
+            repo <- AccountRepository.make(client)
+            _    <- repo.create(Accounts.create(name = AccountName("test-account"), uid = Users.uid1))
+          yield ()
+
+          result.attempt.map(_ mustBe Left(AccountAlreadyExists(AccountName("test-account"))))
+        }
+      }
+    }
+
+    "hide" should {
+      "update hidden field of an account" in {
+        withEmbeddedMongoDb { client =>
+          val result = for
+            repo <- AccountRepository.make(client)
+            _    <- repo.hide(Users.uid1, Accounts.id)
+            cats <- repo.getAll(Users.uid1)
+          yield cats
+
+          result.map(_ mustBe Nil)
+        }
+      }
+
+      "return error when cat does not exist" in {
+        withEmbeddedMongoDb { client =>
+          val result = for
+            repo <- AccountRepository.make(client)
+            res  <- repo.hide(Users.uid2, Accounts.id)
+          yield res
+
+          result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
+        }
+      }
+    }
+
+    "delete" should {
+      "remove user's account" in {
+        withEmbeddedMongoDb { client =>
+          val result = for
+            repo <- AccountRepository.make(client)
+            _    <- repo.delete(Users.uid1, Accounts.id)
+            cats <- repo.getAll(Users.uid1)
+          yield cats
+
+          result.map(_ must have size 0)
+        }
+      }
+
+      "return error if userId doesn't match" in {
+        withEmbeddedMongoDb { client =>
+          val result = for
+            repo <- AccountRepository.make(client)
+            res  <- repo.delete(Users.uid2, Accounts.id)
+          yield res
+
+          result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
+        }
+      }
+    }
+
+    "update" should {
+      "update existing accounts" in {
+        withEmbeddedMongoDb { db =>
+          val update = Accounts.acc(id = Accounts.id, name = AccountName("updated"), uid = Users.uid1)
+          val result = for
+            repo <- AccountRepository.make(db)
+            _    <- repo.update(update)
+            accs <- repo.getAll(Users.uid1)
+          yield accs
+
+          result.map { accs =>
+            accs.map(_.copy(lastUpdatedAt = None)) mustBe List(update)
+          }
+        }
+      }
+
+      "return error when account does not exist" in {
+        withEmbeddedMongoDb { db =>
+          val result = for
+            repo <- AccountRepository.make(db)
+            res  <- repo.update(Accounts.acc(id = Accounts.id, name = AccountName("c2-upd"), uid = Users.uid2))
+          yield res
+
+          result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
         }
       }
     }

@@ -27,7 +27,9 @@ final case class CategoryEntity(
       icon = CategoryIcon(icon),
       color = CategoryColor(color),
       userId = userId.map(uid => UserId(uid)),
-      hidden = hidden.getOrElse(false)
+      hidden = hidden.getOrElse(false),
+      lastUpdatedAt = lastUpdatedAt,
+      createdAt = createdAt
     )
 }
 
