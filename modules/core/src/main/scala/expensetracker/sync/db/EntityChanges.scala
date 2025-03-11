@@ -1,5 +1,6 @@
 package expensetracker.sync.db
 
+import expensetracker.account.db.AccountEntity
 import expensetracker.auth.user.db.UserEntity
 import expensetracker.category.db.CategoryEntity
 import expensetracker.sync.{DataChange, DataChanges}
@@ -16,6 +17,7 @@ final case class EntityChanges(
     transactions: DataChange[TransactionEntity],
     categories: DataChange[CategoryEntity],
     users: DataChange[UserEntity],
+    accounts: DataChange[AccountEntity],
     time: Instant
 ) {
   def toDomain: DataChanges =
@@ -35,6 +37,10 @@ final case class EntityChanges(
       users = DataChange(
         created = users.created.map(_.toDomain),
         updated = users.updated.map(_.toDomain)
+      ),
+      accounts = DataChange(
+        created = accounts.created.map(_.toDomain),
+        updated = accounts.updated.map(_.toDomain)
       ),
       time = time
     )

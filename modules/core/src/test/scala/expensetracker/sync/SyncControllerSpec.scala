@@ -183,6 +183,10 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
                 created = List(Users.user),
                 updated = Nil
               ),
+              accounts = DataChange(
+                created = Nil,
+                updated = Nil
+              ),
               time = time
             )
           )

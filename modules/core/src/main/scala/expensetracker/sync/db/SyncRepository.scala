@@ -87,6 +87,7 @@ final private class LiveSyncRepository[F[_]](
             .lookup("periodic-transactions", "_id", "userId", "periodicTransactionsColl")
             .lookup("transactions", "_id", "userId", "transactionsColl")
             .lookup("categories", "_id", "userId", "categoriesColl")
+            .lookup("accounts", "_id", "userId", "accountsColl")
             .lookup("users", "_id", "_id", "usersColl")
             .addFields(
               "time"                       -> "$$NOW",
@@ -97,7 +98,9 @@ final private class LiveSyncRepository[F[_]](
               "periodicTransactionCreated" -> createdComp("periodicTransactionsColl", "periodicTransaction", from),
               "periodicTransactionUpdated" -> updatedComp("periodicTransactionsColl", "periodicTransaction", from),
               "categoryCreated"            -> createdComp("categoriesColl", "category", from),
-              "categoryUpdated"            -> updatedComp("categoriesColl", "category", from)
+              "categoryUpdated"            -> updatedComp("categoriesColl", "category", from),
+              "accountCreated"            -> createdComp("accountsColl", "account", from),
+              "accountUpdated"            -> updatedComp("accountsColl", "account", from)
             )
             .project(
               Projection
@@ -117,6 +120,10 @@ final private class LiveSyncRepository[F[_]](
                 .computed("periodicTransactions", Document(
                   "created" := "$periodicTransactionCreated", 
                   "updated" := "$periodicTransactionUpdated"
+                ))
+                .computed("accounts", Document(
+                  "created" := "$accountCreated",
+                  "updated" := "$accountUpdated"
                 ))
             )
         )

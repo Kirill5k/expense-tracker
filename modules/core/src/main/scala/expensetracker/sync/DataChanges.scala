@@ -1,5 +1,6 @@
 package expensetracker.sync
 
+import expensetracker.account.Account
 import expensetracker.auth.user.User
 import expensetracker.category.Category
 import expensetracker.transaction.{PeriodicTransaction, Transaction}
@@ -21,5 +22,6 @@ final case class DataChanges(
     transactions: DataChange[Transaction],
     categories: DataChange[Category],
     users: DataChange[User],
+    accounts: DataChange[Account],
     time: Instant
 )
