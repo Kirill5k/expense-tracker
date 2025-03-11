@@ -42,11 +42,13 @@ final private class LiveActionProcessor[F[_]: Temporal](
       // TODO: Create default account
       case Action.SetupNewUser(uid, _)                    => catService.assignDefault(uid)
       case Action.HideTransactionsByCategory(cid, hidden) => txService.hideByCategory(cid, hidden) >> ptxService.hideByCategory(cid, hidden)
-      // TODO: emit this event from svc
-      case Action.HideTransactionsByAccount(aid, hidden)  => txService.hideByAccount(aid, hidden) >> ptxService.hideByAccount(aid, hidden)
-      case Action.SaveUsers(users)                        => userService.save(users)
-      case Action.SaveCategories(categories)              => catService.save(categories)
-      case Action.SaveTransactions(transactions)          => txService.save(transactions)
+      // TODO: emit this action from svc
+      case Action.HideTransactionsByAccount(aid, hidden) => txService.hideByAccount(aid, hidden) >> ptxService.hideByAccount(aid, hidden)
+      case Action.SaveUsers(users)                       => userService.save(users)
+      // TODO: implement
+      case Action.SaveAccounts(accs)                     => Temporal[F].unit
+      case Action.SaveCategories(categories)             => catService.save(categories)
+      case Action.SaveTransactions(transactions)         => txService.save(transactions)
       case Action.SavePeriodicTransactions(periodicTransactions)  => ptxService.save(periodicTransactions)
       case Action.GeneratePeriodicTransactionRecurrences          => ptxService.generateRecurrencesForToday
       case Action.SchedulePeriodicTransactionRecurrenceGeneration => schedulePeriodicTransactionRecurrenceGeneration
