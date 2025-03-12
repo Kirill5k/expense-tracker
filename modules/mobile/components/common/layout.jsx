@@ -14,7 +14,7 @@ import {useColorScheme} from '@/components/useColorScheme'
 export const ScreenHeading = ({heading, subHeading, loading = false}) => {
   const mode = useColorScheme()
   return (
-      <VStack>
+      <VStack className="w-full">
         <Heading size="2xl" className={loading ? 'pb-0' : 'pb-2'}>
           {heading}
         </Heading>

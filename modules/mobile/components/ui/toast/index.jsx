@@ -6,6 +6,7 @@ import {tva} from '@gluestack-ui/nativewind-utils/tva'
 import {withStyleContext, useStyleContext} from '@gluestack-ui/nativewind-utils/withStyleContext'
 import {withStyleContextAndStates} from '@gluestack-ui/nativewind-utils/withStyleContextAndStates'
 import {Motion, AnimatePresence} from '@legendapp/motion'
+import {BlurredContainer} from '@/components/common/blur'
 import {cssInterop} from 'nativewind'
 import {Button, ButtonText} from "../button"
 import {HStack} from "../hstack"
@@ -209,12 +210,15 @@ export const withToast = (ChildComponent) => {
         toast.show({
           id: newId,
           placement: notification?.type === 'info' ? 'bottom' : 'top',
+          duration: 3000,
           render: ({id}) => (
               <Toast
                   nativeId={`toast-${id}`}
                   variant="outline"
                   action={notification?.type || 'error'}
+                  className="bg-transparent border-none rounded-full w-full my-2"
               >
+                <BlurredContainer rounded/>
                 <HStack className="justify-between align-center" space="md">
                   <VStack className="justify-center">
                     {notification?.title && <ToastTitle size="md">{notification.title}</ToastTitle>}
@@ -223,7 +227,7 @@ export const withToast = (ChildComponent) => {
                   <VStack className="justify-center">
                     {notification?.undoAction && (
                         <Button
-                            variant="link"
+                            variant="outline"
                             size="sm"
                             className="self-center"
                             onPress={() => {
