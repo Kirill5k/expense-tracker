@@ -4,6 +4,7 @@ import {Button, ButtonIcon} from '@/components/ui/button'
 import Colors from '@/constants/colors'
 import Classes from '@/constants/classes'
 import {ScrollView} from '@/components/ui/scroll-view'
+import {BlurredBackground} from '@/components/common/blur'
 import {
   Actionsheet,
   ActionsheetItem,
@@ -51,7 +52,8 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
         </Button>
         <Actionsheet isOpen={show} onClose={handleClose} className="w-full">
           <ActionsheetBackdrop />
-          <ActionsheetContent className="w-full">
+          <ActionsheetContent className="w-full bg-transparent">
+            <BlurredBackground style={{borderTopRightRadius: 12, borderTopLeftRadius: 12}}/>
             <ActionsheetDragIndicatorWrapper>
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>

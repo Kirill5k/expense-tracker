@@ -6,7 +6,7 @@ import {tva} from '@gluestack-ui/nativewind-utils/tva'
 import {withStyleContext, useStyleContext} from '@gluestack-ui/nativewind-utils/withStyleContext'
 import {withStyleContextAndStates} from '@gluestack-ui/nativewind-utils/withStyleContextAndStates'
 import {Motion, AnimatePresence} from '@legendapp/motion'
-import {BlurredContainer} from '@/components/common/blur'
+import {BlurredBackground} from '@/components/common/blur'
 import {cssInterop} from 'nativewind'
 import {Button, ButtonText} from "../button"
 import {HStack} from "../hstack"
@@ -218,7 +218,7 @@ export const withToast = (ChildComponent) => {
                   action={notification?.type || 'error'}
                   className="bg-transparent border-none rounded-full w-full my-2"
               >
-                <BlurredContainer rounded/>
+                <BlurredBackground rounded/>
                 <HStack className="justify-between align-center" space="md">
                   <VStack className="justify-center">
                     {notification?.title && <ToastTitle size="md">{notification.title}</ToastTitle>}
