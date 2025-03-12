@@ -1,6 +1,7 @@
 import {Tabs} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {SafeAreaView} from '@/components/ui/safe-area-view'
+import {HapticsTab} from '@/components/common/haptics'
 import Colors from '@/constants/colors'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -25,6 +26,7 @@ const DashboardLayout = () => {
               // Disable the static render of the header on web
               // to prevent a hydration error in React Navigation v6.
               headerShown: false,
+              tabBarButton: HapticsTab,
               tabBarStyle: {
                 backgroundColor: Colors[mode].backgroundColor,
                 borderTopColor: Colors[mode].tabTopBorder,
