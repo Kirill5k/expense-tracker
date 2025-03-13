@@ -24,7 +24,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const {setUndoAlert, setTxToUpdate} = useStore()
   const mode = useColorScheme()
 
-  const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredCats, setFilteredCats] = useState([])
 
@@ -32,10 +31,8 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const transactions = filterByCategory(filterBySearchQuery(mappedTransactions, searchQuery), filteredCats)
 
   const handleItemDelete = (tx) => {
-    setLoading(true)
     hideTransaction(database, tx.id, true)
         .then(() => setUndoAlert('Transaction has been deleted', () => hideTransaction(database, tx.id, false)))
-        .then(() => setLoading(false))
   }
 
   const handleItemCopy = (tx) => {
@@ -58,7 +55,6 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
         <HStack className="relative">
           <ScreenHeading
             heading="Transactions"
-            loading={loading}
           />
           <SearchInput
               mode={mode}
@@ -74,14 +70,12 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
           />
         </HStack>
         <DatePeriodSelect
-            disabled={loading}
             mode={mode}
             value={state.displayDate}
             onSelect={handleDatePeriodChange}
         />
         <TransactionList
             mode={mode}
-            disabled={loading}
             items={transactions}
             onItemPress={handleItemPress}
             onItemCopy={handleItemCopy}

@@ -25,7 +25,6 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   const [kind, setKind] = useState(categoryOptions[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
-  const [loading, setLoading] = useState(false)
 
   const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
   const previousTransactions = mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
@@ -66,7 +65,6 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               mode={mode}
               value={state.displayDate}
               onSelect={handleDatePeriodChange}
-              disabled={loading}
           />
           <CategoryGroupedTransactionList
               mode={mode}
