@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {HStack} from '@/components/ui/hstack'
 import {Menu, MenuItem, MenuItemLabel} from '@/components/ui/menu'
 import {ButtonIcon, ButtonText, Button} from '@/components/ui/button'
@@ -59,7 +59,10 @@ const ranges = {
 }
 
 export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className}) => {
+  const [leftIsPressed, setLeftIsPressed] = useState(false)
+  const [rightIsPressed, setRightIsPressed] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [prevDisplayDate, setPrevDisplayDate] = useState(null)
 
   const resetDate = (range) => {
     const newDateRange = newDisplayDateForToday(range)
@@ -68,15 +71,25 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
   }
 
   const goBack = () => {
+    setLeftIsPressed(true)
     const newDateRange = incrementBy(value, -1)
     const previous = incrementBy(newDateRange, -1)
     onSelect({...newDateRange, previous})
   }
   const goForward = () => {
+    setRightIsPressed(true)
     const previous = {...value}
     const newDateRange = incrementBy(value, 1)
     onSelect({...newDateRange, previous})
   }
+
+  useEffect(() => {
+    if (value.text !== prevDisplayDate) {
+      setPrevDisplayDate(value.text)
+      setLeftIsPressed(false)
+      setRightIsPressed(false)
+    }
+  }, [value])
 
   return (
       <Menu
@@ -93,7 +106,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                   space="lg"
                   className={mergeClasses(
                       'items-center justify-between',
-                      className
+                      className,
                   )}
               >
                 <Button
@@ -102,6 +115,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                     action="primary"
                     onPress={goBack}
                     isDisabled={disabled}
+                    className={mergeClasses(leftIsPressed && 'bg-background-50 rounded-full')}
                 >
                   <ButtonIcon
                       as={MaterialIcon}
@@ -134,6 +148,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                     action="primary"
                     onPress={goForward}
                     isDisabled={disabled}
+                    className={mergeClasses(rightIsPressed && 'bg-background-50 rounded-full')}
                 >
                   <ButtonIcon
                       as={MaterialIcon}

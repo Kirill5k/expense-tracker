@@ -16,6 +16,8 @@ import {updateStateDisplayDate} from '@/db/operations'
 import {mapTransactions} from '@/db/mappers'
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
+import {lightImpact} from '@/utils/haptics'
+
 
 const Analytics = ({state, user, displayedTransactions, categories, previousDisplayedTransactions}) => {
   const database = useDatabase()
@@ -23,6 +25,7 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   const [kind, setKind] = useState(categoryOptions[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
   const previousTransactions = mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
@@ -30,6 +33,11 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
   useEffect(() => {
     setSelectedTransactions([])
   }, [state.displayDateText])
+
+  const handleDatePeriodChange = (datePeriod) => {
+    lightImpact()
+    updateStateDisplayDate(database, datePeriod)
+  }
 
   return (
       <VStack className={`${Classes.dashboardLayout}`} space="md">
@@ -57,7 +65,8 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               className="mb-1"
               mode={mode}
               value={state.displayDate}
-              onSelect={(dd) => updateStateDisplayDate(database, dd)}
+              onSelect={handleDatePeriodChange}
+              disabled={loading}
           />
           <CategoryGroupedTransactionList
               mode={mode}

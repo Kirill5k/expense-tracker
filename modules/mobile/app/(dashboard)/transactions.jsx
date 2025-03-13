@@ -16,6 +16,7 @@ import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 import {filterBySearchQuery, filterByCategory} from '@/utils/transactions'
+import {lightImpact} from '@/utils/haptics'
 
 
 const Transactions = ({state, user, displayedTransactions, categories}) => {
@@ -47,6 +48,11 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
     router.push('transaction')
   }
 
+  const handleDatePeriodChange = (datePeriod) => {
+    lightImpact()
+    updateStateDisplayDate(database, datePeriod)
+  }
+
   return (
       <VStack className={Classes.dashboardLayout} space="md">
         <HStack className="relative">
@@ -71,7 +77,7 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
             disabled={loading}
             mode={mode}
             value={state.displayDate}
-            onSelect={dd => updateStateDisplayDate(database, dd)}
+            onSelect={handleDatePeriodChange}
         />
         <TransactionList
             mode={mode}
