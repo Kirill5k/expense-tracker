@@ -203,26 +203,28 @@ export const withToast = (ChildComponent) => {
     const [toastId, setToastId] = React.useState(0)
     const toast = useToast()
 
+    const type = notification?.type || 'error'
+
     React.useEffect(() => {
       if (notification?.message) {
         const newId = Math.random()
         setToastId(newId)
         toast.show({
           id: newId,
-          placement: notification?.type === 'info' ? 'bottom' : 'top',
+          placement: type === 'info' ? 'bottom' : 'top',
           duration: 3000,
           render: ({id}) => (
               <Toast
                   nativeId={`toast-${id}`}
-                  variant="outline"
-                  action={notification?.type || 'error'}
-                  className="bg-transparent border-none rounded-full w-full my-2"
+                  variant="solid"
+                  action={type}
+                  className="bg-transparent border-none rounded-full w-full my-4 shadow-none"
               >
                 <BlurredBackground rounded/>
                 <HStack className="justify-between align-center" space="md">
                   <VStack className="justify-center">
-                    {notification?.title && <ToastTitle size="md">{notification.title}</ToastTitle>}
-                    <ToastDescription size="md">{notification?.message}</ToastDescription>
+                    {notification?.title && <ToastTitle size="md" className={`text-${type}-600`}>{notification.title}</ToastTitle>}
+                    <ToastDescription size="md" className="text-primary-950">{notification?.message}</ToastDescription>
                   </VStack>
                   <VStack className="justify-center">
                     {notification?.undoAction && (
