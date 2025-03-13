@@ -251,8 +251,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                 isDisabled={loading}
                 className="my-4 w-full"
                 size="md"
-                variant="outline"
-                action="secondary"
+                action="primary"
                 onPress={handleLogout}
             >
               <ButtonText>
