@@ -115,7 +115,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                     action="primary"
                     onPress={goBack}
                     isDisabled={disabled}
-                    className={mergeClasses(leftIsPressed && 'bg-background-50 rounded-full')}
+                    className={mergeClasses(leftIsPressed && 'bg-background-200 rounded-xl')}
                 >
                   <ButtonIcon
                       as={MaterialIcon}
@@ -148,7 +148,7 @@ export const MenuDatePeriodSelect = ({disabled, value, onSelect, mode, className
                     action="primary"
                     onPress={goForward}
                     isDisabled={disabled}
-                    className={mergeClasses(rightIsPressed && 'bg-background-50 rounded-full')}
+                    className={mergeClasses(rightIsPressed && 'bg-background-200 rounded-xl')}
                 >
                   <ButtonIcon
                       as={MaterialIcon}
