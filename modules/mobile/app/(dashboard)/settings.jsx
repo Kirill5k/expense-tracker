@@ -248,6 +248,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
 
           <Box className="px-5 mb-6">
             <Button
+                variant="outline"
                 isDisabled={loading}
                 className="my-4 w-full"
                 size="md"
