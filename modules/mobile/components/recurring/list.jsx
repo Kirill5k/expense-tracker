@@ -1,4 +1,4 @@
-import {FlatList} from '@/components/ui/flat-list'
+import {FlashList} from '@shopify/flash-list'
 import {Icon, CalendarDaysIcon, ClockIcon} from '@/components/ui/icon'
 import {Divider} from '@/components/ui/divider'
 import {Box} from '@/components/ui/box'
@@ -95,11 +95,12 @@ const RecurringTransactionList = ({items, onScroll, onItemPress, onItemDelete, d
   const nullDates = items.filter(i => i.recurrence.nextDate === null)
   const data = nonNullDates.concat(nullDates).map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
   return (
-      <FlatList
+      <FlashList
           bounces={true}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
           initialNumToRender={5}
+          estimatedItemSize={80}
           onScroll={onScroll}
           data={data}
           keyExtractor={(item) => item.id}

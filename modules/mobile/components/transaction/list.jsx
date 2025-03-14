@@ -12,7 +12,7 @@ import {groupBy} from '@/utils/arrays'
 import {calcTotal, printAmount, formatAmount, formatDate, isExpense} from '@/utils/transactions'
 import Classes from '@/constants/classes'
 import Colors from '@/constants/colors'
-import {FlatList} from '@/components/ui/flat-list'
+import {FlashList} from '@shopify/flash-list'
 import TransactionHeader from './header'
 import {mergeClasses} from '@/utils/css'
 
@@ -70,7 +70,7 @@ const TransactionGroup = React.memo(({mode, disabled, items, onItemPress, onItem
 
 const TransactionListItem = React.memo(({mode, disabled, item, onItemPress, onItemCopy, onItemDelete}) => {
   return (
-      <VStack className="mb-5">
+      <VStack onLayout={e => console.log('test', e.nativeEvent.layout.height)} className="mb-5">
         <HStack className="items-center justify-between py-2">
           <Heading size="lg">{formatDate(item)}</Heading>
           <Text className="text-lg">{printAmount(calcTotal(item.txGroup), item.txGroup[0].amount.currency)}</Text>
@@ -101,13 +101,14 @@ const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItem
   }, [firstItem, items.length])
 
   return (
-      <FlatList
+      <FlashList
           ref={flatListRef}
           bounces={true}
           onScroll={onScroll}
           showsVerticalScrollIndicator={false}
           className={Classes.scrollList}
           initialNumToRender={10}
+          estimatedItemSize={110}
           data={data}
           keyExtractor={(item) => item.date}
           renderItem={({item}) => (

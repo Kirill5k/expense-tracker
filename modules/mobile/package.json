@@ -96,7 +96,8 @@
     "expo-localization": "~16.0.1",
     "expo-insights": "~0.8.2",
     "expo-haptics": "~14.0.1",
-    "expo-blur": "~14.0.3"
+    "expo-blur": "~14.0.3",
+    "@shopify/flash-list": "1.7.3"
   },
   "overrides": {
     "@react-aria/utils": "3.27.0"

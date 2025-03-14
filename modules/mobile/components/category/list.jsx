@@ -1,5 +1,5 @@
 import React from 'react'
-import {FlatList} from '@/components/ui/flat-list'
+import {FlashList} from '@shopify/flash-list'
 import {Box} from '@/components/ui/box'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -42,11 +42,12 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
 const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) => {
   const data = items.map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
   return (
-      <FlatList
+      <FlashList
           bounces={true}
           className={Classes.scrollList}
           showsVerticalScrollIndicator={false}
           initialNumToRender={13}
+          estimatedItemSize={63}
           onScroll={onScroll}
           data={data}
           keyExtractor={(item) => item.id}
