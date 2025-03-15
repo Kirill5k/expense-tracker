@@ -17,7 +17,7 @@ final case class Account(
     userId: UserId,
     name: AccountName,
     currency: Currency,
-    isDefault: Boolean = false,
+    isMain: Boolean = false,
     createdAt: Option[Instant] = None,
     lastUpdatedAt: Option[Instant] = None,
     hidden: Option[Boolean] = None
