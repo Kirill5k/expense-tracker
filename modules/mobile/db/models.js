@@ -13,12 +13,12 @@ export class Account extends Model {
   @field('hidden') hidden
 
   get isNotHidden() {
-    return this.hidden !== true && this.category.hidden !== true
+    return this.hidden !== true
   }
 
   @writer async setHidden(hidden) {
-    await this.update(transaction => {
-      transaction.hidden = hidden
+    await this.update(acc => {
+      acc.hidden = hidden
     })
   }
 
