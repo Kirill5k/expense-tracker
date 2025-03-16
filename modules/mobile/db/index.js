@@ -2,7 +2,7 @@ import {Database} from '@nozbe/watermelondb'
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
 import {setGenerator} from '@nozbe/watermelondb/utils/common/randomId'
 import {ObjectId} from 'bson'
-import {User, Transaction, PeriodicTransaction, Category, State} from './models'
+import {Account, User, Transaction, PeriodicTransaction, Category, State} from './models'
 import {initState} from './operations'
 import schema from './schema'
 import migrations from './migrations'
@@ -27,6 +27,7 @@ const adapter = new SQLiteAdapter({
 const database = new Database({
   adapter,
   modelClasses: [
+    Account,
     User,
     Transaction,
     PeriodicTransaction,

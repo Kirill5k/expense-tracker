@@ -1,5 +1,17 @@
 import {appSchema, tableSchema} from '@nozbe/watermelondb'
 
+const Account = tableSchema({
+  name: 'accounts',
+  columns: [
+    {name: 'user_id', type: 'string', isIndexed: true},
+    {name: 'is_main', type: 'boolean', isOptional: true},
+    {name: 'currency_code', type: 'string'},
+    {name: 'currency_symbol', type: 'string'},
+    {name: 'name', type: 'string'},
+    {name: 'hidden', type: 'boolean', isOptional: true},
+  ],
+})
+
 const Category = tableSchema({
   name: 'categories',
   columns: [
@@ -79,6 +91,7 @@ const State = tableSchema({
 export default appSchema({
   version: 1,
   tables: [
+    Account,
     Category,
     Transaction,
     PeriodicTransaction,

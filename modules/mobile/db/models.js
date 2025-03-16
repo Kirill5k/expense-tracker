@@ -2,6 +2,41 @@ import {Model} from '@nozbe/watermelondb'
 import {field, relation, writer, children, lazy} from '@nozbe/watermelondb/decorators'
 import {Q} from '@nozbe/watermelondb'
 
+export class Account extends Model {
+  static table = 'account'
+
+  @field('user_id') userId
+  @field('name') name
+  @field('is_main') isMain
+  @field('currency_code') currencyCode
+  @field('currency_symbol') currencySymbol
+  @field('hidden') hidden
+
+  get isNotHidden() {
+    return this.hidden !== true && this.category.hidden !== true
+  }
+
+  @writer async setHidden(hidden) {
+    await this.update(transaction => {
+      transaction.hidden = hidden
+    })
+  }
+
+  get toDomain() {
+    return {
+      id: this.id,
+      name: this.name,
+      userId: this.userId,
+      currency: {
+        code: this.currencyCode,
+        symbol: this.currencySymbol
+      },
+      isMain: this.isMain,
+      hidden: this.hidden
+    }
+  }
+}
+
 export class Category extends Model {
   static table = 'categories'
 
