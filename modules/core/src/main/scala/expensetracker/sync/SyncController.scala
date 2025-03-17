@@ -49,8 +49,8 @@ final private class SyncController[F[_]](
         val ts = lastPulledAt.map(Instant.ofEpochMilli)
 
         val updatedUsers = changes.users.updated.filter(_.id == sess.userId).map(_.toDomain(ts))
-        val createdAccs  = changes.accounts.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
-        val updatedAccs  = changes.accounts.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+        val createdAccs  = changes.maybeAccounts.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+        val updatedAccs  = changes.maybeAccounts.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
         val createdCats  = changes.categories.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
         val updatedCats  = changes.categories.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
         val createdTxs   = changes.transactions.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
@@ -337,16 +337,17 @@ object SyncController extends TapirSchema with TapirJson {
 
   final case class WatermelonDataChanges(
       state: WatermelonDataChange[WatermelonState],
-      accounts: WatermelonDataChange[WatermelonAccount],
       transactions: WatermelonDataChange[WatermelonTransaction],
       categories: WatermelonDataChange[WatermelonCategory],
       users: WatermelonDataChange[WatermelonUser],
-      periodic_transactions: WatermelonDataChange[WatermelonPeriodicTransaction]
+      periodic_transactions: WatermelonDataChange[WatermelonPeriodicTransaction],
+      accounts: Option[WatermelonDataChange[WatermelonAccount]]
   ) derives Codec.AsObject {
+    val maybeAccounts = accounts.getOrElse(WatermelonDataChange(Nil, Nil, Nil))
 
     def summary: String =
       s"""state - ${state.created.size}/${state.updated.size}/${state.deleted.size} |""" +
-        s"""accounts - ${accounts.created.size}/${accounts.updated.size}/${accounts.deleted.size} |""" +
+        s"""accounts - ${maybeAccounts.created.size}/${maybeAccounts.updated.size}/${maybeAccounts.deleted.size} |""" +
         s"""users - ${users.created.size}/${users.updated.size}/${users.deleted.size} |""" +
         s"""categories - ${categories.created.size}/${categories.updated.size}/${categories.deleted.size} |""" +
         s"""transactions - ${transactions.created.size}/${transactions.updated.size}/${transactions.deleted.size} |""" +
@@ -382,10 +383,12 @@ object SyncController extends TapirSchema with TapirJson {
           updated = dc.periodicTransactions.updated.map(WatermelonPeriodicTransaction.from),
           deleted = Nil
         ),
-        accounts = WatermelonDataChange(
-          created = dc.accounts.created.map(WatermelonAccount.from),
-          updated = dc.accounts.updated.map(WatermelonAccount.from),
-          deleted = Nil
+        accounts = Some(
+          WatermelonDataChange(
+            created = dc.accounts.created.map(WatermelonAccount.from),
+            updated = dc.accounts.updated.map(WatermelonAccount.from),
+            deleted = Nil
+          )
         )
       )
 
