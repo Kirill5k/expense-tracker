@@ -2,6 +2,7 @@ package expensetracker.sync
 
 import cats.Monad
 import cats.syntax.flatMap.*
+import expensetracker.account.Account
 import expensetracker.sync.db.SyncRepository
 import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.Category
@@ -15,6 +16,7 @@ trait SyncService[F[_]]:
   def pullChanges(uid: UserId, from: Option[Instant]): F[DataChanges]
   def pushChanges(
       users: List[User],
+      accs: List[Account],
       cats: List[Category],
       txs: List[Transaction],
       ptxs: List[PeriodicTransaction]
@@ -32,11 +34,13 @@ final private class LiveSyncService[F[_]](
 
   override def pushChanges(
       users: List[User],
+      accs: List[Account],
       cats: List[Category],
       txs: List[Transaction],
       ptxs: List[PeriodicTransaction]
   ): F[Unit] =
     F.whenA(users.nonEmpty)(dispatcher.dispatch(Action.SaveUsers(users))) >>
+      F.whenA(accs.nonEmpty)(dispatcher.dispatch(Action.SaveAccounts(accs))) >>
       F.whenA(cats.nonEmpty)(dispatcher.dispatch(Action.SaveCategories(cats))) >>
       F.whenA(txs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(txs))) >>
       F.whenA(ptxs.nonEmpty)(dispatcher.dispatch(Action.SavePeriodicTransactions(ptxs)))

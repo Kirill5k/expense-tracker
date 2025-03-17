@@ -73,6 +73,7 @@ export class Transaction extends Model {
   static table = 'transactions'
 
   @field('category_id') categoryId
+  @field('account_id') accountId
   @field('parent_transaction_id') parentTransactionId
   @field('is_recurring') isRecurring
   @field('amount_value') amountValue
@@ -101,6 +102,7 @@ export class Transaction extends Model {
       id: this.id,
       kind: this.kind,
       categoryId: this.categoryId,
+      accountId: this.accountId,
       parentTransactionId: this.parentTransactionId,
       isRecurring: this.isRecurring,
       amount: {
@@ -122,6 +124,7 @@ export class PeriodicTransaction extends Model {
   static table = 'periodic_transactions'
 
   @field('category_id') categoryId
+  @field('account_id') accountId
   @field('amount_value') amountValue
   @field('amount_currency_code') amountCurrencyCode
   @field('amount_currency_symbol') amountCurrencySymbol
@@ -152,6 +155,7 @@ export class PeriodicTransaction extends Model {
       id: this.id,
       kind: this.kind,
       categoryId: this.categoryId,
+      accountId: this.accountId,
       amount: {
         value: this.amountValue,
         currency: {

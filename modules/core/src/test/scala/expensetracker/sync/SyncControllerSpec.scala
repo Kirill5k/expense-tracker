@@ -1,6 +1,7 @@
 package expensetracker.sync
 
 import cats.effect.IO
+import expensetracker.account.Account
 import expensetracker.auth.Authenticator
 import expensetracker.auth.user.{User, UserId}
 import expensetracker.category.Category
@@ -25,6 +26,23 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
        |      ],
        |      "updated" : [
        |        { "id": "expense-tracker", "user_id" : "${Users.uid1}" }
+       |      ],
+       |      "deleted" : [
+       |      ]
+       |    },
+       |    "accounts" : {
+       |      "created" : [
+       |        {
+       |          "id" : "${Accounts.id}",
+       |          "user_id" : "${Users.uid1}",
+       |          "currency_code" : "GBP",
+       |          "currency_symbol" : "£",
+       |          "name" : "test-account",
+       |          "hidden" : null,
+       |          "is_main" : false
+       |        }
+       |      ],
+       |      "updated" : [
        |      ],
        |      "deleted" : [
        |      ]
@@ -184,7 +202,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
                 updated = Nil
               ),
               accounts = DataChange(
-                created = Nil,
+                created = List(Accounts.acc()),
                 updated = Nil
               ),
               time = time
@@ -205,7 +223,13 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
         val svc = mock[SyncService[IO]]
-        when(svc.pushChanges(anyList[User], anyList[Category], anyList[Transaction], anyList[PeriodicTransaction])).thenReturnUnit
+        when(svc.pushChanges(
+          anyList[User],
+          anyList[Account],
+          anyList[Category],
+          anyList[Transaction],
+          anyList[PeriodicTransaction]
+        )).thenReturnUnit
 
         val req = Request[IO](Method.POST, Uri.unsafeFromString(s"/sync/watermelon?lastPulledAt=${time.toEpochMilli}"))
           .withAuthHeader()
@@ -215,7 +239,10 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
 
         res mustHaveStatus (Status.NoContent, None)
         verify(svc).pushChanges(
-          List(),
+          Nil,
+          List(
+            Accounts.acc()
+          ),
           List(
             Categories.cat().copy(createdAt = Some(time), lastUpdatedAt = Some(time)),
             Categories.cat(Categories.cid2).copy(lastUpdatedAt = Some(time))
@@ -235,7 +262,15 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess.copy(userId = Users.uid2))
 
         val svc = mock[SyncService[IO]]
-        when(svc.pushChanges(anyList[User], anyList[Category], anyList[Transaction], anyList[PeriodicTransaction])).thenReturnUnit
+        when(
+          svc.pushChanges(
+            anyList[User],
+            anyList[Account],
+            anyList[Category],
+            anyList[Transaction],
+            anyList[PeriodicTransaction]
+          )
+        ).thenReturnUnit
 
         val req = Request[IO](Method.POST, Uri.unsafeFromString(s"/sync/watermelon?lastPulledAt=${time.toEpochMilli}"))
           .withAuthHeader()
@@ -244,7 +279,7 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
         val res = SyncController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         res mustHaveStatus (Status.NoContent, None)
-        verify(svc).pushChanges(Nil, Nil, Nil, Nil)
+        verify(svc).pushChanges(Nil, Nil, Nil, Nil, Nil)
       }
     }
   }

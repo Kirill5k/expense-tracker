@@ -12,12 +12,12 @@ import expensetracker.sync.SyncController.{WatermelonDataChanges, WatermelonPull
 import expensetracker.transaction.{PeriodicTransaction, RecurrenceFrequency, RecurrencePattern, Transaction, TransactionId}
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.refineV
-import expensetracker.account.AccountId
+import expensetracker.account.{Account, AccountId, AccountName}
 import io.circe.Codec
 import io.circe.generic.semiauto.deriveCodec
 import org.http4s.HttpRoutes
 import org.typelevel.log4cats.Logger
-import squants.market.{Currency, Money, defaultMoneyContext}
+import squants.market.{defaultMoneyContext, Currency, Money}
 import sttp.model.StatusCode
 import sttp.tapir.*
 
@@ -49,6 +49,8 @@ final private class SyncController[F[_]](
         val ts = lastPulledAt.map(Instant.ofEpochMilli)
 
         val updatedUsers = changes.users.updated.filter(_.id == sess.userId).map(_.toDomain(ts))
+        val createdAccs  = changes.accounts.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
+        val updatedAccs  = changes.accounts.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
         val createdCats  = changes.categories.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
         val updatedCats  = changes.categories.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
         val createdTxs   = changes.transactions.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
@@ -57,6 +59,7 @@ final private class SyncController[F[_]](
         val updatedPtxs  = changes.periodic_transactions.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
 
         val users = updatedUsers.flatMap(_.toOption)
+        val accs  = createdAccs.flatMap(_.toOption) ::: updatedAccs.flatMap(_.toOption)
         val cats  = createdCats ::: updatedCats
         val txs   = createdTxs.flatMap(_.toOption) ::: updatedTxs.flatMap(_.toOption)
         val ptxs  = createdPtxs.flatMap(_.toOption) ::: updatedPtxs.flatMap(_.toOption)
@@ -64,11 +67,12 @@ final private class SyncController[F[_]](
         logger.info(
           s"Push changes for ${sess.userId} at $ts: ${changes.summary}. Valid data: " +
             s"users - ${users.size} | " +
+            s"accounts - ${accs.size} | " +
             s"categories - ${cats.size} | " +
             s"transactions - ${txs.size} | " +
             s"periodicTransactions - ${ptxs.size}"
         ) >>
-          service.pushChanges(users, cats, txs, ptxs).voidResponse
+          service.pushChanges(users, accs, cats, txs, ptxs).voidResponse
       }
 
   override def routes(using authenticator: Authenticator[F]): HttpRoutes[F] =
@@ -87,6 +91,42 @@ object SyncController extends TapirSchema with TapirJson {
       id: String,
       user_id: Option[UserId]
   ) derives Codec.AsObject
+
+  final case class WatermelonAccount(
+      id: AccountId,
+      user_id: UserId,
+      name: AccountName,
+      is_main: Option[Boolean],
+      currency_code: String,
+      currency_symbol: String,
+      hidden: Option[Boolean]
+  ) derives Codec.AsObject {
+    def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, Account] =
+      Currency(currency_code)(defaultMoneyContext).toEither.left
+        .map(e => AppError.FailedValidation(s"Invalid currency code $currency_code"))
+        .map { currency =>
+          Account(
+            id = id,
+            userId = user_id,
+            name = name,
+            currency = currency,
+            isMain = is_main.getOrElse(false),
+            hidden = hidden
+          )
+        }
+  }
+
+  object WatermelonAccount:
+    def from(acc: Account): WatermelonAccount =
+      WatermelonAccount(
+        id = acc.id,
+        user_id = acc.userId,
+        name = acc.name,
+        is_main = Some(acc.isMain),
+        currency_code = acc.currency.code,
+        currency_symbol = acc.currency.symbol,
+        hidden = acc.hidden
+      )
 
   final case class WatermelonUser(
       id: UserId,
@@ -297,6 +337,7 @@ object SyncController extends TapirSchema with TapirJson {
 
   final case class WatermelonDataChanges(
       state: WatermelonDataChange[WatermelonState],
+      accounts: WatermelonDataChange[WatermelonAccount],
       transactions: WatermelonDataChange[WatermelonTransaction],
       categories: WatermelonDataChange[WatermelonCategory],
       users: WatermelonDataChange[WatermelonUser],
@@ -305,6 +346,7 @@ object SyncController extends TapirSchema with TapirJson {
 
     def summary: String =
       s"""state - ${state.created.size}/${state.updated.size}/${state.deleted.size} |""" +
+        s"""accounts - ${accounts.created.size}/${accounts.updated.size}/${accounts.deleted.size} |""" +
         s"""users - ${users.created.size}/${users.updated.size}/${users.deleted.size} |""" +
         s"""categories - ${categories.created.size}/${categories.updated.size}/${categories.deleted.size} |""" +
         s"""transactions - ${transactions.created.size}/${transactions.updated.size}/${transactions.deleted.size} |""" +
@@ -316,7 +358,8 @@ object SyncController extends TapirSchema with TapirJson {
       WatermelonDataChanges(
         state = WatermelonDataChange(
           created = Nil,
-          updated = Option.when(dc.users.created.nonEmpty)(WatermelonState("expense-tracker", dc.users.created.headOption.map(_.id))).toList,
+          updated =
+            Option.when(dc.users.created.nonEmpty)(WatermelonState("expense-tracker", dc.users.created.headOption.map(_.id))).toList,
           deleted = Nil
         ),
         transactions = WatermelonDataChange(
@@ -337,6 +380,11 @@ object SyncController extends TapirSchema with TapirJson {
         periodic_transactions = WatermelonDataChange(
           created = dc.periodicTransactions.created.map(WatermelonPeriodicTransaction.from),
           updated = dc.periodicTransactions.updated.map(WatermelonPeriodicTransaction.from),
+          deleted = Nil
+        ),
+        accounts = WatermelonDataChange(
+          created = dc.accounts.created.map(WatermelonAccount.from),
+          updated = dc.accounts.updated.map(WatermelonAccount.from),
           deleted = Nil
         )
       )

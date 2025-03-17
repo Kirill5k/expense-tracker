@@ -28,6 +28,7 @@ const Transaction = tableSchema({
   name: 'transactions',
   columns: [
     {name: 'category_id', type: 'string', isIndexed: true},
+    {name: 'account_id', type: 'string', isIndexed: true},
     {name: 'parent_transaction_id', type: 'string', isOptional: true},
     {name: 'amount_value', type: 'number'},
     {name: 'amount_currency_code', type: 'string'},
@@ -45,6 +46,7 @@ const PeriodicTransaction = tableSchema({
   name: 'periodic_transactions',
   columns: [
     {name: 'category_id', type: 'string', isIndexed: true},
+    {name: 'account_id', type: 'string', isIndexed: true},
     {name: 'amount_value', type: 'number'},
     {name: 'amount_currency_code', type: 'string'},
     {name: 'amount_currency_symbol', type: 'string'},
