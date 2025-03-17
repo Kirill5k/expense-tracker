@@ -3,7 +3,7 @@ import {field, relation, writer, children, lazy} from '@nozbe/watermelondb/decor
 import {Q} from '@nozbe/watermelondb'
 
 export class Account extends Model {
-  static table = 'account'
+  static table = 'accounts'
 
   @field('user_id') userId
   @field('name') name
