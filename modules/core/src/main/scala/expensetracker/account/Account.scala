@@ -27,5 +27,5 @@ final case class CreateAccount(
     userId: UserId,
     name: AccountName,
     currency: Currency,
-    isDefault: Boolean = false
+    isMain: Boolean = false
 )

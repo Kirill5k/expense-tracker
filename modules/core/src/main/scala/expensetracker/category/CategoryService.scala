@@ -29,7 +29,8 @@ final private class LiveCategoryService[F[_]](
     repository.getAll(uid)
 
   override def delete(uid: UserId, cid: CategoryId): F[Unit] =
-    repository.delete(uid, cid)
+    repository.delete(uid, cid) >>
+      dispatcher.dispatch(Action.HideTransactionsByCategory(cid, true))
 
   override def update(cat: Category): F[Unit] =
     repository.update(cat)

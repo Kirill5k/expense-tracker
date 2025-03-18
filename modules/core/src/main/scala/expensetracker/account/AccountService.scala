@@ -7,9 +7,13 @@ import expensetracker.auth.user.UserId
 import expensetracker.common.actions.{Action, ActionDispatcher}
 
 trait AccountService[F[_]]:
+  def create(ca: CreateAccount): F[Account]
+  def update(acc: Account): F[Unit]
+  def getAll(uid: UserId): F[List[Account]]
   def save(accounts: List[Account]): F[Unit]
   def hide(uid: UserId, aid: AccountId, hidden: Boolean = true): F[Unit]
   def deleteAll(uid: UserId): F[Unit]
+  def delete(uid: UserId, aid: AccountId): F[Unit]
 
 final private class LiveAccountService[F[_]](
     private val repository: AccountRepository[F],
@@ -27,6 +31,19 @@ final private class LiveAccountService[F[_]](
 
   override def deleteAll(uid: UserId): F[Unit] =
     repository.deleteAll(uid)
+
+  override def getAll(uid: UserId): F[List[Account]] =
+    repository.getAll(uid)
+
+  override def create(ca: CreateAccount): F[Account] =
+    repository.create(ca)
+
+  override def update(acc: Account): F[Unit] =
+    repository.update(acc)
+
+  override def delete(uid: UserId, aid: AccountId): F[Unit] =
+    repository.delete(uid, aid) >>
+      dispatcher.dispatch(Action.HideTransactionsByAccount(aid, true))
 }
 
 object AccountService:

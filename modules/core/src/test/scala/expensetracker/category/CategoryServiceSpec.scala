@@ -15,6 +15,7 @@ class CategoryServiceSpec extends IOWordSpec {
     "delete category from db" in {
       val (repo, disp) = mocks
       when(repo.delete(any[UserId], any[CategoryId])).thenReturnUnit
+      when(disp.dispatch(any[Action])).thenReturnUnit
 
       val result = for
         svc <- CategoryService.make[IO](repo, disp)
@@ -23,7 +24,7 @@ class CategoryServiceSpec extends IOWordSpec {
 
       result.asserting { res =>
         verify(repo).delete(Users.uid1, Categories.cid)
-        verifyNoInteractions(disp)
+        verify(disp).dispatch(HideTransactionsByCategory(Categories.cid, true))
         res mustBe ()
       }
     }
