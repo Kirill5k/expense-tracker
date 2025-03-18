@@ -9,7 +9,6 @@ import expensetracker.auth.user.UserId
 import expensetracker.common.config.JwtConfig
 import expensetracker.common.errors.AppError
 import expensetracker.common.types.StringType
-import io.circe.Codec
 import pdi.jwt.algorithms.{JwtAsymmetricAlgorithm, JwtHmacAlgorithm}
 import pdi.jwt.{JwtAlgorithm, JwtCirce}
 

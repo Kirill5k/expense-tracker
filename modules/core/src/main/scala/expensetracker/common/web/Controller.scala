@@ -13,7 +13,7 @@ import kirill5k.common.syntax.time.*
 import io.circe.Codec
 import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes
-import sttp.tapir.*
+import sttp.tapir.{Validator, DecodeResult, Endpoint, ValidationResult, PublicEndpoint, endpoint, statusCode, auth}
 import sttp.tapir.Codec as TapirCodec
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
