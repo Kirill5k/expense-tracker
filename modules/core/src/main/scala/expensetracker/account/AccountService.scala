@@ -2,12 +2,15 @@ package expensetracker.account
 
 import cats.Monad
 import cats.syntax.flatMap.*
+import cats.syntax.functor.*
 import expensetracker.account.db.AccountRepository
 import expensetracker.auth.user.UserId
 import expensetracker.common.actions.{Action, ActionDispatcher}
+import squants.market.Currency
 
 trait AccountService[F[_]]:
   def create(ca: CreateAccount): F[Account]
+  def createDefault(uid: UserId, currency: Currency): F[Unit]
   def update(acc: Account): F[Unit]
   def getAll(uid: UserId): F[List[Account]]
   def save(accounts: List[Account]): F[Unit]
@@ -37,6 +40,9 @@ final private class LiveAccountService[F[_]](
 
   override def create(ca: CreateAccount): F[Account] =
     repository.create(ca)
+
+  override def createDefault(uid: UserId, currency: Currency): F[Unit] =
+    repository.create(CreateAccount(uid, AccountName("Main"), currency, isMain = true)).void
 
   override def update(acc: Account): F[Unit] =
     repository.update(acc)

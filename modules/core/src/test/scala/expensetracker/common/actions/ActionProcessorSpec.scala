@@ -10,7 +10,7 @@ import expensetracker.transaction.{PeriodicTransaction, PeriodicTransactionServi
 import kirill5k.common.cats.Clock
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import squants.market.GBP
+import squants.market.{Currency, GBP}
 
 import scala.concurrent.duration.*
 import java.time.Instant
@@ -42,7 +42,8 @@ class ActionProcessorSpec extends IOWordSpec {
 
     "setup new account" in {
       val (usrSvc, catSvc, txSvc, ptxSvc, accSvc) = mocks
-      when(catSvc.assignDefault(any[UserId])).thenReturn(IO.unit)
+      when(catSvc.assignDefault(any[UserId])).thenReturnUnit
+      when(accSvc.createDefault(any[UserId], any[Currency])).thenReturnUnit
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
@@ -53,7 +54,8 @@ class ActionProcessorSpec extends IOWordSpec {
 
       result.asserting { r =>
         verify(catSvc).assignDefault(Users.uid1)
-        verifyNoInteractions(txSvc, usrSvc, ptxSvc, accSvc)
+        verify(accSvc).createDefault(Users.uid1, GBP)
+        verifyNoInteractions(txSvc, usrSvc, ptxSvc)
         r mustBe ()
       }
     }

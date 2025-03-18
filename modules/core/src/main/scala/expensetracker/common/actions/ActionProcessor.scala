@@ -38,12 +38,11 @@ final private class LiveActionProcessor[F[_]: Temporal](
 
   private def handleAction(action: Action): F[Unit] =
     (action match
-      case Action.DeleteAllAccounts(uid)             => accService.deleteAll(uid)
-      case Action.DeleteAllCategories(uid)           => catService.deleteAll(uid)
-      case Action.DeleteAllTransactions(uid)         => txService.deleteAll(uid)
-      case Action.DeleteAllPeriodicTransactions(uid) => ptxService.deleteAll(uid)
-      // TODO: Create default account
-      case Action.SetupNewUser(uid, _)                    => catService.assignDefault(uid)
+      case Action.DeleteAllAccounts(uid)                  => accService.deleteAll(uid)
+      case Action.DeleteAllCategories(uid)                => catService.deleteAll(uid)
+      case Action.DeleteAllTransactions(uid)              => txService.deleteAll(uid)
+      case Action.DeleteAllPeriodicTransactions(uid)      => ptxService.deleteAll(uid)
+      case Action.SetupNewUser(uid, currency)             => catService.assignDefault(uid) >> accService.createDefault(uid, currency)
       case Action.HideTransactionsByCategory(cid, hidden) => txService.hideByCategory(cid, hidden) >> ptxService.hideByCategory(cid, hidden)
       case Action.HideTransactionsByAccount(aid, hidden)  => txService.hideByAccount(aid, hidden) >> ptxService.hideByAccount(aid, hidden)
       case Action.SaveUsers(users)                        => userService.save(users)
