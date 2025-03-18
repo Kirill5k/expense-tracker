@@ -3,6 +3,7 @@ package expensetracker.common.web
 import cats.Monad
 import cats.effect.Async
 import cats.syntax.semigroupk.*
+import expensetracker.account.Accounts
 import expensetracker.auth.{Auth, Authenticator}
 import expensetracker.category.Categories
 import expensetracker.common.config.ServerConfig
@@ -24,6 +25,7 @@ final class Http[F[_]: Async] private (
     private val categories: Categories[F],
     private val transactions: Transactions[F],
     private val periodicTransactions: PeriodicTransactions[F],
+    private val accounts: Accounts[F],
     private val sync: Sync[F]
 ) {
 
@@ -36,6 +38,7 @@ final class Http[F[_]: Async] private (
       categories.controller.routes <+>
       transactions.controller.routes <+>
       periodicTransactions.controller.routes <+>
+      accounts.controller.routes <+>
       sync.controller.routes
 
     Router("/api" -> api, "/" -> core)
@@ -61,5 +64,6 @@ object Http:
       cats: Categories[F],
       txs: Transactions[F],
       ptxs: PeriodicTransactions[F],
+      accs: Accounts[F],
       sync: Sync[F]
-  ): F[Http[F]] = Monad[F].pure(Http(health, wellKnown, auth, cats, txs, ptxs, sync))
+  ): F[Http[F]] = Monad[F].pure(Http(health, wellKnown, auth, cats, txs, ptxs, accs, sync))

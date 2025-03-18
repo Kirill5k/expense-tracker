@@ -32,7 +32,7 @@ object Application extends IOApp.Simple:
           txs        <- Transactions.make(res)
           ptxs       <- PeriodicTransactions.make(res, dispatcher)
           sync       <- Sync.make(res, dispatcher)
-          http       <- Http.make(health, wellKnown, auth, cats, txs, ptxs, sync)
+          http       <- Http.make(health, wellKnown, auth, cats, txs, ptxs, accs, sync)
           processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service, ptxs.service, accs.service)
           _          <- dispatcher.dispatch(Action.SchedulePeriodicTransactionRecurrenceGeneration)
           _ <- logger.info("starting http server") >> http

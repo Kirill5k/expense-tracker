@@ -6,9 +6,11 @@ import cats.syntax.functor.*
 import expensetracker.Resources
 import expensetracker.account.db.AccountRepository
 import expensetracker.common.actions.ActionDispatcher
+import expensetracker.common.web.Controller
 
 final class Accounts[F[_]] private (
-    val service: AccountService[F]
+    val service: AccountService[F],
+    val controller: Controller[F]
 )
 
 object Accounts:
@@ -16,4 +18,5 @@ object Accounts:
     for
       repo <- AccountRepository.make[F](resources.mongoDb)
       svc  <- AccountService.make[F](repo, disp)
-    yield Accounts[F](svc)
+      ctrl <- AccountController.make(svc)
+    yield Accounts[F](svc, ctrl)
