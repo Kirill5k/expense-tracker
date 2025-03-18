@@ -29,11 +29,8 @@ final class Http[F[_]: Async] private (
     private val sync: Sync[F]
 ) {
 
-  private val routes: HttpRoutes[F] = {
+  private val apiRoutes: HttpRoutes[F] = {
     given Authenticator[F] = auth.authenticator
-    val core = health.controller.routes <+>
-      wellKnown.controller.routes
-
     val api = auth.controller.routes <+>
       categories.controller.routes <+>
       transactions.controller.routes <+>
@@ -41,7 +38,14 @@ final class Http[F[_]: Async] private (
       accounts.controller.routes <+>
       sync.controller.routes
 
-    Router("/api" -> api, "/" -> core)
+    Router("/api" -> api)
+  }
+
+  private val coreRoutes: HttpRoutes[F] = {
+    given Authenticator[F] = auth.authenticator
+    val core = health.controller.routes <+>
+      wellKnown.controller.routes
+    Router("/" -> core)
   }
 
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => AutoSlash(http) }
@@ -51,7 +55,7 @@ final class Http[F[_]: Async] private (
   private val loggers: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => RequestLogger.httpRoutes(true, true)(http) }
     .andThen((http: HttpRoutes[F]) => ResponseLogger.httpRoutes(true, true)(http))
 
-  val app: HttpRoutes[F] = loggers(middleware(routes))
+  val app: HttpRoutes[F] = loggers(middleware(apiRoutes)) <+> middleware(coreRoutes)
 
   def serve(config: ServerConfig): fs2.Stream[F, Unit] = Server.serveEmber(config, app)
 }
