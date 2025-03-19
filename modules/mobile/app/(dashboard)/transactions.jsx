@@ -15,7 +15,7 @@ import {updateStateDisplayDate, hideTransaction} from '@/db/operations'
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
-import {filterBySearchQuery, filterByCategory, filterBy} from '@/utils/transactions'
+import {filterBy} from '@/utils/transactions'
 import {lightImpact} from '@/utils/haptics'
 
 

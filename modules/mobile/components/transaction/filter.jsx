@@ -30,7 +30,6 @@ const SliderMax = 500
 const MinAmount = 1
 const MaxAmount = 50000
 
-
 function amountToSliderValue(amount) {
   const logMin = Math.log10(MinAmount)
   const logMax = Math.log10(MaxAmount)
@@ -51,7 +50,6 @@ function sliderValueToAmount(sliderValue) {
   return Math.round(Math.pow(10, logAmount))
 }
 
-
 const TransactionFilter = ({mode, className, categories, value, onChange}) => {
   const [show, setShow] = useState(false)
   const handleClose = () => setShow(false)
@@ -71,6 +69,8 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
   }
 
   const hasSelectedFilters = value?.categories?.length
+      || value.minAmount > MinAmount
+      || value.maxAmount < MaxAmount
 
   const handleMinAmountChange = v => {
     onChange({...value, minAmount: sliderValueToAmount(v)})
@@ -96,11 +96,11 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
           <ButtonIcon as={MaterialIcon} code="filter-outline" dsize={24} dcolor={Colors[mode].text}/>
         </Button>
         <Actionsheet isOpen={show} onClose={handleClose} className="w-full">
-          <ActionsheetBackdrop />
+          <ActionsheetBackdrop/>
           <ActionsheetContent className="w-full bg-transparent">
             <BlurredBackground style={{borderTopRightRadius: 12, borderTopLeftRadius: 12}}/>
             <ActionsheetDragIndicatorWrapper>
-              <ActionsheetDragIndicator />
+              <ActionsheetDragIndicator/>
             </ActionsheetDragIndicatorWrapper>
             <VStack className="w-full px-3" space="lg">
               <Heading>Min Amount: {value.minAmount || MinAmount}</Heading>
@@ -153,7 +153,7 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
                           isDisabled={false}
                       >
                         <CheckboxIndicator>
-                          <CheckboxIcon as={CheckIcon} />
+                          <CheckboxIcon as={CheckIcon}/>
                         </CheckboxIndicator>
                         <CheckboxLabel>{cat.name}</CheckboxLabel>
                       </Checkbox>
