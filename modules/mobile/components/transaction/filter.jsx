@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {Heading} from '@/components/ui/heading'
 import {MaterialIcon, CheckIcon} from '@/components/ui/icon'
 import {Button, ButtonIcon} from '@/components/ui/button'
 import Colors from '@/constants/colors'
@@ -27,13 +28,21 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
   const [show, setShow] = useState(false)
   const handleClose = () => setShow(false)
 
-  const handlePress = (id) => {
-    if (value.includes(id)) {
-      onChange(value.filter(i => i !== id))
+  const handleCategoryPress = (id) => {
+    if (value.categories.includes(id)) {
+      onChange({
+        ...value,
+        categories: value.categories.filter(i => i !== id)
+      })
     } else {
-      onChange([...value, id])
+      onChange({
+        ...value,
+        categories: [...value.categories, id]
+      })
     }
   }
+
+  const hasSelectedFilters = value?.categories?.length
 
   return (
       <>
@@ -42,8 +51,8 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
             size="md"
             className={mergeClasses(
                 'px-2 bg-background-100 rounded-full',
-                value.length ? 'border-2' : 'border border-transparent',
-                value.length && Classes[mode].selectedBorder,
+                hasSelectedFilters ? 'border-2' : 'border border-transparent',
+                hasSelectedFilters && Classes[mode].selectedBorder,
                 className,
             )}
             onPress={() => setShow(true)}
@@ -57,16 +66,17 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
             <ActionsheetDragIndicatorWrapper>
               <ActionsheetDragIndicator />
             </ActionsheetDragIndicatorWrapper>
+            <Heading className="w-full pl-3 pb-1">Categories</Heading>
             <ScrollView className="w-full h-52">
               <CheckboxGroup
-                  value={value}
-                  onChange={onChange}
+                  value={value.categories}
+                  onChange={(c) => onChange({...value, categories: c})}
                   className="w-full flex justify-end"
               >
                 {categories.map(cat => (
                     <ActionsheetItem
                         key={cat.id}
-                        onPress={() => handlePress(cat.id)}
+                        onPress={() => handleCategoryPress(cat.id)}
                     >
                       <Checkbox
                           value={cat.id}

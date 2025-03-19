@@ -65,8 +65,12 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
               className="absolute mx-1 right-0 -top-1"
               mode={mode}
               categories={categories}
-              value={filteredCats}
-              onChange={setFilteredCats}
+              value={{
+                categories: filteredCats
+              }}
+              onChange={({categories}) => {
+                setFilteredCats(categories)
+              }}
           />
         </HStack>
         <DatePeriodSelect
