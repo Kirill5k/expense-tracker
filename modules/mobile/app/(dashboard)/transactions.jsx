@@ -15,7 +15,7 @@ import {updateStateDisplayDate, hideTransaction} from '@/db/operations'
 import {enhanceWithCompleteState} from '@/db/observers'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
-import {filterBySearchQuery, filterByCategory} from '@/utils/transactions'
+import {filterBySearchQuery, filterByCategory, filterBy} from '@/utils/transactions'
 import {lightImpact} from '@/utils/haptics'
 
 
@@ -24,11 +24,11 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const {setUndoAlert, setTxToUpdate} = useStore()
   const mode = useColorScheme()
 
+  const [filters, setFilters] = useState({categories: []})
   const [searchQuery, setSearchQuery] = useState('')
-  const [filteredCats, setFilteredCats] = useState([])
 
   const mappedTransactions = mapTransactions(displayedTransactions, categories, user)
-  const transactions = filterByCategory(filterBySearchQuery(mappedTransactions, searchQuery), filteredCats)
+  const transactions = filterBy(mappedTransactions, searchQuery, filters)
 
   const handleItemDelete = (tx) => {
     hideTransaction(database, tx.id, true)
@@ -65,12 +65,8 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
               className="absolute mx-1 right-0 -top-1"
               mode={mode}
               categories={categories}
-              value={{
-                categories: filteredCats
-              }}
-              onChange={({categories}) => {
-                setFilteredCats(categories)
-              }}
+              value={filters}
+              onChange={setFilters}
           />
         </HStack>
         <DatePeriodSelect

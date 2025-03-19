@@ -103,7 +103,7 @@ export const calculateRecurrenceNextDate = ({recurrence}, dateAfter) => {
 }
 
 export const calculateLastOccurrenceDate = ({recurrence}) => {
-  const { startDate, endDate, frequency, interval } = recurrence
+  const {startDate, endDate, frequency, interval} = recurrence
 
   if (!endDate || startDate > endDate) {
     return null
@@ -124,28 +124,31 @@ export const calculateLastOccurrenceDate = ({recurrence}) => {
   return lastOccurrence.toISOString().split('T')[0]
 }
 
-export const filterBySearchQuery = (transactions, searchQuery) => {
-  if (!searchQuery) {
+export const filterBy = (transactions, searchQuery, filters) => {
+  if (!searchQuery && !filters.categories.length && !filters.maxAmount && !filters.minAmount) {
     return transactions
   }
 
-  const keywords = searchQuery.split(/[\s,]+/).filter(Boolean)
-  return transactions.filter(({ tags, category, note }) => {
-    return keywords.every(keyword => {
-      const lowerKeyword = keyword.toLowerCase()
-      const inCategory = category.name.toLowerCase().includes(lowerKeyword)
-      const inNote = note ? note.toLowerCase().includes(lowerKeyword) : false
-      const inTags = (tags || []).some(tag => tag.toLowerCase().includes(lowerKeyword))
-      return inCategory || inNote || inTags
-    })
-  })
+  const keywords = searchQuery?.split(/[\s,]+/)?.filter(Boolean)
+  const categoryIds =  new Set(filters.categories)
+  return transactions.filter(tx => matchesQuery(tx, keywords) && matchesFilters(tx, categoryIds, filters.minAmount, filters.maxAmount))
 }
 
-export const filterByCategory = (transactions, catIds) => {
-  if (!catIds || !catIds.length) {
-    return transactions
-  }
+const matchesFilters = (tx, categoryIds, minAmount = 0, maxAmount = Number.MAX_VALUE) => {
+  return (categoryIds.size ? categoryIds.has(tx.categoryId) : true)
+      && tx.amount.value >= minAmount
+      && tx.amount.value <= maxAmount
+}
 
-  const ids = new Set(catIds)
-  return transactions.filter(tx => ids.has(tx.categoryId))
+const matchesQuery = ({tags, category, note}, keywords) => {
+  if (!keywords?.length) {
+    return true
+  }
+  return keywords.every(keyword => {
+    const lowerKeyword = keyword.toLowerCase()
+    const inCategory = category.name.toLowerCase().includes(lowerKeyword)
+    const inNote = note ? note.toLowerCase().includes(lowerKeyword) : false
+    const inTags = (tags || []).some(tag => tag.toLowerCase().includes(lowerKeyword))
+    return inCategory || inNote || inTags
+  })
 }
