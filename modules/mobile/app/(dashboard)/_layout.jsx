@@ -43,7 +43,6 @@ const DashboardLayout = () => {
                   key={i}
                   name={tab.path}
                   options={{
-                    lazy: i !== 4,
                     title: tab.text,
                     tabBarIcon: ({color}) => (
                         <MaterialCommunityIcons

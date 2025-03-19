@@ -64,7 +64,7 @@ const transactionsObservable =
 
 const transactionCountObservable =
     withObservables(['user'], ({user}) => ({
-      totalTransactionCount: user ? user.activeTransactions.observeCount() : of$(0),
+      totalTransactionCount: user ? user.activeTransactions.observeCount(false) : of$(0),
     }))
 
 export const enhanceWithCompleteState = compose(
