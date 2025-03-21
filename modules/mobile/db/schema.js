@@ -28,7 +28,7 @@ const Transaction = tableSchema({
   name: 'transactions',
   columns: [
     {name: 'category_id', type: 'string', isIndexed: true},
-    {name: 'account_id', type: 'string', isIndexed: true},
+    {name: 'account_id', type: 'string', isOptional: true},
     {name: 'parent_transaction_id', type: 'string', isOptional: true},
     {name: 'amount_value', type: 'number'},
     {name: 'amount_currency_code', type: 'string'},
