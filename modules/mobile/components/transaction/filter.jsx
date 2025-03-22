@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useCallback} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -26,11 +26,12 @@ import {
   CheckboxLabel
 } from "@/components/ui/checkbox"
 import {mergeClasses} from '@/utils/css'
+import debounce from 'lodash.debounce'
 
 const SliderStep = 1
 const SliderMax = 500
 const MinAmount = 1
-const MaxAmount = 50000
+const MaxAmount = 1000000
 
 const TransactionFilter = ({mode, className, categories, value, onChange}) => {
   const [show, setShow] = useState(false)
@@ -137,15 +138,25 @@ const AmountSlider = ({value, onChange, heading, defaultValue}) => {
     return Math.round(Math.pow(10, logAmount))
   }
 
-  const handleChange = (v) => {
-    onChange(sliderValueToAmount(v))
-  }
+  const [currentValue, setCurrentValue] = useState(amountToSliderValue(value || defaultValue))
 
+  const debouncedOnChange = useCallback(
+      debounce((v) => onChange(sliderValueToAmount(v)), 500),
+      [onChange, sliderValueToAmount]
+  )
+
+  const handleChange = useCallback(
+      (v) => {
+        setCurrentValue(v);
+        debouncedOnChange(v);
+      },
+      [debouncedOnChange]
+  )
   return (
       <>
         <HStack className="justify-between">
           <Heading>{heading}</Heading>
-          <Text size="md">{value || defaultValue}</Text>
+          <Text size="md">{sliderValueToAmount(currentValue)}</Text>
         </HStack>
         <Slider
             defaultValue={amountToSliderValue(defaultValue)}
@@ -153,7 +164,7 @@ const AmountSlider = ({value, onChange, heading, defaultValue}) => {
             minValue={1}
             maxValue={SliderMax}
             sliderTrackHeight={16}
-            value={amountToSliderValue(value || defaultValue)}
+            value={currentValue}
             onChange={handleChange}
         >
           <SliderTrack>
