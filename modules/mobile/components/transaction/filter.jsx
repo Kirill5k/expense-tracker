@@ -1,4 +1,5 @@
 import {useState, useCallback} from 'react'
+import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -70,7 +71,7 @@ const TransactionFilter = ({mode, className, categories, value, onChange}) => {
             <ActionsheetDragIndicatorWrapper>
               <ActionsheetDragIndicator/>
             </ActionsheetDragIndicatorWrapper>
-            <VStack className="w-full px-3" space="lg">
+            <VStack className="w-full px-2" space="lg">
               <AmountSlider
                 heading="Min Amount"
                 defaultValue={MinAmount}
@@ -158,20 +159,22 @@ const AmountSlider = ({value, onChange, heading, defaultValue}) => {
           <Heading>{heading}</Heading>
           <Text size="md">{sliderValueToAmount(currentValue)}</Text>
         </HStack>
-        <Slider
-            defaultValue={amountToSliderValue(defaultValue)}
-            step={SliderStep}
-            minValue={1}
-            maxValue={SliderMax}
-            sliderTrackHeight={16}
-            value={currentValue}
-            onChange={handleChange}
-        >
-          <SliderTrack>
-            <SliderFilledTrack/>
-          </SliderTrack>
-          <SliderThumb/>
-        </Slider>
+        <Box className="w-full px-1.5">
+          <Slider
+              defaultValue={amountToSliderValue(defaultValue)}
+              step={SliderStep}
+              minValue={1}
+              maxValue={SliderMax}
+              sliderTrackHeight={16}
+              value={currentValue}
+              onChange={handleChange}
+          >
+            <SliderTrack>
+              <SliderFilledTrack/>
+            </SliderTrack>
+            <SliderThumb/>
+          </Slider>
+        </Box>
       </>
   )
 }
