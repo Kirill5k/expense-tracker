@@ -5,7 +5,7 @@ export const Header = ({heading, children}) => {
 
   return (
       <HStack className="justify-between items-center">
-        <Heading>{heading}</Heading>
+        <Heading size="md">{heading}</Heading>
         {children}
       </HStack>
   )
