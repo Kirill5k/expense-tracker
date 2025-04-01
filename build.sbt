@@ -15,14 +15,15 @@ val noPublish = Seq(
 )
 
 val docker = Seq(
-  packageName        := moduleName.value,
-  version            := version.value,
-  maintainer         := "immotional@aol.com",
-  dockerBaseImage    := "amazoncorretto:24-alpine",
-  dockerUpdateLatest := true,
-  dockerUsername     := sys.env.get("DOCKER_USERNAME"),
-  dockerRepository   := sys.env.get("DOCKER_REPO_URI"),
-  makeBatScripts     := Nil,
+  Compile / run / fork := true,
+  packageName          := moduleName.value,
+  version              := version.value,
+  maintainer           := "immotional@aol.com",
+  dockerBaseImage      := "amazoncorretto:24-alpine",
+  dockerUpdateLatest   := true,
+  dockerUsername       := sys.env.get("DOCKER_USERNAME"),
+  dockerRepository     := sys.env.get("DOCKER_REPO_URI"),
+  makeBatScripts       := Nil,
   dockerEnvVars ++= Map("VERSION" -> version.value),
   dockerCommands := {
     val commands         = dockerCommands.value
