@@ -2,11 +2,13 @@ import React from 'react';
 import {ButtonIcon, ButtonText, Button} from '../ui/button';
 import {MaterialIcon} from '../ui/icon';
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
+import {BlurredBackground} from '@/components/common/blur'
 import Colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
 import {mergeClasses} from '@/utils/css'
 
-const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
+
+const CategorySelect = ({items, value, onSelect, mode, isInvalid, blurred = false}) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const itemsByIds = createLookup(items, c => c.id)
   const [selected, setSelected] = React.useState(value?.id ? new Set([value.id]) : new Set([]))
@@ -36,6 +38,7 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid}) => {
                   }}
                   {...triggerProps}
               >
+                {blurred && <BlurredBackground borderRadius={6} rounded/>}
                 {value?.icon && <ButtonIcon
                     as={MaterialIcon}
                     code={value.icon}

@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import React, {useState} from 'react'
 import DateTimePicker from 'react-native-ui-datepicker'
 import {
   Accordion,
@@ -15,12 +15,13 @@ import {Box} from '../ui/box'
 import {MaterialIcon} from '../ui/icon';
 import Classes from '@/constants/classes'
 import Colors from '@/constants/colors'
+import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 import {format} from 'date-fns'
 import dayjs from 'dayjs'
 
 
-const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false}) => {
+const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false, blurred = false}) => {
   const [enabled, setEnabled] = useState(!!value)
   const [selectedValues, setSelectedValues] = useState([])
 
@@ -57,6 +58,7 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
           }}
       >
         <AccordionItem value="a">
+          {blurred && <BlurredBackground borderRadius={6} rounded/>}
           <AccordionHeader>
             <AccordionTrigger className={mergeClasses('px-3 py-0', !nullable && 'pr-5')}>
               {({ isExpanded }) => {

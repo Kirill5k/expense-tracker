@@ -26,6 +26,8 @@ import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
+import {BlurredBackground} from '@/components/common/blur'
+
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -135,6 +137,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, value}}) => (
                   <CategorySelect
+                      blurred
                       isInvalid={!!formState.errors.category}
                       mode={mode}
                       items={categories}
@@ -160,6 +163,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <Input variant="outline">
+                    <BlurredBackground borderRadius={6} rounded/>
                     <InputSlot>
                       <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
@@ -195,6 +199,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
+                      blurred
                       mode={mode}
                       value={value}
                       onSelect={onChange}
@@ -218,6 +223,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <Input variant="outline" className="pl-2.5">
+                    <BlurredBackground borderRadius={6} rounded/>
                     <InputField
                         autoComplete="off"
                         placeholder=""
@@ -247,6 +253,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
+                      blurred
                       mode={mode}
                       placeholder="Add tags"
                       value={value}
