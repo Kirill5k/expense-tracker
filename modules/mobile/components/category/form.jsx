@@ -13,6 +13,7 @@ import {
   FormControlLabelText
 } from'@/components/ui/form-control'
 import IconSelect from '@/components/common/icon-select'
+import {BlurredBackground} from '@/components/common/blur'
 import {categoryOptions} from '@/constants/categories'
 import {AlertTriangle} from 'lucide-react-native'
 import ColorPicker, {HueSlider} from 'reanimated-color-picker';
@@ -86,7 +87,8 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               name="name"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
+                  <Input className="border-0">
+                    <BlurredBackground borderRadius={6} rounded/>
                     <InputField
                         autoComplete="off"
                         autoCorrect={false}
@@ -145,6 +147,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <IconSelect
+                      blurred
                       isInvalid={!!formState.errors.icon}
                       mode={mode}
                       value={value}

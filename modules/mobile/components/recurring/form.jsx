@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Text} from '@/components/ui/text'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
@@ -25,8 +25,10 @@ import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
 import ToggleButton from '@/components/common/toggle-button'
+import {BlurredBackground} from '@/components/common/blur'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 import {calculateLastOccurrenceDate} from '@/utils/transactions'
+
 
 const categorySchema = z.object({
   id: z.string().min(1, 'Category ID is required'),
@@ -197,6 +199,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, value}}) => (
                   <CategorySelect
+                      blurred
                       isInvalid={!!formState.errors.category}
                       mode={mode}
                       items={categories}
@@ -221,7 +224,8 @@ const RecurringTransactionForm = ({
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline">
+                  <Input variant="outline" className="border-0">
+                    <BlurredBackground borderRadius={6} rounded/>
                     <InputSlot>
                       <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
@@ -257,6 +261,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
+                      blurred
                       mode={mode}
                       value={value}
                       onSelect={onChange}
@@ -309,7 +314,8 @@ const RecurringTransactionForm = ({
               defaultValue="1"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline">
+                  <Input variant="outline" className="border-0">
+                    <BlurredBackground borderRadius={6} rounded/>
                     <InputField
                         className="pl-5"
                         autoComplete="off"
@@ -348,6 +354,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
+                      blurred
                       isInvalid={!!formState.errors.endDate}
                       nullable
                       mode={mode}
@@ -377,7 +384,8 @@ const RecurringTransactionForm = ({
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="pl-2">
+                  <Input variant="outline" className="pl-2 border-0">
+                    <BlurredBackground borderRadius={6} rounded/>
                     <InputField
                         autoComplete="off"
                         placeholder=""
@@ -407,6 +415,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
+                      blurred
                       mode={mode}
                       placeholder="Add tags"
                       value={value}

@@ -1,6 +1,7 @@
 import React from 'react'
 import {ScrollView} from '@/components/ui/scroll-view'
 import {Pressable} from '@/components/ui/pressable'
+import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Text} from '@/components/ui/text'
@@ -8,7 +9,7 @@ import {Divider} from '@/components/ui/divider'
 import {MaterialIcon} from '@/components/ui/icon'
 import {Avatar} from '@/components/ui/avatar'
 import Colors from '@/constants/colors'
-import Classes from '@/constants/classes'
+import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 
 const iconGroups = {
@@ -135,40 +136,43 @@ const iconGroups = {
   ]
 }
 
-const IconSelect = ({value, onChange, valueColor, mode, isInvalid}) => {
+const IconSelect = ({value, onChange, valueColor, mode, isInvalid, blurred = false}) => {
   return (
-      <ScrollView
-          className={mergeClasses('max-h-60 border rounded-md p-3 pb-8')}
-          style={{
-            borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
-          }}
-          persistentScrollbar={true}
-      >
-        <VStack>
-          {Object.entries(iconGroups).map(([g, icons]) => (
-              <VStack key={g}>
-                <Text className="py-3 text-md font-medium text-primary-900">{g}</Text>
-                <Divider />
-                <HStack className="py-3 pl-1 w-full flex flex-wrap" space="lg">
-                  {icons.map((i) => (
-                      <Pressable
-                          key={i}
-                          onPress={() => onChange(i)}
-                      >
-                        <Avatar size="sm" style={{backgroundColor: value === i ? valueColor : Colors[mode].text}}>
-                          <MaterialIcon
-                              code={i}
-                              dsize={20}
-                              dcolor={Colors[mode].background}
-                          />
-                        </Avatar>
-                      </Pressable>
-                  ))}
-                </HStack>
-              </VStack>
-          ))}
-        </VStack>
-      </ScrollView>
+      <Box>
+        {blurred && <BlurredBackground borderRadius={6} rounded/>}
+        <ScrollView
+            className={mergeClasses('max-h-60 border rounded-md p-3 pb-8', blurred && 'border-0')}
+            style={{
+              borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
+            }}
+            persistentScrollbar={true}
+        >
+          <VStack>
+            {Object.entries(iconGroups).map(([g, icons]) => (
+                <VStack key={g}>
+                  <Text className="py-3 text-md font-medium text-primary-900">{g}</Text>
+                  <Divider/>
+                  <HStack className="py-3 pl-1 w-full flex flex-wrap" space="lg">
+                    {icons.map((i) => (
+                        <Pressable
+                            key={i}
+                            onPress={() => onChange(i)}
+                        >
+                          <Avatar size="sm" style={{backgroundColor: value === i ? valueColor : Colors[mode].text}}>
+                            <MaterialIcon
+                                code={i}
+                                dsize={20}
+                                dcolor={Colors[mode].background}
+                            />
+                          </Avatar>
+                        </Pressable>
+                    ))}
+                  </HStack>
+                </VStack>
+            ))}
+          </VStack>
+        </ScrollView>
+      </Box>
   )
 }
 
