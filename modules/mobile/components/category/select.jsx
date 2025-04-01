@@ -31,7 +31,8 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid, blurred = fals
                   action="primary"
                   className={mergeClasses(
                       'justify-between items-center pl-4',
-                      isOpen && 'border-primary-600'
+                      isOpen && 'border-primary-600',
+                      blurred && 'border-0'
                   )}
                   style={{
                     borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border

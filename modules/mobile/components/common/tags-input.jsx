@@ -5,6 +5,7 @@ import {VStack} from '@/components/ui/vstack'
 import {TagList} from './tag'
 import Colors from '@/constants/colors'
 import {BlurredBackground} from '@/components/common/blur'
+import {mergeClasses} from '@/utils/css'
 
 
 const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md', blurred = false}) => {
@@ -58,7 +59,7 @@ const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEdit
         <Input
             variant="outline"
             size={size}
-            className="pl-5"
+            className={mergeClasses("pl-5", blurred && 'border-0')}
         >
           {blurred && <BlurredBackground borderRadius={6} rounded/>}
           <InputSlot>

@@ -162,7 +162,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline">
+                  <Input variant="outline" className="border-0">
                     <BlurredBackground borderRadius={6} rounded/>
                     <InputSlot>
                       <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
@@ -222,7 +222,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="pl-2.5">
+                  <Input variant="outline" className="pl-2.5 border-0">
                     <BlurredBackground borderRadius={6} rounded/>
                     <InputField
                         autoComplete="off"
