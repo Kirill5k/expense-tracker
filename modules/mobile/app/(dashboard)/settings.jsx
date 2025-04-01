@@ -153,6 +153,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
                     their original currency.
                   </AccordionContentText>
                   <CurrencySelect
+                      blurred
                       size="md"
                       isDisabled={loading}
                       mode={mode}
@@ -208,6 +209,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
             >
               <SettingsAccordionContent>
                 <PasswordChange
+                    blurred
                     onSubmit={handlePasswordChange}
                 />
               </SettingsAccordionContent>
@@ -218,6 +220,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
             >
               <SettingsAccordionContent>
                 <DeleteButton
+                    blurred
                     outline
                     isDisabled={loading}
                     mode={mode}
@@ -235,6 +238,7 @@ const Settings = ({user, state, totalTransactionCount}) => {
             >
               <SettingsAccordionContent>
                 <DeleteButton
+                    blurred
                     isDisabled={loading}
                     mode={mode}
                     alertText="Closing your account will permanently delete your profile, transactions, categories and settings. This action cannot be undone, and you will lose access to your account."

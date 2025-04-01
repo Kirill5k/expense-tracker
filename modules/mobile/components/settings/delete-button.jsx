@@ -1,12 +1,14 @@
-import {useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Input, InputField} from '@/components/ui/input'
 import {Button, ButtonText} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
 import {Alert, AlertIcon, AlertText} from '@/components/ui/alert'
+import {BlurredBackground} from '@/components/common/blur'
 import Colors from '@/constants/colors'
+import {mergeClasses} from '@/utils/css'
 
-const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText, onPress, outline = false}) => {
+const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText, onPress, outline = false, blurred = false}) => {
   const [input, setInput] = useState('')
   const [isConfirmed, setIsConfirmed] = useState(false)
 
@@ -25,7 +27,9 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
         <Input
             variant="outline"
             size="md"
+            className={mergeClasses(blurred && 'border-0')}
         >
+          {blurred && <BlurredBackground borderRadius={6} rounded/>}
           <InputField
               autoCorrect={false}
               value={input}
