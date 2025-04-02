@@ -4,11 +4,10 @@ import {Input, InputSlot, InputField, InputIcon} from '@/components/ui/input'
 import {VStack} from '@/components/ui/vstack'
 import {TagList} from './tag'
 import Colors from '@/constants/colors'
-import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 
 
-const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md', blurred = false}) => {
+const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEditing, size = 'md', flat = false}) => {
   const [currentTags, setCurrentTags] = useState(value || [])
   const [latestTag, setLatestTag] = useState('')
 
@@ -59,9 +58,8 @@ const TagsInput = ({mode, placeholder, value, onChangeText, onBlur, onSubmitEdit
         <Input
             variant="outline"
             size={size}
-            className={mergeClasses("pl-5", blurred && 'border-0')}
+            className={mergeClasses('pl-5', flat && 'border-0 bg-background-50 focus:bg-background-100')}
         >
-          {blurred && <BlurredBackground borderRadius={6} rounded/>}
           <InputSlot>
             <InputIcon
                 as={MaterialIcon}

@@ -26,7 +26,7 @@ import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
-import {BlurredBackground} from '@/components/common/blur'
+import {mergeClasses} from "../../utils/css";
 
 
 const categorySchema = z.object({
@@ -52,7 +52,7 @@ const transactionSchema = z.object({
   note: z.string().max(30, "Note is too long").optional(),
 });
 
-const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode}) => {
+const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode, flat = false}) => {
   const {
     control,
     handleSubmit,
@@ -137,7 +137,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, value}}) => (
                   <CategorySelect
-                      blurred
+                      flat={flat}
                       isInvalid={!!formState.errors.category}
                       mode={mode}
                       items={categories}
@@ -162,8 +162,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="border-0">
-                    <BlurredBackground borderRadius={6} rounded/>
+                  <Input variant="outline" className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputSlot>
                       <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
@@ -199,7 +198,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
-                      blurred
+                      flat={flat}
                       mode={mode}
                       value={value}
                       onSelect={onChange}
@@ -222,8 +221,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="pl-2.5 border-0">
-                    <BlurredBackground borderRadius={6} rounded/>
+                  <Input variant="outline" className={mergeClasses('pl-2.5',flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoComplete="off"
                         placeholder=""
@@ -253,7 +251,7 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
-                      blurred
+                      flat={flat}
                       mode={mode}
                       placeholder="Add tags"
                       value={value}

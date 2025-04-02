@@ -1,14 +1,12 @@
-import React from 'react';
-import {ButtonIcon, ButtonText, Button} from '../ui/button';
-import {MaterialIcon} from '../ui/icon';
-import {Menu, MenuItem, MenuItemLabel} from '../ui/menu';
-import {BlurredBackground} from '@/components/common/blur'
+import {ButtonIcon, ButtonText, Button} from '../ui/button'
+import {MaterialIcon} from '../ui/icon'
+import {Menu, MenuItem, MenuItemLabel} from '../ui/menu'
 import Colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
 import {mergeClasses} from '@/utils/css'
 
 
-const CategorySelect = ({items, value, onSelect, mode, isInvalid, blurred = false}) => {
+const CategorySelect = ({items, value, onSelect, mode, isInvalid, flat = false}) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const itemsByIds = createLookup(items, c => c.id)
   const [selected, setSelected] = React.useState(value?.id ? new Set([value.id]) : new Set([]))
@@ -32,14 +30,14 @@ const CategorySelect = ({items, value, onSelect, mode, isInvalid, blurred = fals
                   className={mergeClasses(
                       'justify-between items-center pl-4',
                       isOpen && 'border-primary-600',
-                      blurred && 'border-0'
+                      flat && 'border-0 bg-background-50',
+                      flat && isOpen && 'bg-background-100'
                   )}
                   style={{
                     borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
                   }}
                   {...triggerProps}
               >
-                {blurred && <BlurredBackground borderRadius={6} rounded/>}
                 {value?.icon && <ButtonIcon
                     as={MaterialIcon}
                     code={value.icon}
