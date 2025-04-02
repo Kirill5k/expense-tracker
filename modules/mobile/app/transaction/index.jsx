@@ -36,6 +36,7 @@ const Transaction = ({user, categories}) => {
               heading={txToUpdate?.id ? 'Edit Transaction' : 'New Transaction'}
           />
           <TransactionForm
+              flat
               mode={mode}
               transaction={txToUpdate}
               currency={user?.currency}

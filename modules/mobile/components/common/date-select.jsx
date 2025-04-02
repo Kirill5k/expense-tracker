@@ -15,13 +15,12 @@ import {Box} from '../ui/box'
 import {MaterialIcon} from '../ui/icon';
 import Classes from '@/constants/classes'
 import Colors from '@/constants/colors'
-import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 import {format} from 'date-fns'
 import dayjs from 'dayjs'
 
 
-const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false, blurred = false}) => {
+const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false, flat = false}) => {
   const [enabled, setEnabled] = useState(!!value)
   const [selectedValues, setSelectedValues] = useState([])
 
@@ -52,13 +51,16 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
           type="single"
           isCollapsible={true}
           isDisabled={!enabled}
-          className={mergeClasses(!blurred && 'border rounded-md', Classes[mode].inputFieldBorder)}
+          className={mergeClasses(
+              'border rounded-md',
+              flat && 'border-0 p-0.5 bg-background-50',
+              !flat && Classes[mode].inputFieldBorder
+          )}
           style={{
             borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
           }}
       >
         <AccordionItem value="a">
-          {blurred && <BlurredBackground borderRadius={6} rounded/>}
           <AccordionHeader>
             <AccordionTrigger className={mergeClasses('px-3 py-0', !nullable && 'pr-5')}>
               {({ isExpanded }) => {

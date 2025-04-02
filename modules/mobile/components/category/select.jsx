@@ -1,3 +1,4 @@
+import {useState} from 'react'
 import {ButtonIcon, ButtonText, Button} from '../ui/button'
 import {MaterialIcon} from '../ui/icon'
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu'
@@ -7,9 +8,9 @@ import {mergeClasses} from '@/utils/css'
 
 
 const CategorySelect = ({items, value, onSelect, mode, isInvalid, flat = false}) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const itemsByIds = createLookup(items, c => c.id)
-  const [selected, setSelected] = React.useState(value?.id ? new Set([value.id]) : new Set([]))
+  const [selected, setSelected] = useState(value?.id ? new Set([value.id]) : new Set([]))
 
   return (
       <Menu
