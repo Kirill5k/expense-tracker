@@ -14,7 +14,9 @@ import {Input, InputField, InputIcon, InputSlot} from '@/components/ui/input'
 import {Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel} from '@/components/ui/checkbox'
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
 import {Button, ButtonText, ButtonSpinner} from '@/components/ui/button'
-import {CurrencySelect, currencies, getCurrencyByCode} from '@/components/settings/currency-select'
+import {CurrencySelect, getCurrencyByCode} from '@/components/settings/currency-select'
+import {BlurredBackground} from '@/components/common/blur'
+import {mergeClasses} from '@/utils/css'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {z} from 'zod'
@@ -54,7 +56,7 @@ const signUpSchema = z.object({
   acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const RegistrationForm = ({onSubmit, mode, locale}) => {
+export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
   const {
     control,
     handleSubmit,
@@ -103,7 +105,8 @@ export const RegistrationForm = ({onSubmit, mode, locale}) => {
                 defaultValue=""
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                      {blurred && <BlurredBackground borderRadius={3} rounded/>}
                       <InputField
                           autoFocus
                           autoCorrect={false}
@@ -139,7 +142,8 @@ export const RegistrationForm = ({onSubmit, mode, locale}) => {
                 defaultValue=""
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input>
+                    <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                      {blurred && <BlurredBackground borderRadius={3} rounded/>}
                       <InputField
                           autoCorrect={false}
                           inputMode="text"
@@ -177,6 +181,7 @@ export const RegistrationForm = ({onSubmit, mode, locale}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <CurrencySelect
+                      blurred
                       ref={currencySelRef}
                       mode={mode}
                       value={value}
@@ -201,7 +206,8 @@ export const RegistrationForm = ({onSubmit, mode, locale}) => {
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
+                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
                     <InputField
                         autoCorrect={false}
                         spellCheck={false}
@@ -238,7 +244,8 @@ export const RegistrationForm = ({onSubmit, mode, locale}) => {
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
+                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
                     <InputField
                         autoCorrect={false}
                         textContentType="newPassword"
@@ -275,7 +282,8 @@ export const RegistrationForm = ({onSubmit, mode, locale}) => {
               name="confirmPassword"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
+                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
                     <InputField
                         autoCorrect={false}
                         textContentType="newPassword"

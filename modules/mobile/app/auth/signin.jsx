@@ -37,6 +37,7 @@ const SignIn = () => {
                   subHeading={Wordings.signinSubHeading}
               />
               <LoginForm
+                  blurred
                   passwordReset={Features.passwordReset}
                   rememberMe={Features.rememberMe}
                   onSubmit={handleLogin}

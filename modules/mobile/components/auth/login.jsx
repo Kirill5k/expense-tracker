@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/checkbox'
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
 import {Button, ButtonText, ButtonSpinner} from '@/components/ui/button'
+import {BlurredBackground} from '@/components/common/blur'
+import {mergeClasses} from '@/utils/css'
 import {Keyboard} from 'react-native'
 import {useForm, Controller} from 'react-hook-form'
 import {z} from 'zod'
@@ -34,15 +36,14 @@ const loginSchema = z.object({
   rememberme: z.boolean().optional(),
 })
 
-export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
+export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode, blurred = false}) => {
   const {
     control,
     handleSubmit,
     reset,
     formState,
     setError
-  } = useForm({resolver: zodResolver(loginSchema)});
-  const [secureTextEntry, setSecureTextEntry] = useState(false)
+  } = useForm({resolver: zodResolver(loginSchema)})
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const passwordRef = useRef(null)
@@ -76,7 +77,8 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
               name="email"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
+                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
                     <InputField
                         autoFocus
                         autoCorrect={false}
@@ -114,7 +116,8 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode}) => {
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input>
+                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
+                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
                     <InputField
                         autoCorrect={false}
                         type={showPassword ? "text" : "password"}

@@ -45,6 +45,7 @@ const SignUp = ({user}) => {
                   subHeading={Wordings.signupSubHeading}
               />
               <RegistrationForm
+                  blurred
                   locale={locale}
                   mode={mode}
                   onSubmit={handleCreateAccount}

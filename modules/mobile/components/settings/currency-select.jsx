@@ -73,11 +73,12 @@ export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, si
                   className={mergeClasses(
                       'flex justify-between items-center px-3',
                       isOpen && 'border-primary-600',
-                      blurred && 'border-0'
+                      blurred && 'border-0',
+                      isOpen && blurred && 'bg-background-200'
                   )}
                   {...triggerProps}
               >
-                {blurred && <BlurredBackground borderRadius={6} rounded/>}
+                {blurred && <BlurredBackground borderRadius={3} rounded/>}
                 <ButtonText className="px-0 text-lg">
                   {value?.symbol}
                 </ButtonText>
