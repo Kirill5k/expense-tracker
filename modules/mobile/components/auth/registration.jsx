@@ -15,7 +15,6 @@ import {Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel} from '@/compon
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
 import {Button, ButtonText, ButtonSpinner} from '@/components/ui/button'
 import {CurrencySelect, getCurrencyByCode} from '@/components/settings/currency-select'
-import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -56,7 +55,7 @@ const signUpSchema = z.object({
   acceptTerms: z.boolean().refine(v => v, {message: 'You must accept the terms and conditions'})
 })
 
-export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
+export const RegistrationForm = ({onSubmit, mode, locale, flat = false}) => {
   const {
     control,
     handleSubmit,
@@ -105,8 +104,7 @@ export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
                 defaultValue=""
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                      {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                    <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                       <InputField
                           autoFocus
                           autoCorrect={false}
@@ -142,8 +140,7 @@ export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
                 defaultValue=""
                 control={control}
                 render={({field: {onChange, onBlur, value}}) => (
-                    <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                      {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                    <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                       <InputField
                           autoCorrect={false}
                           inputMode="text"
@@ -181,7 +178,7 @@ export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <CurrencySelect
-                      blurred
+                      flat={flat}
                       ref={currencySelRef}
                       mode={mode}
                       value={value}
@@ -206,8 +203,7 @@ export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                  <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoCorrect={false}
                         spellCheck={false}
@@ -244,8 +240,7 @@ export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                  <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoCorrect={false}
                         textContentType="newPassword"
@@ -282,8 +277,7 @@ export const RegistrationForm = ({onSubmit, mode, locale, blurred = false}) => {
               name="confirmPassword"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                  <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoCorrect={false}
                         textContentType="newPassword"

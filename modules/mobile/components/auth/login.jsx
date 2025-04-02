@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/checkbox'
 import {CheckIcon, EyeIcon, EyeOffIcon} from '@/components/ui/icon'
 import {Button, ButtonText, ButtonSpinner} from '@/components/ui/button'
-import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 import {Keyboard} from 'react-native'
 import {useForm, Controller} from 'react-hook-form'
@@ -36,7 +35,7 @@ const loginSchema = z.object({
   rememberme: z.boolean().optional(),
 })
 
-export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode, blurred = false}) => {
+export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode, flat = false}) => {
   const {
     control,
     handleSubmit,
@@ -77,8 +76,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode, blurred = 
               name="email"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                  <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoFocus
                         autoCorrect={false}
@@ -116,8 +114,7 @@ export const LoginForm = ({onSubmit, rememberMe, passwordReset, mode, blurred = 
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input className={mergeClasses(blurred && 'border-0 focus:bg-background-200')}>
-                    {blurred && <BlurredBackground borderRadius={3} rounded/>}
+                  <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoCorrect={false}
                         type={showPassword ? "text" : "password"}

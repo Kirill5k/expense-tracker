@@ -2,7 +2,6 @@ import React, {useState, forwardRef, useImperativeHandle} from 'react'
 import {ButtonIcon, ButtonText, Button} from '../ui/button'
 import {MaterialIcon} from '../ui/icon'
 import {Menu, MenuItem, MenuItemLabel} from '../ui/menu'
-import {BlurredBackground} from '@/components/common/blur'
 import colors from '@/constants/colors'
 import {createLookup} from '@/utils/arrays'
 import {mergeClasses} from '@/utils/css'
@@ -39,7 +38,7 @@ const currenciesByCode = createLookup(currencies, c => c.code)
 
 export const getCurrencyByCode = (code, defaultCode = 'USD') => currenciesByCode[code] || currenciesByCode[defaultCode]
 
-export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, size = 'md', blurred = false}, ref) => {
+export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, size = 'md', flat = false}, ref) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState(value?.code ? new Set([value.code]) : new Set([]))
 
@@ -73,12 +72,11 @@ export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, si
                   className={mergeClasses(
                       'flex justify-between items-center px-3',
                       isOpen && 'border-primary-600',
-                      blurred && 'border-0',
-                      isOpen && blurred && 'bg-background-200'
+                      flat && 'border-0 bg-background-50',
+                      isOpen && flat && 'bg-background-100'
                   )}
                   {...triggerProps}
               >
-                {blurred && <BlurredBackground borderRadius={3} rounded/>}
                 <ButtonText className="px-0 text-lg">
                   {value?.symbol}
                 </ButtonText>
