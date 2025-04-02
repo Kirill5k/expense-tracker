@@ -37,6 +37,7 @@ const Recurring = ({user, categories}) => {
               heading={rtxToUpdate?.id ? 'Edit Recurring Transaction' : 'New Recurring Transaction'}
           />
           <RecurringTransactionForm
+              flat
               mode={mode}
               transaction={rtxToUpdate}
               currency={user?.currency}

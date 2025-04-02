@@ -25,9 +25,9 @@ import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
 import ToggleButton from '@/components/common/toggle-button'
-import {BlurredBackground} from '@/components/common/blur'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 import {calculateLastOccurrenceDate} from '@/utils/transactions'
+import {mergeClasses} from '@/utils/css'
 
 
 const categorySchema = z.object({
@@ -100,7 +100,8 @@ const RecurringTransactionForm = ({
   incomeCategories,
   expenseCategories,
   currency,
-  mode
+  mode,
+  flat = false
 }) => {
   const {
     control,
@@ -199,7 +200,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, value}}) => (
                   <CategorySelect
-                      blurred
+                      flat={flat}
                       isInvalid={!!formState.errors.category}
                       mode={mode}
                       items={categories}
@@ -224,8 +225,7 @@ const RecurringTransactionForm = ({
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="border-0">
-                    <BlurredBackground borderRadius={6} rounded/>
+                  <Input variant="outline" className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputSlot>
                       <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
                     </InputSlot>
@@ -261,7 +261,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
-                      blurred
+                      flat={flat}
                       mode={mode}
                       value={value}
                       onSelect={onChange}
@@ -314,8 +314,7 @@ const RecurringTransactionForm = ({
               defaultValue="1"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="border-0">
-                    <BlurredBackground borderRadius={6} rounded/>
+                  <Input variant="outline" className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         className="pl-5"
                         autoComplete="off"
@@ -354,7 +353,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <DateSelect
-                      blurred
+                      flat={flat}
                       isInvalid={!!formState.errors.endDate}
                       nullable
                       mode={mode}
@@ -384,8 +383,7 @@ const RecurringTransactionForm = ({
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className="pl-2 border-0">
-                    <BlurredBackground borderRadius={6} rounded/>
+                  <Input variant="outline" className={mergeClasses('pl-2', flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoComplete="off"
                         placeholder=""
@@ -415,7 +413,7 @@ const RecurringTransactionForm = ({
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <TagsInput
-                      blurred
+                      flat={flat}
                       mode={mode}
                       placeholder="Add tags"
                       value={value}

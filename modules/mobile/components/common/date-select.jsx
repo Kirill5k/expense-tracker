@@ -53,7 +53,9 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
           isDisabled={!enabled}
           className={mergeClasses(
               'border rounded-md',
-              flat && 'border-0 p-0.5 bg-background-50',
+              flat && 'border-0 bg-background-50',
+              flat && !nullable && 'p-0.5',
+              flat && selectedValues.length && 'bg-background-100',
               !flat && Classes[mode].inputFieldBorder
           )}
           style={{
