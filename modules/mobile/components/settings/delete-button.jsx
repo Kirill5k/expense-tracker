@@ -4,7 +4,6 @@ import {Input, InputField} from '@/components/ui/input'
 import {Button, ButtonText} from '@/components/ui/button'
 import {MaterialIcon} from '@/components/ui/icon'
 import {Alert, AlertIcon, AlertText} from '@/components/ui/alert'
-import {BlurredBackground} from '@/components/common/blur'
 import Colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
 

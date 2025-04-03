@@ -14,7 +14,7 @@ import {
   FormControlLabel,
   FormControlLabelText
 } from '@/components/ui/form-control'
-import {Input, InputField, InputSlot} from '@/components/ui/input'
+import {Input, InputField} from '@/components/ui/input'
 import {z} from 'zod'
 import {format} from 'date-fns'
 import {Controller, useForm} from 'react-hook-form'
@@ -24,7 +24,7 @@ import {AlertTriangle} from 'lucide-react-native'
 import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
-import {AmountInput} from './amount-input'
+import {MultipleAmountInput} from './amount-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 import {mergeClasses} from '@/utils/css'
 
@@ -171,7 +171,7 @@ const TransactionForm = ({
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <AmountInput
+                  <MultipleAmountInput
                       flat={flat}
                       currency={currency}
                       value={value}
@@ -179,6 +179,7 @@ const TransactionForm = ({
                       onBlur={onBlur}
                       onSubmitEditing={handleKeyPress}
                   />
+                  //TODO: add helper text when amounts > 1
               )}
           />
           <FormControlError>
