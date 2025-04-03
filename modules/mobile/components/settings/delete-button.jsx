@@ -8,7 +8,7 @@ import {BlurredBackground} from '@/components/common/blur'
 import Colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
 
-const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText, onPress, outline = false, blurred = false}) => {
+const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText, onPress, outline = false, flat = false}) => {
   const [input, setInput] = useState('')
   const [isConfirmed, setIsConfirmed] = useState(false)
 
@@ -27,9 +27,8 @@ const DeleteButton = ({mode, isDisabled, alertText, buttonText, confirmationText
         <Input
             variant="outline"
             size="md"
-            className={mergeClasses(blurred && 'border-0')}
+            className={mergeClasses(flat && 'border-0 bg-background-100 focus:bg-background-200')}
         >
-          {blurred && <BlurredBackground borderRadius={6} rounded/>}
           <InputField
               autoCorrect={false}
               value={input}

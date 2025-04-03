@@ -38,7 +38,10 @@ const currenciesByCode = createLookup(currencies, c => c.code)
 
 export const getCurrencyByCode = (code, defaultCode = 'USD') => currenciesByCode[code] || currenciesByCode[defaultCode]
 
-export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, size = 'md', flat = false}, ref) => {
+export const CurrencySelect = forwardRef((
+    {className, isDisabled, value, onSelect, mode, size = 'md', flat = false},
+    ref
+) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState(value?.code ? new Set([value.code]) : new Set([]))
 
@@ -73,7 +76,8 @@ export const CurrencySelect = forwardRef(({isDisabled, value, onSelect, mode, si
                       'flex justify-between items-center px-3',
                       isOpen && 'border-primary-600',
                       flat && 'border-0 bg-background-50',
-                      isOpen && flat && 'bg-background-100'
+                      isOpen && flat && 'bg-background-100',
+                      className
                   )}
                   {...triggerProps}
               >

@@ -13,7 +13,6 @@ import {
   FormControlErrorIcon,
   FormControlError
 } from '@/components/ui/form-control'
-import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 import {useForm, Controller} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -45,7 +44,7 @@ const changePasswordSchema = z.object({
       ),
 })
 
-const PasswordChange = ({onSubmit, blurred = false}) => {
+const PasswordChange = ({onSubmit, flat = false}) => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -86,8 +85,7 @@ const PasswordChange = ({onSubmit, blurred = false}) => {
               name="currentPassword"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="md" className={mergeClasses(blurred && 'border-0')}>
-                    {blurred && <BlurredBackground borderRadius={6} rounded/>}
+                  <Input size="md" className={mergeClasses(flat && 'border-0 bg-background-100 focus:bg-background-200')}>
                     <InputField
                         className="text-md"
                         placeholder="Current Password"
@@ -120,8 +118,7 @@ const PasswordChange = ({onSubmit, blurred = false}) => {
               name="password"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="md" className={mergeClasses(blurred && 'border-0')}>
-                    {blurred && <BlurredBackground borderRadius={6} rounded/>}
+                  <Input size="md" className={mergeClasses(flat && 'border-0 bg-background-100 focus:bg-background-200')}>
                     <InputField
                         className="text-md"
                         placeholder="Password"
@@ -159,8 +156,7 @@ const PasswordChange = ({onSubmit, blurred = false}) => {
               name="confirmPassword"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input size="md" className={mergeClasses(blurred && 'border-0')}>
-                    {blurred && <BlurredBackground borderRadius={6} rounded/>}
+                  <Input size="md" className={mergeClasses(flat && 'border-0 bg-background-100 focus:bg-background-200')}>
                     <InputField
                         placeholder="Confirm Password"
                         className="text-md"
