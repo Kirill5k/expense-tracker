@@ -9,7 +9,6 @@ import {Divider} from '@/components/ui/divider'
 import {MaterialIcon} from '@/components/ui/icon'
 import {Avatar} from '@/components/ui/avatar'
 import Colors from '@/constants/colors'
-import {BlurredBackground} from '@/components/common/blur'
 import {mergeClasses} from '@/utils/css'
 
 const iconGroups = {
@@ -136,12 +135,14 @@ const iconGroups = {
   ]
 }
 
-const IconSelect = ({value, onChange, valueColor, mode, isInvalid, blurred = false}) => {
+const IconSelect = ({value, onChange, valueColor, mode, isInvalid, flat = false}) => {
   return (
       <Box>
-        {blurred && <BlurredBackground borderRadius={6} rounded/>}
         <ScrollView
-            className={mergeClasses('max-h-60 border rounded-md p-3 pb-8', blurred && 'border-0')}
+            className={mergeClasses(
+                'max-h-60 border rounded-md p-3 pb-8',
+                flat && 'border-0 bg-background-50'
+            )}
             style={{
               borderColor: isInvalid ? Colors[mode].borderInvalid : Colors[mode].border
             }}

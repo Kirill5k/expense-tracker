@@ -32,6 +32,7 @@ const Category = ({user}) => {
               heading={catToUpdate?.id ? 'Edit Category' : 'New Category'}
           />
           <CategoryForm
+              flat
               mode={mode}
               category={catToUpdate}
               onCancel={() => router.back()}

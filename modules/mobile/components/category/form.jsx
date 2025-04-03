@@ -13,8 +13,8 @@ import {
   FormControlLabelText
 } from'@/components/ui/form-control'
 import IconSelect from '@/components/common/icon-select'
-import {BlurredBackground} from '@/components/common/blur'
 import {categoryOptions} from '@/constants/categories'
+import {mergeClasses} from '@/utils/css'
 import {AlertTriangle} from 'lucide-react-native'
 import ColorPicker, {HueSlider} from 'reanimated-color-picker';
 import {Keyboard} from 'react-native'
@@ -29,7 +29,7 @@ const categorySchema = z.object({
   icon: z.string().min(1, 'Category icon is required'),
 })
 
-const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
+const CategoryForm = ({mode, category, onSubmit, onCancel, flat}) => {
   const {
     control,
     handleSubmit,
@@ -87,8 +87,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               name="name"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input className="border-0">
-                    <BlurredBackground borderRadius={6} rounded/>
+                  <Input className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoComplete="off"
                         autoCorrect={false}
@@ -147,7 +146,7 @@ const CategoryForm = ({mode, category, onSubmit, onCancel}) => {
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <IconSelect
-                      blurred
+                      flat={flat}
                       isInvalid={!!formState.errors.icon}
                       mode={mode}
                       value={value}
