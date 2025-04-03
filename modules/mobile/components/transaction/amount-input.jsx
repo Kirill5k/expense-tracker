@@ -1,4 +1,4 @@
-import {useState, forwardRef, useRef, useEffect} from 'react'
+import {useState, forwardRef, useRef, createRef} from 'react'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
@@ -15,7 +15,6 @@ export const AmountInput = forwardRef((
 
   return (
       <Input
-          ref={ref}
           variant="outline"
           className={mergeClasses(
               'grow',
@@ -26,6 +25,7 @@ export const AmountInput = forwardRef((
           <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
         </InputSlot>
         <InputField
+            ref={ref}
             autoComplete="off"
             inputMode="decimal"
             keyboardType="decimal-pad"
@@ -42,20 +42,37 @@ export const AmountInput = forwardRef((
 })
 
 const addAtNextPos = (arr, i, el) => arr.slice(0, i + 1).concat(el).concat(arr.slice(i + 1))
-const removeAt = (arr, i) => arr.filter((_, i1) => i1 !== i)
+const removeAt = (arr, index) => arr.filter((_, i) => i !== index)
 
 export const MultipleAmountInput = ({onSubmitEditing, value, onChange, onBlur, currency, flat = false}) => {
   const [latestInputId, setLatestInputId] = useState(0)
   const [inputs, setInputs] = useState([0])
+  const inputRefs = useRef(new Map())
+
+  const getInputRef = (id) => {
+    if (!inputRefs.current.has(id)) {
+      inputRefs.current.set(id, createRef())
+    }
+    return inputRefs.current.get(id)
+  }
 
   const handleAddButtonPress = (index) => {
     const id = latestInputId + 1
     setInputs(array => addAtNextPos(array, index, id))
     setLatestInputId(id)
+
+    requestAnimationFrame(() => {
+      const newInputRef = inputRefs.current.get(id);
+      if (newInputRef?.current) {
+        setTimeout(() => newInputRef.current.focus(), 50)
+      }
+    })
   }
 
   const handleRemoveButtonPress = (index) => {
     setInputs(array => removeAt(array, index))
+    const idToRemove = inputs[index]
+    inputRefs.current.delete(idToRemove)
   }
 
   return (
@@ -63,6 +80,7 @@ export const MultipleAmountInput = ({onSubmitEditing, value, onChange, onBlur, c
         {inputs.map((key, index) => (
             <HStack key={key} className="w-full items-center" space="sm">
               <AmountInput
+                  ref={getInputRef(key)}
                   flat={flat}
                   currency={currency}
                   value={value}
