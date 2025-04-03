@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react'
-import {Text} from '@/components/ui/text'
 import {HStack} from '@/components/ui/hstack'
 import {VStack} from '@/components/ui/vstack'
 import {Button, ButtonText} from '@/components/ui/button'
@@ -25,8 +24,9 @@ import {AlertTriangle} from 'lucide-react-native'
 import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
+import {AmountInput} from './amount-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
-import {mergeClasses} from "../../utils/css";
+import {mergeClasses} from '@/utils/css'
 
 
 const categorySchema = z.object({
@@ -52,7 +52,16 @@ const transactionSchema = z.object({
   note: z.string().max(30, "Note is too long").optional(),
 });
 
-const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, expenseCategories, currency, mode, flat = false}) => {
+const TransactionForm = ({
+  transaction,
+  onSubmit,
+  onCancel,
+  incomeCategories,
+  expenseCategories,
+  currency,
+  mode,
+  flat = false
+}) => {
   const {
     control,
     handleSubmit,
@@ -162,23 +171,14 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className={mergeClasses(flat && 'border-0 bg-background-50 focus:bg-background-100')}>
-                    <InputSlot>
-                      <Text className="pr-0 pl-5 text-xl text-primary-500">{currency.symbol}</Text>
-                    </InputSlot>
-                    <InputField
-                        autoComplete="off"
-                        inputMode="decimal"
-                        keyboardType="decimal-pad"
-                        placeholder="0.00"
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        onSubmitEditing={handleKeyPress}
-                        returnKeyType="done"
-                        importantForAutofill="no"
-                    />
-                  </Input>
+                  <AmountInput
+                      flat={flat}
+                      currency={currency}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      onSubmitEditing={handleKeyPress}
+                  />
               )}
           />
           <FormControlError>
@@ -221,7 +221,8 @@ const TransactionForm = ({transaction, onSubmit, onCancel, incomeCategories, exp
               name="note"
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <Input variant="outline" className={mergeClasses('pl-2.5',flat && 'border-0 bg-background-50 focus:bg-background-100')}>
+                  <Input variant="outline" className={mergeClasses('pl-2.5',
+                      flat && 'border-0 bg-background-50 focus:bg-background-100')}>
                     <InputField
                         autoComplete="off"
                         placeholder=""
