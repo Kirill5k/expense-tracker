@@ -41,13 +41,13 @@ const transactionSchema = z.object({
   kind: z.enum(['expense', 'income']),
   category: z.preprocess(c => c || {id: '', name: '', kind: 'expense', color: '#000', icon: ''},
       categorySchema.refine((cat) => cat.id && cat.name, {message: 'Please select category'})),
-  date: z.date().refine((val) => val, {message: 'Invalid date format'}),
-  amount: z.string().refine((v) => isPositiveNumber(v), {message: 'Please specify the correct amount'}),
+  date: z.date().refine((v) => v, {message: 'Invalid date format'}),
+  amounts: z.array(z.string().refine(isPositiveNumber, {message: 'Please specify the correct amount'}))
+      .min(1)
+      .refine(v => v.every(isPositiveNumber), {message: 'Please specify the correct amount'}),
   tags: z.array(z.string())
       .max(4, "You can add a maximum of 4 tags")
-      .refine((tags) => containsUniqueElements(tags), {
-        message: "Tags must be unique",
-      })
+      .refine(containsUniqueElements, {message: "Tags must be unique"})
       .optional(),
   note: z.string().max(30, "Note is too long").optional(),
 });
@@ -74,7 +74,7 @@ const TransactionForm = ({
       date: transaction?.date ? new Date(transaction.date) : new Date(),
       kind: transaction?.category?.kind || 'expense',
       category: transaction?.category || null,
-      amount: transaction?.amount?.value?.toFixed(2),
+      amounts: [transaction?.amount?.value?.toFixed(2) || ''],
       tags: transaction?.tags || [],
       note: transaction?.note || ''
     },
@@ -105,7 +105,7 @@ const TransactionForm = ({
       date: format(data.date, 'yyyy-MM-dd'),
       amount: {
         currency,
-        value: parseFloat(data.amount)
+        value: parseFloat(data.amounts[0])
       }
     }
     onSubmit(tx)
@@ -162,20 +162,20 @@ const TransactionForm = ({
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
-        <FormControl isInvalid={!!formState.errors.amount}>
+        <FormControl isInvalid={!!formState.errors.amounts}>
           <FormControlLabel>
             <FormControlLabelText>Amount</FormControlLabelText>
           </FormControlLabel>
           <Controller
-              name="amount"
+              name="amounts"
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
                   <MultipleAmountInput
                       flat={flat}
                       currency={currency}
-                      value={value}
-                      onChange={onChange}
+                      value={value[0]}
+                      onChange={(v) => onChange([v])}
                       onBlur={onBlur}
                       onSubmitEditing={handleKeyPress}
                   />
@@ -185,7 +185,7 @@ const TransactionForm = ({
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
-              {formState.errors?.amount?.message}
+              {formState.errors?.amounts?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
