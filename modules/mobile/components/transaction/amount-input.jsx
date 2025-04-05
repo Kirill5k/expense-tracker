@@ -60,6 +60,7 @@ export const MultipleAmountInput = ({onSubmitEditing, value, onChange, onBlur, c
     const id = latestInputId + 1
     setInputs(array => addAtNextPos(array, index, id))
     setLatestInputId(id)
+    onChange([...value, null])
 
     requestAnimationFrame(() => {
       const newInputRef = inputRefs.current.get(id);
@@ -73,6 +74,12 @@ export const MultipleAmountInput = ({onSubmitEditing, value, onChange, onBlur, c
     setInputs(array => removeAt(array, index))
     const idToRemove = inputs[index]
     inputRefs.current.delete(idToRemove)
+    onChange(removeAt(value, index))
+  }
+
+  const handleChange = (updatedValue, index) => {
+    const newValue = value.map((v, i) => i === index ? updatedValue : v)
+    onChange(newValue)
   }
 
   return (
@@ -83,8 +90,8 @@ export const MultipleAmountInput = ({onSubmitEditing, value, onChange, onBlur, c
                   ref={getInputRef(key)}
                   flat={flat}
                   currency={currency}
-                  value={value}
-                  onChange={onChange}
+                  value={value[index]}
+                  onChange={(v => handleChange(v, index))}
                   onBlur={onBlur}
                   onSubmitEditing={onSubmitEditing}
               />

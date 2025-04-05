@@ -174,8 +174,8 @@ const TransactionForm = ({
                   <MultipleAmountInput
                       flat={flat}
                       currency={currency}
-                      value={value[0]}
-                      onChange={(v) => onChange([v])}
+                      value={value}
+                      onChange={onChange}
                       onBlur={onBlur}
                       onSubmitEditing={handleKeyPress}
                   />
