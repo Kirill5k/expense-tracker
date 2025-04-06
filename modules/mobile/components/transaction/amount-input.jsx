@@ -60,7 +60,7 @@ export const MultipleAmountInput = ({onSubmitEditing, value, onChange, onBlur, c
     const id = latestInputId + 1
     setInputs(array => addAtNextPos(array, index, id))
     setLatestInputId(id)
-    onChange([...value, null])
+    onChange([...value, ''])
 
     requestAnimationFrame(() => {
       const newInputRef = inputRefs.current.get(id);

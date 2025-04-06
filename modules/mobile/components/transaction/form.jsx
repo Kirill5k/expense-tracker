@@ -24,7 +24,7 @@ import {AlertTriangle} from 'lucide-react-native'
 import CategorySelect from '@/components/category/select'
 import DateSelect from '@/components/common/date-select'
 import TagsInput from '@/components/common/tags-input'
-import {MultipleAmountInput} from './amount-input'
+import {MultipleAmountInput, AmountInput} from './amount-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 import {mergeClasses} from '@/utils/css'
 
@@ -171,14 +171,27 @@ const TransactionForm = ({
               defaultValue=""
               control={control}
               render={({field: {onChange, onBlur, value}}) => (
-                  <MultipleAmountInput
-                      flat={flat}
-                      currency={currency}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      onSubmitEditing={handleKeyPress}
-                  />
+                  transaction?.id
+                    ? (
+                          <AmountInput
+                              flat={flat}
+                              currency={currency}
+                              value={value[0]}
+                              onChange={(v) => onChange([v])}
+                              onBlur={onBlur}
+                              onSubmitEditing={handleKeyPress}
+                          />
+                      )
+                    : (
+                          <MultipleAmountInput
+                              flat={flat}
+                              currency={currency}
+                              value={value}
+                              onChange={onChange}
+                              onBlur={onBlur}
+                              onSubmitEditing={handleKeyPress}
+                          />
+                      )
                   //TODO: add helper text when amounts > 1
               )}
           />
