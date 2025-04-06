@@ -27,6 +27,7 @@ import TagsInput from '@/components/common/tags-input'
 import {MultipleAmountInput, AmountInput} from './amount-input'
 import {isPositiveNumber, containsUniqueElements} from '@/utils/validations'
 import {mergeClasses} from '@/utils/css'
+import {sum} from '@/utils/arrays'
 
 
 const categorySchema = z.object({
@@ -84,6 +85,7 @@ const TransactionForm = ({
   const [categories, setCategories] = useState(transaction?.kind === 'income' ? incomeCategories : expenseCategories)
   const [loaded, setLoaded] = useState(false)
 
+  const amounts = watch('amounts')
   const txKind = watch('kind')
   useEffect(() => {
     if (txKind === 'income' && loaded) {
@@ -192,9 +194,15 @@ const TransactionForm = ({
                               onSubmitEditing={handleKeyPress}
                           />
                       )
-                  //TODO: add helper text when amounts > 1
               )}
           />
+          {amounts.length && amounts.length > 1 && (
+              <FormControlHelper>
+                <FormControlHelperText className="text-xs test-secondary-500">
+                  {amounts.length} transactions with a total amount of {sum(amounts).toFixed(2)}
+                </FormControlHelperText>
+              </FormControlHelper>
+          )}
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>
             <FormControlErrorText className="text-xs">
@@ -276,8 +284,9 @@ const TransactionForm = ({
               )}
           />
           <FormControlHelper>
-            <FormControlHelperText className="text-xs test-secondary-500">Enter a comma after each
-              tag</FormControlHelperText>
+            <FormControlHelperText className="text-xs test-secondary-500">
+              Enter a comma after each tag
+            </FormControlHelperText>
           </FormControlHelper>
           <FormControlError>
             <FormControlErrorIcon size="sm" as={AlertTriangle}/>

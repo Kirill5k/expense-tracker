@@ -1,3 +1,11 @@
+export const sum = (numbers) => {
+  let total = 0.0
+  for (let num of numbers) {
+    total += num ? parseFloat(num) : 0
+  }
+  return total
+}
+
 export const zipFlat = (arr1, arr2) => {
   const minLength = Math.min(arr1.length, arr2.length);
   const zipped = [];
