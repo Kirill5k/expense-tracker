@@ -5,7 +5,7 @@ import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import TransactionForm from '@/components/transaction/form'
 import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithCategories} from '@/db/observers'
-import {updateTransaction, createTransaction, saveTransactions} from '@/db/operations'
+import {updateTransaction, saveTransactions} from '@/db/operations'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 
