@@ -1,12 +1,11 @@
 import {useEffect} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
-import {Box} from '@/components/ui/box'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import TransactionForm from '@/components/transaction/form'
 import {useColorScheme} from '@/components/useColorScheme'
 import {enhanceWithCategories} from '@/db/observers'
-import {updateTransaction, createTransaction} from '@/db/operations'
+import {updateTransaction, createTransaction, saveTransactions} from '@/db/operations'
 import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 
@@ -20,8 +19,9 @@ const Transaction = ({user, categories}) => {
 
   const withUserId = obj => ({...obj, userId: user.id})
 
-  const handleFormSubmit = (tx) => {
-    const res = tx.id ? updateTransaction(database, withUserId(tx)) : createTransaction(database, withUserId(tx))
+  const handleFormSubmit = (txs) => {
+    const isUpdate = txs.some(tx => tx.id)
+    const res = isUpdate ? updateTransaction(database, withUserId(txs[0])) : saveTransactions(database, user.id, txs)
     return res.then(() => router.back())
   }
 

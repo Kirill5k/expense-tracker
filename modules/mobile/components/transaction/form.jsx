@@ -100,17 +100,17 @@ const TransactionForm = ({
   }, [txKind])
 
   const handleFormSubmit = (data) => {
-    const tx = {
+    const txs = data.amounts.map(amount => ({
       ...transaction,
       ...data,
       categoryId: data.category.id,
       date: format(data.date, 'yyyy-MM-dd'),
       amount: {
         currency,
-        value: parseFloat(data.amounts[0])
+        value: parseFloat(amount)
       }
-    }
-    onSubmit(tx)
+    }))
+    onSubmit(txs)
   }
 
   const handleKeyPress = () => {

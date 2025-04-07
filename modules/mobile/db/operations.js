@@ -215,7 +215,9 @@ export const saveTransactions = async (database, userId, transactions) => {
   await database.write(async () => {
     const actions = transactions.map(tx => database.get('transactions').prepareCreate(rec => {
       updateTxRec(rec, tx)
-      rec._raw.id = tx.id
+      if (tx.id) {
+        rec._raw.id = tx.id
+      }
       rec.userId = userId
     }))
     await database.batch(actions)
