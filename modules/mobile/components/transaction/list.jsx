@@ -29,48 +29,54 @@ const TransactionGroupHeader = ({date, total}) => {
 // height 63
 const TransactionListItem = ({item, mode, disabled, onPress, onCopy, onDelete}) => {
   return (
-      <ListItemPressable
-          disabled={disabled}
-          onPress={() => onPress(item)}
-          onCopy={() => onCopy(item)}
-          onDelete={() => onDelete(item)}
-      >
-        <HStack className={Classes.listItemLayout + ' '}>
-          <ListItemIcon
-              icon={item.category.icon}
-              color={item.category.color}
-          />
-          <VStack className="justify-center gap-1">
-            <HStack space="xs" className="items-center">
-              <Text className={Classes.listItemMainText}>
-                {item.note || item.category.name}
-              </Text>
-              {item.isRecurring && (
-                  <Badge
-                      className="bg-transparent p-0 pb-0.5"
-                      variant="solid"
-                  >
-                    <BadgeIcon
-                        className="text-white"
-                        as={MaterialIcon}
-                        code="repeat-variant"
-                        dsize={20}
-                        dcolor={Colors[mode].tabIconDefault}
-                    />
-                  </Badge>
-              )}
-            </HStack>
-            <TagList items={item.tags} className="max-w-64"/>
-          </VStack>
-          <Text
-              className={mergeClasses(
-                  Classes.listItemAmount,
-                  isExpense(item) ? 'text-red-500' : 'text-green-500'
-              )}>
-            {formatAmount(item)}
-          </Text>
-        </HStack>
-      </ListItemPressable>
+      <Box className={mergeClasses(
+          'px-1 py-0.5 bg-background-50',
+          item.isFirst && 'rounded-t-xl pt-1',
+          item.isLast && 'rounded-b-xl pb-1 mb-5'
+      )}>
+        <ListItemPressable
+            disabled={disabled}
+            onPress={() => onPress(item)}
+            onCopy={() => onCopy(item)}
+            onDelete={() => onDelete(item)}
+        >
+          <HStack className={Classes.listItemLayout + ' '}>
+            <ListItemIcon
+                icon={item.category.icon}
+                color={item.category.color}
+            />
+            <VStack className="justify-center gap-1">
+              <HStack space="xs" className="items-center">
+                <Text className={Classes.listItemMainText}>
+                  {item.note || item.category.name}
+                </Text>
+                {item.isRecurring && (
+                    <Badge
+                        className="bg-transparent p-0 pb-0.5"
+                        variant="solid"
+                    >
+                      <BadgeIcon
+                          className="text-white"
+                          as={MaterialIcon}
+                          code="repeat-variant"
+                          dsize={20}
+                          dcolor={Colors[mode].tabIconDefault}
+                      />
+                    </Badge>
+                )}
+              </HStack>
+              <TagList items={item.tags} className="max-w-64"/>
+            </VStack>
+            <Text
+                className={mergeClasses(
+                    Classes.listItemAmount,
+                    isExpense(item) ? 'text-red-500' : 'text-green-500'
+                )}>
+              {formatAmount(item)}
+            </Text>
+          </HStack>
+        </ListItemPressable>
+      </Box>
   )
 }
 
@@ -115,21 +121,15 @@ const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItem
               item.isHeader ? (
                   <TransactionGroupHeader date={item.date} total={item.total}/>
               ) : (
-                  <Box className={mergeClasses(
-                      'px-1 py-0.5 bg-background-50',
-                      item.isFirst && 'rounded-t-xl pt-1',
-                      item.isLast && 'rounded-b-xl pb-1 mb-5'
-                  )}>
-                    <TransactionListItem
-                        key={item.id}
-                        mode={mode}
-                        disabled={disabled}
-                        item={item}
-                        onPress={onItemPress}
-                        onCopy={onItemCopy}
-                        onDelete={onItemDelete}
-                    />
-                  </Box>
+                  <TransactionListItem
+                      key={item.id}
+                      mode={mode}
+                      disabled={disabled}
+                      item={item}
+                      onPress={onItemPress}
+                      onCopy={onItemCopy}
+                      onDelete={onItemDelete}
+                  />
               )
           )}
           ListHeaderComponent={<TransactionHeader items={items}/>}
