@@ -27,8 +27,8 @@ export const printAmount = (total, currency, withSign = true) => {
   return `${sign}${currency ? currency.symbol : ''}${formattedNumber}`
 }
 
-export const formatDate = (tx) => {
-  const date = parseISO(tx.date);
+export const formatDate = (value) => {
+  const date = typeof value === 'string' ? parseISO(value) : parseISO(value.date) ;
   if (isToday(date)) {
     return 'Today'
   }

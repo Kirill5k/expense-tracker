@@ -79,7 +79,7 @@ const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItem
   const data = groupedItems.flatMap(([date, txGroup]) => {
     const header = {
       isHeader: true,
-      date: formatDate({date}),
+      date: formatDate(date),
       total: printAmount(calcTotal(txGroup), txGroup[0].amount.currency)
     }
     const items = txGroup.map((item, i) => ({...item, isFirst: i === 0, isLast: i === txGroup.length - 1}))
