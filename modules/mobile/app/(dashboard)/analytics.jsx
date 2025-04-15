@@ -39,18 +39,15 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
   }
 
   return (
-      <VStack className={`${Classes.dashboardLayout}`} space="md">
-        <ScreenHeading heading="Analytics"/>
-        <ToggleButton
-            size="lg"
-            value={kind}
-            items={categoryOptions}
-            onChange={setKind}
-        />
-        <ScrollView
-            bounces={true}
-            showsVerticalScrollIndicator={false}
-        >
+      <VStack className={`${Classes.dashboardLayout}`}>
+        <VStack space="md">
+          <ScreenHeading heading="Analytics"/>
+          <ToggleButton
+              size="lg"
+              value={kind}
+              items={categoryOptions}
+              onChange={setKind}
+          />
           <TransactionChart
               kind={kind}
               mode={mode}
@@ -60,12 +57,17 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
               currency={user?.currency}
               onChartPress={setSelectedTransactions}
           />
-          <DatePeriodSelect
-              className="mb-1"
-              mode={mode}
-              value={state.displayDate}
-              onSelect={handleDatePeriodChange}
-          />
+        </VStack>
+        <DatePeriodSelect
+            className="mb-1"
+            mode={mode}
+            value={state.displayDate}
+            onSelect={handleDatePeriodChange}
+        />
+        <ScrollView
+            bounces={true}
+            showsVerticalScrollIndicator={false}
+        >
           <CategoryGroupedTransactionList
               mode={mode}
               items={selectedTransactions.length === 0 ? analysedTransactions : selectedTransactions}
