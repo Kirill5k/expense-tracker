@@ -146,6 +146,7 @@ const RecurringTransactionForm = ({
       ...transaction,
       ...data,
       categoryId: data.category.id,
+      accountId: null,
       recurrence: {
         frequency: data.frequency,
         interval: parseInt(data.interval),

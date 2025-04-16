@@ -103,6 +103,7 @@ const TransactionForm = ({
     const txs = data.amounts.map(amount => ({
       ...transaction,
       ...data,
+      accountId: null,
       categoryId: data.category.id,
       date: format(data.date, 'yyyy-MM-dd'),
       amount: {
