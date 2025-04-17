@@ -10,15 +10,17 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 
 const Category = ({user}) => {
-  const {catToUpdate, setCatToUpdate} = useStore()
+  const {catToUpdate, setCatToUpdate, setErrorAlert} = useStore()
   const database = useDatabase()
   const mode = useColorScheme()
 
   const withUserId = obj => ({...obj, userId: user.id})
 
   const handleFormSubmit = (cat) => {
-    const res = cat.id ? updateCategory(database, withUserId(cat)) : createCategory(database, withUserId(cat))
-    return res.then(() => router.back())
+    const res = cat.id
+        ? updateCategory(database, withUserId(cat))
+        : createCategory(database, withUserId(cat))
+    return res.then(() => router.back()).catch((err) => setErrorAlert(err.message))
   }
 
   useEffect(() => {

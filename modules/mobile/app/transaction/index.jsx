@@ -10,7 +10,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 
 const Transaction = ({user, categories}) => {
-  const {txToUpdate, setTxToUpdate} = useStore()
+  const {txToUpdate, setTxToUpdate, setErrorAlert} = useStore()
   const database = useDatabase()
   const mode = useColorScheme()
 
@@ -21,8 +21,10 @@ const Transaction = ({user, categories}) => {
 
   const handleFormSubmit = (txs) => {
     const isUpdate = txs.some(tx => tx.id)
-    const res = isUpdate ? updateTransaction(database, withUserId(txs[0])) : saveTransactions(database, user.id, txs)
-    return res.then(() => router.back())
+    const res = isUpdate
+        ? updateTransaction(database, withUserId(txs[0]))
+        : saveTransactions(database, user.id, txs)
+    return res.then(() => router.back()).catch((err) => setErrorAlert(err.message))
   }
 
   useEffect(() => {

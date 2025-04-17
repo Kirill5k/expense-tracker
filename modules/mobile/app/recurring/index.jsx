@@ -10,7 +10,7 @@ import {useDatabase} from '@nozbe/watermelondb/react'
 import useStore from '@/store'
 
 const Recurring = ({user, categories}) => {
-  const {rtxToUpdate, setRtxToUpdate} = useStore()
+  const {rtxToUpdate, setRtxToUpdate, setErrorAlert} = useStore()
   const database = useDatabase()
   const mode = useColorScheme()
 
@@ -23,7 +23,7 @@ const Recurring = ({user, categories}) => {
     const res = rtx.id
         ? updateRecurringTransaction(database, withUserId(rtx))
         : createRecurringTransaction(database, withUserId(rtx))
-    return res.then(() => router.back())
+    return res.then(() => router.back()).catch((err) => setErrorAlert(err.message))
   }
 
   useEffect(() => {
