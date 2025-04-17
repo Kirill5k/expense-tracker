@@ -52,7 +52,7 @@ export const ScreenLayout = ({children}) => {
             className="w-full h-full"
             contentContainerStyle={{flexGrow: 1}}
         >
-          <VStack className="w-full h-full p-9 gap-16">
+          <VStack className="w-full h-full p-9" space="md">
             {children}
           </VStack>
         </ScrollView>

@@ -1,6 +1,5 @@
 import {useEffect} from 'react'
 import {router} from 'expo-router'
-import {VStack} from '@/components/ui/vstack'
 import RecurringTransactionForm from '@/components/recurring/form'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {createRecurringTransaction, updateRecurringTransaction} from '@/db/operations'
@@ -32,21 +31,19 @@ const Recurring = ({user, categories}) => {
 
   return (
       <ScreenLayout>
-        <VStack space="md">
-          <ScreenHeader
-              heading={rtxToUpdate?.id ? 'Edit Recurring Transaction' : 'New Recurring Transaction'}
-          />
-          <RecurringTransactionForm
-              flat
-              mode={mode}
-              transaction={rtxToUpdate}
-              currency={user?.currency}
-              expenseCategories={expenseCategories}
-              incomeCategories={incomeCategories}
-              onCancel={() => router.back()}
-              onSubmit={handleFormSubmit}
-          />
-        </VStack>
+        <ScreenHeader
+            heading={rtxToUpdate?.id ? 'Edit Recurring Transaction' : 'New Recurring Transaction'}
+        />
+        <RecurringTransactionForm
+            flat
+            mode={mode}
+            transaction={rtxToUpdate}
+            currency={user?.currency}
+            expenseCategories={expenseCategories}
+            incomeCategories={incomeCategories}
+            onCancel={() => router.back()}
+            onSubmit={handleFormSubmit}
+        />
       </ScreenLayout>
   )
 }

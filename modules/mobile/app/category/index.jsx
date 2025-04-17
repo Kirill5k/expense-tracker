@@ -1,6 +1,5 @@
 import {useEffect} from 'react'
 import {router} from 'expo-router'
-import {VStack} from '@/components/ui/vstack'
 import CategoryForm from '@/components/category/form'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import {createCategory, updateCategory} from '@/db/operations'
@@ -29,18 +28,16 @@ const Category = ({user}) => {
 
   return (
       <ScreenLayout>
-        <VStack space="md">
-          <ScreenHeader
-              heading={catToUpdate?.id ? 'Edit Category' : 'New Category'}
-          />
-          <CategoryForm
-              flat
-              mode={mode}
-              category={catToUpdate}
-              onCancel={() => router.back()}
-              onSubmit={handleFormSubmit}
-          />
-        </VStack>
+        <ScreenHeader
+            heading={catToUpdate?.id ? 'Edit Category' : 'New Category'}
+        />
+        <CategoryForm
+            flat
+            mode={mode}
+            category={catToUpdate}
+            onCancel={() => router.back()}
+            onSubmit={handleFormSubmit}
+        />
       </ScreenLayout>
   )
 }

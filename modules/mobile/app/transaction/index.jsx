@@ -1,6 +1,5 @@
 import {useEffect} from 'react'
 import {router} from 'expo-router'
-import {VStack} from '@/components/ui/vstack'
 import {ScreenLayout, ScreenHeader} from '@/components/common/layout'
 import TransactionForm from '@/components/transaction/form'
 import {useColorScheme} from '@/components/useColorScheme'
@@ -33,21 +32,19 @@ const Transaction = ({user, categories}) => {
 
   return (
       <ScreenLayout>
-        <VStack space="md">
-          <ScreenHeader
-              heading={txToUpdate?.id ? 'Edit Transaction' : 'New Transaction'}
-          />
-          <TransactionForm
-              flat
-              mode={mode}
-              transaction={txToUpdate}
-              currency={user?.currency}
-              expenseCategories={expenseCategories}
-              incomeCategories={incomeCategories}
-              onCancel={() => router.back()}
-              onSubmit={handleFormSubmit}
-          />
-        </VStack>
+        <ScreenHeader
+            heading={txToUpdate?.id ? 'Edit Transaction' : 'New Transaction'}
+        />
+        <TransactionForm
+            flat
+            mode={mode}
+            transaction={txToUpdate}
+            currency={user?.currency}
+            expenseCategories={expenseCategories}
+            incomeCategories={incomeCategories}
+            onCancel={() => router.back()}
+            onSubmit={handleFormSubmit}
+        />
       </ScreenLayout>
   )
 }
