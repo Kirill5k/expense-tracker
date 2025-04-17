@@ -31,7 +31,7 @@ const SignIn = () => {
   return (
       <ScreenLayout>
         {!accessToken && (
-            <VStack space="md">
+            <>
               <ScreenHeader
                   heading={Wordings.signinHeading}
                   subHeading={Wordings.signinSubHeading}
@@ -55,7 +55,7 @@ const SignIn = () => {
                   </LinkText>
                 </Link>
               </HStack>
-            </VStack>
+            </>
         )}
         {accessToken && (
             <VStack className="w-full h-full justify-center items-center">

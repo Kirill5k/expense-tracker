@@ -39,7 +39,7 @@ const SignUp = ({user}) => {
   return (
       <ScreenLayout>
         {!accessToken && (
-            <VStack space="md">
+            <>
               <ScreenHeader
                   heading={Wordings.signupHeading}
                   subHeading={Wordings.signupSubHeading}
@@ -62,7 +62,7 @@ const SignUp = ({user}) => {
                   </LinkText>
                 </Link>
               </HStack>
-            </VStack>
+            </>
         )}
         {accessToken && (
             <VStack className="w-full h-full justify-center items-center">
