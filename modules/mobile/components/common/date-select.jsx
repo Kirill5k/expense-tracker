@@ -121,7 +121,7 @@ const DateSelect = ({value, onSelect, mode}) => {
   }
 
   const selectedContainer = 'rounded rounded-full bg-info-500 m-0.5'
-  const selectedText = 'text-background-50'
+  const selectedText = 'text-background-0'
 
   return (
       <Box className="pb-8">
