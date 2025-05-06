@@ -120,7 +120,7 @@ const DateSelect = ({value, onSelect, mode}) => {
     onSelect(new Date(date))
   }
 
-  const selectedContainer = 'rounded rounded-full bg-info-500 m-0.5'
+  const selectedContainer = 'rounded rounded-full bg-primary-500 m-0.5'
   const selectedText = 'text-background-0'
 
   return (
@@ -147,18 +147,18 @@ const DateSelect = ({value, onSelect, mode}) => {
               day_label: 'text-primary-500 text-md',
               month_label: 'text-primary-500 text-md',
               year_label: 'text-primary-500 text-md',
-              active_year_label: 'text-info-500 text-md',
+              active_year_label: 'text-primary-500 text-md',
               weekdays: 'border-b border-b-2 border-primary-300 pb-1 mb-1',
               weekday_label: 'text-secondary-600 text-md',
-              today: 'rounded rounded-full border-info-500 border-2 m-0.5',
-              today_label: 'text-info-500 text-md',
+              today: 'rounded rounded-full border-primary-500 border-2 m-0.5',
+              today_label: 'text-primary-500 text-md',
             }}
         />
         <Fab
-            size="md"
+            size="sm"
             placement="bottom right"
             className={mergeClasses(
-                'right-3 bottom-3 rounded-lg px-0 py-1.5 bg-info-500',
+                'right-3 bottom-3 rounded-lg px-0 py-1.5 bg-primary-500',
             )}
             onPress={() => onSelect(new Date())}
         >
