@@ -17,7 +17,6 @@ import Classes from '@/constants/classes'
 import Colors from '@/constants/colors'
 import {mergeClasses} from '@/utils/css'
 import {format} from 'date-fns'
-import dayjs from 'dayjs'
 
 
 const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false, flat = false}) => {
@@ -116,64 +115,50 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
 
 
 const DateSelect = ({value, onSelect, mode}) => {
-  const textStyle = {
-    fontSize: 16,
-    lineHeight: 20
+
+  const handleDateChange = ({date}) => {
+    onSelect(new Date(date))
   }
 
-  const handleDateChange = (params) => {
-    onSelect(params.date.toDate())
-  }
+  const selectedContainer = 'rounded rounded-full bg-info-500 m-0.5'
+  const selectedText = 'text-background-50'
 
   return (
       <Box className="pb-8">
         <DateTimePicker
-            height={240}
-            displayFullDays={false}
+            containerHeight={240}
             mode="single"
-            date={value ? dayjs(value) : dayjs()}
+            date={value}
             onChange={handleDateChange}
-            headerButtonsPosition="right"
+            navigationPosition="right"
             headerButtonColor={Colors[mode].tint}
             selectedItemColor={Colors[mode].tint}
-            selectedTextStyle={{
-              fontWeight: 600,
-              color: Colors[mode].background,
-              ...textStyle
-            }}
-            calendarTextStyle={{
-              color: Colors[mode].text,
-              ...textStyle
-            }}
-            headerTextStyle={{
-              fontWeight: 500,
-              color: Colors[mode].text,
-              fontSize: 18,
-              lineHeight: 18
-            }}
-            weekDaysTextStyle={{
-              color: Colors[mode].textSecondary,
-              fontSize: 14,
-              lineHeight: 20
-            }}
-            todayTextStyle={{
-              fontWeight: 600,
-            }}
-            dayContainerStyle={{
-              height: 10
-            }}
-            todayContainerStyle={{
-            }}
-            headerContainerStyle={{
-              height: 24
+            classNames={{
+              selected_month: selectedContainer,
+              selected_year: selectedContainer,
+              selected: selectedContainer,
+              selected_year_label: selectedText,
+              selected_month_label: selectedText,
+              selected_label: selectedText,
+
+              month_selector_label: 'text-primary-500 text-lg font-semibold',
+              year_selector_label: 'text-primary-500 text-lg font-semibold',
+              outside_label: 'text-secondary-300 text-md',
+              day_label: 'text-primary-500 text-md',
+              month_label: 'text-primary-500 text-md',
+              year_label: 'text-primary-500 text-md',
+              active_year_label: 'text-info-500 text-md',
+              weekdays: 'border-b border-b-2 border-primary-300 pb-1 mb-1',
+              weekday_label: 'text-secondary-600 text-md',
+              today: 'rounded rounded-full border-info-500 border-2 m-0.5',
+              today_label: 'text-info-500 text-md',
             }}
         />
         <Fab
             size="md"
             placement="bottom right"
             className={mergeClasses(
-                'right-3 bottom-3 rounded-lg px-0 py-1.5',
-                mode === 'light' ? 'bg-blue-600' : 'bg-blue-300'
+                'right-3 bottom-3 rounded-lg px-0 py-1.5 bg-info-500',
             )}
             onPress={() => onSelect(new Date())}
         >
