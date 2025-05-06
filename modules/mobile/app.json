@@ -46,7 +46,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "@morrowdigital/watermelondb-expo-plugin",
       "expo-router",
       "expo-localization",
       [
@@ -58,7 +57,15 @@
             "buildToolsVersion": "35.0.0"
           },
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "15.1",
+            "extraPods": [
+              {
+                "name": "simdjson",
+                "configurations": ["Debug", "Release"],
+                "path": "../node_modules/@nozbe/simdjson",
+                "modular_headers": true
+              }
+            ]
           }
         }
       ],

@@ -48,7 +48,6 @@
     "@gluestack-ui/tooltip": "^0.1.43",
     "@hookform/resolvers": "^3.9.0",
     "@legendapp/motion": "^2.4.0",
-    "@morrowdigital/watermelondb-expo-plugin": "^2.3.3",
     "@nozbe/watermelondb": "^0.27.1",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
