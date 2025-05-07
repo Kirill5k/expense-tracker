@@ -1,9 +1,8 @@
-import 'react-native-get-random-values'
 import {defaultDisplayDate} from '@/utils/dates'
 import {generateRecurrences, calculateRecurrenceNextDate} from '@/utils/transactions'
 import {nonEmpty} from '@/utils/arrays'
 import {toIsoDateString} from '@/utils/dates'
-import {ObjectId} from 'bson'
+import {generateObjectIdHexString} from './utils'
 import * as Crypto from 'expo-crypto'
 import {Q} from '@nozbe/watermelondb'
 
@@ -111,7 +110,7 @@ export const hideCategory = async (database, catid, hidden) => {
 }
 
 export const createRecurringTransaction = async (database, rtx) => {
-  const rtxId = new ObjectId().toHexString();
+  const rtxId = generateObjectIdHexString();
   const {transactions, recurringTransaction} = generateRecurrences({...rtx, id: rtxId})
   await database.write(async () => {
     const actions = []

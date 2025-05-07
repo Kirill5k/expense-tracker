@@ -1,6 +1,5 @@
 import '@/global.css'
 import 'react-native-reanimated'
-import 'react-native-get-random-values'
 import React, {useEffect, useState} from 'react'
 import {AppState} from 'react-native'
 import {useLocales} from 'expo-localization'
