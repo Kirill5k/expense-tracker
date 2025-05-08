@@ -123,6 +123,10 @@ const DateSelect = ({value, onSelect, mode}) => {
   const selectedContainer = 'rounded rounded-full bg-primary-500 m-0.5'
   const selectedText = 'text-background-0'
 
+  if (!value) {
+    return null
+  }
+
   return (
       <Box className="pb-8">
         <DateTimePicker
