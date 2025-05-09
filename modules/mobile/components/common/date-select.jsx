@@ -112,8 +112,6 @@ const AccordionDateSelect = ({value, onSelect, mode, isInvalid, nullable = false
   )
 }
 
-
-
 const DateSelect = ({value, onSelect, mode}) => {
 
   const handleDateChange = ({date}) => {
@@ -145,17 +143,18 @@ const DateSelect = ({value, onSelect, mode}) => {
               selected_month_label: selectedText,
               selected_label: selectedText,
 
+              weekdays: 'border-b border-b-2 border-secondary-600 pb-1',
+              weekday_label: 'text-secondary-600 text-md',
+              day_label: 'text-primary-500 text-lg',
+              outside_label: 'text-secondary-300 text-lg',
+
               month_selector_label: 'text-primary-500 text-lg font-semibold',
               year_selector_label: 'text-primary-500 text-lg font-semibold',
-              outside_label: 'text-secondary-300 text-md',
-              day_label: 'text-primary-500 text-md',
-              month_label: 'text-primary-500 text-md',
-              year_label: 'text-primary-500 text-md',
-              active_year_label: 'text-primary-500 text-md',
-              weekdays: 'border-b border-b-2 border-primary-300 pb-1 mb-1',
-              weekday_label: 'text-secondary-600 text-md',
+              month_label: 'text-primary-500 text-lg',
+              year_label: 'text-primary-500 text-lg',
+              active_year_label: 'text-primary-500 text-lg',
               today: 'rounded rounded-full border-primary-500 border-2 m-0.5',
-              today_label: 'text-primary-500 text-md',
+              today_label: 'text-primary-500 text-lg',
             }}
         />
         <Fab
