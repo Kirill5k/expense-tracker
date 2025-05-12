@@ -12,7 +12,6 @@ import expensetracker.common.actions.ActionDispatcher
 import expensetracker.common.config.AuthConfig
 import expensetracker.common.web.Controller
 import jwt.JwtEncoder
-import org.typelevel.log4cats.Logger
 
 final class Auth[F[_]] private (
     val userService: UserService[F],
@@ -21,7 +20,7 @@ final class Auth[F[_]] private (
 )
 
 object Auth:
-  def make[F[_]: {Async, Logger}](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
+  def make[F[_]: Async](config: AuthConfig, resources: Resources[F], dispatcher: ActionDispatcher[F]): F[Auth[F]] =
     for
       sessRepo <- SessionRepository.make[F](resources.mongoDb)
       jwtEnc   <- JwtEncoder.circeJwtEncoder[F](config.jwt)

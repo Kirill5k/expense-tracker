@@ -13,7 +13,6 @@ import expensetracker.common.errors.AppError.IdMismatch
 import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.common.validations.*
 import expensetracker.transaction.TransactionController.TransactionView
-import org.bson.types.ObjectId
 import io.circe.Codec
 import io.circe.refined.*
 import org.http4s.HttpRoutes

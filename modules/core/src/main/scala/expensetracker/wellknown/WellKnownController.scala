@@ -33,11 +33,11 @@ final class WellKnownController[F[_]: Async](
       apps = List(s"${config.apple.developerId}.${config.apple.bundleId}")
     )
   )
-  
+
   private val statusEndpoint: ServerEndpoint[Fs2Streams[F], F] =
     WellKnownController.aasaEndpoint.serverLogicPure(_ => Right(appleAppSiteAssociation))
 
-  def routes(using auth: Authenticator[F]): HttpRoutes[F] = Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
+  def routes(using Authenticator[F]): HttpRoutes[F] = Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
 }
 
 object WellKnownController extends TapirSchema with TapirJson {

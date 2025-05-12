@@ -49,8 +49,8 @@ final private class SyncController[F[_]](
         val ts = lastPulledAt.map(Instant.ofEpochMilli)
 
         val updatedUsers = changes.users.updated.filter(_.id == sess.userId).map(_.toDomain(ts))
-        val createdAccs  = changes.maybeAccounts.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
-        val updatedAccs  = changes.maybeAccounts.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
+        val createdAccs  = changes.maybeAccounts.created.filter(_.user_id == sess.userId).map(_.toDomain)
+        val updatedAccs  = changes.maybeAccounts.updated.filter(_.user_id == sess.userId).map(_.toDomain)
         val createdCats  = changes.categories.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
         val updatedCats  = changes.categories.updated.filter(_.user_id == sess.userId).map(_.toDomain(None, ts))
         val createdTxs   = changes.transactions.created.filter(_.user_id == sess.userId).map(_.toDomain(ts, ts))
@@ -101,9 +101,9 @@ object SyncController extends TapirSchema with TapirJson {
       currency_symbol: String,
       hidden: Option[Boolean]
   ) derives Codec.AsObject {
-    def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, Account] =
-      Currency(currency_code)(defaultMoneyContext).toEither.left
-        .map(e => AppError.FailedValidation(s"Invalid currency code $currency_code"))
+    def toDomain: Either[AppError, Account] =
+      Currency(currency_code)(using defaultMoneyContext).toEither.left
+        .map(_ => AppError.FailedValidation(s"Invalid currency code $currency_code"))
         .map { currency =>
           Account(
             id = id,
@@ -140,8 +140,8 @@ object SyncController extends TapirSchema with TapirJson {
       registration_date: Instant
   ) derives Codec.AsObject {
     def toDomain(lastUpdatedAt: Option[Instant]): Either[AppError, User] =
-      Currency(settings_currency_code)(defaultMoneyContext).toEither.left
-        .map(e => AppError.FailedValidation(s"Invalid currency code $settings_currency_code"))
+      Currency(settings_currency_code)(using defaultMoneyContext).toEither.left
+        .map(_ => AppError.FailedValidation(s"Invalid currency code $settings_currency_code"))
         .map { currency =>
           User(
             id = id,
@@ -222,8 +222,8 @@ object SyncController extends TapirSchema with TapirJson {
       user_id: UserId
   ) derives Codec.AsObject {
     def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, Transaction] =
-      Currency(amount_currency_code)(defaultMoneyContext).toEither.left
-        .map(e => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
+      Currency(amount_currency_code)(using defaultMoneyContext).toEither.left
+        .map(_ => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
         .map { currency =>
           Transaction(
             id = id,
@@ -280,8 +280,8 @@ object SyncController extends TapirSchema with TapirJson {
       user_id: UserId
   ) derives Codec.AsObject {
     def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, PeriodicTransaction] =
-      Currency(amount_currency_code)(defaultMoneyContext).toEither.left
-        .map(e => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
+      Currency(amount_currency_code)(using defaultMoneyContext).toEither.left
+        .map(_ => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
         .map { currency =>
           PeriodicTransaction(
             id = id,

@@ -15,13 +15,10 @@ import expensetracker.common.web.{Controller, TapirJson, TapirSchema}
 import expensetracker.transaction.PeriodicTransactionController.PeriodicTransactionView
 import io.circe.Codec
 import io.circe.refined.*
-import org.bson.types.ObjectId
 import org.http4s.HttpRoutes
 import squants.market.Money
 import sttp.model.StatusCode
 import sttp.tapir.*
-
-import java.time.{Instant, LocalDate}
 
 final private class PeriodicTransactionController[F[_]](
     private val service: PeriodicTransactionService[F]
@@ -81,8 +78,6 @@ final private class PeriodicTransactionController[F[_]](
 }
 
 object PeriodicTransactionController extends TapirSchema with TapirJson {
-  import Controller.given
-
   final case class CreatePeriodicTransactionRequest(
       categoryId: IdString,
       accountId: Option[IdString],

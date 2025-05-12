@@ -12,7 +12,7 @@ transparent trait JsonCodecs {
   inline given Decoder[Currency] = Decoder[JsonObject].emap { json =>
     for
       code     <- json("code").flatMap(_.asString).toRight("Missing currency code")
-      currency <- Currency(code)(defaultMoneyContext).toEither.leftMap(_.getMessage)
+      currency <- Currency(code)(using defaultMoneyContext).toEither.leftMap(_.getMessage)
     yield currency
   }
 

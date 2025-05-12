@@ -29,7 +29,7 @@ final class HealthController[F[_]: Async](
 
   private val statusEndpoint: ServerEndpoint[Fs2Streams[F], F] =
     HealthController.statusEndpoint
-      .serverLogicSuccess { req =>
+      .serverLogicSuccess { _ =>
         clock
           .durationBetweenNowAnd(startupTime)
           .map { uptime =>
@@ -43,7 +43,7 @@ final class HealthController[F[_]: Async](
           }
       }
 
-  def routes(using auth: Authenticator[F]): HttpRoutes[F] = Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
+  def routes(using Authenticator[F]): HttpRoutes[F] = Http4sServerInterpreter[F]().toRoutes(statusEndpoint)
 }
 
 object HealthController extends TapirSchema with TapirJson {

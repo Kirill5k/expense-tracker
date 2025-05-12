@@ -14,7 +14,7 @@ import mongo4cats.bson.ObjectId
 import mongo4cats.circe.MongoJsonCodecs
 import squants.market.Money
 
-import java.time.{Instant, LocalDate}
+import java.time.Instant
 
 final case class PeriodicTransactionEntity(
     _id: ObjectId,
