@@ -118,7 +118,7 @@ const DateSelect = ({value, onSelect, mode}) => {
     onSelect(new Date(date))
   }
 
-  const selectedColor = 'primary-200'
+  const selectedColor = 'primary-300'
   const selectedContainer = `rounded rounded-full bg-${selectedColor} m-0.5`
   const selectedText = 'text-background-0'
 
