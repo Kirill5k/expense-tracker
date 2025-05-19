@@ -118,8 +118,7 @@ const DateSelect = ({value, onSelect, mode}) => {
     onSelect(new Date(date))
   }
 
-  const selectedColor = 'primary-300'
-  const selectedContainer = `rounded rounded-full bg-${selectedColor} m-0.5`
+  const selectedContainer = `rounded rounded-full bg-primary-200 m-0.5`
   const selectedText = 'text-background-0'
 
   if (!value) {
@@ -154,7 +153,7 @@ const DateSelect = ({value, onSelect, mode}) => {
               month_label: 'text-primary-500 text-lg',
               year_label: 'text-primary-500 text-lg',
               active_year_label: 'text-primary-500 text-lg',
-              today: `rounded rounded-full border-${selectedColor} border-2 m-0.5`,
+              today: `rounded rounded-full border-primary-500 border-2 m-0.5`,
               today_label: 'text-primary-500 text-lg',
             }}
         />
