@@ -281,6 +281,85 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
         res mustHaveStatus (Status.NoContent, None)
         verify(svc).pushChanges(Nil, Nil, Nil, Nil, Nil)
       }
+
+      "handle scenarios when account id is empty string" in {
+        val requestBody = s"""{
+             |    "state" : {
+             |      "created" : [],
+             |      "updated" : [],
+             |      "deleted" : []
+             |    },
+             |    "accounts" : {
+             |      "created" : [],
+             |      "updated" : [],
+             |      "deleted" : []
+             |    },
+             |    "transactions" : {
+             |      "created" : [],
+             |      "updated" : [],
+             |      "deleted" : []
+             |    },
+             |    "categories" : {
+             |      "created" : [],
+             |      "updated" : [],
+             |      "deleted" : []
+             |    },
+             |    "users" : {
+             |      "updated" : [],
+             |      "created" : [],
+             |      "deleted" : []
+             |    },
+             |    "periodic_transactions": {
+             |      "created" : [
+             |        {
+             |          "id" : "${PeriodicTransactions.txid}",
+             |          "category_id" : "${Categories.cid}",
+             |          "account_id" : "",
+             |          "amount_value" : 15.0,
+             |          "amount_currency_code" : "GBP",
+             |          "amount_currency_symbol" : "£",
+             |          "recurrence_start_date" : "${LocalDate.now}",
+             |          "recurrence_next_date" : null,
+             |          "recurrence_end_date" : null,
+             |          "recurrence_interval" : 1,
+             |          "recurrence_frequency" : "monthly",
+             |          "note" : "test tx",
+             |          "tags" : "foo",
+             |          "hidden" : false,
+             |          "user_id" : "${Users.uid1}"
+             |        }
+             |      ],
+             |      "updated" : [],
+             |      "deleted" : []
+             |    }
+             |  }""".stripMargin
+
+          given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+
+          val svc = mock[SyncService[IO]]
+          when(svc.pushChanges(
+            anyList[User],
+            anyList[Account],
+            anyList[Category],
+            anyList[Transaction],
+            anyList[PeriodicTransaction]
+          )).thenReturnUnit
+
+          val req = Request[IO](Method.POST, Uri.unsafeFromString(s"/sync/watermelon?lastPulledAt=${time.toEpochMilli}"))
+            .withAuthHeader()
+            .withBody(requestBody)
+
+          val res = SyncController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+          res mustHaveStatus(Status.NoContent, None)
+          verify(svc).pushChanges(
+            Nil,
+            Nil,
+            Nil,
+            Nil,
+            List(PeriodicTransactions.tx().copy(createdAt = Some(time), lastUpdatedAt = Some(time), accountId = None))
+          )
+      }
     }
   }
 }

@@ -229,7 +229,7 @@ object SyncController extends TapirSchema with TapirJson {
             id = id,
             userId = user_id,
             categoryId = category_id,
-            accountId = account_id,
+            accountId = account_id.filter(_.value.nonEmpty),
             parentTransactionId = parent_transaction_id,
             isRecurring = is_recurring.getOrElse(false),
             amount = Money(amount_value, currency),
@@ -287,7 +287,7 @@ object SyncController extends TapirSchema with TapirJson {
             id = id,
             userId = user_id,
             categoryId = category_id,
-            accountId = account_id,
+            accountId = account_id.filter(_.value.nonEmpty),
             recurrence = RecurrencePattern(
               startDate = recurrence_start_date,
               nextDate = recurrence_next_date,
