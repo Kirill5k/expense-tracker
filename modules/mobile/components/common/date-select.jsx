@@ -118,7 +118,8 @@ const DateSelect = ({value, onSelect, mode}) => {
     onSelect(new Date(date))
   }
 
-  const selectedContainer = `rounded rounded-full bg-primary-200 m-0.5`
+  const selectBorder = 'rounded rounded-xl'
+  const selectedContainer = `${selectBorder} bg-primary-200 m-0.5`
   const selectedText = 'text-background-0'
 
   if (!value) {
@@ -145,7 +146,7 @@ const DateSelect = ({value, onSelect, mode}) => {
 
               weekdays: 'border-b border-b-2 border-secondary-600 pb-1',
               weekday_label: 'text-secondary-600 text-md',
-              day_label: 'text-primary-500 text-lg',
+              day_label: 'text-primary-500 text-lg p-0 m-0',
               outside_label: 'text-secondary-300 text-lg',
 
               month_selector_label: 'text-primary-500 text-lg font-semibold',
@@ -153,7 +154,7 @@ const DateSelect = ({value, onSelect, mode}) => {
               month_label: 'text-primary-500 text-lg',
               year_label: 'text-primary-500 text-lg',
               active_year_label: 'text-primary-500 text-lg',
-              today: `rounded rounded-full border-primary-500 border-2 m-0.5`,
+              today: `${selectBorder} border-primary-500 border-2 m-0.5`,
               today_label: 'text-primary-500 text-lg',
             }}
         />
