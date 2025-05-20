@@ -68,7 +68,7 @@ export const generateRecurrences = (rtx, now = new Date()) => {
     transactions,
     recurringTransaction: {
       ...rtx,
-      recurrence: {...recurrence, nextDate: currentDate && currentDate.toISOString().split('T')[0]}
+      recurrence: {...recurrence, nextDate: currentDate && format(currentDate, 'yyyy-MM-dd')},
     }
   }
 }
