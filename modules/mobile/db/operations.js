@@ -57,7 +57,7 @@ const updateRtxRec = (rec, rtx) => {
   rec.recurrenceFrequency = rtx.recurrence.frequency
   rec.recurrenceInterval = rtx.recurrence.interval
   rec.userId = rtx.userId
-  rec.accountId = rtx.accountId
+  rec.accountId = rtx.accountId || null
   rec.amountValue = rtx.amount.value
   rec.amountCurrencyCode = rtx.amount.currency.code
   rec.amountCurrencySymbol = rtx.amount.currency.symbol
@@ -71,7 +71,7 @@ const updateTxRec = (rec, tx) => {
   rec.date = tx.date
   rec.userId = tx.userId
   rec.parentTransactionId = tx.parentTransactionId
-  rec.accountId = tx.accountId
+  rec.accountId = tx.accountId || null
   rec.isRecurring = tx.isRecurring
   rec.amountValue = tx.amount.value
   rec.amountCurrencyCode = tx.amount.currency.code
