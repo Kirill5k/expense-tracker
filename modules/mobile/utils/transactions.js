@@ -54,7 +54,7 @@ export const generateRecurrences = (rtx, now = new Date()) => {
       ...rtx,
       parentTransactionId: rtx.id,
       isRecurring: true,
-      date: currentDate.toISOString().split('T')[0]
+      date: format(currentDate, 'yyyy-MM-dd')
     })
 
     currentDate = addInterval(currentDate, recurrence)
@@ -99,7 +99,7 @@ export const calculateRecurrenceNextDate = ({recurrence}, dateAfter) => {
     return null
   }
 
-  return currentNextDate.toISOString().split('T')[0]
+  return format(currentNextDate, 'yyyy-MM-dd')
 }
 
 export const calculateLastOccurrenceDate = ({recurrence}) => {
@@ -121,7 +121,7 @@ export const calculateLastOccurrenceDate = ({recurrence}) => {
     lastOccurrence = nextOccurrence
   }
 
-  return lastOccurrence.toISOString().split('T')[0]
+  return format(lastOccurrence, 'yyyy-MM-dd')
 }
 
 export const filterBy = (transactions, searchQuery, filters) => {

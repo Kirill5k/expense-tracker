@@ -5,6 +5,7 @@ import {toIsoDateString} from '@/utils/dates'
 import {generateObjectIdHexString} from './utils'
 import * as Crypto from 'expo-crypto'
 import {Q} from '@nozbe/watermelondb'
+import {format} from 'date-fns'
 
 export const generateRecurrenceInstanceId = async (ptxId, date) => {
   const timestamp = Math.floor(new Date(date).getTime() / 1000)
@@ -143,7 +144,7 @@ export const updateRecurringTransaction = async (database, rtx) => {
 }
 
 export const createRecurringTransactionInstancesWithTodayDate = async (database) => {
-  const now = new Date().toISOString().slice(0, 10)
+  const now = format(new Date(), 'yyyy-MM-dd')
   const rtxs = await database.get('periodic_transactions').query(
       Q.where('recurrence_next_date', Q.eq(now)),
       Q.or(
