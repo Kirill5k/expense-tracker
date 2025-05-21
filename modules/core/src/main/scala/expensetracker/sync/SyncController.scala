@@ -92,6 +92,10 @@ object SyncController extends TapirSchema with TapirJson {
       user_id: Option[UserId]
   ) derives Codec.AsObject
 
+  private def parseCurrency(code: String): Either[AppError, Currency] =
+    Currency(code)(using defaultMoneyContext).toEither.left
+      .map(_ => AppError.FailedValidation(s"Invalid currency code $code"))
+
   final case class WatermelonAccount(
       id: AccountId,
       user_id: UserId,
@@ -102,18 +106,18 @@ object SyncController extends TapirSchema with TapirJson {
       hidden: Option[Boolean]
   ) derives Codec.AsObject {
     def toDomain: Either[AppError, Account] =
-      Currency(currency_code)(using defaultMoneyContext).toEither.left
-        .map(_ => AppError.FailedValidation(s"Invalid currency code $currency_code"))
-        .map { currency =>
-          Account(
-            id = id,
-            userId = user_id,
-            name = name,
-            currency = currency,
-            isMain = is_main.getOrElse(false),
-            hidden = hidden
-          )
-        }
+      for
+        currency <- parseCurrency(currency_code)
+        _        <- id.toValidObjectId
+        _        <- user_id.toValidObjectId
+      yield Account(
+        id = id,
+        userId = user_id,
+        name = name,
+        currency = currency,
+        isMain = is_main.getOrElse(false),
+        hidden = hidden
+      )
   }
 
   object WatermelonAccount:
@@ -140,21 +144,20 @@ object SyncController extends TapirSchema with TapirJson {
       registration_date: Instant
   ) derives Codec.AsObject {
     def toDomain(lastUpdatedAt: Option[Instant]): Either[AppError, User] =
-      Currency(settings_currency_code)(using defaultMoneyContext).toEither.left
-        .map(_ => AppError.FailedValidation(s"Invalid currency code $settings_currency_code"))
-        .map { currency =>
-          User(
-            id = id,
-            email = UserEmail(email),
-            name = UserName(first_name, last_name),
-            password = PasswordHash(""),
-            settings = UserSettings(currency, false, settings_dark_mode, settings_future_transaction_visibility_days),
-            registrationDate = registration_date,
-            categories = None,
-            totalTransactionCount = None,
-            lastUpdatedAt = lastUpdatedAt
-          )
-        }
+      for
+        currency <- parseCurrency(settings_currency_code)
+        _        <- id.toValidObjectId
+      yield User(
+        id = id,
+        email = UserEmail(email),
+        name = UserName(first_name, last_name),
+        password = PasswordHash(""),
+        settings = UserSettings(currency, false, settings_dark_mode, settings_future_transaction_visibility_days),
+        registrationDate = registration_date,
+        categories = None,
+        totalTransactionCount = None,
+        lastUpdatedAt = lastUpdatedAt
+      )
   }
 
   object WatermelonUser:
@@ -187,7 +190,7 @@ object SyncController extends TapirSchema with TapirJson {
         name = CategoryName(name),
         icon = CategoryIcon(icon),
         color = CategoryColor(color),
-        userId = Some(user_id),
+        userId = Some(user_id).filter(_.value.nonEmpty),
         hidden = hidden,
         createdAt = createdAt,
         lastUpdatedAt = lastUpdatedAt
@@ -222,26 +225,26 @@ object SyncController extends TapirSchema with TapirJson {
       user_id: UserId
   ) derives Codec.AsObject {
     def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, Transaction] =
-      Currency(amount_currency_code)(using defaultMoneyContext).toEither.left
-        .map(_ => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
-        .map { currency =>
-          Transaction(
-            id = id,
-            userId = user_id,
-            categoryId = category_id,
-            accountId = account_id.filter(_.value.nonEmpty),
-            parentTransactionId = parent_transaction_id,
-            isRecurring = is_recurring.getOrElse(false),
-            amount = Money(amount_value, currency),
-            date = date,
-            note = note,
-            tags = tags.fold(Set.empty)(t => t.split(",").toSet),
-            hidden = hidden,
-            category = None,
-            createdAt = createdAt,
-            lastUpdatedAt = lastUpdatedAt
-          )
-        }
+      for
+        currency <- parseCurrency(amount_currency_code)
+        _        <- id.toValidObjectId
+        _        <- category_id.toValidObjectId
+      yield Transaction(
+        id = id,
+        userId = user_id,
+        categoryId = category_id,
+        accountId = account_id.filter(_.value.nonEmpty),
+        parentTransactionId = parent_transaction_id.filter(_.value.nonEmpty),
+        isRecurring = is_recurring.getOrElse(false),
+        amount = Money(amount_value, currency),
+        date = date,
+        note = note,
+        tags = tags.fold(Set.empty)(t => t.split(",").toSet),
+        hidden = hidden,
+        category = None,
+        createdAt = createdAt,
+        lastUpdatedAt = lastUpdatedAt
+      )
   }
 
   object WatermelonTransaction:
@@ -280,30 +283,31 @@ object SyncController extends TapirSchema with TapirJson {
       user_id: UserId
   ) derives Codec.AsObject {
     def toDomain(createdAt: Option[Instant], lastUpdatedAt: Option[Instant]): Either[AppError, PeriodicTransaction] =
-      Currency(amount_currency_code)(using defaultMoneyContext).toEither.left
-        .map(_ => AppError.FailedValidation(s"Invalid currency code $amount_currency_code"))
-        .map { currency =>
-          PeriodicTransaction(
-            id = id,
-            userId = user_id,
-            categoryId = category_id,
-            accountId = account_id.filter(_.value.nonEmpty),
-            recurrence = RecurrencePattern(
-              startDate = recurrence_start_date,
-              nextDate = recurrence_next_date,
-              endDate = recurrence_end_date,
-              interval = refineV[Positive].unsafeFrom(Option(recurrence_interval).filter(_ > 0).getOrElse(1)),
-              frequency = recurrence_frequency
-            ),
-            amount = Money(amount_value, currency),
-            note = note,
-            tags = tags.fold(Set.empty)(t => t.split(",").toSet),
-            hidden = hidden,
-            category = None,
-            createdAt = createdAt,
-            lastUpdatedAt = lastUpdatedAt
-          )
-        }
+      for
+        currency <- parseCurrency(amount_currency_code)
+        _        <- id.toValidObjectId
+        _        <- user_id.toValidObjectId
+        _        <- category_id.toValidObjectId
+      yield PeriodicTransaction(
+        id = id,
+        userId = user_id,
+        categoryId = category_id,
+        accountId = account_id.filter(_.value.nonEmpty),
+        recurrence = RecurrencePattern(
+          startDate = recurrence_start_date,
+          nextDate = recurrence_next_date,
+          endDate = recurrence_end_date,
+          interval = refineV[Positive].unsafeFrom(Option(recurrence_interval).filter(_ > 0).getOrElse(1)),
+          frequency = recurrence_frequency
+        ),
+        amount = Money(amount_value, currency),
+        note = note,
+        tags = tags.fold(Set.empty)(t => t.split(",").toSet),
+        hidden = hidden,
+        category = None,
+        createdAt = createdAt,
+        lastUpdatedAt = lastUpdatedAt
+      )
   }
 
   object WatermelonPeriodicTransaction:

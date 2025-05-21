@@ -1,5 +1,6 @@
 package expensetracker.common
 
+import expensetracker.common.errors.AppError
 import mongo4cats.bson.ObjectId
 import io.circe.{Decoder, Encoder}
 
@@ -28,8 +29,9 @@ object types {
     given Decoder[Id] = Decoder[String].map(apply)
 
     extension (id: Id)
-      def value: String        = id.asInstanceOf[String]
-      def toObjectId: ObjectId = ObjectId(value)
+      def value: String                               = id.asInstanceOf[String]
+      def toObjectId: ObjectId                        = ObjectId(value)
+      def toValidObjectId: Either[AppError, ObjectId] = ObjectId.from(value).left.map(err => AppError.FailedValidation(err))
 
   transparent trait StringType[Str]:
     def apply(str: String): Str = str.asInstanceOf[Str]
