@@ -11,8 +11,8 @@ object Dependencies {
     val bcrypt       = "4.3.0"
     val refined      = "0.11.3"
     val logback      = "1.5.18"
-    val log4cats     = "2.7.0"
-    val tapir        = "1.11.28"
+    val log4cats     = "2.7.1"
+    val tapir        = "1.11.33"
     val jwt          = "10.0.4"
     val apispec      = "0.11.3"
   }
