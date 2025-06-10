@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.docker.*
+import org.typelevel.scalacoptions.ScalacOptions
 import sbtghactions.JavaSpec
 
 ThisBuild / scalaVersion                        := "3.6.4"
@@ -6,6 +7,7 @@ ThisBuild / version                             := scala.sys.process.Process("gi
 ThisBuild / organization                        := "io.github.kirill5k"
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
 ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("24"))
+ThisBuild / Test / tpolecatExcludeOptions += ScalacOptions.warnNonUnitStatement
 
 val noPublish = Seq(
   publish         := {},
@@ -43,7 +45,7 @@ val core = project
     moduleName           := "expense-tracker-core",
     Docker / packageName := "expense-tracker-core",
     libraryDependencies ++= Dependencies.core ++ Dependencies.test,
-    Test / scalacOptions += "-Wconf:msg=unused value of type:silent"
+    Test / tpolecatExcludeOptions += ScalacOptions.warnNonUnitStatement
   )
 
 val openapi = project
