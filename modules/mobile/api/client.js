@@ -85,15 +85,18 @@ class BackendClient {
         data
       })
 
-  pullChanges = (token, lastPulledAt) =>
-      dispatch({
-        method: 'get',
-        url: '/api/sync/watermelon',
-        headers: {Authorization: `Bearer ${token}`},
-        params: {lastPulledAt}
-      })
+  pullChanges = (token, lastPulledAt) => {
+    console.log('Pulling changes from backend', new Date(lastPulledAt))
+    return dispatch({
+      method: 'get',
+      url: '/api/sync/watermelon',
+      headers: {Authorization: `Bearer ${token}`},
+      params: {lastPulledAt}
+    })
+  }
 
   pushChanges = (token, lastPulledAt, data) => {
+    console.log('Pushing changes to backend', new Date(lastPulledAt))
     return dispatch({
       method: 'post',
       data,
