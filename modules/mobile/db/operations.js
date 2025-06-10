@@ -146,7 +146,7 @@ export const updateRecurringTransaction = async (database, rtx) => {
 export const createRecurringTransactionInstancesWithTodayDate = async (database) => {
   const now = format(new Date(), 'yyyy-MM-dd')
   const rtxs = await database.get('periodic_transactions').query(
-      Q.where('recurrence_next_date', Q.eq(now)),
+      Q.where('recurrence_next_date', Q.lte(now)),
       Q.or(
           Q.where('recurrence_end_date', Q.eq(null)),
           Q.where('recurrence_end_date', Q.gt(now))
