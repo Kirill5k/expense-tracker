@@ -1,3 +1,4 @@
+import {useMemo} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
 import {Badge, BadgeIcon} from "@/components/ui/badge"
@@ -32,7 +33,7 @@ const prepareData = (txs) => {
 }
 
 const CategoryGroupedTransactionList = ({items, mode}) => {
-  const {data, total} = prepareData(items)
+  const {data, total} = useMemo(() => prepareData(items), [items])
 
   if (items.length === 0) {
     return null

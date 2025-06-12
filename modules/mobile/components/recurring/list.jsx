@@ -1,3 +1,4 @@
+import {useMemo} from 'react'
 import {FlashList} from '@shopify/flash-list'
 import {Icon, CalendarDaysIcon, ClockIcon} from '@/components/ui/icon'
 import {Divider} from '@/components/ui/divider'
@@ -91,9 +92,12 @@ const RecurringTransactionListItem = ({item, onItemDelete, onItemPress, disabled
 }
 
 const RecurringTransactionList = ({items, onScroll, onItemPress, onItemDelete, disabled}) => {
-  const nonNullDates = items.filter(i => i.recurrence.nextDate !== null)
-  const nullDates = items.filter(i => i.recurrence.nextDate === null)
-  const data = nonNullDates.concat(nullDates).map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
+  const nonNullDates = useMemo(() => items.filter(i => i.recurrence.nextDate !== null), [items])
+  const nullDates = useMemo(() => items.filter(i => i.recurrence.nextDate === null), [items])
+  const data = useMemo(
+      () => nonNullDates.concat(nullDates).map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0})),
+      [nonNullDates, nullDates]
+  )
   return (
       <FlashList
           bounces={true}

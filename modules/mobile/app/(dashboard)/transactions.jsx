@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {HStack} from '@/components/ui/hstack'
@@ -27,8 +27,8 @@ const Transactions = ({state, user, displayedTransactions, categories}) => {
   const [filters, setFilters] = useState({categories: []})
   const [searchQuery, setSearchQuery] = useState('')
 
-  const mappedTransactions = mapTransactions(displayedTransactions, categories, user)
-  const transactions = filterBy(mappedTransactions, searchQuery, filters)
+  const mappedTransactions = useMemo(() =>  mapTransactions(displayedTransactions, categories, user), [displayedTransactions, categories, user])
+  const transactions = useMemo(() => filterBy(mappedTransactions, searchQuery, filters), [mappedTransactions, searchQuery, filters])
 
   const handleItemDelete = (tx) => {
     hideTransaction(database, tx.id, true)

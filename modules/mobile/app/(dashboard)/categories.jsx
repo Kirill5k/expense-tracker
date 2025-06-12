@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState, useMemo} from 'react'
 import {router} from 'expo-router'
 import {VStack} from '@/components/ui/vstack'
 import {ScreenHeading} from '@/components/common/layout'
@@ -20,7 +20,7 @@ const Categories = ({categories}) => {
 
   const [loading, setLoading] = useState(false)
 
-  const displayedCategories = mapCategories(categories)
+  const displayedCategories = useMemo(() => mapCategories(categories), [categories])
 
   const handleItemDelete = (cat) => {
     setLoading(true)

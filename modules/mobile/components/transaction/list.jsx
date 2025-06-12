@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useMemo} from 'react'
 import {Badge, BadgeIcon} from "@/components/ui/badge"
 import {MaterialIcon} from '@/components/ui/icon'
 import {Box} from '@/components/ui/box'
@@ -81,8 +81,8 @@ const TransactionListItem = ({item, mode, disabled, onPress, onCopy, onDelete}) 
 }
 
 const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItemDelete, onScroll}) => {
-  const groupedItems = Object.entries(groupBy(items, i => i.date))
-  const data = groupedItems.flatMap(([date, txGroup]) => {
+  const groupedItems = useMemo(() => Object.entries(groupBy(items, i => i.date)), [items])
+  const data = useMemo(() => groupedItems.flatMap(([date, txGroup]) => {
     const header = {
       isHeader: true,
       date: formatDate(date),
@@ -90,11 +90,11 @@ const TransactionList = ({mode, disabled, items, onItemPress, onItemCopy, onItem
     }
     const items = txGroup.map((item, i) => ({...item, isFirst: i === 0, isLast: i === txGroup.length - 1}))
     return [header, ...items]
-  })
+  }), [groupedItems])
 
-  const stickyHeaderIndices = data
+  const stickyHeaderIndices = useMemo(() => data
       .map((item, i) => item.isHeader ? i : null)
-      .filter((item) => item !== null)
+      .filter((item) => item !== null), [data])
 
   const flatListRef = useRef(null)
   const firstItem = items.length > 0 ? items[0].id : null

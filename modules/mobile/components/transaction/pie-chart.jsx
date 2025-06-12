@@ -1,9 +1,9 @@
+import {useState, useMemo} from 'react'
 import {Pressable} from '@/components/ui/pressable'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
 import {Box} from '@/components/ui/box'
-import {useState} from 'react'
 import {PieChart} from 'react-native-gifted-charts'
 import Colors from '@/constants/colors'
 import {nonEmpty} from '@/utils/arrays'
@@ -56,7 +56,7 @@ const focusItem = (items, index) => items.map((d, i) =>  ({...d, focused: i === 
 
 const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, onChartPress}) => {
   const [pressedItem, setPressedItem] = useState(null)
-  const chartData = prepareChartData(items, mode)
+  const chartData = useMemo(() => prepareChartData(items, mode), [items, mode])
 
   const [prevItems, setPrevItems] = useState(items)
   if (items.length !== prevItems.length || (nonEmpty(items) && nonEmpty(prevItems) && items[0].id !== prevItems[0].id)) {
@@ -68,7 +68,7 @@ const TransactionPieChart = ({items, previousPeriodItems, mode, currency, kind, 
       ? [focusItem(chartData.data, pressedItem.index), pressedItem.value]
       : [chartData.data, chartData.total]
 
-  const prevData = groupTxByCat(previousPeriodItems)
+  const prevData = useMemo(() => groupTxByCat(previousPeriodItems), [previousPeriodItems])
   const prevTotal = pressedItem
       ? prevData.transactionsByCategory[chartData.data[pressedItem.index].category.id]?.totalAmount
       : prevData.total

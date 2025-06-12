@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useMemo} from 'react'
 import {router} from 'expo-router'
 import {Box} from '@/components/ui/box'
 import {VStack} from '@/components/ui/vstack'
@@ -26,8 +26,14 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
   const [kind, setKind] = useState(categoryOptions[0].value)
   const [selectedTransactions, setSelectedTransactions] = useState([])
 
-  const analysedTransactions = mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
-  const previousTransactions = mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind)
+  const analysedTransactions = useMemo(
+      () => mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind),
+      [displayedTransactions]
+  )
+  const previousTransactions = useMemo(
+      () => mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind),
+      [previousDisplayedTransactions]
+  )
 
   useEffect(() => {
     setSelectedTransactions([])

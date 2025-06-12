@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 import {FlashList} from '@shopify/flash-list'
 import {Box} from '@/components/ui/box'
 import {HStack} from '@/components/ui/hstack'
@@ -40,7 +40,10 @@ const CategoryListItem = React.memo(({item, onItemPress, disabled, onItemDelete}
 })
 
 const CategoryList = ({items, onItemPress, disabled, onItemDelete, onScroll}) => {
-  const data = items.map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0}))
+  const data = useMemo(
+      () => items.map((item, i) => ({...item, isLast: i === items.length - 1, isFirst: i === 0})),
+      [items]
+  )
   return (
       <FlashList
           bounces={true}

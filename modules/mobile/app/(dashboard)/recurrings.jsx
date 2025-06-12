@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import Classes from '@/constants/classes'
 import {ScreenHeading} from '@/components/common/layout'
@@ -35,8 +35,14 @@ const Recurring = ({user, categories, recurringTransactions}) => {
     router.push('recurring')
   }
 
-  const transactions = mapTransactions(recurringTransactions, categories, user)
-  const displayedTxs = kind === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind)
+  const transactions = useMemo(
+      () => mapTransactions(recurringTransactions, categories, user),
+      [recurringTransactions, categories, user]
+  )
+  const displayedTxs = useMemo(
+      () => kind === 'all' ? transactions : transactions.filter(tx => tx.category.kind === kind),
+      [transactions, kind]
+  )
 
   return (
       <VStack className={Classes.dashboardLayout} space="md">

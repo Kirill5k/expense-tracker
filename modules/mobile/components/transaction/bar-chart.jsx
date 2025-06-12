@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useMemo} from 'react'
 import {VStack} from '@/components/ui/vstack'
 import {Text} from '@/components/ui/text'
 import {Heading} from '@/components/ui/heading'
@@ -142,11 +142,17 @@ const TransactionBarChart = ({items, previousPeriodItems, mode, displayDate, cur
     }
   }
 
-  const previousPeriodChartData = prepareChartData(previousPeriodItems, displayDate)
-  const previousData = previousPeriodChartData.data.map(i => ({value: i.value, disablePress: true, frontColor: Colors[mode][kind].barChartSecondary}))
+  const previousPeriodChartData = useMemo(
+      () => prepareChartData(previousPeriodItems, displayDate),
+      [previousPeriodItems, displayDate]
+  )
+  const previousData = useMemo(
+      () => previousPeriodChartData.data.map(i => ({value: i.value, disablePress: true, frontColor: Colors[mode][kind].barChartSecondary})),
+      [previousPeriodChartData.data, mode, kind]
+  )
   const previousTotal = previousPeriodChartData.total
 
-  const zippedData = zipFlat(data, previousData)
+  const zippedData = useMemo(() => zipFlat(data, previousData), [data, previousData])
 
   const percentageChangeLabelText = pressedItem ? ' ' : percentageChangeLabel(total, previousTotal, displayDate)
   const axisLabelStyle = {color: Colors[mode].text, fontSize: 12, lineHeight: 12}
