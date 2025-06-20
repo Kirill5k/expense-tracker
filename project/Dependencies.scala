@@ -5,15 +5,15 @@ object Dependencies {
     val mongo4cats   = "0.7.13"
     val commonScala  = "0.1.26"
     val pureConfig   = "0.17.9"
-    val circe        = "0.14.13"
+    val circe        = "0.14.14"
     val circeRefined = "0.15.1"
     val squants      = "1.8.3"
     val bcrypt       = "4.3.0"
     val refined      = "0.11.3"
     val logback      = "1.5.18"
     val log4cats     = "2.7.1"
-    val tapir        = "1.11.33"
-    val jwt          = "10.0.4"
+    val tapir        = "1.11.34"
+    val jwt          = "11.0.0"
     val apispec      = "0.11.3"
   }
 
