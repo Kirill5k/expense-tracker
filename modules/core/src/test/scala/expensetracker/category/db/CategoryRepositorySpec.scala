@@ -227,5 +227,5 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             res      <- test(db)
           yield res
         }
-    }.unsafeToFuture()(IORuntime.global)
+    }.unsafeToFuture()(using IORuntime.global)
 }

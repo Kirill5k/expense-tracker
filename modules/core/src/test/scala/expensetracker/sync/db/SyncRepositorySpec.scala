@@ -106,5 +106,5 @@ class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             res          <- test(db)
           yield res
         }
-    }.unsafeToFuture()(IORuntime.global)
+    }.unsafeToFuture()(using IORuntime.global)
 }

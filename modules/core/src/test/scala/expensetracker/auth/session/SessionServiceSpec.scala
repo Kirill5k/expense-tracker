@@ -8,8 +8,6 @@ import expensetracker.auth.session.db.SessionRepository
 import expensetracker.common.errors.AppError
 import expensetracker.fixtures.{Sessions, Users}
 
-import java.time.Instant
-
 class SessionServiceSpec extends IOWordSpec {
 
   "A SessionService" when {

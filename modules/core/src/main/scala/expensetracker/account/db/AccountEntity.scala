@@ -2,8 +2,9 @@ package expensetracker.account.db
 
 import expensetracker.account.{Account, AccountId, AccountName, CreateAccount}
 import expensetracker.auth.user.UserId
-import expensetracker.common.json.given
+import expensetracker.common.JsonCodecs
 import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 import mongo4cats.bson.ObjectId
 import mongo4cats.circe.given
 import squants.market.Currency
@@ -19,7 +20,7 @@ final case class AccountEntity(
     lastUpdatedAt: Option[Instant],
     hidden: Option[Boolean],
     isMain: Option[Boolean],
-) derives Codec.AsObject {
+) {
   def toDomain: Account =
     Account(
       id = AccountId(_id),
@@ -33,7 +34,8 @@ final case class AccountEntity(
     )
 }
 
-object AccountEntity:
+object AccountEntity extends JsonCodecs:
+  given Codec[AccountEntity] = deriveCodec[AccountEntity]
   def from(account: CreateAccount): AccountEntity =
     AccountEntity(
       _id = ObjectId.gen,

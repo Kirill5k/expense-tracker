@@ -269,5 +269,5 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             res        <- test(db, sess)
           yield res
         }
-    }.unsafeToFuture()(IORuntime.global)
+    }.unsafeToFuture()(using IORuntime.global)
 }

@@ -217,5 +217,5 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             res        <- test(db, sess)
           yield res
         }
-    }.unsafeToFuture()(IORuntime.global)
+    }.unsafeToFuture()(using IORuntime.global)
 }

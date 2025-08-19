@@ -2,9 +2,10 @@ package expensetracker.auth.user
 
 import expensetracker.account.Account
 import expensetracker.category.Category
+import expensetracker.common.JsonCodecs
 import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 import expensetracker.common.types.{IdType, StringType}
-import expensetracker.common.json.given
 import squants.market.{Currency, GBP}
 import expensetracker.common.validations.EmailString
 
@@ -32,9 +33,10 @@ final case class UserSettings(
     hideFutureTransactions: Boolean,
     darkMode: Option[Boolean],
     futureTransactionVisibilityDays: Option[Int]
-) derives Codec.AsObject
+)
 
-object UserSettings {
+object UserSettings extends JsonCodecs {
+  given Codec[UserSettings] = deriveCodec[UserSettings]
   val Default = UserSettings(
     GBP,
     hideFutureTransactions = false,

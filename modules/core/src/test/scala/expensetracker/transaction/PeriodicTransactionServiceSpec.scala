@@ -8,7 +8,7 @@ import kirill5k.common.cats.Clock
 import kirill5k.common.cats.test.IOWordSpec
 import kirill5k.common.syntax.time.*
 
-import java.time.{Instant, LocalDate}
+import java.time.LocalDate
 
 class PeriodicTransactionServiceSpec extends IOWordSpec {
   val now         = LocalDate.of(2024, 11, 10)

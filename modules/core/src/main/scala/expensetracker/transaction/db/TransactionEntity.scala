@@ -2,14 +2,15 @@ package expensetracker.transaction.db
 
 import expensetracker.account.AccountId
 import expensetracker.account.db.AccountEntity
-import io.circe.Codec
 import expensetracker.auth.user.UserId
 import expensetracker.category.CategoryId
 import expensetracker.category.db.CategoryEntity
-import expensetracker.common.json.given
+import expensetracker.common.JsonCodecs
 import expensetracker.transaction.{CreateTransaction, Transaction, TransactionId}
+import io.circe.Codec
+import io.circe.generic.semiauto.deriveCodec
 import mongo4cats.bson.ObjectId
-import mongo4cats.circe.given
+import mongo4cats.circe.MongoJsonCodecs
 import squants.market.*
 
 import java.time.{Instant, LocalDate}
@@ -30,7 +31,7 @@ final case class TransactionEntity(
     tags: Option[Set[String]],
     category: Option[CategoryEntity] = None,
     account: Option[AccountEntity] = None
-) derives Codec.AsObject {
+) {
   def containsInvalidCategory: Boolean =
     category.isEmpty || category.exists(cat => cat.hidden.getOrElse(false) || cat.userId.exists(_ != userId))
 
@@ -60,7 +61,8 @@ final case class TransactionEntity(
     )
 }
 
-object TransactionEntity:
+object TransactionEntity extends JsonCodecs with MongoJsonCodecs:
+  given Codec[TransactionEntity] = deriveCodec[TransactionEntity]
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       _id = ObjectId(),

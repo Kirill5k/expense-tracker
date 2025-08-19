@@ -114,5 +114,5 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
         .use { client =>
           client.getDatabase("expense-tracker").flatMap(test)
         }
-    }.unsafeToFuture()(IORuntime.global)
+    }.unsafeToFuture()(using IORuntime.global)
 }

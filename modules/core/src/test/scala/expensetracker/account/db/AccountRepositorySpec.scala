@@ -156,5 +156,5 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             res      <- test(db)
           yield res
         }
-    }.unsafeToFuture()(IORuntime.global)
+    }.unsafeToFuture()(using IORuntime.global)
 }
