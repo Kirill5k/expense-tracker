@@ -23,8 +23,8 @@
       "bundleIdentifier": "com.github.kirill5k.spendsync",
       "userInterfaceStyle": "automatic",
       "associatedDomains": [
-        "applinks:api.spendsync.co.uk",
-        "webcredentials:api.spendsync.co.uk"
+        "applinks:api--expense-tracker-core--j6xvqz9kpswd.code.run",
+        "webcredentials:api--expense-tracker-core--j6xvqz9kpswd.code.run"
       ],
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",
