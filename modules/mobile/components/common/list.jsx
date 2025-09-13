@@ -34,7 +34,7 @@ const RightActions = ({progress, showCopy, onCopy, onDelete, swipeableRef}) => {
             borderBottomRightRadius: 12,
             justifyContent: 'flex-end',
             alignItems: 'stretch',
-            paddingRight: 4,
+            paddingRight: 0, // reduced right gap
             overflow: 'hidden'
           }}
       >
