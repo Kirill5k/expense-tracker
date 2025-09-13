@@ -28,11 +28,11 @@ const Analytics = ({state, user, displayedTransactions, categories, previousDisp
 
   const analysedTransactions = useMemo(
       () => mapTransactions(displayedTransactions, categories, user).filter(tx => tx.category.kind === kind),
-      [displayedTransactions]
+      [displayedTransactions, kind]
   )
   const previousTransactions = useMemo(
       () => mapTransactions(previousDisplayedTransactions, categories, user).filter(tx => tx.category.kind === kind),
-      [previousDisplayedTransactions]
+      [previousDisplayedTransactions, kind]
   )
 
   useEffect(() => {
