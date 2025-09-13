@@ -7,24 +7,26 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable'
 import Animated, {useAnimatedStyle} from 'react-native-reanimated'
 
 
-// Right swipe action buttons (copy/delete) with progressive reveal
-const RightActionsContainer = ({progress, withCopyButton, onCopy, onDelete, swipeableRef}) => {
-  const buttonWidth = 48
-  const gap = withCopyButton ? 4 : 0
-  const width = withCopyButton ? buttonWidth * 2 + gap : buttonWidth
+// Constants
+const ACTION_BTN_WIDTH = 48
+const ACTION_GAP = 4
 
-  const animatedStyle = useAnimatedStyle(() => {
-    const p = progress?.value ?? 0
+// Progressive reveal action buttons (slides from right, fades in)
+const RightActions = ({progress, showCopy, onCopy, onDelete, swipeableRef}) => {
+  const totalWidth = showCopy ? ACTION_BTN_WIDTH * 2 + ACTION_GAP : ACTION_BTN_WIDTH
+
+  const animatedRowStyle = useAnimatedStyle(() => {
+    const p = progress?.value ?? 0 // shared value (0 -> 1)
     return {
-      transform: [{translateX: (1 - p) * width}], // slide in from right
-      opacity: p < 0.25 ? (p / 0.25) * 0.6 : 0.6 + ((p - 0.25) / 0.75) * 0.4,
+      transform: [{translateX: (1 - p) * totalWidth}],
+      opacity: 0.4 + 0.6 * p, // simple linear fade
     }
-  }, [withCopyButton])
+  }, [showCopy])
 
   return (
       <Animated.View
           style={{
-            width,
+            width: totalWidth,
             height: '100%',
             flexDirection: 'row',
             backgroundColor: '#262626',
@@ -33,19 +35,18 @@ const RightActionsContainer = ({progress, withCopyButton, onCopy, onDelete, swip
             justifyContent: 'flex-end',
             alignItems: 'stretch',
             paddingRight: 4,
-            gap: 4,
-            overflow: 'hidden',
+            overflow: 'hidden'
           }}
       >
-        <Animated.View style={[{flexDirection: 'row', gap: 4, height: '100%'}, animatedStyle]}>
-          {withCopyButton && (
+        <Animated.View style={[{flexDirection: 'row', height: '100%'}, animatedRowStyle]}>
+          {showCopy && (
               <Button
                   size="sm"
                   accessibilityLabel="Copy"
-                  className="rounded-xl w-12 h-full p-0 bg-sky-500"
+                  className="rounded-xl w-12 h-full p-0 bg-sky-500 mr-1"
                   action="positive"
                   onPress={() => {
-                    onCopy()
+                    onCopy?.()
                     swipeableRef?.current?.close()
                   }}
               >
@@ -58,7 +59,7 @@ const RightActionsContainer = ({progress, withCopyButton, onCopy, onDelete, swip
               className="rounded-xl w-12 h-full p-0 bg-red-500"
               action="negative"
               onPress={() => {
-                onDelete()
+                onDelete?.()
                 swipeableRef?.current?.close()
               }}
           >
@@ -69,18 +70,16 @@ const RightActionsContainer = ({progress, withCopyButton, onCopy, onDelete, swip
   )
 }
 
-const RightAction = ({onCopy, onDelete, swipeableRef}) => (progress /* shared value */) => {
-  const withCopyButton = onCopy != null
-  return (
-      <RightActionsContainer
-          progress={progress}
-          withCopyButton={withCopyButton}
-          onCopy={onCopy}
-          onDelete={onDelete}
-          swipeableRef={swipeableRef}
-      />
-  )
-}
+// Factory passed to Swipeable
+const buildRightActionsRenderer = ({onCopy, onDelete, swipeableRef}) => (progress /* shared value */) => (
+    <RightActions
+        progress={progress}
+        showCopy={onCopy != null}
+        onCopy={onCopy}
+        onDelete={onDelete}
+        swipeableRef={swipeableRef}
+    />
+)
 
 export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete}) => {
   const ref = React.useRef(null)
@@ -100,7 +99,7 @@ export const ListItemPressable = ({onPress, children, disabled, onCopy, onDelete
           friction={2}
           enableTrackpadTwoFingerGesture
           rightThreshold={40}
-          renderRightActions={RightAction({onCopy, onDelete, swipeableRef: ref})}
+          renderRightActions={buildRightActionsRenderer({onCopy, onDelete, swipeableRef: ref})}
           onSwipeableWillOpen={handleSwipeableWillOpen}
           onSwipeableClose={() => setIsSwiped(false)}
       >
