@@ -34,7 +34,7 @@ const RightActions = ({progress, showCopy, onCopy, onDelete, swipeableRef}) => {
             borderBottomRightRadius: 12,
             justifyContent: 'flex-end',
             alignItems: 'stretch',
-            paddingRight: 0, // reduced right gap
+            paddingRight: 0,
             overflow: 'hidden'
           }}
       >
@@ -43,7 +43,8 @@ const RightActions = ({progress, showCopy, onCopy, onDelete, swipeableRef}) => {
               <Button
                   size="sm"
                   accessibilityLabel="Copy"
-                  className="rounded-xl w-12 h-full p-0 bg-sky-500 mr-1"
+                  className="rounded-xl w-12 h-full p-0 bg-sky-500"
+                  style={{marginRight: ACTION_GAP}}
                   action="positive"
                   onPress={() => {
                     onCopy?.()
