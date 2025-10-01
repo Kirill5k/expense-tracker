@@ -113,7 +113,7 @@ class CategoryControllerSpec extends HttpRoutesWordSpec:
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Invalid value foo for enum CategoryKind, Accepted values: expense,income"}"""
-        res mustHaveStatus (Status.UnprocessableEntity, Some(responseBody))
+        res mustHaveStatus (Status.UnprocessableContent, Some(responseBody))
         verifyNoInteractions(svc)
       }
 
@@ -127,7 +127,7 @@ class CategoryControllerSpec extends HttpRoutesWordSpec:
           .withBody("""{"name":"cat-1","icon":"icon","kind":"income","color":"blue"}""")
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"blue is not a valid color"}"""))
+        res mustHaveStatus (Status.UnprocessableContent, Some("""{"message":"blue is not a valid color"}"""))
         verifyNoInteractions(svc)
       }
     }
@@ -171,7 +171,7 @@ class CategoryControllerSpec extends HttpRoutesWordSpec:
         val req = Request[IO](Method.GET, uri"/categories/foo").withAuthHeader()
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"Invalid hexadecimal representation of an id: foo"}"""))
+        res mustHaveStatus (Status.UnprocessableContent, Some("""{"message":"Invalid hexadecimal representation of an id: foo"}"""))
         verifyNoInteractions(svc)
       }
     }
@@ -235,7 +235,7 @@ class CategoryControllerSpec extends HttpRoutesWordSpec:
         val res = CategoryController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"name must not be empty, color is required"}"""
-        res mustHaveStatus (Status.UnprocessableEntity, Some(resBody))
+        res mustHaveStatus (Status.UnprocessableContent, Some(resBody))
         verifyNoInteractions(svc)
       }
 

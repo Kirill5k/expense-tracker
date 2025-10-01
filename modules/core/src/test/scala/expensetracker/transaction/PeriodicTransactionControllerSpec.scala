@@ -66,7 +66,7 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
           )
         val res = PeriodicTransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message": "end date must be after start date"}"""))
+        res mustHaveStatus (Status.UnprocessableContent, Some("""{"message": "end date must be after start date"}"""))
         verifyNoInteractions(svc)
       }
 
@@ -94,7 +94,7 @@ class PeriodicTransactionControllerSpec extends HttpRoutesWordSpec {
           )
         val res = PeriodicTransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message": "0 is smaller than 1"}"""))
+        res mustHaveStatus (Status.UnprocessableContent, Some("""{"message": "0 is smaller than 1"}"""))
         verifyNoInteractions(svc)
       }
     }

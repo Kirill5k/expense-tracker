@@ -54,7 +54,7 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
               |}""".stripMargin)
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus (Status.UnprocessableEntity, Some("""{"message":"FOO is not a valid categoryId"}"""))
+        res mustHaveStatus (Status.UnprocessableContent, Some("""{"message":"FOO is not a valid categoryId"}"""))
         verifyNoInteractions(svc)
       }
     }
@@ -194,7 +194,7 @@ class TransactionControllerSpec extends HttpRoutesWordSpec:
         val res = TransactionController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val resBody = """{"message":"foo is not a valid categoryId, amount is required, date is required"}"""
-        res mustHaveStatus (Status.UnprocessableEntity, Some(resBody))
+        res mustHaveStatus (Status.UnprocessableContent, Some(resBody))
         verifyNoInteractions(svc)
       }
 
