@@ -46,7 +46,7 @@ const transactionSchema = z.object({
   frequency: z.enum(['monthly', 'weekly', 'daily']),
   interval: z
       .string()
-      .refine((v) => isPositiveNumber(v) && Number(v) < 13, {message: 'Interval must be between 1 and 12'}),
+      .refine((v) => isPositiveNumber(v) && Number(v) < 53, {message: 'Interval must be between 1 and 53'}),
   endDate: z
       .date()
       .nullable()
