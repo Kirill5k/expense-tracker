@@ -2,12 +2,11 @@ import com.typesafe.sbt.packager.docker.*
 import org.typelevel.scalacoptions.ScalacOptions
 import sbtghactions.JavaSpec
 
-ThisBuild / scalaVersion                        := "3.7.2"
+ThisBuild / scalaVersion                        := "3.7.4"
 ThisBuild / version                             := scala.sys.process.Process("git rev-parse HEAD").!!.trim.slice(0, 7)
 ThisBuild / organization                        := "io.github.kirill5k"
 ThisBuild / githubWorkflowPublishTargetBranches := Nil
 ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("25"))
-ThisBuild / Test / tpolecatExcludeOptions += ScalacOptions.warnNonUnitStatement
 
 val noPublish = Seq(
   publish         := {},
