@@ -19,7 +19,7 @@ import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
 
 import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate}
+import java.time.Instant
 import scala.concurrent.Future
 
 class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers with MongoOps {
