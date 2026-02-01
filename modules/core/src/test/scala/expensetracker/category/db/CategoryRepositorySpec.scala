@@ -23,7 +23,7 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
   "A CategoryRepository" when {
 
     "create" should {
-      "create new category in db" in {
+      "create new category in db" in
         withEmbeddedMongoDb { client =>
           val create = Categories.create()
           val result = for
@@ -39,9 +39,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cat.kind mustBe create.kind
           }
         }
-      }
 
-      "return error if cat with such name already exists" in {
+      "return error if cat with such name already exists" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- CategoryRepository.make(client)
@@ -50,11 +49,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
           result.attempt.map(_ mustBe Left(CategoryAlreadyExists(CategoryName("C2"))))
         }
-      }
     }
 
     "get" should {
-      "return error when cat id and acc id do not match" in {
+      "return error when cat id and acc id do not match" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- CategoryRepository.make(client)
@@ -63,11 +61,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
           result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.cid2)))
         }
-      }
     }
 
     "isHidden" should {
-      "return hidden status of hidden cat" in {
+      "return hidden status of hidden cat" in
         withEmbeddedMongoDb { client =>
           for
             repo     <- CategoryRepository.make(client)
@@ -75,20 +72,18 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             isHidden <- repo.isHidden(Users.uid2, Categories.cid2)
           yield isHidden mustBe true
         }
-      }
 
-      "return hidden status of displayed cat" in {
+      "return hidden status of displayed cat" in
         withEmbeddedMongoDb { client =>
           for
             repo     <- CategoryRepository.make(client)
             isHidden <- repo.isHidden(Users.uid2, Categories.cid2)
           yield isHidden mustBe false
         }
-      }
     }
 
     "hide" should {
-      "update hidden field of a cat" in {
+      "update hidden field of a cat" in
         withEmbeddedMongoDb { client =>
           for
             repo <- CategoryRepository.make(client)
@@ -96,9 +91,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cats <- repo.getAll(Users.uid2)
           yield cats mustBe Nil
         }
-      }
 
-      "return error when cat does not exist" in {
+      "return error when cat does not exist" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- CategoryRepository.make(client)
@@ -107,11 +101,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
           result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.cid2)))
         }
-      }
     }
 
     "getAll" should {
-      "return all account's categories" in {
+      "return all account's categories" in
         withEmbeddedMongoDb { client =>
           for
             repo <- CategoryRepository.make(client)
@@ -123,11 +116,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cats.head.userId mustBe Some(Users.uid2)
           }
         }
-      }
     }
 
     "assignDefaults" should {
-      "copy default categories with a new account id" in {
+      "copy default categories with a new account id" in
         withEmbeddedMongoDb { client =>
           for
             repo <- CategoryRepository.make(client)
@@ -138,11 +130,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cats.flatMap(_.userId) mustBe List(Users.uid2, Users.uid2)
           }
         }
-      }
     }
 
     "delete" should {
-      "remove user's category" in {
+      "remove user's category" in
         withEmbeddedMongoDb { client =>
           for
             repo <- CategoryRepository.make(client)
@@ -150,9 +141,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cats <- repo.getAll(Users.uid2)
           yield cats mustBe Nil
         }
-      }
 
-      "return error if userId doesn't match" in {
+      "return error if userId doesn't match" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- CategoryRepository.make(client)
@@ -161,11 +151,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
           result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.cid2)))
         }
-      }
     }
 
     "update" should {
-      "update existing category" in {
+      "update existing category" in
         withEmbeddedMongoDb { db =>
           val update = Categories.cat(id = Categories.cid2, name = CategoryName("c2-upd"), uid = Some(Users.uid2))
           for
@@ -174,9 +163,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cats <- repo.getAll(Users.uid2)
           yield cats.map(_.copy(lastUpdatedAt = None)) mustBe List(update)
         }
-      }
 
-      "return error when category does not exist" in {
+      "return error when category does not exist" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- CategoryRepository.make(db)
@@ -185,11 +173,10 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
 
           result.attempt.map(_ mustBe Left(CategoryDoesNotExist(Categories.cid)))
         }
-      }
     }
 
     "save" should {
-      "insert data into db if it doesn't exist" in {
+      "insert data into db if it doesn't exist" in
         withEmbeddedMongoDb { db =>
           val newCat = Categories.cat(id = CategoryId(ObjectId().toHexString), name = CategoryName("cx"), uid = Some(Users.uid1))
           for
@@ -198,9 +185,8 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cat  <- repo.get(Users.uid1, newCat.id)
           yield cat.copy(lastUpdatedAt = None, createdAt = None) mustBe newCat
         }
-      }
 
-      "update existing data" in {
+      "update existing data" in
         withEmbeddedMongoDb { db =>
           val updatedCat = Categories.cat(id = Categories.cid2, name = CategoryName("cx"), uid = Some(Users.uid2))
           for
@@ -209,7 +195,6 @@ class CategoryRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMo
             cat  <- repo.get(Users.uid2, updatedCat.id)
           yield cat.copy(lastUpdatedAt = None, createdAt = None) mustBe updatedCat
         }
-      }
     }
   }
 

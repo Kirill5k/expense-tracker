@@ -19,7 +19,7 @@ trait MongoOps {
       "kind"       := "expense",
       "categoryId" := cid.toObjectId,
       "userId"     := uid.toObjectId,
-      "amount" := Document(
+      "amount"     := Document(
         "value"    := amount.amount,
         "currency" := Document("code" := amount.currency.code, "symbol" := amount.currency.symbol)
       ),

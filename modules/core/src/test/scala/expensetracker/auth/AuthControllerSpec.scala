@@ -4,7 +4,7 @@ import cats.effect.IO
 import expensetracker.auth.jwt.BearerToken
 import expensetracker.auth.session.{CreateSession, Session, SessionId, SessionService}
 import expensetracker.auth.user.*
-import expensetracker.common.errors.AppError.{UserAlreadyExists, InvalidEmailOrPassword, SessionDoesNotExist}
+import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, SessionDoesNotExist, UserAlreadyExists}
 import expensetracker.fixtures.{Sessions, Users}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.implicits.*

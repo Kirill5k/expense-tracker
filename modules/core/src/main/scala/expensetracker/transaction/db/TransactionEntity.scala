@@ -39,7 +39,7 @@ final case class TransactionEntity(
     accountId.isDefined && (
       account.isEmpty ||
         account.exists(acc => acc.hidden.getOrElse(false) || acc.userId != userId)
-      )
+    )
 
   def toDomain: Transaction =
     Transaction(
@@ -62,7 +62,7 @@ final case class TransactionEntity(
 }
 
 object TransactionEntity extends JsonCodecs with MongoJsonCodecs:
-  given Codec[TransactionEntity] = deriveCodec[TransactionEntity]
+  given Codec[TransactionEntity]                       = deriveCodec[TransactionEntity]
   def create(tx: CreateTransaction): TransactionEntity =
     TransactionEntity(
       _id = ObjectId(),

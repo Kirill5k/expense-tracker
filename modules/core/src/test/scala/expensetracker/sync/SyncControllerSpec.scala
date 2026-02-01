@@ -223,13 +223,15 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
         given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
         val svc = mock[SyncService[IO]]
-        when(svc.pushChanges(
-          anyList[User],
-          anyList[Account],
-          anyList[Category],
-          anyList[Transaction],
-          anyList[PeriodicTransaction]
-        )).thenReturnUnit
+        when(
+          svc.pushChanges(
+            anyList[User],
+            anyList[Account],
+            anyList[Category],
+            anyList[Transaction],
+            anyList[PeriodicTransaction]
+          )
+        ).thenReturnUnit
 
         val req = Request[IO](Method.POST, Uri.unsafeFromString(s"/sync/watermelon?lastPulledAt=${time.toEpochMilli}"))
           .withAuthHeader()
@@ -334,31 +336,33 @@ class SyncControllerSpec extends HttpRoutesWordSpec {
              |    }
              |  }""".stripMargin
 
-          given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
+        given auth: Authenticator[IO] = _ => IO.pure(Sessions.sess)
 
-          val svc = mock[SyncService[IO]]
-          when(svc.pushChanges(
+        val svc = mock[SyncService[IO]]
+        when(
+          svc.pushChanges(
             anyList[User],
             anyList[Account],
             anyList[Category],
             anyList[Transaction],
             anyList[PeriodicTransaction]
-          )).thenReturnUnit
-
-          val req = Request[IO](Method.POST, Uri.unsafeFromString(s"/sync/watermelon?lastPulledAt=${time.toEpochMilli}"))
-            .withAuthHeader()
-            .withBody(requestBody)
-
-          val res = SyncController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
-
-          res mustHaveStatus(Status.NoContent, None)
-          verify(svc).pushChanges(
-            Nil,
-            Nil,
-            Nil,
-            Nil,
-            List(PeriodicTransactions.tx().copy(createdAt = Some(time), lastUpdatedAt = Some(time), accountId = None))
           )
+        ).thenReturnUnit
+
+        val req = Request[IO](Method.POST, Uri.unsafeFromString(s"/sync/watermelon?lastPulledAt=${time.toEpochMilli}"))
+          .withAuthHeader()
+          .withBody(requestBody)
+
+        val res = SyncController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        res mustHaveStatus (Status.NoContent, None)
+        verify(svc).pushChanges(
+          Nil,
+          Nil,
+          Nil,
+          Nil,
+          List(PeriodicTransactions.tx().copy(createdAt = Some(time), lastUpdatedAt = Some(time), accountId = None))
+        )
       }
     }
   }

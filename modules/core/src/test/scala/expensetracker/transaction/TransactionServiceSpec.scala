@@ -134,7 +134,7 @@ class TransactionServiceSpec extends IOWordSpec {
 
       result.asserting { res =>
         verify(repo).hideByAccount(Accounts.id, true)
-        res mustBe()
+        res mustBe ()
       }
     }
   }

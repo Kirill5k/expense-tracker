@@ -59,13 +59,13 @@ object errors {
 
     final case class AccountDoesNotExist(id: AccountId) extends NotFound:
       override val message: String = s"Account with id $id does not exist"
-    
+
     final case class CategoryAlreadyExists(name: CategoryName) extends Conflict:
       override val message: String = s"A category with name $name already exists"
 
     final case class AccountAlreadyExists(name: AccountName) extends Conflict:
       override val message: String = s"An account with name $name already exists"
-    
+
     final case class TransactionDoesNotExist(id: TransactionId) extends NotFound:
       override val message: String = s"Transaction with id $id does not exist"
 

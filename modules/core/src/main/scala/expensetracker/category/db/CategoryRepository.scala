@@ -36,7 +36,7 @@ final private class LiveCategoryRepository[F[_]](
 
   extension (cat: Category)
     private def toFilterById: Filter = userIdEq(cat.userId) && idEq(cat.id.toObjectId)
-    private def toUpdate: Update = {
+    private def toUpdate: Update     = {
       var upd = Update
         .setOnInsert(Field.Id, cat.id.toObjectId)
         .setOnInsert(Field.UId, cat.userId.map(_.toObjectId))

@@ -250,15 +250,15 @@ class ActionProcessorSpec extends IOWordSpec {
 
       val result = for
         dispatcher <- ActionDispatcher.make[IO]
-        processor <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc, accSvc)
-        _ <- dispatcher.dispatch(Action.DeleteAllAccounts(Users.uid1))
-        res <- processor.run.interruptAfter(1.second).compile.drain
+        processor  <- ActionProcessor.make[IO](dispatcher, usrSvc, catSvc, txSvc, ptxSvc, accSvc)
+        _          <- dispatcher.dispatch(Action.DeleteAllAccounts(Users.uid1))
+        res        <- processor.run.interruptAfter(1.second).compile.drain
       yield res
 
       result.asserting { r =>
         verify(accSvc).deleteAll(Users.uid1)
         verifyNoInteractions(txSvc, usrSvc, ptxSvc, catSvc)
-        r mustBe()
+        r mustBe ()
       }
     }
   }

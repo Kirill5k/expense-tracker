@@ -19,7 +19,7 @@ final case class AccountEntity(
     createdAt: Option[Instant],
     lastUpdatedAt: Option[Instant],
     hidden: Option[Boolean],
-    isMain: Option[Boolean],
+    isMain: Option[Boolean]
 ) {
   def toDomain: Account =
     Account(
@@ -35,7 +35,7 @@ final case class AccountEntity(
 }
 
 object AccountEntity extends JsonCodecs:
-  given Codec[AccountEntity] = deriveCodec[AccountEntity]
+  given Codec[AccountEntity]                      = deriveCodec[AccountEntity]
   def from(account: CreateAccount): AccountEntity =
     AccountEntity(
       _id = ObjectId.gen,

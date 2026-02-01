@@ -17,7 +17,7 @@ class PeriodicTransactionServiceSpec extends IOWordSpec {
   "PeriodicTransactionService" when {
     "generateRecurrencesForToday" should {
       "generate periodic transaction recurrences" in {
-        val txid = TransactionId("673cb70801452339cd5b4ec1")
+        val txid       = TransactionId("673cb70801452339cd5b4ec1")
         val recurrence = PeriodicTransactions.recurrence.copy(
           startDate = LocalDate.of(2024, 1, 10),
           nextDate = Some(now)

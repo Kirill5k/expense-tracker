@@ -25,8 +25,9 @@ class WellKnownControllerSpec extends HttpRoutesWordSpec:
         val res = WellKnownController.make[IO](config).flatMap(_.routes.orNotFound.run(req))
 
         res mustContainHeaders Map("Content-Type" -> "application/json")
-        res mustHaveStatus (Status.Ok, Some(
-          """
+        res mustHaveStatus (
+          Status.Ok,
+          Some("""
             |{
             |  "applinks" : {
             |    "apps" : [
@@ -51,7 +52,8 @@ class WellKnownControllerSpec extends HttpRoutesWordSpec:
             |    ]
             |  }
             |}
-            |""".stripMargin))
+            |""".stripMargin)
+        )
       }
     }
   }

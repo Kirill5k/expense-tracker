@@ -107,7 +107,7 @@ final private class LivePeriodicTransactionRepository[F[_]](
     collection
       .updateMany(Filter.eq(Field.AId, aid.toObjectId), updateHidden(hidden))
       .void
-    
+
   override def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]] =
     collection
       .find(

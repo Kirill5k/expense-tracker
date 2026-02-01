@@ -37,7 +37,7 @@ final case class UserSettings(
 
 object UserSettings extends JsonCodecs {
   given Codec[UserSettings] = deriveCodec[UserSettings]
-  val Default = UserSettings(
+  val Default               = UserSettings(
     GBP,
     hideFutureTransactions = false,
     darkMode = None,

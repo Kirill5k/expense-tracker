@@ -33,7 +33,7 @@ final private class LiveAccountRepository[F[_]](
 
   extension (acc: Account)
     private def toFilterById: Filter = userIdEq(acc.userId) && idEq(acc.id.toObjectId)
-    private def toUpdate: Update = {
+    private def toUpdate: Update     = {
       var upd = Update
         .setOnInsert(Field.Id, acc.id.toObjectId)
         .setOnInsert(Field.UId, acc.userId.toObjectId)
@@ -62,7 +62,7 @@ final private class LiveAccountRepository[F[_]](
 
   override def deleteAll(uid: UserId): F[Unit] =
     collection.deleteMany(userIdEq(uid)).void
-  
+
   override def hide(uid: UserId, aid: AccountId, hidden: Boolean): F[Unit] =
     collection
       .updateOne(userIdEq(uid) && idEq(aid.toObjectId), updateHidden(hidden))

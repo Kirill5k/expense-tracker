@@ -126,7 +126,7 @@ final private class LiveTransactionRepository[F[_]](
     collection
       .updateMany(Filter.eq(Field.AId, aid.toObjectId), updateHidden(hidden))
       .void
-  
+
   override def isHidden(uid: UserId, txid: TransactionId): F[Boolean] =
     collection
       .count(userIdEq(uid) && idEq(txid.toObjectId) && Filter.eq(Field.Hidden, true))

@@ -13,7 +13,7 @@ import kirill5k.common.syntax.time.*
 import io.circe.Codec
 import mongo4cats.bson.ObjectId
 import org.http4s.HttpRoutes
-import sttp.tapir.{Validator, DecodeResult, Endpoint, ValidationResult, PublicEndpoint, endpoint, statusCode, auth}
+import sttp.tapir.{auth, endpoint, statusCode, DecodeResult, Endpoint, PublicEndpoint, ValidationResult, Validator}
 import sttp.tapir.Codec as TapirCodec
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
@@ -34,7 +34,7 @@ trait Controller[F[_]] extends TapirJson with TapirSchema {
   def routes(using authenticator: Authenticator[F]): HttpRoutes[F]
 
   extension [A](fa: F[A])(using F: MonadThrow[F])
-    def voidResponse: F[Either[(StatusCode, ErrorResponse), Unit]] = mapResponse(_ => ())
+    def voidResponse: F[Either[(StatusCode, ErrorResponse), Unit]]             = mapResponse(_ => ())
     def mapResponse[B](fab: A => B): F[Either[(StatusCode, ErrorResponse), B]] =
       fa
         .map(fab(_).asRight[(StatusCode, ErrorResponse)])
@@ -81,7 +81,7 @@ object Controller extends TapirSchema with TapirJson {
               case _                            => None
           } else {
             ctx.failure match
-              case DecodeResult.Error(_, e) => errorEndpointOut(e)
+              case DecodeResult.Error(_, e)     => errorEndpointOut(e)
               case DecodeResult.InvalidValue(e) =>
                 val msgs = e.flatMap(_.customMessage)
                 errorEndpointOut(AppError.FailedValidation(msgs.mkString(", ")))

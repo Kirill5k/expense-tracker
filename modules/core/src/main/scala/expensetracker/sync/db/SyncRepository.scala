@@ -37,7 +37,7 @@ final private class LiveSyncRepository[F[_]](
           "$filter" := Document(
             "input" := "$" + collection,
             "as"    := item,
-            "cond" := BV.document("$gt" := BV.array(BV.string("$$" + item + ".createdAt"), BV.instant(value)))
+            "cond"  := BV.document("$gt" := BV.array(BV.string("$$" + item + ".createdAt"), BV.instant(value)))
           )
         )
       case None =>
@@ -56,10 +56,10 @@ final private class LiveSyncRepository[F[_]](
           "$filter" := Document(
             "input" := "$" + collection,
             "as"    := item,
-            "cond" := Document(
+            "cond"  := Document(
               "$and" := BV.array(
                 BV.document("$lte" := BV.array(BV.string("$$" + item + ".createdAt"), BV.instant(value))),
-                BV.document("$gt" := BV.array(BV.string("$$" + item + ".lastUpdatedAt"), BV.instant(value)))
+                BV.document("$gt"  := BV.array(BV.string("$$" + item + ".lastUpdatedAt"), BV.instant(value)))
               )
             )
           )
@@ -94,32 +94,47 @@ final private class LiveSyncRepository[F[_]](
               "periodicTransactionUpdated" -> updatedComp("periodicTransactionsColl", "periodicTransaction", from),
               "categoryCreated"            -> createdComp("categoriesColl", "category", from),
               "categoryUpdated"            -> updatedComp("categoriesColl", "category", from),
-              "accountCreated"            -> createdComp("accountsColl", "account", from),
-              "accountUpdated"            -> updatedComp("accountsColl", "account", from)
+              "accountCreated"             -> createdComp("accountsColl", "account", from),
+              "accountUpdated"             -> updatedComp("accountsColl", "account", from)
             )
             .project(
               Projection
                 .include("time")
-                .computed("users", Document(
-                  "created" := "$userCreated", 
-                  "updated" := "$userUpdated"
-                ))
-                .computed("categories", Document(
-                  "created" := "$categoryCreated", 
-                  "updated" := "$categoryUpdated"
-                ))
-                .computed("transactions", Document(
-                  "created" := "$transactionCreated", 
-                  "updated" := "$transactionUpdated"
-                ))
-                .computed("periodicTransactions", Document(
-                  "created" := "$periodicTransactionCreated", 
-                  "updated" := "$periodicTransactionUpdated"
-                ))
-                .computed("accounts", Document(
-                  "created" := "$accountCreated",
-                  "updated" := "$accountUpdated"
-                ))
+                .computed(
+                  "users",
+                  Document(
+                    "created" := "$userCreated",
+                    "updated" := "$userUpdated"
+                  )
+                )
+                .computed(
+                  "categories",
+                  Document(
+                    "created" := "$categoryCreated",
+                    "updated" := "$categoryUpdated"
+                  )
+                )
+                .computed(
+                  "transactions",
+                  Document(
+                    "created" := "$transactionCreated",
+                    "updated" := "$transactionUpdated"
+                  )
+                )
+                .computed(
+                  "periodicTransactions",
+                  Document(
+                    "created" := "$periodicTransactionCreated",
+                    "updated" := "$periodicTransactionUpdated"
+                  )
+                )
+                .computed(
+                  "accounts",
+                  Document(
+                    "created" := "$accountCreated",
+                    "updated" := "$accountUpdated"
+                  )
+                )
             )
         )
         .first

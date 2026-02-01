@@ -20,7 +20,7 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
   "A SessionRepository" should {
 
-    "create new sessions" in {
+    "create new sessions" in
       withEmbeddedMongoDb { db =>
         val result = for
           repo <- SessionRepository.make(db)
@@ -40,9 +40,8 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           ).some
         }
       }
-    }
 
-    "return empty option when session does not exist" in {
+    "return empty option when session does not exist" in
       withEmbeddedMongoDb { db =>
         val result = for
           repo <- SessionRepository.make(db)
@@ -51,9 +50,8 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
         result.map(_ mustBe None)
       }
-    }
 
-    "unauth session" in {
+    "unauth session" in
       withEmbeddedMongoDb { db =>
         val result = for
           repo <- SessionRepository.make(db)
@@ -68,9 +66,8 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           sess.status mustBe SessionStatus.LoggedOut
         }
       }
-    }
 
-    "invalidate all sessions" in {
+    "invalidate all sessions" in
       withEmbeddedMongoDb { db =>
         val result = for
           repo <- SessionRepository.make(db)
@@ -89,9 +86,8 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           case _ => fail("unexpected match")
         }
       }
-    }
 
-    "update session lastAccessedAt field on find" in {
+    "update session lastAccessedAt field on find" in
       withEmbeddedMongoDb { db =>
         val result = for
           repo <- SessionRepository.make(db)
@@ -104,7 +100,6 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
           sess.flatMap(_.lastAccessedAt) must not be empty
         }
       }
-    }
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =

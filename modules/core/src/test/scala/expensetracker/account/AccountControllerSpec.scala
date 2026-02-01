@@ -11,7 +11,7 @@ import org.http4s.implicits.*
 
 class AccountControllerSpec extends HttpRoutesWordSpec:
 
-  def failedAuth(error: Throwable): Authenticator[IO] = _ => IO.raiseError(error)
+  def failedAuth(error: Throwable): Authenticator[IO]     = _ => IO.raiseError(error)
   def successfulAuth(session: Session): Authenticator[IO] = _ => IO.pure(session)
 
   "A AccountController" when {
@@ -24,7 +24,7 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
         val req = Request[IO](Method.GET, uri"/accounts").withAuthHeader()
         val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.Forbidden, Some("""{"message":"Session has expired"}"""))
+        res mustHaveStatus (Status.Forbidden, Some("""{"message":"Session has expired"}"""))
         verifyNoInteractions(svc)
       }
 
@@ -36,7 +36,7 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
         val req = Request[IO](Method.GET, uri"/accounts").withAuthHeader("Bearer ")
         val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.Forbidden, Some("""{"message":"Invalid Bearer token"}"""))
+        res mustHaveStatus (Status.Forbidden, Some("""{"message":"Invalid Bearer token"}"""))
         verifyNoInteractions(svc)
       }
 
@@ -49,7 +49,7 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
         val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
         val responseBody = """{"message":"Missing authorization header"}"""
-        res mustHaveStatus(Status.Forbidden, Some(responseBody))
+        res mustHaveStatus (Status.Forbidden, Some(responseBody))
         verifyNoInteractions(svc)
       }
 
@@ -61,7 +61,7 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
         val req = Request[IO](uri = uri"/accounts", method = Method.GET)
         val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.Forbidden, Some("""{"message":"Missing authorization header"}"""))
+        res mustHaveStatus (Status.Forbidden, Some("""{"message":"Missing authorization header"}"""))
         verifyNoInteractions(svc)
       }
     }
@@ -85,7 +85,7 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
              |"currency": {"code":"GBP","symbol":"£"},
              |"isMain":false
              |}""".stripMargin
-        res mustHaveStatus(Status.Created, Some(resBody))
+        res mustHaveStatus (Status.Created, Some(resBody))
         verify(svc).create(Accounts.create())
       }
 
@@ -100,7 +100,7 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
           .withBody(s"""{"name":"new-account","isMain":false,"currency":{"code":"GBP","symbol":"£"}}""")
         val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
 
-        res mustHaveStatus(Status.Conflict, Some("""{"message":"An account with name new-account already exists"}"""))
+        res mustHaveStatus (Status.Conflict, Some("""{"message":"An account with name new-account already exists"}"""))
         verify(svc).create(Accounts.create())
       }
     }

@@ -25,7 +25,7 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
 
   "PeriodicTransactionRepository" when {
     "create" should {
-      "create new transaction and return it with category" in {
+      "create new transaction and return it with category" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -33,9 +33,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAll(Users.uid1)
           yield txs mustBe List(tx)
         }
-      }
 
-      "return an error when trying to create a transaction with invalid category" in {
+      "return an error when trying to create a transaction with invalid category" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -43,9 +42,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             res <- repo.create(PeriodicTransactions.create(catid = catid)).attempt
           yield res mustBe Left(AppError.CategoryDoesNotExist(catid))
         }
-      }
 
-      "return an error when trying to create a transaction with invalid account" in {
+      "return an error when trying to create a transaction with invalid account" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -53,11 +51,10 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             res <- repo.create(PeriodicTransactions.create(accid = Some(accid))).attempt
           yield res mustBe Left(AppError.AccountDoesNotExist(accid))
         }
-      }
     }
 
     "update" should {
-      "update existing tx" in {
+      "update existing tx" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -66,20 +63,18 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAll(Users.uid1)
           yield txs.map(tx => tx.id -> tx.amount) mustBe List(tx.id -> GBP(25.0))
         }
-      }
 
-      "return error when tx does not exist" in {
+      "return error when tx does not exist" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
             res  <- repo.update(PeriodicTransactions.tx()).attempt
           yield res mustBe Left(TransactionDoesNotExist(PeriodicTransactions.txid))
         }
-      }
     }
 
     "hide" should {
-      "update hidden field of a tx" in {
+      "update hidden field of a tx" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -88,9 +83,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAll(Users.uid1)
           yield txs mustBe Nil
         }
-      }
 
-      "return error when tx does not exist" in {
+      "return error when tx does not exist" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -98,9 +92,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             res  <- repo.hide(Users.uid2, tx.id).attempt
           yield res mustBe Left(TransactionDoesNotExist(tx.id))
         }
-      }
 
-      "update hidden field of a tx by category id" in {
+      "update hidden field of a tx by category id" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -109,22 +102,20 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAll(Users.uid1)
           yield txs mustBe Nil
         }
-      }
 
-      "update hidden field of a tx by account id" in {
+      "update hidden field of a tx by account id" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            _ <- repo.create(PeriodicTransactions.create())
-            _ <- repo.hideByAccount(Accounts.id, true)
-            txs <- repo.getAll(Users.uid1)
+            _    <- repo.create(PeriodicTransactions.create())
+            _    <- repo.hideByAccount(Accounts.id, true)
+            txs  <- repo.getAll(Users.uid1)
           yield txs mustBe Nil
         }
-      }
     }
 
     "save" should {
-      "insert new tx into db" in {
+      "insert new tx into db" in
         withEmbeddedMongoDb { case (db, sess) =>
           val tx = PeriodicTransactions.tx()
           for
@@ -133,9 +124,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAll(Users.uid1)
           yield txs.map(_.copy(category = None, createdAt = None, lastUpdatedAt = None, account = None)) mustBe List(tx)
         }
-      }
 
-      "update existing tx in db" in {
+      "update existing tx in db" in
         withEmbeddedMongoDb { case (db, sess) =>
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
@@ -144,11 +134,10 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAll(Users.uid1)
           yield txs.map(tx => tx.id -> tx.amount) mustBe List(tx.id -> GBP(10.0))
         }
-      }
     }
 
     "getAllByOccurrenceDate" should {
-      "return all periodic transactions that are due to be executed on provided date" in {
+      "return all periodic transactions that are due to be executed on provided date" in
         withEmbeddedMongoDb { case (db, sess) =>
           val date       = LocalDate.of(2024, 10, 10)
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date))
@@ -158,9 +147,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe List(tx.copy(category = None, account = None))
         }
-      }
 
-      "return all periodic transactions that are due to be executed on provided date when end date is after provided date" in {
+      "return all periodic transactions that are due to be executed on provided date when end date is after provided date" in
         withEmbeddedMongoDb { case (db, sess) =>
           val date       = LocalDate.of(2024, 10, 10)
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date), endDate = Some(date.plusDays(1)))
@@ -170,9 +158,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe List(tx.copy(category = None, account = None))
         }
-      }
 
-      "not return periodic transaction if its end date is same or before provided date" in {
+      "not return periodic transaction if its end date is same or before provided date" in
         withEmbeddedMongoDb { case (db, sess) =>
           val date       = LocalDate.of(2024, 10, 10)
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date), endDate = Some(date))
@@ -182,9 +169,8 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe Nil
         }
-      }
 
-      "not return anything when date is not matching" in {
+      "not return anything when date is not matching" in
         withEmbeddedMongoDb { case (db, sess) =>
           val date       = LocalDate.of(2024, 10, 10)
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date.plusDays(1)))
@@ -194,7 +180,6 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
             txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe Nil
         }
-      }
     }
   }
 

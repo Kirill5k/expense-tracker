@@ -117,7 +117,7 @@ object AccountController extends TapirSchema with TapirJson {
       id: String,
       name: String,
       currency: Currency,
-      isMain: Boolean,
+      isMain: Boolean
   ) derives Codec.AsObject
 
   object AccountView {

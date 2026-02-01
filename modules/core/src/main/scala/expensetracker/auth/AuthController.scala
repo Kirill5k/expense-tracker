@@ -63,7 +63,7 @@ final private class AuthController[F[_]](
   private def deleteCurrentUser(using authenticator: Authenticator[F]) =
     deleteCurrentUserEndpoint.withAuthenticatedSession
       .serverLogic { session => _ =>
-          userService.delete(session.userId).voidResponse
+        userService.delete(session.userId).voidResponse
       }
 
   private def deleteCurrentUserData(using authenticator: Authenticator[F]) =
@@ -215,7 +215,7 @@ object AuthController extends TapirSchema with TapirJson {
     .in(userPath / "data")
     .out(statusCode(StatusCode.NoContent))
     .description("Permanently delete currently logged in user's data")
-  
+
   val updateUserSettingsEndpoint = Controller.securedEndpoint.put
     .in(userIdPath / "settings")
     .in(jsonBody[UpdateUserSettingsRequest])

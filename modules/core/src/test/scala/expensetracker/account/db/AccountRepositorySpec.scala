@@ -24,7 +24,7 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
   "A AccountRepository" when {
 
     "create" should {
-      "create new account in db" in {
+      "create new account in db" in
         withEmbeddedMongoDb { client =>
           val create = Accounts.create()
           for
@@ -33,9 +33,8 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             accs   <- repo.getAll(Users.uid1)
           yield accs.map(_.id) must contain(newAcc.id)
         }
-      }
 
-      "return error if acc with such name already exists" in {
+      "return error if acc with such name already exists" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- AccountRepository.make(client)
@@ -44,11 +43,10 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
           result.attempt.map(_ mustBe Left(AccountAlreadyExists(AccountName("test-account"))))
         }
-      }
     }
 
     "hide" should {
-      "update hidden field of an account" in {
+      "update hidden field of an account" in
         withEmbeddedMongoDb { client =>
           for
             repo <- AccountRepository.make(client)
@@ -56,9 +54,8 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             cats <- repo.getAll(Users.uid1)
           yield cats mustBe Nil
         }
-      }
 
-      "return error when cat does not exist" in {
+      "return error when cat does not exist" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- AccountRepository.make(client)
@@ -67,11 +64,10 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
           result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
         }
-      }
     }
 
     "delete" should {
-      "remove user's account" in {
+      "remove user's account" in
         withEmbeddedMongoDb { client =>
           for
             repo <- AccountRepository.make(client)
@@ -79,9 +75,8 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             cats <- repo.getAll(Users.uid1)
           yield cats mustBe Nil
         }
-      }
 
-      "return error if userId doesn't match" in {
+      "return error if userId doesn't match" in
         withEmbeddedMongoDb { client =>
           val result = for
             repo <- AccountRepository.make(client)
@@ -90,11 +85,10 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
           result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
         }
-      }
     }
 
     "update" should {
-      "update existing accounts" in {
+      "update existing accounts" in
         withEmbeddedMongoDb { db =>
           val update = Accounts.acc(id = Accounts.id, name = AccountName("updated"), uid = Users.uid1)
           for
@@ -103,9 +97,8 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             accs <- repo.getAll(Users.uid1)
           yield accs.map(_.copy(lastUpdatedAt = None)) mustBe List(update)
         }
-      }
 
-      "return error when account does not exist" in {
+      "return error when account does not exist" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- AccountRepository.make(db)
@@ -114,11 +107,10 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
 
           result.attempt.map(_ mustBe Left(AccountDoesNotExist(Accounts.id)))
         }
-      }
     }
 
     "save" should {
-      "insert data into db if it doesn't exist" in {
+      "insert data into db if it doesn't exist" in
         withEmbeddedMongoDb { db =>
           val newAcc = Accounts.acc(id = AccountId(ObjectId()), name = AccountName("account"), uid = Users.uid2)
           for
@@ -127,9 +119,8 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             accs <- repo.getAll(Users.uid2)
           yield accs.map(_.copy(lastUpdatedAt = None, createdAt = None)) mustBe List(newAcc)
         }
-      }
 
-      "update existing data" in {
+      "update existing data" in
         withEmbeddedMongoDb { db =>
           val updatedAcc = Accounts.acc(id = Accounts.id, name = AccountName("updated"), uid = Users.uid1)
           for
@@ -138,7 +129,6 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
             accs <- repo.getAll(Users.uid1)
           yield accs.map(_.copy(lastUpdatedAt = None, createdAt = None)) mustBe List(updatedAcc)
         }
-      }
     }
   }
 

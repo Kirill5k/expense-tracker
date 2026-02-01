@@ -19,7 +19,7 @@ class UserServiceSpec extends IOWordSpec {
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
-          res <- service.deleteData(Users.uid1)
+          res     <- service.deleteData(Users.uid1)
         yield res
 
         result.asserting { res =>
@@ -40,7 +40,7 @@ class UserServiceSpec extends IOWordSpec {
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
-          res <- service.delete(Users.uid1)
+          res     <- service.delete(Users.uid1)
         yield res
 
         result.asserting { res =>
@@ -49,7 +49,7 @@ class UserServiceSpec extends IOWordSpec {
           verify(disp).dispatch(Action.DeleteAllCategories(Users.uid1))
           verify(disp).dispatch(Action.DeleteAllTransactions(Users.uid1))
           verify(disp).dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
-          res mustBe()
+          res mustBe ()
         }
       }
     }

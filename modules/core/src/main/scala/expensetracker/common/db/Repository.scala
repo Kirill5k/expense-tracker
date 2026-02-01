@@ -69,6 +69,6 @@ trait Repository[F[_]] {
 
   protected def countByName[T](collection: MongoCollection[F, T], uid: UserId, name: String): F[Long] =
     collection.count(userIdEq(uid) && notHidden && Filter.regex(Field.Name, "(?i)^" + name + "$"))
-    
+
   protected def now: Instant = Instant.now()
 }

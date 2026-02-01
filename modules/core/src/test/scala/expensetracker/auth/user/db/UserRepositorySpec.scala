@@ -27,7 +27,7 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
   "An UserRepository" when {
 
     "find" should {
-      "return error account does not exist" in {
+      "return error account does not exist" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
@@ -36,9 +36,8 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
           result.attempt.map(_ mustBe Left(UserDoesNotExist(Users.uid2)))
         }
-      }
 
-      "find account by id with its categories" in {
+      "find account by id with its categories" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
@@ -53,11 +52,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc.totalTransactionCount mustBe Some(2)
           }
         }
-      }
     }
 
     "findBy" should {
-      "find account by email" in {
+      "find account by email" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
@@ -68,9 +66,8 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc mustBe Some(User(Users.uid1, Users.details.email, Users.details.name, Users.hash, UserSettings.Default, Users.regDate))
           }
         }
-      }
 
-      "return empty option when account does not exist" in {
+      "return empty option when account does not exist" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
@@ -79,11 +76,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
           result.map(_ mustBe None)
         }
-      }
     }
 
     "updateSettings" should {
-      "update account settings" in {
+      "update account settings" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
@@ -95,11 +91,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc.settings mustBe UserSettings(USD, false, None, Some(7))
           }
         }
-      }
 
-      "return error when account does not exist" in {
+      "return error when account does not exist" in
         withEmbeddedMongoDb { db =>
-          val id = UserId(ObjectId().toHexString)
+          val id     = UserId(ObjectId().toHexString)
           val result = for
             repo <- UserRepository.make(db)
             acc  <- repo.updateSettings(id, UserSettings.Default)
@@ -107,11 +102,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
           result.attempt.map(_ mustBe Left(UserDoesNotExist(id)))
         }
-      }
     }
 
     "updatePassword" should {
-      "update account password" in {
+      "update account password" in
         withEmbeddedMongoDb { db =>
           val newpwd = PasswordHash("new-password")
           val result = for
@@ -124,11 +118,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             acc.password mustBe newpwd
           }
         }
-      }
 
-      "return error when account does not exist" in {
+      "return error when account does not exist" in
         withEmbeddedMongoDb { db =>
-          val id = UserId(ObjectId().toHexString)
+          val id     = UserId(ObjectId().toHexString)
           val result = for
             repo <- UserRepository.make(db)
             acc  <- repo.updatePassword(id)(Users.hash)
@@ -136,11 +129,10 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
           result.attempt.map(_ mustBe Left(UserDoesNotExist(id)))
         }
-      }
     }
 
     "create" should {
-      "create new account" in {
+      "create new account" in
         withEmbeddedMongoDb { db =>
           val email = UserEmail("acc2@et.com")
 
@@ -156,9 +148,8 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
             case _ => fail("unmatched case")
           }
         }
-      }
 
-      "return error when account already exists" in {
+      "return error when account already exists" in
         withEmbeddedMongoDb { db =>
           val result = for
             repo <- UserRepository.make(db)
@@ -167,7 +158,6 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
 
           result.attempt.map(_ mustBe Left(UserAlreadyExists(Users.details.email)))
         }
-      }
     }
   }
 
@@ -179,14 +169,14 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo 
           for
             db         <- client.getDatabase("expense-tracker")
             categories <- db.getCollection("categories")
-            _ <- categories.insertMany(
+            _          <- categories.insertMany(
               List(
                 categoryDoc(Categories.cid, "category-1", Some(Users.uid1)),
                 categoryDoc(Categories.cid2, "category-2", Some(Users.uid1), Some(true))
               )
             )
             transactions <- db.getCollection("transactions")
-            _ <- transactions.insertMany(
+            _            <- transactions.insertMany(
               List(
                 transactionDoc(Transactions.txid, Categories.cid, Users.uid1, GBP(15.0), Transactions.txdate),
                 transactionDoc(TransactionId(ObjectId().toHexString), Categories.cid2, Users.uid1, GBP(15.0), Transactions.txdate)

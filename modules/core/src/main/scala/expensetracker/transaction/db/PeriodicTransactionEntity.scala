@@ -38,8 +38,8 @@ final case class PeriodicTransactionEntity(
     accountId.isDefined && (
       account.isEmpty ||
         account.exists(acc => acc.hidden.getOrElse(false) || acc.userId != userId)
-      )
-    
+    )
+
   def toDomain: PeriodicTransaction =
     PeriodicTransaction(
       id = TransactionId(_id),
@@ -54,7 +54,7 @@ final case class PeriodicTransactionEntity(
       account = account.map(_.toDomain),
       hidden = hidden.getOrElse(false),
       createdAt = createdAt,
-      lastUpdatedAt = lastUpdatedAt,
+      lastUpdatedAt = lastUpdatedAt
     )
 }
 

@@ -48,7 +48,7 @@ final private class LiveTransactionService[F[_]](
 
   override def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit] =
     repository.hideByAccount(cid, hidden)
-  
+
   override def save(txs: List[Transaction]): F[Unit] =
     F.whenA(txs.nonEmpty)(repository.save(txs))
 

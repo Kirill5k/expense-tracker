@@ -31,7 +31,7 @@ final class Http[F[_]: Async] private (
 
   private val apiRoutes: HttpRoutes[F] = {
     given Authenticator[F] = auth.authenticator
-    val api = auth.controller.routes <+>
+    val api                = auth.controller.routes <+>
       categories.controller.routes <+>
       transactions.controller.routes <+>
       periodicTransactions.controller.routes <+>
@@ -43,7 +43,7 @@ final class Http[F[_]: Async] private (
 
   private val coreRoutes: HttpRoutes[F] = {
     given Authenticator[F] = auth.authenticator
-    val core = health.controller.routes <+>
+    val core               = health.controller.routes <+>
       wellKnown.controller.routes
     Router("/" -> core)
   }
