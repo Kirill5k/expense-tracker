@@ -12,7 +12,7 @@ object Dependencies {
     val refined      = "0.11.3"
     val logback      = "1.5.32"
     val log4cats     = "2.7.1"
-    val tapir        = "1.13.9"
+    val tapir        = "1.13.10"
     val jwt          = "11.0.3"
     val apispec      = "0.11.3"
   }
