@@ -37,6 +37,15 @@ const recurringTransactionsObservable =
       ).observe()
     }))
 
+const TRANSACTION_OBSERVED_COLUMNS = [
+  'amount_value',
+  'category_id',
+  'date',
+  'note',
+  'tags',
+  'hidden',
+]
+
 const transactionsObservable =
     withObservables(['state', 'user'], ({state}) => ({
       displayedTransactions: combineLatest([state.observe()]).pipe(
@@ -47,7 +56,7 @@ const transactionsObservable =
                   Q.where('user_id', Q.eq(currentState.userId)),
                   Q.where('hidden', Q.notEq(true)),
                   Q.sortBy('date', Q.desc),
-              ).observe()
+              ).observeWithColumns(TRANSACTION_OBSERVED_COLUMNS)
           )
       ),
       previousDisplayedTransactions: combineLatest([state.observe()]).pipe(
@@ -57,7 +66,7 @@ const transactionsObservable =
                   Q.where('date', Q.lt(currentState.displayDateStart)),
                   Q.where('user_id', Q.eq(currentState.userId)),
                   Q.where('hidden', Q.notEq(true)),
-              ).observe()
+              ).observeWithColumns(TRANSACTION_OBSERVED_COLUMNS)
           )
       ),
     }))
