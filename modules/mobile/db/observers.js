@@ -13,14 +13,35 @@ const userObservable =
       user: state.user.observe(),
     }))
 
+const CATEGORY_OBSERVED_COLUMNS = [
+  'name',
+  'icon',
+  'kind',
+  'color',
+  'hidden',
+]
+
 const categoriesObservable =
     withObservables([], ({state}) => ({
       categories: state.collections.get('categories').query(
           Q.where('user_id', Q.eq(state.userId)),
           Q.where('hidden', Q.notEq(true)),
           Q.sortBy('name', Q.asc),
-      ).observe()
+      ).observeWithColumns(CATEGORY_OBSERVED_COLUMNS)
     }))
+
+const RECURRING_TRANSACTION_OBSERVED_COLUMNS = [
+  'amount_value',
+  'category_id',
+  'recurrence_start_date',
+  'recurrence_next_date',
+  'recurrence_end_date',
+  'recurrence_interval',
+  'recurrence_frequency',
+  'note',
+  'tags',
+  'hidden',
+]
 
 const recurringTransactionsObservable =
     withObservables([], ({state}) => ({
@@ -29,12 +50,12 @@ const recurringTransactionsObservable =
           Q.where('user_id', Q.eq(state.userId)),
           Q.where('hidden', Q.notEq(true)),
           Q.sortBy('name', Q.asc),
-      ).observe(),
+      ).observeWithColumns(CATEGORY_OBSERVED_COLUMNS),
       recurringTransactions: state.collections.get('periodic_transactions').query(
           Q.where('user_id', Q.eq(state.userId)),
           Q.where('hidden', Q.notEq(true)),
           Q.sortBy('recurrence_next_date', Q.asc),
-      ).observe()
+      ).observeWithColumns(RECURRING_TRANSACTION_OBSERVED_COLUMNS)
     }))
 
 const TRANSACTION_OBSERVED_COLUMNS = [
