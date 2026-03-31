@@ -1,6 +1,7 @@
 package expensetracker
 
 import cats.effect.{IO, IOApp}
+import cats.effect.unsafe.IORuntimeConfig
 import expensetracker.account.Accounts
 import expensetracker.auth.Auth
 import expensetracker.category.Categories
@@ -14,7 +15,12 @@ import expensetracker.wellknown.WellKnown
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
+import scala.concurrent.duration.Duration
+
 object Application extends IOApp.Simple:
+  override def runtimeConfig: IORuntimeConfig =
+    super.runtimeConfig.copy(cpuStarvationCheckInitialDelay = Duration.Inf)
+  
   given logger: Logger[IO]   = Slf4jLogger.getLogger[IO]
   override val run: IO[Unit] =
     for
