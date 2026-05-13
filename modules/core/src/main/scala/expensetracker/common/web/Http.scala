@@ -1,8 +1,8 @@
 package expensetracker.common.web
 
-import cats.Monad
 import cats.effect.Async
 import cats.syntax.semigroupk.*
+import cats.syntax.applicative.*
 import expensetracker.account.Accounts
 import expensetracker.auth.{Auth, Authenticator}
 import expensetracker.category.Categories
@@ -26,7 +26,8 @@ final class Http[F[_]: Async] private (
     private val transactions: Transactions[F],
     private val periodicTransactions: PeriodicTransactions[F],
     private val accounts: Accounts[F],
-    private val sync: Sync[F]
+    private val sync: Sync[F],
+    private val redactor: SensitiveDataRedactor[F]
 ) {
 
   private val apiRoutes: HttpRoutes[F] = {
@@ -52,8 +53,9 @@ final class Http[F[_]: Async] private (
     .andThen((http: HttpRoutes[F]) => CORS.policy.withAllowOriginAll.withAllowCredentials(false).apply(http))
     .andThen((http: HttpRoutes[F]) => Timeout(60.seconds)(http))
 
-  private val loggers: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) => RequestLogger.httpRoutes(true, true)(http) }
-    .andThen((http: HttpRoutes[F]) => ResponseLogger.httpRoutes(true, true)(http))
+  private val loggers: HttpRoutes[F] => HttpRoutes[F] = { (http: HttpRoutes[F]) =>
+    RequestLogger.httpRoutes(true, true, logAction = Some(redactor.log))(http)
+  }.andThen((http: HttpRoutes[F]) => ResponseLogger.httpRoutes(true, true, logAction = Some(redactor.log))(http))
 
   val app: HttpRoutes[F] = loggers(middleware(apiRoutes)) <+> middleware(coreRoutes)
 
@@ -70,4 +72,14 @@ object Http:
       ptxs: PeriodicTransactions[F],
       accs: Accounts[F],
       sync: Sync[F]
-  ): F[Http[F]] = Monad[F].pure(Http(health, wellKnown, auth, cats, txs, ptxs, accs, sync))
+  ): F[Http[F]] = Http(
+    health = health,
+    wellKnown = wellKnown,
+    auth = auth,
+    categories = cats,
+    transactions = txs,
+    periodicTransactions = ptxs,
+    accounts = accs,
+    sync = sync,
+    redactor = SensitiveDataRedactor[F](Set("password", "currentPassword", "newPassword", "apiKey"))
+  ).pure[F]
