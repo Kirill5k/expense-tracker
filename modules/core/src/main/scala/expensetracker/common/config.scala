@@ -4,6 +4,8 @@ import cats.effect.kernel.Sync
 import kirill5k.common.http4s.Server
 import pureconfig.*
 
+import scala.concurrent.duration.FiniteDuration
+
 object config {
 
   final case class WellKnownAppleConfig(
@@ -27,7 +29,10 @@ object config {
 
   final case class MongoConfig(
       connectionUri: String,
-      databaseName: String
+      databaseName: String,
+      connectTimeout: FiniteDuration,
+      readTimeout: FiniteDuration,
+      serverSelectionTimeout: FiniteDuration
   ) derives ConfigReader
 
   final case class ServerConfig(
