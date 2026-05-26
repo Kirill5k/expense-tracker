@@ -28,8 +28,10 @@ object config {
   ) derives ConfigReader
 
   final case class MongoConfig(
-      connectionUri: String,
-      databaseName: String,
+      user: String,
+      password: String,
+      host: String,
+      dbName: String,
       connectTimeout: FiniteDuration,
       readTimeout: FiniteDuration,
       serverSelectionTimeout: FiniteDuration

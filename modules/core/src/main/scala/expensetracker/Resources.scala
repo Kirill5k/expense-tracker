@@ -14,13 +14,26 @@ trait Resources[F[_]]:
 
 object Resources:
 
+  private def mongoConnectionUri(c: MongoConfig): Either[Throwable, String] =
+    val blank = List("user" -> c.user, "password" -> c.password, "host" -> c.host)
+      .collect { case (name, value) if value.isBlank => name }
+    Either.cond(
+      blank.isEmpty,
+      s"mongodb+srv://${c.user}:${c.password}@${c.host}/${c.dbName}",
+      new IllegalArgumentException(
+        s"MongoDB config is missing required fields: ${blank.mkString(", ")}. " +
+          "Please set the MONGO_USER, MONGO_PASSWORD, and MONGO_HOST environment variables."
+      )
+    )
+
   private def mongoDb[F[_]: Async](config: MongoConfig): Resource[F, (ClientSession[F], MongoDatabase[F])] =
     for
+      uri <- Resource.eval(Async[F].fromEither(mongoConnectionUri(config)))
       settings = MongoClientSettings
         .builder()
         .retryReads(true)
         .retryWrites(true)
-        .applyConnectionString(ConnectionString(config.connectionUri))
+        .applyConnectionString(ConnectionString(uri))
         .applyToSocketSettings { builder =>
           val _ = builder
             .connectTimeout(config.connectTimeout.toMillis, TimeUnit.MILLISECONDS)
@@ -31,10 +44,10 @@ object Resources:
         }
         .build()
       client  <- MongoClient.create[F](settings)
+      db      <- Resource.eval(client.getDatabase(config.dbName))
       session <- client.startSession
-      db      <- Resource.eval(client.getDatabase(config.databaseName))
     yield session -> db
-
+  
   def make[F[_]: Async](config: AppConfig): Resource[F, Resources[F]] =
     mongoDb[F](config.mongo).map { case (sess, db) =>
       new Resources[F] {

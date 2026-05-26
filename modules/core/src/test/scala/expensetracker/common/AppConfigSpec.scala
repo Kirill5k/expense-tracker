@@ -17,7 +17,9 @@ class AppConfigSpec extends IOWordSpec {
 
       config.asserting { c =>
         c.server.host mustBe "0.0.0.0"
-        c.mongo.connectionUri mustBe "mongodb+srv://user:password@mongo/expense-tracker"
+        c.mongo.user mustBe "user"
+        c.mongo.host mustBe "mongo"
+        c.mongo.password mustBe "password"
       }
     }
   }
