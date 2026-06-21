@@ -176,7 +176,7 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
           val recurrence = PeriodicTransactions.recurrence.copy(nextDate = Some(date.plusDays(1)))
           for
             repo <- PeriodicTransactionRepository.make(db, sess, false)
-            tx   <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
+            _    <- repo.create(PeriodicTransactions.create(recurrence = recurrence))
             txs  <- repo.getAllByRecurrenceDate(date)
           yield txs mustBe Nil
         }
