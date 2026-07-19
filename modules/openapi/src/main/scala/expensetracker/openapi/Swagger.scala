@@ -1,9 +1,14 @@
 package expensetracker.openapi
 
 import cats.effect.Async
+import expensetracker.account.AccountController
 import expensetracker.auth.AuthController
 import expensetracker.category.CategoryController
+import expensetracker.health.HealthController
+import expensetracker.sync.SyncController
+import expensetracker.transaction.PeriodicTransactionController
 import expensetracker.transaction.TransactionController
+import expensetracker.wellknown.WellKnownController
 import org.http4s.HttpRoutes
 import sttp.apispec.openapi.Info
 import sttp.apispec.openapi.circe.yaml.*
@@ -12,6 +17,14 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.SwaggerUI
 
 object Swagger {
+  private val accounts = List(
+    AccountController.getAllAccountsEndpoint,
+    AccountController.createAccountEndpoint,
+    AccountController.updateAccountEndpoint,
+    AccountController.hideAccountEndpoint,
+    AccountController.deleteAccountEndpoint
+  )
+
   private val categories = List(
     CategoryController.getAllCategoriesEndpoint,
     CategoryController.getCategoryByIdEndpoint,
@@ -30,16 +43,39 @@ object Swagger {
     TransactionController.deleteEndpoint
   )
 
+  private val periodicTransactions = List(
+    PeriodicTransactionController.createEndpoint,
+    PeriodicTransactionController.getAllEndpoint,
+    PeriodicTransactionController.getByIdEndpoint,
+    PeriodicTransactionController.updateEndpoint,
+    PeriodicTransactionController.hideEndpoint
+  )
+
   private val auth = List(
     AuthController.createUserEndpoint,
     AuthController.loginEndpoint,
     AuthController.getCurrentUserEndpoint,
     AuthController.changePasswordEndpoint,
     AuthController.updateUserSettingsEndpoint,
-    AuthController.logoutEndpoint
+    AuthController.logoutEndpoint,
+    AuthController.deleteCurrentUserEndpoint,
+    AuthController.deleteCurrentUserDataEndpoint
   )
 
-  private val allEndpoints = auth ::: categories ::: transactions
+  private val sync = List(
+    SyncController.pullChangesEndpoint,
+    SyncController.pushChangesEndpoint
+  )
+
+  private val health = List(
+    HealthController.statusEndpoint
+  )
+
+  private val wellKnown = List(
+    WellKnownController.aasaEndpoint
+  )
+
+  private val allEndpoints = auth ::: categories ::: transactions ::: accounts ::: periodicTransactions ::: sync ::: health ::: wellKnown
 
   private val apiInfo = Info("Expense-tracker", "1.0", Some("Expense-tracker API documentation"))
 
@@ -48,3 +84,4 @@ object Swagger {
     Http4sServerInterpreter[F]().toRoutes(SwaggerUI(docsAsYaml))
 
 }
+
