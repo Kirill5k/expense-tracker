@@ -19,6 +19,7 @@ class PeriodicTransactionSpec extends AnyWordSpec with Matchers {
         id = TransactionId("67071900f0844c2b758161c0"),
         userId = ptx.userId,
         categoryId = ptx.categoryId,
+        accountId = ptx.accountId,
         parentTransactionId = Some(ptx.id),
         isRecurring = true,
         amount = ptx.amount,
@@ -27,6 +28,12 @@ class PeriodicTransactionSpec extends AnyWordSpec with Matchers {
         tags = ptx.tags,
         hidden = false
       )
+    }
+
+    "leave generated transactions unassigned when the schedule has no account" in {
+      val ptx = PeriodicTransactions.tx(accid = None)
+
+      ptx.toTransaction(LocalDate.of(2024, 10, 10)).accountId mustBe None
     }
   }
 }

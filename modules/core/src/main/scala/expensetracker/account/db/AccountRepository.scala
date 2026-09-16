@@ -9,6 +9,7 @@ import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
 import expensetracker.common.JsonCodecs
 import kirill5k.common.cats.syntax.applicative.*
+import kirill5k.common.cats.syntax.monadthrow.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.collection.MongoCollection
 import mongo4cats.database.MongoDatabase
@@ -38,7 +39,7 @@ final private class LiveAccountRepository[F[_]](
         .setOnInsert(Field.Id, acc.id.toObjectId)
         .setOnInsert(Field.UId, acc.userId.toObjectId)
         .set(Field.Name, acc.name)
-        .set(Field.Currency, acc.currency)
+        .setOnInsert(Field.Currency, acc.currency)
         .set(Field.Hidden, acc.hidden)
 
       upd = acc.createdAt.fold(upd.setOnInsert(Field.CreatedAt, now))(ts => upd.set(Field.CreatedAt, ts))
@@ -76,9 +77,14 @@ final private class LiveAccountRepository[F[_]](
         case _ => F.raiseError(AppError.AccountAlreadyExists(acc.name))
 
   override def update(acc: Account): F[Unit] =
-    collection
-      .updateOne(acc.toFilterById, acc.toUpdate)
-      .flatMap(errorIfNoMatches(AppError.AccountDoesNotExist(acc.id)))
+    for
+      existing <- collection.find(acc.toFilterById).first.unwrapOpt(AppError.AccountDoesNotExist(acc.id))
+      _        <- F.raiseWhen(existing.currency != acc.currency)(AppError.AccountCurrencyCannotBeChanged)
+      matches  <- countByName(collection, acc.userId, acc.name.value, Some(acc.id.toObjectId))
+      _        <- F.raiseWhen(matches > 0)(AppError.AccountAlreadyExists(acc.name))
+      result   <- collection.updateOne(acc.toFilterById, acc.toUpdate)
+      _        <- errorIfNoMatches(AppError.AccountDoesNotExist(acc.id))(result)
+    yield ()
 
   override def save(accs: List[Account]): F[Unit] =
     val commands = accs.map(c => WriteCommand.UpdateOne(c.toFilterById, c.toUpdate, upsertUpdateOpt))

@@ -35,10 +35,12 @@ trait TransactionRepository[F[_]] extends Repository[F]:
   def hideByAccount(aid: AccountId, hidden: Boolean): F[Unit]
   def isHidden(uid: UserId, txid: TransactionId): F[Boolean]
   def save(txs: List[Transaction]): F[Unit]
+  def saveGenerated(txs: List[Transaction]): F[Unit]
   def deleteAll(uid: UserId): F[Unit]
 
 final private class LiveTransactionRepository[F[_]](
     private val collection: MongoCollection[F, TransactionEntity],
+    private val references: TransactionReferences[F],
     private val session: ClientSession[F],
     private val acid: Boolean
 )(using
@@ -101,9 +103,13 @@ final private class LiveTransactionRepository[F[_]](
       .unwrapOpt(TransactionDoesNotExist(txid))
 
   override def update(tx: Transaction): F[Unit] =
-    collection
-      .updateOne(tx.toFilterById, tx.toUpdate)
-      .flatMap(errorIfNoMatches(TransactionDoesNotExist(tx.id)))
+    for
+      existing <- collection.count(tx.toFilterById)
+      _        <- F.raiseWhen(existing == 0)(TransactionDoesNotExist(tx.id))
+      _        <- references.validate(tx.userId, tx.categoryId, tx.accountId)
+      result   <- collection.updateOne(tx.toFilterById, tx.toUpdate)
+      _        <- errorIfNoMatches(TransactionDoesNotExist(tx.id))(result)
+    yield ()
 
   override def delete(uid: UserId, txid: TransactionId): F[Unit] =
     collection
@@ -136,6 +142,26 @@ final private class LiveTransactionRepository[F[_]](
     val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, upsertUpdateOpt))
     collection.bulkWrite(cmds).void
 
+  override def saveGenerated(txs: List[Transaction]): F[Unit] =
+    val cmds = txs.map { tx =>
+      val insert = Update
+        .setOnInsert(Field.Id, tx.id.toObjectId)
+        .setOnInsert(Field.UId, tx.userId.toObjectId)
+        .setOnInsert(Field.CId, tx.categoryId.toObjectId)
+        .setOnInsert(Field.AId, tx.accountId.map(_.toObjectId))
+        .setOnInsert(Field.Amount, tx.amount)
+        .setOnInsert(Field.Note, tx.note)
+        .setOnInsert(Field.Date, tx.date)
+        .setOnInsert(Field.Tags, tx.tags)
+        .setOnInsert(Field.Hidden, tx.hidden)
+        .setOnInsert("parentTransactionId", tx.parentTransactionId.map(_.toObjectId))
+        .setOnInsert("isRecurring", tx.isRecurring)
+        .setOnInsert(Field.CreatedAt, tx.createdAt.getOrElse(now))
+        .setOnInsert(Field.LastUpdatedAt, tx.lastUpdatedAt.getOrElse(now))
+      WriteCommand.UpdateOne(tx.toFilterById, insert, upsertUpdateOpt)
+    }
+    collection.bulkWrite(cmds).void
+
   override def deleteAll(uid: UserId): F[Unit] =
     collection.deleteMany(userIdEq(uid)).void
 }
@@ -144,4 +170,4 @@ object TransactionRepository extends MongoJsonCodecs with JsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F], cs: ClientSession[F], acid: Boolean = true): F[TransactionRepository[F]] =
     db.getCollectionWithCodec[TransactionEntity]("transactions")
       .map(_.withAddedCodec[Money])
-      .map(coll => LiveTransactionRepository[F](coll, cs, acid))
+      .map(coll => LiveTransactionRepository[F](coll, TransactionReferences[F](db), cs, acid))

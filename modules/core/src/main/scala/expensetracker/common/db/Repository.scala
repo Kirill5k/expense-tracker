@@ -10,6 +10,7 @@ import mongo4cats.models.collection.{UnwindOptions, UpdateOptions}
 import mongo4cats.operations.{Aggregate, Filter, Sort, Update}
 
 import java.time.Instant
+import java.util.regex.Pattern
 
 trait Repository[F[_]] {
 
@@ -67,8 +68,17 @@ trait Repository[F[_]] {
 
   protected val upsertUpdateOpt: UpdateOptions = UpdateOptions(upsert = true)
 
-  protected def countByName[T](collection: MongoCollection[F, T], uid: UserId, name: String): F[Long] =
-    collection.count(userIdEq(uid) && notHidden && Filter.regex(Field.Name, "(?i)^" + name + "$"))
+  protected def countByName[T](
+      collection: MongoCollection[F, T],
+      uid: UserId,
+      name: String,
+      excludedId: Option[ObjectId] = None
+  ): F[Long] =
+    collection.count(
+      userIdEq(uid) && notHidden &&
+        Filter.regex(Field.Name, "(?i)^" + Pattern.quote(name) + "$") &&
+        excludedId.fold(Filter.empty)(id => Filter.ne(Field.Id, id))
+    )
 
   protected def now: Instant = Instant.now()
 }

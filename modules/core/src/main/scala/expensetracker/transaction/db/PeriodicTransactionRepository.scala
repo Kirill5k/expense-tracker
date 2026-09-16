@@ -11,7 +11,7 @@ import expensetracker.common.JsonCodecs
 import expensetracker.common.db.Repository
 import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.{CategoryDoesNotExist, TransactionDoesNotExist}
-import expensetracker.transaction.{CreatePeriodicTransaction, PeriodicTransaction, RecurrencePattern, TransactionId}
+import expensetracker.transaction.{CreatePeriodicTransaction, PeriodicTransaction, RecurrenceCheckpoint, RecurrencePattern, TransactionId}
 import kirill5k.common.cats.syntax.applicative.*
 import mongo4cats.circe.MongoJsonCodecs
 import mongo4cats.client.ClientSession
@@ -31,11 +31,14 @@ trait PeriodicTransactionRepository[F[_]] extends Repository[F]:
   def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
   def hideByAccount(aid: AccountId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
+  def advanceRecurrences(checkpoints: List[RecurrenceCheckpoint]): F[Unit]
+  def validCheckpointIds(checkpoints: List[RecurrenceCheckpoint]): F[Set[TransactionId]]
   def getAllByRecurrenceDate(date: LocalDate): F[List[PeriodicTransaction]]
   def deleteAll(uid: UserId): F[Unit]
 
 final private class LivePeriodicTransactionRepository[F[_]](
     private val collection: MongoCollection[F, PeriodicTransactionEntity],
+    private val references: TransactionReferences[F],
     private val session: ClientSession[F],
     private val acid: Boolean
 )(using
@@ -82,6 +85,25 @@ final private class LivePeriodicTransactionRepository[F[_]](
     val cmds = txs.map(tx => WriteCommand.UpdateOne(tx.toFilterById, tx.toUpdate, upsertUpdateOpt))
     collection.bulkWrite(cmds).void
 
+  private def checkpointFilter(checkpoint: RecurrenceCheckpoint): Filter =
+    userIdEq(checkpoint.userId) && idEq(checkpoint.id.toObjectId) && notHidden &&
+      Filter.eq(Field.Recurrence, checkpoint.previousRecurrence)
+
+  override def validCheckpointIds(checkpoints: List[RecurrenceCheckpoint]): F[Set[TransactionId]] =
+    if checkpoints.isEmpty then F.pure(Set.empty)
+    else
+      collection
+        .find(Filter.or(checkpoints.map(checkpointFilter)*))
+        .all
+        .map(_.map(tx => TransactionId(tx._id)).toSet)
+
+  override def advanceRecurrences(checkpoints: List[RecurrenceCheckpoint]): F[Unit] =
+    val cmds = checkpoints.map { checkpoint =>
+      val update = Update.set("recurrence.nextDate", checkpoint.nextDate).currentDate(Field.LastUpdatedAt)
+      WriteCommand.UpdateOne(checkpointFilter(checkpoint), update)
+    }
+    collection.bulkWrite(cmds).void
+
   override def getAll(uid: UserId): F[List[PeriodicTransaction]] =
     collection
       .aggregate[PeriodicTransactionEntity](findTxWithCategoryAndAccount(userIdEq(uid) && notHidden))
@@ -89,9 +111,13 @@ final private class LivePeriodicTransactionRepository[F[_]](
       .mapList(_.toDomain)
 
   override def update(tx: PeriodicTransaction): F[Unit] =
-    collection
-      .updateOne(tx.toFilterById, tx.toUpdate)
-      .flatMap(errorIfNoMatches(TransactionDoesNotExist(tx.id)))
+    for
+      existing <- collection.count(tx.toFilterById)
+      _        <- F.raiseWhen(existing == 0)(TransactionDoesNotExist(tx.id))
+      _        <- references.validate(tx.userId, tx.categoryId, tx.accountId)
+      result   <- collection.updateOne(tx.toFilterById, tx.toUpdate)
+      _        <- errorIfNoMatches(TransactionDoesNotExist(tx.id))(result)
+    yield ()
 
   override def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] =
     collection
@@ -112,8 +138,13 @@ final private class LivePeriodicTransactionRepository[F[_]](
     collection
       .find(
         notHidden &&
-          Filter.eq("recurrence.nextDate", date) &&
-          (Filter.isNull("recurrence.endDate") || Filter.gt("recurrence.endDate", date))
+          (Filter.lte("recurrence.nextDate", date) ||
+            (Filter.isNull("recurrence.nextDate") && Filter.lte("recurrence.startDate", date))) &&
+          (Filter.isNull("recurrence.endDate") || Filter.expr(
+            org.bson.Document.parse(
+              """{"$lt": [{"$ifNull": ["$recurrence.nextDate", "$recurrence.startDate"]}, "$recurrence.endDate"]}"""
+            )
+          ))
       )
       .all
       .mapList(_.toDomain)
@@ -127,4 +158,4 @@ object PeriodicTransactionRepository extends MongoJsonCodecs with JsonCodecs:
   def make[F[_]: Async](db: MongoDatabase[F], cs: ClientSession[F], acid: Boolean = true): F[PeriodicTransactionRepository[F]] =
     db.getCollectionWithCodec[PeriodicTransactionEntity]("periodic-transactions")
       .map(_.withAddedCodec[Money].withAddedCodec[RecurrencePattern])
-      .map(coll => LivePeriodicTransactionRepository[F](coll, cs, acid))
+      .map(coll => LivePeriodicTransactionRepository[F](coll, TransactionReferences[F](db), cs, acid))

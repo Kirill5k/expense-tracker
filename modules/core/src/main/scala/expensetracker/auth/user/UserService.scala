@@ -1,10 +1,13 @@
 package expensetracker.auth.user
 
 import cats.{MonadError, MonadThrow}
+import cats.syntax.applicativeError.*
 import cats.syntax.flatMap.*
 import expensetracker.auth.user.db.UserRepository
 import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError
+
+import java.util.concurrent.CancellationException
 
 trait UserService[F[_]]:
   def create(details: UserDetails, password: Password): F[UserId]
@@ -32,7 +35,15 @@ final private class LiveUserService[F[_]](
     encryptor
       .hash(password)
       .flatMap(h => repository.create(details, h))
-      .flatTap(uid => dispatcher.dispatch(Action.SetupNewUser(uid, details.currency)))
+      .flatTap { uid =>
+        dispatcher.dispatchAndAwait(Action.SetupNewUser(uid, details.currency)).onError {
+          // An interrupted processor may have no worker left to consume a compensating action.
+          case _: CancellationException => F.unit
+          case _                        =>
+            // Retain the user if cleanup fails; deleting it first would strand its financial data.
+            (deleteData(uid) >> repository.delete(uid)).handleError(_ => ())
+        }
+      }
 
   override def login(login: Login): F[User] =
     repository
@@ -66,13 +77,10 @@ final private class LiveUserService[F[_]](
     repository.save(users)
 
   override def delete(userId: UserId): F[Unit] =
-    repository.delete(userId) >> deleteData(userId)
+    deleteData(userId) >> repository.delete(userId)
 
   override def deleteData(userId: UserId): F[Unit] =
-    dispatcher.dispatch(Action.DeleteAllCategories(userId)) >>
-      dispatcher.dispatch(Action.DeleteAllTransactions(userId)) >>
-      dispatcher.dispatch(Action.DeleteAllPeriodicTransactions(userId)) >>
-      dispatcher.dispatch(Action.DeleteAllAccounts(userId))
+    dispatcher.dispatchAndAwait(Action.DeleteAllUserData(userId))
 }
 
 object UserService:

@@ -66,6 +66,9 @@ object errors {
     final case class AccountAlreadyExists(name: AccountName) extends Conflict:
       override val message: String = s"An account with name $name already exists"
 
+    case object AccountCurrencyCannotBeChanged extends BadReq:
+      override val message: String = "Account currency cannot be changed after creation"
+
     final case class TransactionDoesNotExist(id: TransactionId) extends NotFound:
       override val message: String = s"Transaction with id $id does not exist"
 

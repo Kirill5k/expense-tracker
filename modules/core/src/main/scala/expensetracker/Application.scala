@@ -20,7 +20,7 @@ import scala.concurrent.duration.Duration
 object Application extends IOApp.Simple:
   override def runtimeConfig: IORuntimeConfig =
     super.runtimeConfig.copy(cpuStarvationCheckInitialDelay = Duration.Inf)
-  
+
   given logger: Logger[IO]   = Slf4jLogger.getLogger[IO]
   override val run: IO[Unit] =
     for
@@ -40,6 +40,7 @@ object Application extends IOApp.Simple:
           sync       <- Sync.make(res, dispatcher)
           http       <- Http.make(health, wellKnown, auth, cats, txs, ptxs, accs, sync)
           processor  <- ActionProcessor.make[IO](dispatcher, auth.userService, cats.service, txs.service, ptxs.service, accs.service)
+          _          <- dispatcher.dispatch(Action.GeneratePeriodicTransactionRecurrences)
           _          <- dispatcher.dispatch(Action.SchedulePeriodicTransactionRecurrenceGeneration)
           _          <- logger.info("starting http server") >> http
             .serve(config.server)

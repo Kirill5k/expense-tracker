@@ -26,7 +26,6 @@ class PeriodicTransactionServiceSpec extends IOWordSpec {
 
         val (repo, disp) = mocks
         when(repo.getAllByRecurrenceDate(any[LocalDate])).thenReturnIO(List(ptx))
-        when(repo.save(anyList[PeriodicTransaction])).thenReturnUnit
         when(disp.dispatch(any[Action])).thenReturnUnit
 
         val result = for
@@ -37,12 +36,13 @@ class PeriodicTransactionServiceSpec extends IOWordSpec {
         result.asserting { res =>
           verify(repo).getAllByRecurrenceDate(now)
           verify(disp).dispatch(
-            Action.SaveTransactions(
+            Action.SaveGeneratedRecurrences(
               List(
                 Transaction(
                   id = TransactionId("672ff78060d80ea32bb028cb"),
                   userId = ptx.userId,
                   categoryId = ptx.categoryId,
+                  accountId = ptx.accountId,
                   parentTransactionId = Some(ptx.id),
                   isRecurring = true,
                   amount = ptx.amount,
@@ -51,12 +51,103 @@ class PeriodicTransactionServiceSpec extends IOWordSpec {
                   tags = ptx.tags,
                   hidden = false
                 )
-              )
+              ),
+              List(checkpoint(ptx, now))
             )
           )
-          verify(repo).save(List(ptx.withUpdatedNextDate(now)))
           verifyNoMoreInteractions(disp, repo)
           res mustBe ()
+        }
+      }
+
+      "catch up missed occurrences before an exclusive end date after downtime" in {
+        val recurrence = PeriodicTransactions.recurrence.copy(
+          startDate = now.minusDays(10),
+          nextDate = Some(now.minusDays(4)),
+          endDate = Some(now.minusDays(1)),
+          frequency = RecurrenceFrequency.Daily
+        )
+        val ptx   = PeriodicTransactions.tx(recurrence = recurrence)
+        val dates = List(now.minusDays(4), now.minusDays(3), now.minusDays(2))
+
+        val (repo, disp) = mocks
+        when(repo.getAllByRecurrenceDate(any[LocalDate])).thenReturnIO(List(ptx))
+        when(disp.dispatch(any[Action])).thenReturnUnit
+
+        val result = for
+          svc <- PeriodicTransactionService.make[IO](repo, disp)
+          _   <- svc.generateRecurrencesForToday
+        yield ()
+
+        result.asserting { _ =>
+          verify(repo).getAllByRecurrenceDate(now)
+          verify(disp).dispatch(Action.SaveGeneratedRecurrences(dates.map(ptx.toTransaction), List(checkpoint(ptx, dates.last))))
+          verifyNoMoreInteractions(repo, disp)
+          succeed
+        }
+      }
+
+      "do nothing when there are no due schedules" in {
+        val (repo, disp) = mocks
+        when(repo.getAllByRecurrenceDate(any[LocalDate])).thenReturnIO(Nil)
+
+        val result = for
+          svc <- PeriodicTransactionService.make[IO](repo, disp)
+          _   <- svc.generateRecurrencesForToday
+        yield ()
+
+        result.asserting { _ =>
+          verify(repo).getAllByRecurrenceDate(now)
+          verifyNoMoreInteractions(repo)
+          verifyNoInteractions(disp)
+          succeed
+        }
+      }
+    }
+
+    "create" should {
+      "dispatch generated instances and their checkpoint together" in {
+        val recurrence   = PeriodicTransactions.recurrence.copy(startDate = now, nextDate = None)
+        val create       = PeriodicTransactions.create(recurrence = recurrence)
+        val ptx          = PeriodicTransactions.tx(recurrence = recurrence)
+        val (repo, disp) = mocks
+        when(repo.create(any[CreatePeriodicTransaction])).thenReturnIO(ptx)
+        when(disp.dispatch(any[Action])).thenReturnUnit
+
+        val result = for
+          svc <- PeriodicTransactionService.make[IO](repo, disp)
+          tx  <- svc.create(create)
+        yield tx
+
+        result.asserting { tx =>
+          tx mustBe ptx.withUpdatedNextDate(now)
+          verify(repo).create(create)
+          verify(disp).dispatch(Action.SaveGeneratedRecurrences(List(ptx.toTransaction(now)), List(checkpoint(ptx, now))))
+          verifyNoMoreInteractions(repo, disp)
+          succeed
+        }
+      }
+
+      "save the initial next date directly for a future schedule with no instances" in {
+        val recurrence   = PeriodicTransactions.recurrence.copy(startDate = now.plusDays(1), nextDate = None)
+        val create       = PeriodicTransactions.create(recurrence = recurrence)
+        val ptx          = PeriodicTransactions.tx(recurrence = recurrence)
+        val (repo, disp) = mocks
+        when(repo.create(any[CreatePeriodicTransaction])).thenReturnIO(ptx)
+        when(repo.save(anyList[PeriodicTransaction])).thenReturnUnit
+
+        val result = for
+          svc <- PeriodicTransactionService.make[IO](repo, disp)
+          tx  <- svc.create(create)
+        yield tx
+
+        result.asserting { tx =>
+          tx.recurrence.nextDate mustBe Some(recurrence.startDate)
+          verify(repo).create(create)
+          verify(repo).save(List(tx))
+          verifyNoMoreInteractions(repo)
+          verifyNoInteractions(disp)
+          succeed
         }
       }
     }
@@ -107,6 +198,9 @@ class PeriodicTransactionServiceSpec extends IOWordSpec {
       }
     }
   }
+
+  private def checkpoint(tx: PeriodicTransaction, date: LocalDate): RecurrenceCheckpoint =
+    RecurrenceCheckpoint(tx.id, tx.userId, tx.recurrence, tx.withUpdatedNextDate(date).recurrence.nextDate)
 
   def mocks: (PeriodicTransactionRepository[IO], ActionDispatcher[IO]) =
     (mock[PeriodicTransactionRepository[IO]], mock[ActionDispatcher[IO]])

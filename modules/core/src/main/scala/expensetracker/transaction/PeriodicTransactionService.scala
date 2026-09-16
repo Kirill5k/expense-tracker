@@ -22,6 +22,8 @@ trait PeriodicTransactionService[F[_]]:
   def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
   def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]
   def save(txs: List[PeriodicTransaction]): F[Unit]
+  def advanceRecurrences(checkpoints: List[RecurrenceCheckpoint]): F[Unit]
+  def validCheckpointIds(checkpoints: List[RecurrenceCheckpoint]): F[Set[TransactionId]]
   def generateRecurrencesForToday: F[Unit]
   def deleteAll(uid: UserId): F[Unit]
 
@@ -33,19 +35,24 @@ final private class LivePeriodicTransactionService[F[_]](
     C: Clock[F]
 ) extends PeriodicTransactionService[F] {
 
-  def getAll(uid: UserId): F[List[PeriodicTransaction]]                = repository.getAll(uid)
-  def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit] = repository.hide(uid, txid, hidden)
-  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]        = repository.hideByCategory(cid, hidden)
-  def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]          = repository.hideByAccount(cid, hidden)
-  def save(txs: List[PeriodicTransaction]): F[Unit]                    = F.whenA(txs.nonEmpty)(repository.save(txs))
+  def getAll(uid: UserId): F[List[PeriodicTransaction]]                    = repository.getAll(uid)
+  def hide(uid: UserId, txid: TransactionId, hidden: Boolean): F[Unit]     = repository.hide(uid, txid, hidden)
+  def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]            = repository.hideByCategory(cid, hidden)
+  def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]              = repository.hideByAccount(cid, hidden)
+  def save(txs: List[PeriodicTransaction]): F[Unit]                        = F.whenA(txs.nonEmpty)(repository.save(txs))
+  def advanceRecurrences(checkpoints: List[RecurrenceCheckpoint]): F[Unit] =
+    F.whenA(checkpoints.nonEmpty)(repository.advanceRecurrences(checkpoints))
+  def validCheckpointIds(checkpoints: List[RecurrenceCheckpoint]): F[Set[TransactionId]] =
+    repository.validCheckpointIds(checkpoints)
 
   override def create(tx: CreatePeriodicTransaction): F[PeriodicTransaction] =
     for
       newTx <- repository.create(tx)
       now   <- C.now.map(_.toLocalDate)
       (updatedTx, txInstances) = generateTxInstances(newTx, now)
-      _ <- F.whenA(txInstances.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(txInstances)))
-      _ <- save(List(updatedTx))
+      _ <-
+        if txInstances.isEmpty then save(List(updatedTx))
+        else dispatcher.dispatch(Action.SaveGeneratedRecurrences(txInstances, List(checkpoint(newTx, updatedTx))))
     yield updatedTx
 
   override def update(tx: PeriodicTransaction): F[Unit] =
@@ -62,16 +69,18 @@ final private class LivePeriodicTransactionService[F[_]](
     updatedPTx -> newTxs
   }
 
+  private def checkpoint(previous: PeriodicTransaction, updated: PeriodicTransaction): RecurrenceCheckpoint =
+    RecurrenceCheckpoint(previous.id, previous.userId, previous.recurrence, updated.recurrence.nextDate)
+
   override def generateRecurrencesForToday: F[Unit] =
     for
       now <- C.now.map(_.toLocalDate)
       txs <- repository.getAllByRecurrenceDate(now)
-      (updPTxs, updTxs) = txs.foldLeft((List.empty[PeriodicTransaction], List.empty[Transaction])) { case ((ptxs, txs), ptx) =>
+      (checkpoints, updTxs) = txs.foldLeft((List.empty[RecurrenceCheckpoint], List.empty[Transaction])) { case ((checkpoints, txs), ptx) =>
         val (updPtx, newTxs) = generateTxInstances(ptx, now)
-        (updPtx :: ptxs, newTxs ::: txs)
+        (checkpoint(ptx, updPtx) :: checkpoints, newTxs ::: txs)
       }
-      _ <- F.whenA(updTxs.nonEmpty)(dispatcher.dispatch(Action.SaveTransactions(updTxs)))
-      _ <- save(updPTxs)
+      _ <- F.whenA(checkpoints.nonEmpty)(dispatcher.dispatch(Action.SaveGeneratedRecurrences(updTxs, checkpoints)))
     yield ()
 
   override def deleteAll(uid: UserId): F[Unit] =

@@ -77,6 +77,7 @@ final case class PeriodicTransaction(
       id = TransactionId(oid.toHexString),
       userId = userId,
       categoryId = categoryId,
+      accountId = accountId,
       parentTransactionId = Some(id),
       isRecurring = true,
       amount = amount,
@@ -114,6 +115,13 @@ final case class RecurrencePattern(
     generateDates(nextDate.getOrElse(startDate), Nil)
   }
 }
+
+final case class RecurrenceCheckpoint(
+    id: TransactionId,
+    userId: UserId,
+    previousRecurrence: RecurrencePattern,
+    nextDate: Option[LocalDate]
+)
 
 object RecurrenceFrequency extends EnumType[RecurrenceFrequency](() => RecurrenceFrequency.values, _.print)
 enum RecurrenceFrequency:

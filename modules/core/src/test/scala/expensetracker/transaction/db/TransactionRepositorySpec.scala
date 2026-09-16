@@ -8,18 +8,19 @@ import expensetracker.auth.user.{UserEmail, UserId}
 import expensetracker.category.CategoryId
 import expensetracker.common.errors.AppError
 import expensetracker.common.errors.AppError.TransactionDoesNotExist
-import expensetracker.fixtures.{Accounts, Categories, Transactions, Users}
+import expensetracker.fixtures.{Accounts, Categories, PeriodicTransactions, Transactions, Users}
 import expensetracker.transaction.{Transaction, TransactionId}
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.{ClientSession, MongoClient}
 import mongo4cats.database.MongoDatabase
 import mongo4cats.embedded.EmbeddedMongo
+import mongo4cats.operations.{Filter, Update}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.GBP
 
 import java.time.temporal.ChronoUnit
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers with MongoOps {
@@ -27,6 +28,29 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
   override protected val mongoPort: Int = 12349
 
   "TransactionRepository" when {
+
+    "saveGenerated" should {
+      "deduplicate retried recurrences and preserve edited and archived ledger entries" in
+        withEmbeddedMongoDb { case (db, sess) =>
+          val tx = PeriodicTransactions.tx().toTransaction(LocalDate.of(2024, 10, 10))
+          for
+            repo    <- TransactionRepository.make(db, sess, false)
+            _       <- repo.saveGenerated(List(tx))
+            _       <- repo.saveGenerated(List(tx))
+            created <- repo.getAll(tx.userId, None, None)
+            _       <- repo.update(tx.copy(amount = GBP(29.50), note = Some("edited after generation")))
+            _       <- repo.hide(tx.userId, tx.id)
+            _       <- repo.saveGenerated(List(tx))
+            stored  <- repo.get(tx.userId, tx.id)
+          yield {
+            created.map(_.id) mustBe List(tx.id)
+            created.map(_.accountId) mustBe List(tx.accountId)
+            stored.amount mustBe GBP(29.50)
+            stored.note mustBe Some("edited after generation")
+            stored.hidden mustBe true
+          }
+        }
+    }
 
     "create" should {
       "create new transaction and return it with category" in
@@ -154,6 +178,84 @@ class TransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Ma
             _    <- repo.update(tx.copy(amount = GBP(25.0)))
             txs  <- repo.getAll(Users.uid1, None, None)
           yield txs.map(tx => tx.id -> tx.amount) mustBe List(tx.id -> GBP(25.0))
+        }
+
+      List("missing", "hidden", "owned by another user").foreach { state =>
+        s"reject an update with a $state category without changing the transaction" in
+          withEmbeddedMongoDb { case (db, sess) =>
+            val cid = CategoryId(ObjectId.gen)
+            for
+              repo       <- TransactionRepository.make(db, sess, false)
+              tx         <- repo.create(Transactions.create())
+              categories <- db.getCollection("categories")
+              _          <- IO.whenA(state != "missing")(
+                categories
+                  .insertOne(
+                    categoryDoc(
+                      cid,
+                      "unavailable category",
+                      Some(if state == "owned by another user" then Users.uid2 else Users.uid1),
+                      Some(state == "hidden")
+                    )
+                  )
+                  .void
+              )
+              result <- repo.update(tx.copy(categoryId = cid, amount = GBP(99.0))).attempt
+              stored <- repo.getAll(Users.uid1, None, None)
+            yield
+              result mustBe Left(AppError.CategoryDoesNotExist(cid))
+              stored.map(t => (t.id, t.categoryId, t.amount)) mustBe List((tx.id, tx.categoryId, tx.amount))
+          }
+
+        s"reject an update with a $state account without changing the transaction" in
+          withEmbeddedMongoDb { case (db, sess) =>
+            val aid = AccountId(ObjectId.gen)
+            for
+              repo     <- TransactionRepository.make(db, sess, false)
+              tx       <- repo.create(Transactions.create())
+              accounts <- db.getCollection("accounts")
+              _        <- IO.whenA(state != "missing")(
+                accounts
+                  .insertOne(
+                    accountDoc(
+                      aid,
+                      if state == "owned by another user" then Users.uid2 else Users.uid1,
+                      AccountName("unavailable account")
+                    )
+                  )
+                  .void
+              )
+              _ <- IO.whenA(state == "hidden")(
+                accounts.updateOne(Filter.idEq(aid.toObjectId), Update.set("hidden", true)).void
+              )
+              result <- repo.update(tx.copy(accountId = Some(aid), amount = GBP(99.0))).attempt
+              stored <- repo.getAll(Users.uid1, None, None)
+            yield
+              result mustBe Left(AppError.AccountDoesNotExist(aid))
+              stored.map(t => (t.id, t.accountId, t.amount)) mustBe List((tx.id, tx.accountId, tx.amount))
+          }
+      }
+
+      "allow removing an account assignment" in
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo <- TransactionRepository.make(db, sess, false)
+            tx   <- repo.create(Transactions.create())
+            _    <- repo.update(tx.copy(accountId = None))
+            txs  <- repo.getAll(Users.uid1, None, None)
+          yield txs.map(_.accountId) mustBe List(None)
+        }
+
+      "reject updates to another user's transaction" in
+        withEmbeddedMongoDb { case (db, sess) =>
+          for
+            repo   <- TransactionRepository.make(db, sess, false)
+            tx     <- repo.create(Transactions.create())
+            result <- repo.update(tx.copy(userId = Users.uid2, amount = GBP(99.0))).attempt
+            stored <- repo.getAll(Users.uid1, None, None)
+          yield
+            result mustBe Left(TransactionDoesNotExist(tx.id))
+            stored.map(_.amount) mustBe List(tx.amount)
         }
 
       "return error when tx does not exist" in

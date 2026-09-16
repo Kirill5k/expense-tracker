@@ -9,13 +9,15 @@ import expensetracker.common.actions.{Action, ActionDispatcher}
 import expensetracker.common.errors.AppError.{InvalidEmailOrPassword, InvalidPassword}
 import squants.market.GBP
 
+import java.util.concurrent.CancellationException
+
 class UserServiceSpec extends IOWordSpec {
 
   "A UserService" when {
     "deleteData" should {
       "dispatch an action for delete all user data" in {
         val (repo, encr, disp) = mocks
-        when(disp.dispatch(any[Action])).thenReturnUnit
+        when(disp.dispatchAndAwait(any[Action])).thenReturnUnit
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -23,20 +25,35 @@ class UserServiceSpec extends IOWordSpec {
         yield res
 
         result.asserting { res =>
-          verify(disp).dispatch(Action.DeleteAllAccounts(Users.uid1))
-          verify(disp).dispatch(Action.DeleteAllCategories(Users.uid1))
-          verify(disp).dispatch(Action.DeleteAllTransactions(Users.uid1))
-          verify(disp).dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
+          verify(disp).dispatchAndAwait(Action.DeleteAllUserData(Users.uid1))
+          verifyNoMoreInteractions(disp)
           res mustBe ()
         }
       }
     }
 
     "delete" should {
+      "keep the user available for retry when data cleanup fails" in {
+        val (repo, encr, disp) = mocks
+        val failure            = new RuntimeException("cleanup failed")
+        when(disp.dispatchAndAwait(any[Action])).thenRaiseError(failure)
+
+        val result = for
+          service  <- UserService.make[IO](repo, encr, disp)
+          response <- service.delete(Users.uid1).attempt
+        yield response
+
+        result.asserting { response =>
+          verify(disp).dispatchAndAwait(Action.DeleteAllUserData(Users.uid1))
+          verifyNoInteractions(repo, encr)
+          response mustBe Left(failure)
+        }
+      }
+
       "delete user as well as dispatch an action for delete all user data" in {
         val (repo, encr, disp) = mocks
         when(repo.delete(any[UserId])).thenReturnUnit
-        when(disp.dispatch(any[Action])).thenReturnUnit
+        when(disp.dispatchAndAwait(any[Action])).thenReturnUnit
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -45,21 +62,79 @@ class UserServiceSpec extends IOWordSpec {
 
         result.asserting { res =>
           verify(repo).delete(Users.uid1)
-          verify(disp).dispatch(Action.DeleteAllAccounts(Users.uid1))
-          verify(disp).dispatch(Action.DeleteAllCategories(Users.uid1))
-          verify(disp).dispatch(Action.DeleteAllTransactions(Users.uid1))
-          verify(disp).dispatch(Action.DeleteAllPeriodicTransactions(Users.uid1))
+          verify(disp).dispatchAndAwait(Action.DeleteAllUserData(Users.uid1))
+          verifyNoMoreInteractions(disp)
           res mustBe ()
         }
       }
     }
 
     "create" should {
+      "remove partial setup and the user after a confirmed setup failure" in {
+        val (repo, encr, disp) = mocks
+        val failure            = new RuntimeException("setup failed")
+        when(encr.hash(any[Password])).thenReturnIO(Users.hash)
+        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturnIO(Users.uid1)
+        when(repo.delete(any[UserId])).thenReturnUnit
+        when(disp.dispatchAndAwait(any[Action])).thenReturn(IO.raiseError(failure), IO.unit)
+
+        val result = for
+          service  <- UserService.make[IO](repo, encr, disp)
+          response <- service.create(Users.details, Users.pwd).attempt
+        yield response
+
+        result.asserting { response =>
+          verify(disp).dispatchAndAwait(SetupNewUser(Users.uid1, GBP))
+          verify(disp).dispatchAndAwait(Action.DeleteAllUserData(Users.uid1))
+          verify(repo).delete(Users.uid1)
+          response mustBe Left(failure)
+        }
+      }
+
+      "retain the user and return the original setup error when compensation cleanup fails" in {
+        val (repo, encr, disp) = mocks
+        val failure            = new RuntimeException("setup failed")
+        when(encr.hash(any[Password])).thenReturnIO(Users.hash)
+        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturnIO(Users.uid1)
+        when(disp.dispatchAndAwait(any[Action])).thenReturn(IO.raiseError(failure), IO.raiseError(new RuntimeException("cleanup failed")))
+
+        val result = for
+          service  <- UserService.make[IO](repo, encr, disp)
+          response <- service.create(Users.details, Users.pwd).attempt
+        yield response
+
+        result.asserting { response =>
+          verify(disp).dispatchAndAwait(Action.DeleteAllUserData(Users.uid1))
+          verify(repo, never).delete(any[UserId])
+          response mustBe Left(failure)
+        }
+      }
+
+      "avoid queueing compensation when setup processing was interrupted" in {
+        val (repo, encr, disp) = mocks
+        val failure            = new CancellationException("processor stopped")
+        when(encr.hash(any[Password])).thenReturnIO(Users.hash)
+        when(repo.create(any[UserDetails], any[PasswordHash])).thenReturnIO(Users.uid1)
+        when(disp.dispatchAndAwait(any[Action])).thenRaiseError(failure)
+
+        val result = for
+          service  <- UserService.make[IO](repo, encr, disp)
+          response <- service.create(Users.details, Users.pwd).attempt
+        yield response
+
+        result.asserting { response =>
+          verify(disp).dispatchAndAwait(SetupNewUser(Users.uid1, GBP))
+          verifyNoMoreInteractions(disp)
+          verify(repo, never).delete(any[UserId])
+          response mustBe Left(failure)
+        }
+      }
+
       "return account id on success" in {
         val (repo, encr, disp) = mocks
         when(encr.hash(any[Password])).thenReturnIO(Users.hash)
         when(repo.create(any[UserDetails], any[PasswordHash])).thenReturnIO(Users.uid1)
-        when(disp.dispatch(any[Action])).thenReturnUnit
+        when(disp.dispatchAndAwait(any[Action])).thenReturnUnit
 
         val result = for
           service <- UserService.make[IO](repo, encr, disp)
@@ -69,7 +144,7 @@ class UserServiceSpec extends IOWordSpec {
         result.asserting { res =>
           verify(encr).hash(Users.pwd)
           verify(repo).create(Users.details, Users.hash)
-          verify(disp).dispatch(SetupNewUser(Users.uid1, GBP))
+          verify(disp).dispatchAndAwait(SetupNewUser(Users.uid1, GBP))
           res mustBe Users.uid1
         }
       }

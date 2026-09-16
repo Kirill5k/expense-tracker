@@ -18,6 +18,7 @@ trait TransactionService[F[_]]:
   def hideByCategory(cid: CategoryId, hidden: Boolean): F[Unit]
   def hideByAccount(cid: AccountId, hidden: Boolean): F[Unit]
   def save(txs: List[Transaction]): F[Unit]
+  def saveGenerated(txs: List[Transaction]): F[Unit]
   def deleteAll(uid: UserId): F[Unit]
 
 final private class LiveTransactionService[F[_]](
@@ -51,6 +52,9 @@ final private class LiveTransactionService[F[_]](
 
   override def save(txs: List[Transaction]): F[Unit] =
     F.whenA(txs.nonEmpty)(repository.save(txs))
+
+  override def saveGenerated(txs: List[Transaction]): F[Unit] =
+    F.whenA(txs.nonEmpty)(repository.saveGenerated(txs))
 
   override def deleteAll(uid: UserId): F[Unit] =
     repository.deleteAll(uid)

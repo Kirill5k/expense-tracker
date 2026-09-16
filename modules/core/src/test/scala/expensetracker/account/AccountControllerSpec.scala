@@ -3,7 +3,7 @@ package expensetracker.account
 import cats.effect.IO
 import expensetracker.auth.Authenticator
 import expensetracker.auth.session.Session
-import expensetracker.common.errors.AppError.{AccountAlreadyExists, ExpiredSession}
+import expensetracker.common.errors.AppError.{AccountAlreadyExists, AccountCurrencyCannotBeChanged, ExpiredSession}
 import expensetracker.fixtures.{Accounts, Sessions}
 import kirill5k.common.http4s.test.HttpRoutesWordSpec
 import org.http4s.{Method, Request, Status, Uri}
@@ -102,6 +102,38 @@ class AccountControllerSpec extends HttpRoutesWordSpec:
 
         res mustHaveStatus (Status.Conflict, Some("""{"message":"An account with name new-account already exists"}"""))
         verify(svc).create(Accounts.create())
+      }
+    }
+
+    "PUT /accounts/:id" should {
+      "keep returning 204 when the account update succeeds" in {
+        val svc = mock[AccountService[IO]]
+        when(svc.update(any[Account])).thenReturnIO(())
+
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
+
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/accounts/${Accounts.id}"))
+          .withAuthHeader()
+          .withBody(s"""{"id":"${Accounts.id}","name":"Renamed","isMain":false,"currency":{"code":"GBP","symbol":"£"}}""")
+        val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        res mustHaveStatus Status.NoContent
+        verify(svc).update(Accounts.acc(name = AccountName("Renamed")))
+      }
+
+      "return 400 with the existing error shape when the account currency changes" in {
+        val svc = mock[AccountService[IO]]
+        when(svc.update(any[Account])).thenRaiseError(AccountCurrencyCannotBeChanged)
+
+        given auth: Authenticator[IO] = successfulAuth(Sessions.sess)
+
+        val req = Request[IO](Method.PUT, Uri.unsafeFromString(s"/accounts/${Accounts.id}"))
+          .withAuthHeader()
+          .withBody(s"""{"id":"${Accounts.id}","name":"Renamed","isMain":false,"currency":{"code":"USD","symbol":"$$"}}""")
+        val res = AccountController.make[IO](svc).flatMap(_.routes.orNotFound.run(req))
+
+        res mustHaveStatus (Status.BadRequest, Some("""{"message":"Account currency cannot be changed after creation"}"""))
+        verify(svc).update(Accounts.acc(name = AccountName("Renamed"), currency = squants.market.USD))
       }
     }
 
