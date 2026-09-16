@@ -1,10 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createBffHandler, DEFAULT_CORE_URL, MAX_REQUEST_BYTES, SESSION_COOKIE_NAME } from "./bff";
 import { GET as health } from "../../app/health/route";
 
 const origin = "https://tracker.example";
+const coreOrigin = "https://core.example.test";
 const objectId = "507f1f77bcf86cd799439011";
 const token = "header.payload.signature";
+
+afterEach(() => vi.unstubAllEnvs());
 
 function request(path: string, options: RequestInit = {}): Request {
   const method = options.method ?? "GET";
@@ -26,7 +29,12 @@ function setup(
   const fetcher = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(
     async () => result,
   );
-  const handle = createBffHandler({ fetch: fetcher, secureCookies: false, ...options });
+  const handle = createBffHandler({
+    fetch: fetcher,
+    coreUrl: coreOrigin,
+    secureCookies: false,
+    ...options,
+  });
   return { handle, fetcher };
 }
 
@@ -35,6 +43,41 @@ function expectPrivate(response: Response) {
   expect(response.headers.get("Vary")).toBe("Cookie");
   expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
 }
+
+describe("upstream configuration", () => {
+  it("uses an explicit origin ahead of the environment", async () => {
+    vi.stubEnv("EXPENSE_TRACKER_CORE_URL", "http://127.0.0.1:9");
+    const { handle, fetcher } = setup();
+    const response = await handle(request("accounts"), ["accounts"]);
+    expect(response.status).toBe(200);
+    expect(String(fetcher.mock.calls[0][0])).toBe(`${coreOrigin}/api/accounts`);
+  });
+
+  it("uses the environment when no explicit origin is supplied", async () => {
+    vi.stubEnv("EXPENSE_TRACKER_CORE_URL", "http://127.0.0.1:9");
+    const { handle, fetcher } = setup(jsonResponse([]), { coreUrl: undefined });
+    const response = await handle(request("accounts"), ["accounts"]);
+    expect(response.status).toBe(200);
+    expect(String(fetcher.mock.calls[0][0])).toBe("http://127.0.0.1:9/api/accounts");
+  });
+
+  it("uses the hosted default only when neither origin is configured", async () => {
+    vi.stubEnv("EXPENSE_TRACKER_CORE_URL", undefined);
+    const { handle, fetcher } = setup(jsonResponse([]), { coreUrl: undefined });
+    const response = await handle(request("accounts"), ["accounts"]);
+    expect(response.status).toBe(200);
+    expect(String(fetcher.mock.calls[0][0])).toBe(`${DEFAULT_CORE_URL}/api/accounts`);
+  });
+
+  it("rejects an invalid environment origin without fetching", async () => {
+    vi.stubEnv("EXPENSE_TRACKER_CORE_URL", "https://core.example.test/api");
+    const { handle, fetcher } = setup(jsonResponse([]), { coreUrl: undefined });
+    const response = await handle(request("accounts"), ["accounts"]);
+    expect(response.status).toBe(500);
+    expect((await response.json()).code).toBe("SERVICE_CONFIGURATION_ERROR");
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+});
 
 describe("browser session boundary", () => {
   it("exchanges login credentials for an HttpOnly session cookie and returns no token body", async () => {
@@ -54,7 +97,7 @@ describe("browser session boundary", () => {
     );
     expect(response.headers.get("Set-Cookie")).not.toMatch(/Max-Age|Expires|Domain/);
     const [url, init] = fetcher.mock.calls[0];
-    expect(String(url)).toBe(`${DEFAULT_CORE_URL}/api/auth/login`);
+    expect(String(url)).toBe(`${coreOrigin}/api/auth/login`);
     expect(init?.body).toBe(body);
     expect(new Headers(init?.headers).has("Authorization")).toBe(false);
     expectPrivate(response);
@@ -246,7 +289,7 @@ describe("allowlisted forwarding", () => {
     const { handle, fetcher } = setup(new Response(null, { status: 204 }));
     const response = await handle(request(path!, { method, body }), path!.split("/"));
     expect(response.status).toBe(204);
-    expect(String(fetcher.mock.calls[0][0])).toBe(`${DEFAULT_CORE_URL}/api/${path}`);
+    expect(String(fetcher.mock.calls[0][0])).toBe(`${coreOrigin}/api/${path}`);
     expect(fetcher.mock.calls[0][1]?.method).toBe(method);
   });
 
@@ -287,7 +330,7 @@ describe("allowlisted forwarding", () => {
     const query = "from=2026-09-01T00%3A00%3A00.000Z&to=2026-09-30T23%3A59%3A59.999Z";
     const response = await handle(request(`transactions?${query}`), ["transactions"]);
     expect(response.status).toBe(200);
-    expect(String(fetcher.mock.calls[0][0])).toBe(`${DEFAULT_CORE_URL}/api/transactions?${query}`);
+    expect(String(fetcher.mock.calls[0][0])).toBe(`${coreOrigin}/api/transactions?${query}`);
   });
 
   it.each([
@@ -537,7 +580,7 @@ describe("controlled upstream failures", () => {
     const fetcher = vi.fn(async () => {
       throw new Error("private network details");
     });
-    const handle = createBffHandler({ fetch: fetcher });
+    const handle = createBffHandler({ fetch: fetcher, coreUrl: coreOrigin });
     const response = await handle(request("transactions", { method: "POST", body: "{}" }), [
       "transactions",
     ]);
@@ -555,7 +598,7 @@ describe("controlled upstream failures", () => {
           });
         }),
     );
-    const handle = createBffHandler({ fetch: fetcher, timeoutMs: 5 });
+    const handle = createBffHandler({ fetch: fetcher, coreUrl: coreOrigin, timeoutMs: 5 });
     const response = await handle(request("transactions"), ["transactions"]);
     expect(response.status).toBe(504);
     expect((await response.json()).code).toBe("UPSTREAM_TIMEOUT");
@@ -566,7 +609,7 @@ describe("controlled upstream failures", () => {
     const fetcher = vi.fn(async () => {
       throw new Error("Offline");
     });
-    const handle = createBffHandler({ fetch: fetcher, secureCookies: false });
+    const handle = createBffHandler({ fetch: fetcher, coreUrl: coreOrigin, secureCookies: false });
     const response = await handle(request("auth/logout", { method: "POST" }), ["auth", "logout"]);
     expect(response.status).toBe(502);
     expect(response.headers.get("Set-Cookie")).toContain("Max-Age=0");
