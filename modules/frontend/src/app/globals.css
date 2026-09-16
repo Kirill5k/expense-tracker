@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #f7f8fa;
+  --foreground: #17191e;
+  --card: #ffffff;
+  --primary: #2254f4;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f2f5;
+  --muted: #e8ebf0;
+  --muted-foreground: #656c7a;
+  --border: #e7e9ee;
+  --destructive: #c42d46;
+  --income: #13764b;
+  --expense: #b52b47;
+}
+.dark {
+  --background: #101114;
+  --foreground: #f4f5f7;
+  --card: #1b1d22;
+  --primary: #769aff;
+  --primary-foreground: #101a36;
+  --secondary: #272a31;
+  --muted: #30343d;
+  --muted-foreground: #a4aaba;
+  --border: #30343c;
+  --destructive: #ff91a0;
+  --income: #78d4a5;
+  --expense: #ff91a0;
+  color-scheme: dark;
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-income: var(--income);
+  --color-expense: var(--expense);
+  --font-sans: var(--font-geist-sans);
+}
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans), sans-serif;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled),
+  a,
+  select {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+@layer components {
+  .panel {
+    border-radius: 24px;
+    background: var(--card);
+    padding: 1.5rem;
+  }
+  .form-input {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+  }
+  .form-input:disabled {
+    opacity: 0.6;
+  }
+  .form-input[aria-invalid="true"] {
+    border-color: var(--destructive);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

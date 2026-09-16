@@ -27,4 +27,4 @@ services:
     environment:
       EXPENSE_TRACKER_CORE_URL: http://expense-tracker-core:8080
     ports:
-      - "8000:80"
+      - "8000:3000"

@@ -1,0 +1,85 @@
+name: Frontend checks
+
+on:
+  pull_request:
+    paths:
+      - "modules/frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+      - "docker-compose.yml"
+      - "deployment/frontend.yaml"
+  push:
+    branches: ["**"]
+    paths:
+      - "modules/frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+      - "docker-compose.yml"
+      - "deployment/frontend.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Formatting, lint, types, tests, browser, and container checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: modules/frontend
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Browser tests mock API routes. Never fall back to the real hosted core.
+      EXPENSE_TRACKER_CORE_URL: "http://127.0.0.1:9"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: modules/frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Check types
+        run: npm run typecheck
+      - name: Unit and API boundary tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser checks with synthetic data
+        run: npm run test:e2e
+      - name: Build standalone container
+        run: docker build --tag expense-tracker-web:ci .
+      - name: Container health without backend access
+        run: |
+          frontend_container_id=$(docker run --detach --network none \
+            --env EXPENSE_TRACKER_CORE_URL=http://127.0.0.1:9 \
+            expense-tracker-web:ci)
+          trap 'docker rm --force "$frontend_container_id" >/dev/null' EXIT
+          for attempt in $(seq 1 30); do
+            if docker exec "$frontend_container_id" node -e '
+              fetch("http://127.0.0.1:3000/health", { signal: AbortSignal.timeout(2000) })
+                .then(async response => {
+                  const body = await response.json();
+                  process.exit(response.ok && body.status === "ok" ? 0 : 1);
+                })
+                .catch(() => process.exit(1));
+            '; then
+              echo "Standalone container health check passed."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Standalone container did not become healthy."
+          docker inspect --format '{{.State.Status}}' "$frontend_container_id"
+          exit 1

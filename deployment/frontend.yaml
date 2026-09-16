@@ -4,7 +4,7 @@ metadata:
   name: "web"
 spec:
   ports:
-    - targetPort: 80
+    - targetPort: 3000
       port: 80
   selector:
     app: "expense-tracker-frontend"
@@ -33,25 +33,25 @@ spec:
             - name: EXPENSE_TRACKER_CORE_URL
               value: "http://expense-tracker-core:8080"
           ports:
-            - containerPort: 80
+            - containerPort: 3000
           resources:
             requests:
-              memory: "16Mi"
+              memory: "128Mi"
               cpu: "0.05"
             limits:
-              memory: "32Mi"
+              memory: "512Mi"
               cpu: "0.1"
           readinessProbe:
             httpGet:
               scheme: HTTP
-              path: /index.html
-              port: 80
+              path: /health
+              port: 3000
             initialDelaySeconds: 10
             periodSeconds: 5
           livenessProbe:
             httpGet:
               scheme: HTTP
-              path: /index.html
-              port: 80
+              path: /health
+              port: 3000
             initialDelaySeconds: 10
             periodSeconds: 60
