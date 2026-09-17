@@ -2,13 +2,13 @@ package expensetracker.sync.db
 
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
-import expensetracker.MongoTestSupport
 import expensetracker.MongoOps
 import expensetracker.account.AccountName
 import expensetracker.auth.user.UserEmail
 import expensetracker.fixtures.{Accounts, Categories, Transactions, Users}
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
+import mongo4cats.embedded.EmbeddedMongo
 import mongo4cats.operations.{Filter, Update}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
@@ -17,7 +17,9 @@ import squants.market.GBP
 import java.time.Instant
 import scala.concurrent.Future
 
-class SyncRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSupport with MongoOps {
+class SyncRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
+
+  override protected val mongoPort: Int = 12352
 
   "A SyncRepository" when {
     "pullChanges" should {
@@ -82,9 +84,9 @@ class SyncRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSuppo
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
-    withAvailableMongoPort { port =>
+    withRunningEmbeddedMongo[IO, A] {
       MongoClient
-        .fromConnectionString[IO](s"mongodb://localhost:$port")
+        .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
         .use { client =>
           for
             db         <- client.getDatabase("expense-tracker")

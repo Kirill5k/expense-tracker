@@ -2,7 +2,6 @@ package expensetracker.account.db
 
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
-import expensetracker.MongoTestSupport
 import expensetracker.MongoOps
 import expensetracker.account.{AccountId, AccountName}
 import expensetracker.auth.user.UserEmail
@@ -12,13 +11,16 @@ import expensetracker.fixtures.Users
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
+import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.USD
 
 import scala.concurrent.Future
 
-class AccountRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSupport with MongoOps {
+class AccountRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
+
+  override protected val mongoPort: Int = 12350
 
   "A AccountRepository" when {
 
@@ -130,8 +132,9 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSu
             created <- repo.create(Accounts.create(name = AccountName("Dollar account"), currency = USD))
             _       <- repo.update(created.copy(name = AccountName("Renamed dollar account")))
             accs    <- repo.getAll(Users.uid1)
-          yield accs.find(_.id == created.id).map(acc => acc.name -> acc.currency) mustBe
-            Some(AccountName("Renamed dollar account") -> USD)
+          yield
+            accs.find(_.id == created.id).map(acc => acc.name -> acc.currency) mustBe
+              Some(AccountName("Renamed dollar account") -> USD)
         }
 
       "reject a case-insensitive duplicate rename without modifying the account" in
@@ -208,16 +211,17 @@ class AccountRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSu
             repo <- AccountRepository.make(db)
             _    <- repo.save(List(synced))
             accs <- repo.getAll(Users.uid1)
-          yield accs.map(_.copy(lastUpdatedAt = None, createdAt = None)) mustBe
-            List(synced.copy(currency = squants.market.GBP))
+          yield
+            accs.map(_.copy(lastUpdatedAt = None, createdAt = None)) mustBe
+              List(synced.copy(currency = squants.market.GBP))
         }
     }
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
-    withAvailableMongoPort { port =>
+    withRunningEmbeddedMongo[IO, A] {
       MongoClient
-        .fromConnectionString[IO](s"mongodb://localhost:$port")
+        .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
         .use { client =>
           for
             db       <- client.getDatabase("expense-tracker")

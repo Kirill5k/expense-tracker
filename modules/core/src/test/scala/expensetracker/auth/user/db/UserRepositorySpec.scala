@@ -3,7 +3,6 @@ package expensetracker.auth.user.db
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import de.flapdoodle.embed.mongo.distribution.Version
-import expensetracker.MongoTestSupport
 import expensetracker.MongoOps
 import expensetracker.auth.user.{PasswordHash, User, UserEmail, UserId, UserSettings}
 import expensetracker.category.CategoryName
@@ -13,14 +12,16 @@ import expensetracker.transaction.TransactionId
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
+import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import squants.market.{GBP, USD}
 
 import scala.concurrent.Future
 
-class UserRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSupport with MongoOps {
+class UserRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo with MongoOps {
 
+  override protected val mongoPort: Int        = 12346
   override protected val mongoVersion: Version = Version.V7_0_2
 
   "An UserRepository" when {
@@ -161,9 +162,9 @@ class UserRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSuppo
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
-    withAvailableMongoPort { port =>
+    withRunningEmbeddedMongo {
       MongoClient
-        .fromConnectionString[IO](s"mongodb://localhost:$port")
+        .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
         .use { client =>
           for
             db         <- client.getDatabase("expense-tracker")
