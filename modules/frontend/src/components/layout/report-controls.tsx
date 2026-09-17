@@ -91,48 +91,52 @@ export function ReportControls({
   return (
     <div className="mb-7 flex flex-wrap items-center gap-2">
       <AccountControls filters={filters} accounts={accounts} />
-      <div className="flex min-h-11 items-center gap-1 rounded-full bg-card px-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Previous period"
-          onClick={() => filters.setFilters(shiftRange(filters.range, filters.period, -1))}
-        >
-          <ChevronLeft />
-        </Button>
-        <span className="px-1 text-sm font-medium">{filters.label}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Next period"
-          onClick={() => filters.setFilters(shiftRange(filters.range, filters.period, 1))}
-        >
-          <ChevronRight />
-        </Button>
+      <div className="flex w-full min-w-0 items-center justify-between gap-2 sm:w-auto sm:justify-start">
+        <div className="flex min-h-12 min-w-0 items-center gap-1 rounded-full bg-card px-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Previous period"
+            onClick={() => filters.setFilters(shiftRange(filters.range, filters.period, -1))}
+          >
+            <ChevronLeft />
+          </Button>
+          <span className="min-w-0 truncate px-1 text-sm font-medium" title={filters.label}>
+            {filters.label}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Next period"
+            onClick={() => filters.setFilters(shiftRange(filters.range, filters.period, 1))}
+          >
+            <ChevronRight />
+          </Button>
+        </div>
+        <label className="relative shrink-0">
+          <CalendarDays
+            aria-hidden="true"
+            className="pointer-events-none absolute left-4 top-1/2 z-10 hidden size-4 -translate-y-1/2 text-muted-foreground sm:block"
+          />
+          <Select
+            aria-label="Reporting period"
+            value={filters.period}
+            className="w-auto rounded-full border-0 bg-card pl-4 sm:pl-11"
+            onChange={(e) => {
+              const period = e.target.value as Period;
+              filters.setFilters({
+                period,
+                ...(period === "custom" ? filters.range : periodRange(period)),
+              });
+            }}
+          >
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+            <option value="custom">Custom</option>
+          </Select>
+        </label>
       </div>
-      <label className="relative">
-        <CalendarDays
-          aria-hidden="true"
-          className="pointer-events-none absolute left-4 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground"
-        />
-        <Select
-          aria-label="Reporting period"
-          value={filters.period}
-          className="w-auto rounded-full border-0 bg-card pl-11"
-          onChange={(e) => {
-            const period = e.target.value as Period;
-            filters.setFilters({
-              period,
-              ...(period === "custom" ? filters.range : periodRange(period)),
-            });
-          }}
-        >
-          <option value="week">Week</option>
-          <option value="month">Month</option>
-          <option value="year">Year</option>
-          <option value="custom">Custom</option>
-        </Select>
-      </label>
       <NoAccountHint filters={filters} />
       {filters.period === "custom" && (
         <div className="flex w-full flex-wrap items-center gap-2 pt-2">
