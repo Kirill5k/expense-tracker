@@ -4,19 +4,17 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import cats.syntax.apply.*
 import cats.syntax.option.*
+import expensetracker.MongoTestSupport
 import expensetracker.fixtures.{Sessions, Users}
 import expensetracker.auth.session.*
 import mongo4cats.client.MongoClient
 import mongo4cats.database.MongoDatabase
-import mongo4cats.embedded.EmbeddedMongo
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 
 import scala.concurrent.Future
 
-class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMongo {
-
-  override protected val mongoPort: Int = 12347
+class SessionRepositorySpec extends AsyncWordSpec with Matchers with MongoTestSupport {
 
   "A SessionRepository" should {
 
@@ -103,9 +101,9 @@ class SessionRepositorySpec extends AsyncWordSpec with Matchers with EmbeddedMon
   }
 
   def withEmbeddedMongoDb[A](test: MongoDatabase[IO] => IO[A]): Future[A] =
-    withRunningEmbeddedMongo {
+    withAvailableMongoPort { port =>
       MongoClient
-        .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
+        .fromConnectionString[IO](s"mongodb://localhost:$port")
         .use { client =>
           client.getDatabase("expense-tracker").flatMap(test)
         }

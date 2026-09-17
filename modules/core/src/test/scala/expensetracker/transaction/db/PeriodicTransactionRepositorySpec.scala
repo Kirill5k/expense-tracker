@@ -2,6 +2,7 @@ package expensetracker.transaction.db
 
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
+import expensetracker.MongoTestSupport
 import expensetracker.MongoOps
 import expensetracker.account.{AccountId, AccountName}
 import expensetracker.auth.user.UserEmail
@@ -13,7 +14,6 @@ import expensetracker.transaction.RecurrenceCheckpoint
 import mongo4cats.bson.ObjectId
 import mongo4cats.client.{ClientSession, MongoClient}
 import mongo4cats.database.MongoDatabase
-import mongo4cats.embedded.EmbeddedMongo
 import mongo4cats.operations.{Filter, Update}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
@@ -22,8 +22,7 @@ import squants.market.GBP
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo with Matchers with MongoOps {
-  override protected val mongoPort: Int = 12353
+class PeriodicTransactionRepositorySpec extends AsyncWordSpec with MongoTestSupport with Matchers with MongoOps {
 
   "PeriodicTransactionRepository" when {
     "create" should {
@@ -386,9 +385,9 @@ class PeriodicTransactionRepositorySpec extends AsyncWordSpec with EmbeddedMongo
   }
 
   def withEmbeddedMongoDb[A](test: (MongoDatabase[IO], ClientSession[IO]) => IO[A]): Future[A] =
-    withRunningEmbeddedMongo {
+    withAvailableMongoPort { port =>
       MongoClient
-        .fromConnectionString[IO](s"mongodb://localhost:$mongoPort")
+        .fromConnectionString[IO](s"mongodb://localhost:$port")
         .flatMap { mc =>
           mc.startSession.map(cs => mc -> cs)
         }
