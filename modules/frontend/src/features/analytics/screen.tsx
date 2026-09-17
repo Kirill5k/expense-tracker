@@ -60,8 +60,7 @@ export function OverviewScreen() {
   const query = new URLSearchParams({
     ...filters.range,
     period: filters.period,
-    currency: filters.currency,
-    ...(filters.account ? { account: filters.account } : {}),
+    account: filters.account,
   });
   return (
     <>
@@ -69,11 +68,7 @@ export function OverviewScreen() {
         eyebrow="Your money at a glance"
         title={`Hello, ${user.data?.firstName ?? "there"}`}
       />
-      <ReportControls
-        filters={filters}
-        accounts={ledger.accounts}
-        hasUnassigned={ledger.transactions.some((transaction) => !transaction.accountId)}
-      />
+      <ReportControls filters={filters} accounts={ledger.accounts} />
       <section className="panel mb-6 !p-6 sm:!p-8" aria-label="Financial summary">
         <div className="grid gap-7 md:grid-cols-[1.4fr_1fr]">
           <div>

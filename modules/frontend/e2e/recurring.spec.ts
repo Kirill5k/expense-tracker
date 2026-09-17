@@ -16,7 +16,7 @@ test("a recurring schedule can be created and stopped while keeping transaction 
   await page.getByLabel("End date", { exact: true }).fill("2026-12-15");
   await page.getByLabel("Note", { exact: true }).fill("Fortnightly class");
   await page.getByRole("button", { name: "Create recurring", exact: true }).click();
-  await expect(page).toHaveURL(/\/recurring$/);
+  await expect(page).toHaveURL(`/recurring?account=${ids.everyday}`);
   const schedule = apiMock.recurring.find((item) => item.note === "Fortnightly class")!;
   expect(schedule.recurrence).toMatchObject({
     interval: 2,
@@ -49,7 +49,7 @@ test("editing a recurring schedule keeps its stored next date and original curre
   await expectAmountCurrency(page, "£", "GBP");
   await page.getByLabel("Amount", { exact: true }).fill("14.99");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
-  await expect(page).toHaveURL(/\/recurring$/);
+  await expect(page).toHaveURL(`/recurring?account=${ids.travel}`);
   const schedule = apiMock.recurring.find((item) => item.id === ids.recurring)!;
   expect(schedule.amount).toEqual({ value: 14.99, currency: { code: "GBP", symbol: "£" } });
   expect(schedule.accountId).toBe(ids.travel);
@@ -77,6 +77,6 @@ test("an uncertain recurring save requires an explicit retry and creates one sch
   ).toHaveLength(1);
   await page.getByRole("button", { name: "I checked — enable retry", exact: true }).click();
   await page.getByRole("button", { name: "Create recurring", exact: true }).click();
-  await expect(page).toHaveURL(/\/recurring$/);
+  await expect(page).toHaveURL(`/recurring?account=${ids.everyday}`);
   expect(apiMock.recurring.filter((item) => item.note === "New subscription")).toHaveLength(1);
 });

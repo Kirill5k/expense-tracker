@@ -94,7 +94,7 @@ for (const kind of ["transaction", "recurring"] as const) {
     await expect(tags).toHaveValue(" lunch");
     await page.getByLabel("Note", { exact: true }).fill(`${kind} tag test`);
     await page.getByRole("button", { name: submitLabel, exact: true }).click();
-    await expect(page).toHaveURL(kind === "transaction" ? /\/transactions\?/ : /\/recurring$/);
+    await expect(page).toHaveURL(kind === "transaction" ? "/transactions" : "/recurring");
     const rows = kind === "transaction" ? apiMock.transactions : apiMock.recurring;
     expect(rows.find((row) => row.note === `${kind} tag test`)).toMatchObject({
       categoryId: ids.food,

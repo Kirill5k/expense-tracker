@@ -16,7 +16,7 @@ test("overview navigation supports single transaction creation, editing, and arc
   await page.getByLabel("Note", { exact: true }).fill("Lunch with friends");
   await page.getByLabel("Tags", { exact: true }).fill("social, lunch");
   await page.getByRole("button", { name: "Add transaction", exact: true }).click();
-  await expect(page).toHaveURL(/\/transactions\?currency=GBP$/);
+  await expect(page).toHaveURL(`/transactions?account=${ids.everyday}`);
   await expect(page.getByRole("link", { name: /Lunch with friends/ })).toHaveCount(1);
   const created = apiMock.transactions.filter((item) => item.note === "Lunch with friends");
   expect(created.map((item) => item.amount.value)).toEqual([12.5]);
@@ -45,7 +45,7 @@ test("editing preserves the original currency and recurrence metadata when the a
   page,
   apiMock,
 }) => {
-  await page.goto("/transactions?currency=EUR");
+  await page.goto(`/transactions?account=${ids.travel}`);
   await page.getByRole("link", { name: /Berlin stay/ }).click();
   await expectAmountCurrency(page, "€", "EUR");
   await page.getByLabel("Account", { exact: true }).selectOption(ids.everyday);
@@ -53,7 +53,7 @@ test("editing preserves the original currency and recurrence metadata when the a
   await page.getByLabel("Amount", { exact: true }).fill("91.25");
   await page.getByLabel("Note", { exact: true }).fill("Berlin stay updated");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
-  await expect(page).toHaveURL(/\/transactions\?currency=EUR$/);
+  await expect(page).toHaveURL(`/transactions?account=${ids.everyday}`);
   const updated = apiMock.transactions.find((item) => item.id === ids.euro)!;
   expect(updated.amount).toEqual({ value: 91.25, currency: { code: "EUR", symbol: "€" } });
   expect(updated.accountId).toBe(ids.everyday);
@@ -80,6 +80,6 @@ test("an uncertain transaction save preserves the form and requires an explicit 
   ).toHaveLength(1);
   await page.getByRole("button", { name: "I checked — enable retry", exact: true }).click();
   await page.getByRole("button", { name: "Add transaction", exact: true }).click();
-  await expect(page).toHaveURL(/\/transactions\?currency=GBP$/);
+  await expect(page).toHaveURL(`/transactions?account=${ids.everyday}`);
   expect(apiMock.transactions.filter((item) => item.amount.value === 20)).toHaveLength(1);
 });

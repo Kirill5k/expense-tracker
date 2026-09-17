@@ -60,6 +60,7 @@ export function AccountsScreen() {
       />
     );
   if (!user.data || !accounts.data || !categories.data || !transactions.data) return null;
+  const defaultCurrency = user.data.settings.currency.code;
   const futureDays = user.data.settings.futureTransactionVisibilityDays ?? null;
   const visible = filterTransactions(transactions.data, categories.data, accounts.data, {
     futureDays,
@@ -148,7 +149,7 @@ export function AccountsScreen() {
             />
             <Link
               className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary"
-              href={`/transactions?account=${account.id}&currency=${account.currency.code}&from=${range.from}&to=${range.to}&period=month`}
+              href={`/transactions?account=${account.id}&from=${range.from}&to=${range.to}&period=month`}
             >
               View transactions
               <ArrowUpRight className="size-4" />
@@ -162,13 +163,16 @@ export function AccountsScreen() {
               <p className="mt-1 text-xs text-muted-foreground">Transactions without an account</p>
             </div>
             <ActivityRows activity={unassigned} />
-            <Link
-              className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary"
-              href={`/transactions?account=unassigned&currency=${unassigned[0].currency}&from=${range.from}&to=${range.to}&period=month`}
-            >
-              View transactions
-              <ArrowUpRight className="size-4" />
-            </Link>
+            {!accounts.data.length &&
+              unassigned.some((activity) => activity.currency === defaultCurrency) && (
+                <Link
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary"
+                  href={`/transactions?from=${range.from}&to=${range.to}&period=month`}
+                >
+                  View {defaultCurrency} transactions
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              )}
           </div>
         )}
       </div>
@@ -340,7 +344,7 @@ function AccountForm({
         action={
           account && (
             <Button asChild variant="outline">
-              <Link href={`/transactions?account=${account.id}&currency=${account.currency.code}`}>
+              <Link href={`/transactions?account=${account.id}`}>
                 View transactions
                 <ArrowUpRight />
               </Link>

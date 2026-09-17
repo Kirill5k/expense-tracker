@@ -153,7 +153,11 @@ function TransactionForm({
       }
       await client.invalidateQueries();
       toast.success(editing ? "Transaction updated" : "Transaction added");
-      router.push(`/transactions?currency=${currency.code}`);
+      router.push(
+        values.accountId
+          ? `/transactions?account=${encodeURIComponent(values.accountId)}`
+          : "/transactions",
+      );
     } catch (error) {
       setError(errorMessage(error));
       setUncertain(

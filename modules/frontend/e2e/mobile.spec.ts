@@ -58,3 +58,51 @@ test("capture phone overview in both themes without horizontal overflow", async 
     ).toEqual([]);
   }
 });
+
+for (const report of [
+  { name: "Overview", path: "/" },
+  { name: "Transactions", path: "/transactions" },
+  { name: "Recurring", path: "/recurring" },
+]) {
+  for (const hasAccounts of [true, false]) {
+    test(`${report.name}: the ${hasAccounts ? "account" : "No Account"} selector fills the phone content width`, async ({
+      page,
+      apiMock,
+    }) => {
+      if (!hasAccounts) apiMock.accounts = [];
+      await page.goto(report.path);
+      const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
+      await expect(account).toBeVisible();
+      await expect(account.locator("option")).toHaveCount(hasAccounts ? 2 : 1);
+      if (!hasAccounts) await expect(account.locator("option")).toHaveText(["No Account"]);
+      await expect(
+        page.getByRole("combobox", { name: "Reporting currency", exact: true }),
+      ).toHaveCount(0);
+      const layout = await account.evaluate((element) => {
+        const select = element.getBoundingClientRect();
+        const main = element.closest("main")!;
+        const bounds = main.getBoundingClientRect();
+        const style = getComputedStyle(main);
+        return {
+          left: select.left,
+          right: select.right,
+          contentLeft:
+            bounds.left + parseFloat(style.paddingLeft) + parseFloat(style.borderLeftWidth),
+          contentRight:
+            bounds.right - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth),
+          viewport: window.innerWidth,
+          pageWidth: document.documentElement.scrollWidth,
+        };
+      });
+      expect(
+        Math.abs(layout.left - layout.contentLeft),
+        JSON.stringify(layout),
+      ).toBeLessThanOrEqual(1);
+      expect(
+        Math.abs(layout.right - layout.contentRight),
+        JSON.stringify(layout),
+      ).toBeLessThanOrEqual(1);
+      expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewport);
+    });
+  }
+}

@@ -146,7 +146,11 @@ function RecurringForm({
       toast.success(
         transaction ? "Recurring transaction updated" : "Recurring transaction created",
       );
-      router.push("/recurring");
+      router.push(
+        values.accountId
+          ? `/recurring?account=${encodeURIComponent(values.accountId)}`
+          : "/recurring",
+      );
     } catch (failure) {
       setError(errorMessage(failure));
       setUncertain(

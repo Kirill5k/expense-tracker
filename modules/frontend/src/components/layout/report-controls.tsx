@@ -17,8 +17,6 @@ export function useReportFilters(defaultCurrency: string) {
   const from = params.get("from") ?? "",
     to = params.get("to") ?? "";
   const range = isDateString(from) && isDateString(to) && from <= to ? { from, to } : fallback;
-  const rawCurrency = params.get("currency") ?? defaultCurrency;
-  const currency = /^[A-Z]{3}$/.test(rawCurrency) ? rawCurrency : defaultCurrency;
   function setFilters(updates: Record<string, string>) {
     const next = new URLSearchParams(params.toString());
     Object.entries(updates).forEach(([key, value]) =>
@@ -29,7 +27,6 @@ export function useReportFilters(defaultCurrency: string) {
   return {
     range,
     period,
-    currency,
     defaultCurrency,
     account: params.get("account") ?? "",
     setFilters,
@@ -37,108 +34,63 @@ export function useReportFilters(defaultCurrency: string) {
     label: rangeLabel(range, period),
   };
 }
-type AccountCurrencyFilters = Pick<
+type AccountFilters = Pick<
   ReturnType<typeof useReportFilters>,
-  "account" | "currency" | "defaultCurrency" | "setFilters"
-> & { currencyOptions: string[] };
+  "account" | "defaultCurrency" | "setFilters"
+>;
 
-type AccountCurrencyProps = {
-  filters: AccountCurrencyFilters;
+type AccountControlProps = {
+  filters: AccountFilters;
   accounts: Account[];
-  hasUnassigned?: boolean;
 };
 
-export function AccountCurrencyControls({
-  filters,
-  accounts,
-  hasUnassigned = false,
-}: AccountCurrencyProps) {
+export function AccountControls({ filters, accounts }: AccountControlProps) {
   return (
-    <>
-      <label className="relative min-w-0">
-        <Wallet
-          aria-hidden="true"
-          className="pointer-events-none absolute left-4 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground"
-        />
-        <Select
-          aria-label="Filter by account"
-          value={filters.account}
-          onChange={(e) => {
-            const account = accounts.find((item) => item.id === e.target.value);
-            filters.setFilters({
-              account: e.target.value,
-              currency:
-                e.target.value === "unassigned"
-                  ? filters.defaultCurrency
-                  : (account?.currency.code ?? filters.currency),
-            });
-          }}
-          className="w-auto max-w-64 rounded-full border-0 bg-card pl-11 font-medium"
-        >
-          {accounts.length > 0 && <option value="">All accounts</option>}
-          {(!accounts.length || hasUnassigned || filters.account === "unassigned") && (
-            <option value="unassigned">No account</option>
-          )}
-          {accounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name} · {a.currency.code}
-            </option>
-          ))}
-        </Select>
-      </label>
-      {(filters.account === "" || filters.currencyOptions.length > 1) && (
-        <Select
-          aria-label="Reporting currency"
-          value={filters.currency}
-          onChange={(e) => filters.setFilters({ currency: e.target.value })}
-          className="w-auto rounded-full border-0 bg-card font-medium"
-        >
-          {filters.currencyOptions.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </Select>
-      )}
-    </>
+    <label className="relative grid w-full min-w-0 sm:w-auto">
+      <Wallet
+        aria-hidden="true"
+        className="pointer-events-none absolute left-4 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground"
+      />
+      <Select
+        aria-label="Filter by account"
+        value={filters.account}
+        onChange={(event) => filters.setFilters({ account: event.target.value, currency: "" })}
+        className="w-full rounded-full border-0 bg-card pl-11 font-medium sm:w-auto sm:max-w-64"
+      >
+        {!accounts.length && <option value="unassigned">No Account</option>}
+        {accounts.map((account) => (
+          <option key={account.id} value={account.id}>
+            {account.name} · {account.currency.code}
+          </option>
+        ))}
+      </Select>
+    </label>
   );
 }
 
-export function AccountCurrencyHint({ filters, accounts }: AccountCurrencyProps) {
-  if (filters.account === "unassigned") {
-    return (
-      <p className="w-full pt-1 text-xs text-muted-foreground">
-        Entries without an account · Using your default currency ({filters.defaultCurrency}).
-      </p>
-    );
-  }
-  if (
-    accounts.some((account) => account.id === filters.account) &&
-    filters.currencyOptions.length > 1
-  ) {
-    return (
-      <p className="w-full pt-1 text-xs text-muted-foreground">
-        This account has entries in different currencies. Each currency is shown separately.
-      </p>
-    );
-  }
-  return null;
+export function NoAccountHint({
+  filters,
+}: {
+  filters: Pick<AccountFilters, "account" | "defaultCurrency">;
+}) {
+  if (filters.account !== "unassigned") return null;
+  return (
+    <p className="w-full pt-1 text-xs text-muted-foreground">
+      Entries without an account · Using your default currency ({filters.defaultCurrency}).
+    </p>
+  );
 }
 
 export function ReportControls({
   filters,
   accounts,
-  hasUnassigned = false,
 }: {
-  filters: ReturnType<typeof useReportFilters> & { currencyOptions: string[] };
+  filters: ReturnType<typeof useReportFilters>;
   accounts: Account[];
-  hasUnassigned?: boolean;
 }) {
   return (
     <div className="mb-7 flex flex-wrap items-center gap-2">
-      <AccountCurrencyControls
-        filters={filters}
-        accounts={accounts}
-        hasUnassigned={hasUnassigned}
-      />
+      <AccountControls filters={filters} accounts={accounts} />
       <div className="flex min-h-11 items-center gap-1 rounded-full bg-card px-2">
         <Button
           variant="ghost"
@@ -181,7 +133,7 @@ export function ReportControls({
           <option value="custom">Custom</option>
         </Select>
       </label>
-      <AccountCurrencyHint filters={filters} accounts={accounts} />
+      <NoAccountHint filters={filters} />
       {filters.period === "custom" && (
         <div className="flex w-full flex-wrap items-center gap-2 pt-2">
           <Input

@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { CalendarClock, ChevronRight, Plus, Repeat2 } from "lucide-react";
 import {
-  AccountCurrencyControls,
-  AccountCurrencyHint,
+  AccountControls,
+  NoAccountHint,
   useReportFilters,
 } from "@/components/layout/report-controls";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,6 @@ export function RecurringScreen() {
     ...reportCurrency({
       ...baseFilters,
       accounts: accounts.data ?? [],
-      transactions: recurring.data ?? [],
     }),
   };
   if (user.isPending || recurring.isPending || accounts.isPending || categories.isPending)
@@ -68,8 +67,7 @@ export function RecurringScreen() {
   const selectedSchedules = schedules.filter(
     (item) =>
       item.amount.currency.code === filters.currency &&
-      (!filters.account ||
-        (filters.account === "unassigned" ? !item.accountId : item.accountId === filters.account)),
+      (filters.account === "unassigned" ? !item.accountId : item.accountId === filters.account),
   );
   const activeCount = selectedSchedules.filter(
     (item) => nextOccurrence(item.recurrence).status !== "ended",
@@ -97,12 +95,8 @@ export function RecurringScreen() {
         }
       />
       <div className="mb-7 flex flex-wrap items-center gap-2">
-        <AccountCurrencyControls
-          filters={filters}
-          accounts={accounts.data ?? []}
-          hasUnassigned={schedules.some((item) => !item.accountId)}
-        />
-        <AccountCurrencyHint filters={filters} accounts={accounts.data ?? []} />
+        <AccountControls filters={filters} accounts={accounts.data ?? []} />
+        <NoAccountHint filters={filters} />
       </div>
       <div className="panel mb-6 flex flex-wrap items-center justify-between gap-5">
         <div>
@@ -133,7 +127,7 @@ export function RecurringScreen() {
             title={schedules.length ? "No matching schedules" : "Make it a regular thing"}
             description={
               schedules.length
-                ? "Try a different account, currency, or transaction type to see your other schedules."
+                ? "Try a different account or transaction type to see your other schedules."
                 : "Add rent, subscriptions, or payday. Transactions are recorded automatically when they’re due."
             }
             action={

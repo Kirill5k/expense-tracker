@@ -1,4 +1,3 @@
-import type { Locator } from "@playwright/test";
 import { test, expect, ids } from "./fixtures";
 import { chooseCategory, expectAmountCurrency } from "./form-helpers";
 
@@ -8,34 +7,115 @@ const reports = [
   { name: "Recurring", path: "/recurring" },
 ] as const;
 
-async function expectCurrencyOptions(currency: Locator, codes: string[]) {
-  await expect(currency.locator("option")).toHaveCount(codes.length);
-  expect((await currency.locator("option").allTextContents()).sort()).toEqual([...codes].sort());
-}
-
 for (const report of reports) {
-  test(`${report.name}: All accounts shows a currency selector with only one currency`, async ({
+  test(`${report.name}: only visible accounts are offered and legacy filters default to the main account`, async ({
     page,
     apiMock,
   }) => {
-    apiMock.accounts = apiMock.accounts.filter((item) => item.id === ids.everyday);
-    apiMock.transactions = apiMock.transactions.filter(
-      (item) => item.amount.currency.code === "GBP",
-    );
-    await page.goto(report.path);
-    const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
-    const currency = page.getByRole("combobox", { name: "Reporting currency", exact: true });
-    await expect(account).toHaveValue("");
-    await expect(currency).toBeVisible();
-    await expectCurrencyOptions(currency, ["GBP"]);
-    await account.selectOption(ids.everyday);
-    await expect(currency).toHaveCount(0);
-    await account.selectOption("");
-    await expect(currency).toBeVisible();
-    await expectCurrencyOptions(currency, ["GBP"]);
+    // The main account need not be first in the backend response.
+    apiMock.accounts.reverse();
+    apiMock.accounts.push({
+      ...apiMock.accounts[0],
+      id: "000000000000000000000012",
+      name: "Archived account",
+      hidden: true,
+    });
+    apiMock.transactions.push({
+      ...apiMock.transactions[0],
+      id: "000000000000000000000053",
+      accountId: null,
+      note: "Unassigned expense",
+    });
+    apiMock.recurring.push({
+      ...apiMock.recurring[0],
+      id: "000000000000000000000054",
+      accountId: null,
+      note: "Unassigned expense",
+    });
+    for (const query of [
+      "",
+      "?account=&currency=EUR",
+      "?account=unassigned&currency=EUR",
+      "?account=missing&currency=EUR",
+      "?account=000000000000000000000012&currency=EUR",
+    ]) {
+      await page.goto(`${report.path}${query}`);
+      const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
+      await expect(account).toHaveValue(ids.everyday);
+      await expect(account.locator("option")).toHaveText(["Travel · EUR", "Everyday · GBP"]);
+      await expect(
+        page.getByRole("combobox", { name: "Reporting currency", exact: true }),
+      ).toHaveCount(0);
+      await expect(page.getByRole("link", { name: /^Unassigned expense/ })).toHaveCount(0);
+      await expect(
+        page.getByRole("link", {
+          name: report.name === "Recurring" ? /^Music subscription/ : /^Morning coffee/,
+        }),
+      ).toBeVisible();
+    }
   });
 
-  test(`${report.name}: no visible accounts uses No account and the settings currency for stale URLs`, async ({
+  test(`${report.name}: selecting an account determines currency and survives refresh`, async ({
+    page,
+    apiMock,
+  }) => {
+    apiMock.recurring.push({
+      ...apiMock.recurring[0],
+      id: "000000000000000000000055",
+      accountId: ids.travel,
+      note: "Euro subscription",
+      amount: { value: 19, currency: { code: "EUR", symbol: "€" } },
+    });
+    await page.goto(`${report.path}?currency=USD`);
+    const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
+    const euroEntry = page.getByRole("link", {
+      name: report.name === "Recurring" ? /^Euro subscription/ : /^Berlin stay/,
+    });
+    const sterlingEntry = page.getByRole("link", {
+      name: report.name === "Recurring" ? /^Music subscription/ : /^Morning coffee/,
+    });
+    await expect(account).toHaveValue(ids.everyday);
+    await expect(sterlingEntry).toBeVisible();
+    await expect(euroEntry).toHaveCount(0);
+    await account.selectOption(ids.travel);
+    await expect(euroEntry).toBeVisible();
+    await expect(sterlingEntry).toHaveCount(0);
+    await expect(
+      page.getByRole("combobox", { name: "Reporting currency", exact: true }),
+    ).toHaveCount(0);
+    await page.reload();
+    await expect(account).toHaveValue(ids.travel);
+    await expect(euroEntry).toBeVisible();
+    await page.goto(`${report.path}?account=${ids.travel}&currency=GBP`);
+    await expect(account).toHaveValue(ids.travel);
+    await expect(euroEntry).toBeVisible();
+    await expect(sterlingEntry).toHaveCount(0);
+    // A saved selection also recovers when that account is later archived.
+    apiMock.accounts.find((item) => item.id === ids.travel)!.hidden = true;
+    await page.reload();
+    await expect(account).toHaveValue(ids.everyday);
+    await expect(sterlingEntry).toBeVisible();
+    await expect(euroEntry).toHaveCount(0);
+  });
+
+  test(`${report.name}: the first visible account is selected when there is no main account`, async ({
+    page,
+    apiMock,
+  }) => {
+    apiMock.accounts.reverse();
+    apiMock.accounts.forEach((item) => {
+      item.isMain = false;
+    });
+    await page.goto(report.path);
+    const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
+    await expect(account).toHaveValue(ids.travel);
+    await expect(account.locator("option")).toHaveText(["Travel · EUR", "Everyday · GBP"]);
+    await expect(
+      page.getByRole("combobox", { name: "Reporting currency", exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test(`${report.name}: no visible accounts uses No Account and the settings currency for stale URLs`, async ({
     page,
     apiMock,
   }) => {
@@ -78,7 +158,7 @@ for (const report of reports) {
       await page.goto(`${report.path}${query}`);
       const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
       await expect(account).toHaveValue("unassigned");
-      await expect(account.locator("option")).toHaveText(["No account"]);
+      await expect(account.locator("option")).toHaveText(["No Account"]);
       await expect(
         page.getByRole("combobox", { name: "Reporting currency", exact: true }),
       ).toHaveCount(0);
@@ -93,66 +173,21 @@ for (const report of reports) {
         ).toBeVisible();
       }
     }
+    apiMock.accounts = [];
     apiMock.transactions = [];
     apiMock.recurring = [];
     await page.reload();
     const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
     await expect(account).toHaveValue("unassigned");
-    await expect(account.locator("option")).toHaveText(["No account"]);
+    await expect(account.locator("option")).toHaveText(["No Account"]);
     await expect(
       page.getByRole("combobox", { name: "Reporting currency", exact: true }),
     ).toHaveCount(0);
     await expect(page.getByRole("link", { name: /^Dollar entry/ })).toHaveCount(0);
   });
-
-  test(`${report.name}: choosing No account uses the settings currency`, async ({
-    page,
-    apiMock,
-  }) => {
-    const usd = { code: "USD", symbol: "$" };
-    apiMock.user.settings.currency = usd;
-    apiMock.transactions.push(
-      {
-        ...apiMock.transactions[0],
-        id: "000000000000000000000053",
-        accountId: null,
-        note: "Unassigned dollars",
-        amount: { value: 12.3, currency: usd },
-      },
-      {
-        ...apiMock.transactions[0],
-        id: "000000000000000000000054",
-        accountId: null,
-        note: "Unassigned euros",
-        amount: { value: 9.7, currency: { code: "EUR", symbol: "€" } },
-      },
-    );
-    apiMock.recurring.push(
-      ...apiMock.transactions.slice(-2).map((item) => ({
-        ...apiMock.recurring[0],
-        id: item.id,
-        accountId: item.accountId,
-        note: item.note,
-        amount: item.amount,
-      })),
-    );
-    await page.goto(`${report.path}?currency=EUR`);
-    const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
-    const currency = page.getByRole("combobox", { name: "Reporting currency", exact: true });
-    await expect(currency).toHaveValue("EUR");
-    await expect(page.getByRole("link", { name: /^Unassigned euros/ })).toBeVisible();
-    await account.selectOption("unassigned");
-    await expect(currency).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /^Unassigned dollars/ })).toBeVisible();
-    await expect(page.getByRole("link", { name: /^Unassigned euros/ })).toHaveCount(0);
-    await page.reload();
-    await expect(account).toHaveValue("unassigned");
-    await expect(currency).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /^Unassigned dollars/ })).toBeVisible();
-  });
 }
 
-test("recurring account, currency, and transaction type filters work together", async ({
+test("recurring account and transaction type filters work together using the account currency", async ({
   page,
   apiMock,
 }) => {
@@ -182,59 +217,48 @@ test("recurring account, currency, and transaction type filters work together", 
   );
   await page.goto("/recurring");
   const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
-  const currency = page.getByRole("combobox", { name: "Reporting currency", exact: true });
   const kind = page.getByRole("combobox", {
     name: "Filter recurring transaction type",
     exact: true,
   });
   await expect(page.getByRole("link", { name: /^Music subscription/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /^Euro salary/ })).toHaveCount(0);
-  await currency.selectOption("EUR");
+  await account.selectOption(ids.travel);
   await expect(page.getByRole("link", { name: /^Euro subscription/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /^Euro salary/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /^Legacy euro schedule/ })).toBeVisible();
   await kind.selectOption("income");
   await expect(page.getByRole("link", { name: /^Euro salary/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /^Euro subscription/ })).toHaveCount(0);
-  await account.selectOption(ids.travel);
-  await expect(currency).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /^Euro salary/ })).toBeVisible();
   await kind.selectOption("expense");
   await expect(page.getByRole("link", { name: /^Euro subscription/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /^Euro salary/ })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /^Legacy euro schedule/ })).toHaveCount(0);
   await account.selectOption(ids.everyday);
-  await expectCurrencyOptions(currency, ["EUR", "GBP"]);
-  await currency.selectOption("EUR");
-  await expect(page.getByRole("link", { name: /^Legacy euro schedule/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /^Music subscription/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /^Music subscription/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Legacy euro schedule/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /^Euro subscription/ })).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "Reporting currency", exact: true })).toHaveCount(
+    0,
+  );
 });
 
-test("reporting follows the selected account and keeps all-account currencies separate", async ({
-  page,
-}) => {
+test("overview totals follow each selected account's currency", async ({ page }) => {
   await page.goto("/");
   const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
-  const currency = page.getByRole("combobox", { name: "Reporting currency", exact: true });
   const summary = page.getByRole("region", { name: "Financial summary" });
-  await expectCurrencyOptions(currency, ["EUR", "GBP"]);
+  await expect(account).toHaveValue(ids.everyday);
   await expect(summary.getByText("£1,974.30", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Add transaction", exact: true })).toHaveCount(0);
-  await currency.selectOption("EUR");
+  await account.selectOption(ids.travel);
   await expect(summary.getByText("-€89.95", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /Morning coffee/ })).toHaveCount(0);
   await account.selectOption(ids.everyday);
-  await expect(currency).toHaveCount(0);
   await expect(summary.getByText("£1,974.30", { exact: true })).toBeVisible();
-  await account.selectOption(ids.travel);
-  await expect(currency).toHaveCount(0);
-  await expect(summary.getByText("-€89.95", { exact: true })).toBeVisible();
-  await account.selectOption("");
-  await expectCurrencyOptions(currency, ["EUR", "GBP"]);
+  await expect(page.getByRole("combobox", { name: "Reporting currency", exact: true })).toHaveCount(
+    0,
+  );
 });
 
-test("historical currencies remain reportable on their original account", async ({
+test("stale currency URLs do not change an account's reporting currency or mix historical currencies", async ({
   page,
   apiMock,
 }) => {
@@ -244,34 +268,16 @@ test("historical currencies remain reportable on their original account", async 
     note: "Legacy euro expense",
     amount: { value: 7.2, currency: { code: "EUR", symbol: "€" } },
   });
-  await page.goto(`/transactions?account=${ids.everyday}&currency=USD`);
-  const currency = page.getByRole("combobox", { name: "Reporting currency", exact: true });
-  await expect(currency).toHaveValue("GBP");
-  await expectCurrencyOptions(currency, ["EUR", "GBP"]);
-  await currency.selectOption("EUR");
-  await expect(page.getByRole("link", { name: /Legacy euro expense/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Morning coffee/ })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /Berlin stay/ })).toHaveCount(0);
-});
-
-test("No account appears for matching historical records and stays reachable from a saved filter", async ({
-  page,
-}) => {
-  const account = page.getByRole("combobox", { name: "Filter by account", exact: true });
-  await page.goto("/transactions");
-  await expect(account).toBeVisible();
-  await expect(account.getByRole("option", { name: "No account", exact: true })).toHaveCount(0);
-  await page.goto("/transactions?period=custom&from=2026-08-01&to=2026-08-31");
-  await expect(account.getByRole("option", { name: "No account", exact: true })).toHaveCount(1);
-  await account.selectOption("unassigned");
-  await expect(page.getByRole("link", { name: /August lunch/ })).toBeVisible();
+  await page.goto(`/transactions?account=${ids.everyday}&currency=EUR`);
+  await expect(page.getByRole("combobox", { name: "Filter by account", exact: true })).toHaveValue(
+    ids.everyday,
+  );
   await expect(page.getByRole("combobox", { name: "Reporting currency", exact: true })).toHaveCount(
     0,
   );
-  await page.goto("/transactions?account=unassigned");
-  await expect(account).toHaveValue("unassigned");
-  await expect(account.getByRole("option", { name: "No account", exact: true })).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "A fresh start", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Morning coffee/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Legacy euro expense/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /Berlin stay/ })).toHaveCount(0);
 });
 
 for (const kind of ["transaction", "recurring"] as const) {
@@ -296,7 +302,10 @@ for (const kind of ["transaction", "recurring"] as const) {
       const note = `${kind} ${assignment} FX`;
       await page.getByLabel("Note", { exact: true }).fill(note);
       await page.getByRole("button", { name: submitLabel, exact: true }).click();
-      await expect(page).toHaveURL(kind === "transaction" ? /\/transactions\?/ : /\/recurring$/);
+      const destination = kind === "transaction" ? "/transactions" : "/recurring";
+      await expect(page).toHaveURL(
+        `${destination}${assignment === "account" ? `?account=${ids.travel}` : ""}`,
+      );
       const rows = kind === "transaction" ? apiMock.transactions : apiMock.recurring;
       const saved = rows.find((item) => item.note === note);
       expect(saved?.accountId).toBe(assignment === "account" ? ids.travel : null);

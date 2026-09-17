@@ -104,11 +104,7 @@ export function TransactionsScreen() {
           </Button>
         }
       />
-      <ReportControls
-        filters={filters}
-        accounts={ledger.accounts}
-        hasUnassigned={ledger.transactions.some((transaction) => !transaction.accountId)}
-      />
+      <ReportControls filters={filters} accounts={ledger.accounts} />
       <div className="mb-6 grid grid-cols-3 gap-3">
         <div className="panel !p-4 sm:!p-6">
           <p className="text-xs text-muted-foreground">Income</p>

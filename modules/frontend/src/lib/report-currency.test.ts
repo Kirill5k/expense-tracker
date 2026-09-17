@@ -1,106 +1,74 @@
 import { describe, expect, it } from "vitest";
-import type { Transaction } from "@/features/transactions/types";
 import { currencyFor } from "./money";
 import { reportCurrency } from "./report-currency";
 
 const main = { id: "main", name: "Main", currency: currencyFor("GBP"), isMain: true };
 const travel = { id: "travel", name: "Travel", currency: currencyFor("EUR"), isMain: false };
-const record = (accountId: string | null, code: string): Transaction => ({
-  id: `${accountId}-${code}`,
-  accountId,
-  categoryId: "food",
-  amount: { value: 10, currency: currencyFor(code) },
-  date: "2026-09-15",
-  note: null,
-  tags: [],
-  parentTransactionId: null,
-  isRecurring: false,
-});
+const savings = { id: "savings", name: "Savings", currency: currencyFor("USD"), isMain: false };
 const defaults = {
-  currency: "GBP",
   defaultCurrency: "GBP",
-  account: "",
-  accounts: [main, travel],
-  transactions: [],
+  accounts: [travel, main],
 };
 
 describe("account-aware reporting currency", () => {
-  it("keeps All accounts selected for a new single-currency account", () => {
-    expect(reportCurrency({ ...defaults, accounts: [main] })).toEqual({
-      account: "",
-      currency: "GBP",
-      currencyOptions: ["GBP"],
-    });
-  });
-  it("uses the selected account currency even when the URL retains a different currency", () => {
-    expect(reportCurrency({ ...defaults, account: travel.id })).toEqual({
-      account: travel.id,
-      currency: "EUR",
-      currencyOptions: ["EUR"],
-    });
-  });
-  it("keeps all-account totals separated by currencies actually used", () => {
-    expect(
-      reportCurrency({ ...defaults, transactions: [record(null, "USD")] }).currencyOptions,
-    ).toEqual(["GBP", "EUR", "USD"]);
-  });
-  it("keeps legacy currencies accessible on an account without including other accounts", () => {
-    expect(
-      reportCurrency({
-        ...defaults,
-        account: main.id,
-        currency: "USD",
-        transactions: [record(main.id, "USD"), record(travel.id, "EUR")],
-      }),
-    ).toEqual({ account: main.id, currency: "USD", currencyOptions: ["GBP", "USD"] });
-  });
-  it("uses the settings currency for No account even with a stale currency filter", () => {
-    expect(
-      reportCurrency({
-        ...defaults,
-        account: "unassigned",
-        currency: "EUR",
-        defaultCurrency: "USD",
-        transactions: [record(null, "EUR"), record(main.id, "USD")],
-      }),
-    ).toEqual({ account: "unassigned", currency: "USD", currencyOptions: ["USD"] });
-  });
-  it.each(["", "unassigned", "missing", main.id])(
-    "uses No account and the settings currency when no accounts exist (filter %s)",
+  it.each([undefined, "", "unassigned", "archived-account"])(
+    "selects the visible main account for an absent or unavailable selection (%s)",
     (account) => {
-      expect(
-        reportCurrency({
-          ...defaults,
-          account,
-          currency: "EUR",
-          defaultCurrency: "USD",
-          accounts: [],
-          transactions: [record(null, "EUR"), record(main.id, "GBP")],
-        }),
-      ).toEqual({ account: "unassigned", currency: "USD", currencyOptions: ["USD"] });
+      expect(reportCurrency({ ...defaults, account })).toEqual({
+        account: main.id,
+        currency: "GBP",
+      });
     },
   );
-  it("falls back to All accounts when a saved account is no longer visible", () => {
-    expect(reportCurrency({ ...defaults, account: "missing" })).toEqual({
-      account: "",
-      currency: "GBP",
-      currencyOptions: ["GBP", "EUR"],
-    });
-  });
-  it("uses the latest settings currency for No account", () => {
-    const before = reportCurrency({ ...defaults, account: "unassigned" });
-    expect(reportCurrency({ ...defaults, ...before, defaultCurrency: "EUR" })).toEqual({
-      account: "unassigned",
+
+  it("uses the explicitly selected account and its currency ahead of the main account", () => {
+    expect(reportCurrency({ ...defaults, account: travel.id, defaultCurrency: "USD" })).toEqual({
+      account: travel.id,
       currency: "EUR",
-      currencyOptions: ["EUR"],
     });
   });
-  it("supports recurring records without transaction-only fields", () => {
+
+  it("selects the first visible account when there is no visible main account", () => {
+    expect(reportCurrency({ ...defaults, accounts: [travel, savings], account: main.id })).toEqual({
+      account: travel.id,
+      currency: "EUR",
+    });
+  });
+
+  it.each([undefined, "", "unassigned", main.id])(
+    "uses No account and the settings currency when no accounts exist (selection %s)",
+    (account) => {
+      expect(
+        reportCurrency({ ...defaults, account, accounts: [], defaultCurrency: "USD" }),
+      ).toEqual({ account: "unassigned", currency: "USD" });
+    },
+  );
+
+  it("uses the updated settings currency while there are no accounts", () => {
+    const before = reportCurrency({ ...defaults, accounts: [] });
     expect(
       reportCurrency({
         ...defaults,
-        transactions: [{ accountId: null, amount: { currency: { code: "USD" } } }],
-      }).currencyOptions,
-    ).toEqual(["GBP", "EUR", "USD"]);
+        account: before.account,
+        accounts: [],
+        defaultCurrency: "EUR",
+      }),
+    ).toEqual({ account: "unassigned", currency: "EUR" });
+  });
+
+  it("selects an account when one becomes available after No account was selected", () => {
+    const before = reportCurrency({ ...defaults, accounts: [] });
+    expect(reportCurrency({ ...defaults, account: before.account, accounts: [travel] })).toEqual({
+      account: travel.id,
+      currency: "EUR",
+    });
+  });
+
+  it("falls back to No account after the last visible account is archived", () => {
+    const before = reportCurrency({ ...defaults, account: travel.id, accounts: [travel] });
+    expect(reportCurrency({ ...defaults, account: before.account, accounts: [] })).toEqual({
+      account: "unassigned",
+      currency: "GBP",
+    });
   });
 });
