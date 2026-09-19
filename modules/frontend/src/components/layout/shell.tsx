@@ -219,8 +219,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
             )}
           >
             <span className="flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-              {/* Match the wallet's taller artwork to the neighboring arrow icons. */}
-              <Icon className={href === "/accounts" ? "size-[18px]" : "size-5"} />
+              {/* Lower the wallet artwork to align its visible baseline with adjacent icons. */}
+              <Icon className={href === "/accounts" ? "size-[18px] translate-y-[2px]" : "size-5"} />
             </span>
             <span className="whitespace-nowrap">{label}</span>
           </Link>
