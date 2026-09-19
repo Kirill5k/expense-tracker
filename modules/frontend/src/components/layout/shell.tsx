@@ -29,8 +29,8 @@ import { useDataCleanup } from "@/features/settings/cleanup";
 const links = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/transactions", label: "Transactions", icon: ArrowDownUp },
-  { href: "/accounts", label: "Accounts", icon: Wallet },
   { href: "/recurring", label: "Recurring", icon: Repeat2 },
+  { href: "/accounts", label: "Accounts", icon: Wallet },
   { href: "/categories", label: "Categories", icon: Grid2X2 },
   { href: "/settings", label: "Settings", icon: Settings2 },
 ];
@@ -208,7 +208,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         aria-label="Mobile navigation"
         className="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-border bg-card px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
       >
-        {links.slice(0, 3).map(({ href, label, icon: Icon }) => (
+        {links.slice(0, 4).map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
@@ -226,7 +226,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Dropdown.Trigger
             className={cn(
               "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-medium text-muted-foreground",
-              links.slice(3).some((link) => active(link.href)) && "text-primary",
+              links.slice(4).some((link) => active(link.href)) && "text-primary",
             )}
           >
             <Ellipsis className="size-5" />
@@ -239,7 +239,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               sideOffset={14}
               className="z-50 min-w-48 rounded-2xl border border-border bg-card p-2 shadow-lg"
             >
-              {links.slice(3).map(({ href, label, icon: Icon }) => (
+              {links.slice(4).map(({ href, label, icon: Icon }) => (
                 <Dropdown.Item key={href} asChild>
                   <Link
                     href={href}
