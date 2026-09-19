@@ -80,7 +80,7 @@ describe("upstream configuration", () => {
 });
 
 describe("browser session boundary", () => {
-  it("exchanges login credentials for an HttpOnly session cookie and returns no token body", async () => {
+  it("exchanges login credentials for a persistent HttpOnly cookie and returns no token body", async () => {
     const { handle, fetcher } = setup(jsonResponse({ access_token: token, token_type: "Bearer" }), {
       secureCookies: true,
     });
@@ -93,9 +93,9 @@ describe("browser session boundary", () => {
     expect(response.status).toBe(204);
     expect(await response.text()).toBe("");
     expect(response.headers.get("Set-Cookie")).toBe(
-      `${SESSION_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Secure`,
+      `${SESSION_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=2592000`,
     );
-    expect(response.headers.get("Set-Cookie")).not.toMatch(/Max-Age|Expires|Domain/);
+    expect(response.headers.get("Set-Cookie")).not.toContain("Domain");
     const [url, init] = fetcher.mock.calls[0];
     expect(String(url)).toBe(`${coreOrigin}/api/auth/login`);
     expect(init?.body).toBe(body);
@@ -110,6 +110,7 @@ describe("browser session boundary", () => {
       "login",
     ]);
     expect(response.headers.get("Set-Cookie")).not.toContain("Secure");
+    expect(response.headers.get("Set-Cookie")).toContain("Max-Age=2592000");
   });
 
   it.each([

@@ -99,6 +99,12 @@
     font-size: 0.875rem;
     color: var(--foreground);
   }
+  @media (pointer: coarse) {
+    .form-input {
+      /* Keep touch inputs large enough to avoid iOS zooming on focus. */
+      font-size: 1rem;
+    }
+  }
   .form-input:disabled {
     opacity: 0.6;
   }
