@@ -10,7 +10,6 @@ import { api, json, errorMessage } from "@/lib/api";
 import { formatMoney, toMinor } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "@/features/categories/icon";
-import type { Account } from "@/features/accounts/types";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
 import type { Transaction } from "./types";
@@ -96,12 +95,10 @@ function TransactionActions({ transaction }: { transaction: Transaction }) {
 
 export function TransactionList({
   transactions,
-  accounts,
   limit,
   actions = true,
 }: {
   transactions: Transaction[];
-  accounts: Account[];
   limit?: number;
   actions?: boolean;
 }) {
@@ -147,22 +144,17 @@ export function TransactionList({
                   <p className="truncate text-sm font-semibold">
                     {tx.note || tx.category?.name || "Transaction"}
                   </p>
-                  <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground">
-                    {tx.isRecurring && <Repeat2 className="size-3 shrink-0" />}
-                    {tx.note
-                      ? tx.category?.name
-                      : (accounts.find((a) => a.id === tx.accountId)?.name ?? "No account")}
-                    {tx.tags.length > 0 && (
-                      <span className="hidden sm:inline">
-                        {" "}
-                        · {tx.tags.map((tag) => `#${tag}`).join(" ")}
+                  {(tx.isRecurring || (tx.note && tx.category?.name) || tx.tags.length > 0) && (
+                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                      {tx.isRecurring && <Repeat2 className="size-3 shrink-0" />}
+                      <span className="min-w-0 break-words">
+                        {[tx.note && tx.category?.name, tx.tags.map((tag) => `#${tag}`).join(" ")]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </span>
-                    )}
-                  </p>
+                    </p>
+                  )}
                 </Link>
-                <span className="hidden w-28 truncate text-xs text-muted-foreground xl:block">
-                  {accounts.find((a) => a.id === tx.accountId)?.name ?? "No account"}
-                </span>
                 <p
                   className={cn(
                     "shrink-0 text-sm font-semibold tabular-nums",

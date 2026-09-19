@@ -113,6 +113,37 @@ describe("browser session boundary", () => {
     expect(response.headers.get("Set-Cookie")).toContain("Max-Age=2592000");
   });
 
+  it("upgrades an existing browser session to a persistent cookie after the core validates it", async () => {
+    const { handle, fetcher } = setup(jsonResponse({ id: objectId }), { secureCookies: true });
+    const response = await handle(request("auth/user"), ["auth", "user"]);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ id: objectId });
+    expect(new Headers(fetcher.mock.calls[0][1]?.headers).get("Authorization")).toBe(
+      `Bearer ${token}`,
+    );
+    expect(response.headers.get("Set-Cookie")).toBe(
+      `${SESSION_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=2592000`,
+    );
+    expectPrivate(response);
+  });
+
+  it.each([
+    [403, 401, "Max-Age=0"],
+    [500, 502, null],
+    [200, 502, null],
+  ])(
+    "does not renew an unusable session check (core status %i)",
+    async (status, expectedStatus, expectedCookie) => {
+      const { handle } = setup(new Response("invalid response", { status }));
+      const response = await handle(request("auth/user"), ["auth", "user"]);
+
+      expect(response.status).toBe(expectedStatus);
+      if (expectedCookie) expect(response.headers.get("Set-Cookie")).toContain(expectedCookie);
+      else expect(response.headers.has("Set-Cookie")).toBe(false);
+    },
+  );
+
   it.each([
     { access_token: "bad; Path=/", token_type: "Bearer" },
     { access_token: token, token_type: "Other" },

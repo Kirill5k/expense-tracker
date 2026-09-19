@@ -206,7 +206,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </div>
       <nav
         aria-label="Mobile navigation"
-        className="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-border bg-card px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
       >
         {links.slice(0, 4).map(({ href, label, icon: Icon }) => (
           <Link
@@ -214,23 +214,23 @@ export function Shell({ children }: { children: React.ReactNode }) {
             href={href}
             aria-current={active(href) ? "page" : undefined}
             className={cn(
-              "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-medium text-muted-foreground",
+              "flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[11px] leading-4 font-medium text-muted-foreground",
               active(href) && "text-primary",
             )}
           >
-            <Icon className="size-5" />
-            {label}
+            <Icon className="size-5 shrink-0" aria-hidden="true" />
+            <span className="whitespace-nowrap">{label}</span>
           </Link>
         ))}
         <Dropdown.Root>
           <Dropdown.Trigger
             className={cn(
-              "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-medium text-muted-foreground",
+              "flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[11px] leading-4 font-medium text-muted-foreground",
               links.slice(4).some((link) => active(link.href)) && "text-primary",
             )}
           >
-            <Ellipsis className="size-5" />
-            More
+            <Ellipsis className="size-5 shrink-0" aria-hidden="true" />
+            <span className="whitespace-nowrap">More</span>
           </Dropdown.Trigger>
           <Dropdown.Portal>
             <Dropdown.Content

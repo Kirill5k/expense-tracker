@@ -1,7 +1,7 @@
 /** Server-only API boundary. Browser requests never receive the core bearer token. */
 export const DEFAULT_CORE_URL = "https://api--expense-tracker-core--j6xvqz9kpswd.code.run";
 export const SESSION_COOKIE_NAME = "expense_tracker_session";
-// Core sessions remain valid until revoked; bound browser persistence to 30 days.
+// Core sessions remain valid until revoked; renew 30-day browser persistence on session checks.
 const SESSION_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 export const MAX_REQUEST_BYTES = 64 * 1024;
 
@@ -413,6 +413,10 @@ export function createBffHandler(dependencies: BffDependencies = {}) {
         (result.ok && (endpoint.action === "password" || endpoint.action === "delete-user"))
       ) {
         clearSession(response, secure);
+      } else if (response.ok && request.method === "GET" && pathname === "auth/user" && token) {
+        // Upgrade existing session-only cookies, and keep active browser sessions persistent.
+        // Only renew after the core has validated the token and returned a usable response.
+        response.headers.set("Set-Cookie", cookie(token, secure));
       }
       return response;
     } catch {

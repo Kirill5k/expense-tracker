@@ -1,7 +1,7 @@
 import { test, expect, ids } from "./fixtures";
 import { chooseCategory, expectAmountCurrency } from "./form-helpers";
 
-test("a recurring schedule can be created and stopped while keeping transaction history", async ({
+test("a recurring schedule can be created and stopped from its menu while keeping transaction history", async ({
   page,
   apiMock,
 }) => {
@@ -15,6 +15,7 @@ test("a recurring schedule can be created and stopped while keeping transaction 
   await page.getByLabel("Start date", { exact: true }).fill("2026-09-15");
   await page.getByLabel("End date", { exact: true }).fill("2026-12-15");
   await page.getByLabel("Note", { exact: true }).fill("Fortnightly class");
+  await page.getByLabel("Tags", { exact: true }).fill("fitness, fortnightly");
   await page.getByRole("button", { name: "Create recurring", exact: true }).click();
   await expect(page).toHaveURL(`/recurring?account=${ids.everyday}`);
   const schedule = apiMock.recurring.find((item) => item.note === "Fortnightly class")!;
@@ -24,17 +25,45 @@ test("a recurring schedule can be created and stopped while keeping transaction 
     startDate: "2026-09-15",
     endDate: "2026-12-15",
   });
-  await page.getByRole("button", { name: "Stop Fortnightly class", exact: true }).click();
-  await expect(page.getByRole("alertdialog")).toContainText(
-    "Transactions already in your history are kept",
-  );
-  await page
-    .getByRole("alertdialog")
-    .getByRole("button", { name: "Stop recurring transaction", exact: true })
-    .click();
+  const scheduleLink = page.getByRole("link", { name: /^Fortnightly class/ });
+  await expect(scheduleLink.getByText("#fitness #fortnightly", { exact: true })).toBeVisible();
+  await expect(scheduleLink).not.toContainText("Everyday");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(scheduleLink.getByText("#fitness #fortnightly", { exact: true })).toBeVisible();
+  const actions = page.getByRole("button", { name: "Actions for Fortnightly class", exact: true });
   await expect(
     page.getByRole("button", { name: "Stop Fortnightly class", exact: true }),
   ).toHaveCount(0);
+  await actions.click();
+  await page.getByRole("menuitem", { name: "Stop", exact: true }).click();
+  const confirmation = page.getByRole("alertdialog");
+  await expect(confirmation).toContainText("Transactions already in your history are kept");
+  await confirmation.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(confirmation).toHaveCount(0);
+  expect(schedule.hidden).not.toBe(true);
+  expect(
+    apiMock.requests.filter(
+      (request) => request.path === `periodic-transactions/${schedule.id}/hidden`,
+    ),
+  ).toHaveLength(0);
+
+  await page.getByRole("menuitem", { name: "Stop", exact: true }).click();
+  apiMock.failureQueue.set(`PUT periodic-transactions/${schedule.id}/hidden`, [
+    { status: 503, message: "Please try stopping this schedule again" },
+  ]);
+  const stop = confirmation.getByRole("button", {
+    name: "Stop recurring transaction",
+    exact: true,
+  });
+  await stop.click();
+  await expect(confirmation.getByRole("alert")).toContainText(
+    "Please try stopping this schedule again",
+  );
+  expect(schedule.hidden).not.toBe(true);
+  await stop.click();
+  await expect(confirmation).toHaveCount(0);
+  await expect(actions).toHaveCount(0);
+  await expect(scheduleLink).toHaveCount(0);
   expect(schedule.hidden).toBe(true);
   expect(apiMock.transactions).toHaveLength(historyCount);
 });
@@ -43,7 +72,10 @@ test("editing a recurring schedule keeps its stored next date and original curre
   page,
   apiMock,
 }) => {
-  await page.goto(`/recurring/${ids.recurring}`);
+  await page.goto("/recurring");
+  await page.getByRole("button", { name: "Actions for Music subscription", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
+  await expect(page).toHaveURL(`/recurring/${ids.recurring}`);
   await expectAmountCurrency(page, "£", "GBP");
   await page.getByLabel("Account", { exact: true }).selectOption(ids.travel);
   await expectAmountCurrency(page, "£", "GBP");

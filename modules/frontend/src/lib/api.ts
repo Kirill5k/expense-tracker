@@ -9,11 +9,17 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
+interface ApiOptions extends RequestInit {
+  // An anonymous session check on the auth page must not sign out other tabs.
+  notifySessionExpiry?: boolean;
+}
+
+export async function api<T>(path: string, options: ApiOptions = {}): Promise<T> {
+  const { notifySessionExpiry = true, ...requestOptions } = options;
   let response: Response;
   try {
     response = await fetch(`/api/${path}`, {
-      ...options,
+      ...requestOptions,
       credentials: "same-origin",
       cache: "no-store",
       headers: {
@@ -37,7 +43,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
       response.status,
       body.code,
     );
-    if (error.code === "SESSION_EXPIRED" && typeof window !== "undefined")
+    if (notifySessionExpiry && error.code === "SESSION_EXPIRED" && typeof window !== "undefined")
       window.dispatchEvent(new Event("session-expired"));
     throw error;
   }

@@ -242,12 +242,7 @@ export function OverviewScreen() {
             <ChevronRight className="size-4" />
           </Link>
         </SectionHeading>
-        <TransactionList
-          transactions={transactions}
-          accounts={ledger.accounts}
-          limit={5}
-          actions={false}
-        />
+        <TransactionList transactions={transactions} limit={5} actions={false} />
       </section>
     </>
   );

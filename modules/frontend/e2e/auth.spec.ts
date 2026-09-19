@@ -1,5 +1,37 @@
 import { test, expect } from "./fixtures";
 
+test("reopening the sign-in page resumes an existing session without credentials", async ({
+  page,
+  context,
+  apiMock,
+}) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Hello, Alex", exact: true })).toBeVisible();
+  await page.close();
+  const reopened = await context.newPage();
+  await reopened.goto("/signin");
+  await expect(reopened).toHaveURL("/");
+  await expect(reopened.getByRole("heading", { name: "Hello, Alex", exact: true })).toBeVisible();
+  expect(apiMock.requests.filter((request) => request.path === "auth/login")).toHaveLength(0);
+});
+
+test("a temporary session-check failure can retry without requiring credentials", async ({
+  page,
+  apiMock,
+}) => {
+  apiMock.failures.set("GET auth/user", {
+    status: 502,
+    message: "The expense service is temporarily unavailable. Please try again.",
+  });
+  await page.goto("/signin");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("temporarily unavailable");
+  await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
+  apiMock.failures.delete("GET auth/user");
+  await page.getByRole("button", { name: "Try again", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  expect(apiMock.requests.filter((request) => request.path === "auth/login")).toHaveLength(0);
+});
+
 test("anonymous visitors sign in after an actionable credential error", async ({
   page,
   apiMock,

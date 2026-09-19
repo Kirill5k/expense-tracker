@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { format, parseISO } from "date-fns";
-import { CalendarClock, ChevronRight, Plus, Repeat2 } from "lucide-react";
+import { CalendarClock, Plus, Repeat2 } from "lucide-react";
 import {
   AccountControls,
   NoAccountHint,
@@ -21,7 +21,7 @@ import { formatMoney, toMinor } from "@/lib/money";
 import { reportCurrency } from "@/lib/report-currency";
 import { cn } from "@/lib/utils";
 import { useRecurring } from "./api";
-import { StopRecurring } from "./actions";
+import { RecurringActions } from "./actions";
 import { nextOccurrence, recurrenceLabel } from "./validation";
 
 export function RecurringScreen() {
@@ -145,7 +145,6 @@ export function RecurringScreen() {
               const next = nextOccurrence(transaction.recurrence);
               const income = transaction.category?.kind === "income";
               const expense = transaction.category?.kind === "expense";
-              const account = accounts.data?.find((item) => item.id === transaction.accountId);
               return (
                 <li key={transaction.id} className="py-5 first:pt-1 last:pb-1">
                   <div className="flex items-start gap-3 sm:gap-4">
@@ -161,11 +160,11 @@ export function RecurringScreen() {
                         {recurrenceLabel(transaction.recurrence)} ·{" "}
                         {transaction.category?.name ?? "Category unavailable"}
                       </p>
-                      <p className="mt-1 truncate text-xs text-muted-foreground">
-                        {account?.name ??
-                          (transaction.accountId ? "Account unavailable" : "No account")}{" "}
-                        · {transaction.amount.currency.code}
-                      </p>
+                      {transaction.tags.length > 0 && (
+                        <p className="mt-1 break-words text-xs text-muted-foreground">
+                          {transaction.tags.map((tag) => `#${tag}`).join(" ")}
+                        </p>
+                      )}
                     </Link>
                     <div className="shrink-0 text-right">
                       <p
@@ -184,6 +183,7 @@ export function RecurringScreen() {
                         {income ? "Income" : expense ? "Expense" : "Transaction"}
                       </p>
                     </div>
+                    <RecurringActions transaction={transaction} />
                   </div>
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:ml-15">
                     <p
@@ -197,19 +197,6 @@ export function RecurringScreen() {
                         ? `${next.status === "due" ? "Due" : "Next"} ${format(parseISO(next.date), "d MMM yyyy")}`
                         : "Schedule ended"}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <Button asChild variant="ghost" size="small">
-                        <Link href={`/recurring/${transaction.id}`}>
-                          Edit
-                          <span className="sr-only">
-                            {" "}
-                            {transaction.note || transaction.category?.name || "schedule"}
-                          </span>
-                          <ChevronRight className="size-4" />
-                        </Link>
-                      </Button>
-                      <StopRecurring transaction={transaction} />
-                    </div>
                   </div>
                 </li>
               );

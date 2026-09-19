@@ -164,7 +164,7 @@ export function TransactionsScreen() {
         <p className="mb-5 text-xs text-muted-foreground">
           {transactions.length} transactions · {filters.currency}
         </p>
-        <TransactionList transactions={transactions} accounts={ledger.accounts} />
+        <TransactionList transactions={transactions} />
       </div>
     </>
   );

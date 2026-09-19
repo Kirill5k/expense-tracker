@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,8 +11,9 @@ import { api, json, errorMessage } from "@/lib/api";
 import { currencies, currencyFor } from "@/lib/money";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/fields";
+import { ErrorState, LoadingState } from "@/components/ui/states";
 import { Brand } from "@/components/layout/shell";
-import { signIn } from "./api";
+import { signIn, useExistingSession } from "./api";
 
 const authSchema = z.object({
   email: z.string().trim().email("Enter a valid email address."),
@@ -27,6 +28,13 @@ export function AuthScreen({ registration = false }: { registration?: boolean })
     client = useQueryClient();
   const [error, setError] = useState("");
   const [registered, setRegistered] = useState(false);
+  const session = useExistingSession();
+  useEffect(() => {
+    if (session.data && !session.isFetching && !session.error) {
+      client.setQueryData(["user"], session.data);
+      router.replace("/");
+    }
+  }, [session.data, session.isFetching, session.error, client, router]);
   const schema = authSchema.superRefine((data, ctx) => {
     if (registration && !registered) {
       if (!data.firstName.trim())
@@ -66,6 +74,18 @@ export function AuthScreen({ registration = false }: { registration?: boolean })
     }
   }
   const { errors, isSubmitting } = form.formState;
+  if (session.error)
+    return (
+      <main className="mx-auto max-w-xl p-8">
+        <ErrorState message={errorMessage(session.error)} retry={() => void session.refetch()} />
+      </main>
+    );
+  if (session.isPending || session.data)
+    return (
+      <main className="mx-auto max-w-5xl p-8">
+        <LoadingState />
+      </main>
+    );
   return (
     <main className="grid min-h-dvh lg:grid-cols-2">
       <section className="flex flex-col bg-card px-6 py-8 sm:px-12 lg:px-16">
