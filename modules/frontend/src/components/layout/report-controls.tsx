@@ -1,14 +1,14 @@
 "use client";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, CalendarDays, Wallet } from "lucide-react";
 import { isDateString, periodRange, rangeLabel, shiftRange, type Period } from "@/lib/dates";
 import type { Account } from "@/features/accounts/types";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/fields";
-export function useReportFilters(defaultCurrency: string) {
-  const params = useSearchParams(),
-    router = useRouter(),
-    pathname = usePathname();
+import { useReportPeriod, type ReportPeriodSelection } from "./report-period-provider";
+
+function readReportPeriod(params: Pick<URLSearchParams, "get">): ReportPeriodSelection {
   const rawPeriod = params.get("period") ?? "month";
   const period: Period = ["week", "month", "year", "custom"].includes(rawPeriod)
     ? (rawPeriod as Period)
@@ -17,12 +17,35 @@ export function useReportFilters(defaultCurrency: string) {
   const from = params.get("from") ?? "",
     to = params.get("to") ?? "";
   const range = isDateString(from) && isDateString(to) && from <= to ? { from, to } : fallback;
+  return { period, range };
+}
+
+export function useReportFilters(defaultCurrency: string) {
+  const params = useSearchParams(),
+    pathname = usePathname();
+  const { selection, setSelection } = useReportPeriod();
+  const hasDateSelection = ["period", "from", "to"].some((key) => params.has(key));
+  const { period, range } = hasDateSelection ? readReportPeriod(params) : selection;
+  const { from, to } = range;
+
+  // Explicit URL dates (including browser history) become the shared selection.
+  // Pages opened without date parameters keep the last workspace selection.
+  useEffect(() => {
+    if (hasDateSelection) setSelection({ period, range: { from, to } });
+  }, [hasDateSelection, period, from, to, setSelection]);
+
   function setFilters(updates: Record<string, string>) {
     const next = new URLSearchParams(params.toString());
+    next.set("period", period);
+    next.set("from", from);
+    next.set("to", to);
     Object.entries(updates).forEach(([key, value]) =>
       value ? next.set(key, value) : next.delete(key),
     );
-    router.replace(`${pathname}${next.size ? `?${next}` : ""}`, { scroll: false });
+    setSelection(readReportPeriod(next));
+    // These filters drive client queries. Updating history keeps the URL and
+    // shared state in sync without an asynchronous route replacement.
+    window.history.replaceState(null, "", `${pathname}${next.size ? `?${next}` : ""}`);
   }
   return {
     range,

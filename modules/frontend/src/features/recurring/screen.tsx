@@ -179,9 +179,6 @@ export function RecurringScreen() {
                           transaction.amount.currency.code,
                         )}
                       </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {income ? "Income" : expense ? "Expense" : "Transaction"}
-                      </p>
                     </div>
                     <RecurringActions transaction={transaction} />
                   </div>
