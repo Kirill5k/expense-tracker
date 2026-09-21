@@ -157,7 +157,6 @@ export function RecurringScreen() {
                         {transaction.note || transaction.category?.name || "Recurring transaction"}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {recurrenceLabel(transaction.recurrence)} ·{" "}
                         {transaction.category?.name ?? "Category unavailable"}
                       </p>
                       {transaction.tags.length > 0 && (
@@ -182,7 +181,11 @@ export function RecurringScreen() {
                     </div>
                     <RecurringActions transaction={transaction} />
                   </div>
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:ml-15">
+                  <div className="mt-4 flex flex-wrap items-center gap-2 sm:ml-15">
+                    <p className="inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs text-muted-foreground">
+                      <Repeat2 className="size-3.5" aria-hidden="true" />
+                      {recurrenceLabel(transaction.recurrence)}
+                    </p>
                     <p
                       className={cn(
                         "inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs",

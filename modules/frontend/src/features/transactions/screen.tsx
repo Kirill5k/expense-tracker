@@ -93,6 +93,7 @@ export function TransactionsScreen() {
   return (
     <>
       <PageHeading
+        eyebrow="Your activity"
         title="Transactions"
         description="The everyday details. All in one place."
         action={
