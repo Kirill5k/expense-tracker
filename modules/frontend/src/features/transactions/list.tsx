@@ -137,7 +137,7 @@ export function TransactionList({
             {txs?.map((tx) => (
               <li
                 key={tx.id}
-                className="flex items-center gap-3 border-b border-border/70 py-3 last:border-0 sm:gap-4"
+                className="flex items-start gap-3 border-b border-border/70 py-3 last:border-0 sm:gap-4"
               >
                 <CategoryIcon category={tx.category} />
                 <Link href={`/transactions/${tx.id}`} className="min-w-0 flex-1 rounded-md">
